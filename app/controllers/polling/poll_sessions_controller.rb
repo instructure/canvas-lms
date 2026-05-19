@@ -77,7 +77,6 @@ module Polling
   class PollSessionsController < ApplicationController
     include ::Filters::Polling
 
-    before_action :require_user
     before_action :require_poll, except: [:opened, :closed]
 
     # @API List poll sessions for a poll

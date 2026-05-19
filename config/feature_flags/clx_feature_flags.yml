@@ -7,22 +7,9 @@ horizon_course_setting:
   description: |-
     Enables the Canvas Career tab in account settings.
   beta: true
+  after_state_change_proc: sync_with_salesforce
 
 # Feature flags read by Horizon app
-horizon_role_dashboards:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Role Dashboards"
-  description: |-
-    Enables role-based dashboards in Canvas Career.
-horizon_dashboard_ai_widgets:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Data & Insights AI Widgets"
-  description: |-
-    Enables the AI widgets in the Canvas Career Data & Insights dashboard.
 horizon_hris_integrations:
   applies_to: RootAccount
   state: hidden
@@ -86,27 +73,20 @@ horizon_native_permissions_page:
   display_name: "Canvas Career: Permissions Page"
   description: |-
     Enables native permissions page instead of the Academic iframe in Canvas Career.
-horizon_course_academic_switcher:
+horizon_native_inbox:
   applies_to: RootAccount
   state: hidden
   shadow: true
-  display_name: "Canvas Career: Course Academic Switcher"
+  display_name: "Canvas Career: Native Inbox"
   description: |-
-    Handles switching between Canvas Academic and Career in Courses.
-horizon_syncable_objects_redesign:
+    Enables the native inbox in Canvas Career.
+horizon_study_tools:
   applies_to: RootAccount
   state: hidden
   shadow: true
-  display_name: "Canvas Career: Syncable Objects Redesign"
+  display_name: "Canvas Career: Study Tools"
   description: |-
-    Enables the redesigned syncable objects interface in Canvas Career.
-horizon_help_navigation:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Help Navigation"
-  description: |-
-    Enables the help navigation menu in Canvas Career.
+    Restricts AI study tools to Page and File learning object routes in Canvas Career.
 
 # Feature flags read by Canvas
 horizon_bulk_api_permission:
@@ -116,17 +96,10 @@ horizon_bulk_api_permission:
   display_name: "Canvas Career: Manage Bulk API & Permission"
   description: |-
     Enables the ability to manage bulk API and permission settings in Canvas Career.
-horizon_auto_content_ingestion:
+horizon_autopilot:
   applies_to: RootAccount
   state: hidden
   shadow: true
-  display_name: "Canvas Career: Auto Content Ingestion"
+  display_name: "Canvas Career: Rule-Based Automations"
   description: |-
-    Automatically ingests course files and wiki pages into Pine when a course becomes a Canvas Career course.
-horizon_learning_object_ingestion_on_change:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Learning Object Ingestion on Change"
-  description: |-
-    Automatically ingests course files and wiki pages into Pine when they are created or modified in a Canvas Career course.
+    Enables creating & running rule-based automations in Canvas Career.

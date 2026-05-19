@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe Messages::AssignmentSubmitted::EmailPresenter do
   let(:course) { course_model(name: "MATH-101") }
   let(:assignment) { course.assignments.create!(name: "Introductions", due_at: 1.day.ago) }
@@ -94,6 +92,37 @@ describe Messages::AssignmentSubmitted::EmailPresenter do
         it "#subject includes the name of the student" do
           expect(presenter.subject).to include("Adam Jones")
         end
+      end
+    end
+
+    context "when the assignment is a New Quizzes anonymous survey" do
+      before do
+        tool = course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+        assignment.update!(
+          submission_types: "external_tool",
+          external_tool_tag_attributes: { content: tool, url: tool.url },
+          settings: { "new_quizzes" => { "anonymous_participants" => true } }
+        )
+      end
+
+      it "#body excludes the name of the student" do
+        expect(presenter.body).not_to include("Adam Jones")
+      end
+
+      it "#link is a url to SpeedGrader" do
+        expect(presenter.link).to eq(
+          message.speed_grader_course_gradebook_url(course, assignment_id: assignment.id, anonymous_id: submission.anonymous_id)
+        )
+      end
+
+      it "#subject excludes the name of the student" do
+        expect(presenter.subject).not_to include("Adam Jones")
       end
     end
   end

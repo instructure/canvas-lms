@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
-import {htmlEscapeCriteriaLongDescription} from './utils/rubricUtils'
+import {formatLongDescriptionHTML} from '@canvas/rubrics/react/utils'
 
 const I18n = createI18nScope('rubrics-assessment-tray')
 
@@ -57,7 +58,7 @@ export const LongDescriptionModal = ({
         <Text
           lineHeight="double"
           wrap="break-word"
-          dangerouslySetInnerHTML={htmlEscapeCriteriaLongDescription(longDescription)}
+          dangerouslySetInnerHTML={{__html: formatLongDescriptionHTML(longDescription ?? '')}}
         />
       </Modal.Body>
     </Modal>

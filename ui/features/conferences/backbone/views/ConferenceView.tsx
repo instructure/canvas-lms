@@ -35,7 +35,6 @@ const I18n = createI18nScope('conferences')
 // @ts-expect-error TS2345 (typescriptify)
 extend(ConferenceView, View)
 
-// @ts-expect-error TS7023 (typescriptify)
 function ConferenceView() {
   // @ts-expect-error TS2683 (typescriptify)
   this.updateConferenceDetails = this.updateConferenceDetails.bind(this)

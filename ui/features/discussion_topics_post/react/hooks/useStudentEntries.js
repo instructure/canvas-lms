@@ -19,7 +19,7 @@
 import {useInfiniteQuery} from '@tanstack/react-query'
 import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/graphql'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('student_entries')

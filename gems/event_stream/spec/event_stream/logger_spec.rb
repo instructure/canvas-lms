@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe EventStream::Logger do
   it "writes standard log messages" do
     l_klass = Class.new do

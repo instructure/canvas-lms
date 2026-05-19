@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type EnvAccounts = Partial<EnvAccountsAdminTools>
+export type EnvAccounts = Partial<EnvAccountsAdminTools & EnvAccountsSisImport>
 
 /**
  * From AccountsController#admin_tools
@@ -48,6 +48,17 @@ export interface EnvAccountsAdminTools {
         }
     restore_course: boolean
     view_messages: boolean
+    can_view_institutional_tags: boolean
+    can_create_institutional_tags: boolean
+    can_edit_institutional_tags: boolean
   }
-  bounced_emails_admin_tool: boolean
+  BOUNCED_EMAILS_ADMIN_TOOL: boolean
+}
+
+/**
+ * From AccountsController#sis_import
+ */
+export interface EnvAccountsSisImport {
+  SHOW_SITE_ADMIN_CONFIRMATION: boolean
+  INSTITUTIONAL_TAGS_ENABLED: boolean
 }

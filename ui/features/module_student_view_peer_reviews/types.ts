@@ -54,8 +54,14 @@ export type GraphQLModuleItemsNode = {
   moduleItems: Array<{content: GraphQLAssignment}>
 }
 
+export type GraphQLPageInfo = {
+  hasNextPage: boolean
+  endCursor: string | null
+}
+
 export type GraphQLModuleItemData = {
   nodes: Array<GraphQLModuleItemsNode>
+  pageInfo: GraphQLPageInfo
 }
 
 export type GraphQLResponse = {
@@ -85,6 +91,7 @@ export type ExpandedAssignmentPeerReview = AssignmentPeerReviewSubset & {
   peer_review_count?: number | null
   peer_review_points_possible?: number | null
   peer_review_due_at?: string | null
+  peer_review_sub_assignment?: Record<string, unknown> | null
 }
 
 export type StudentViewPeerReviewsAssignment = {

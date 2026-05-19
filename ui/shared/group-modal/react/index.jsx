@@ -26,8 +26,9 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
-import {showFlashAlert, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {showFlashAlert, showFlashSuccess} from '@instructure/platform-alerts'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import GroupMembershipInput from './GroupMembershipInput'
 
@@ -195,6 +196,8 @@ export default function GroupModal({groupCategory, group, onSave, requestMethod,
       size="small"
       shouldCloseOnDocumentClick={false}
       footer={<Footer />}
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
       {...modalProps}
     >
       {alert}

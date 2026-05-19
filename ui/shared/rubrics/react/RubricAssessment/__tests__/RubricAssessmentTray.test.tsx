@@ -21,7 +21,7 @@ import {fireEvent, render} from '@testing-library/react'
 import {RubricAssessmentTray, type RubricAssessmentTrayProps} from '../RubricAssessmentTray'
 import {RUBRIC_DATA} from './fixtures'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('RubricAssessmentTray Tests', () => {
@@ -126,7 +126,9 @@ describe('RubricAssessmentTray Tests', () => {
     it('should display points when hidePoints is false', () => {
       const {getByTestId} = renderComponent({hidePoints: false})
       expect(getByTestId('rubric-assessment-instructor-score')).toBeInTheDocument()
-      expect(getByTestId('traditional-criterion-1-ratings-0-points')).toHaveTextContent('4 pts')
+      expect(getByTestId('traditional-criterion-1-ratings-0-points')).toHaveTextContent(
+        '4 to >3 pts',
+      )
     })
 
     it('should not display points when hidePoints is true in modern view', () => {

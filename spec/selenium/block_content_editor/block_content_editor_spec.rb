@@ -66,6 +66,7 @@ describe "Block Content Editor", :ignore_js_errors do
 
       add_to_page_button.click
       wait_for_ajaximations
+      keep_trying_until { !element_exists?(add_block_modal_selector) }
 
       expect(element_exists?(add_block_modal_selector)).to be false
       expect(block_layout).to be_displayed
@@ -397,7 +398,7 @@ describe "Block Content Editor", :ignore_js_errors do
       wait_for_ajaximations
 
       block_title_toggle = BlockTitleToggle.new
-      expect(element_exists?(block_title_toggle.toggle_selector, true)).to be false
+      expect(element_exists?(block_title_toggle.toggle_selector, xpath: true)).to be false
     end
 
     it "does not have title color settings in settings tray" do
@@ -405,7 +406,7 @@ describe "Block Content Editor", :ignore_js_errors do
       wait_for_ajaximations
 
       color_settings = ColorSettings.new
-      expect(element_exists?(color_settings.title_color_setting_selector, true)).to be false
+      expect(element_exists?(color_settings.title_color_setting_selector, xpath: true)).to be false
     end
   end
 
@@ -955,7 +956,7 @@ describe "Block Content Editor", :ignore_js_errors do
 
         expect(settings.choose_media_button).to be_displayed
         expect(settings.choose_media_button.text).to eq("Add media")
-        expect(element_exists?(settings.replace_media_button_selector, true)).to be false
+        expect(element_exists?(settings.replace_media_button_selector, xpath: true)).to be false
       end
 
       it "adds media" do
@@ -1008,7 +1009,7 @@ describe "Block Content Editor", :ignore_js_errors do
         settings = blocks.first.settings
         expect(settings.replace_media_button).to be_displayed
         expect(settings.replace_media_button.text).to eq("Replace media")
-        expect(element_exists?(settings.choose_media_button_selector, true)).to be false
+        expect(element_exists?(settings.choose_media_button_selector, xpath: true)).to be false
       end
 
       it "preserves media after closing settings tray" do

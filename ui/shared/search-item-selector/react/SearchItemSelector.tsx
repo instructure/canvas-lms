@@ -19,7 +19,8 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useEffect, useCallback, ReactNode} from 'react'
 
-import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
+import {CanvasAsyncSelect} from '@instructure/platform-instui-bindings'
+import type {FormMessage} from '@instructure/ui-form-field'
 import useDebouncedSearchTerm from './hooks/useDebouncedSearchTerm'
 
 interface SearchItem {
@@ -161,7 +162,7 @@ export default function SearchItemSelector({
     onOptionSelected: handleItemSelected,
     mountNode: mountNodeRef?.current,
     inputRef: inputRef || undefined,
-    messages,
+    messages: messages as FormMessage[],
     onFocus,
     id: id || undefined,
   }

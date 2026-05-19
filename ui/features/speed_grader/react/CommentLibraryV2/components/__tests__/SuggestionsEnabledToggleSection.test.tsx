@@ -20,11 +20,11 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {SuggestionsEnabledToggleSection} from '../SuggestionsEnabledToggleSection'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 const server = setupServer()
 
@@ -45,9 +45,7 @@ describe('SuggestionsEnabledToggleSection', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Default handler for user settings API
-    server.use(
-      http.put('/api/v1/users/self/settings', () => HttpResponse.json({})),
-    )
+    server.use(http.put('/api/v1/users/self/settings', () => HttpResponse.json({})))
   })
 
   afterEach(() => {
@@ -159,9 +157,7 @@ describe('SuggestionsEnabledToggleSection', () => {
     it('shows error flash alert when API call fails', async () => {
       const user = userEvent.setup()
       const showFlashAlertMock = vi.spyOn(FlashAlert, 'showFlashAlert')
-      server.use(
-        http.put('/api/v1/users/self/settings', () => HttpResponse.error()),
-      )
+      server.use(http.put('/api/v1/users/self/settings', () => HttpResponse.error()))
 
       setup({checked: false})
 
@@ -179,9 +175,7 @@ describe('SuggestionsEnabledToggleSection', () => {
     it('still calls onChange callback even when API fails', async () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
-      server.use(
-        http.put('/api/v1/users/self/settings', () => HttpResponse.error()),
-      )
+      server.use(http.put('/api/v1/users/self/settings', () => HttpResponse.error()))
 
       setup({checked: false, onChange})
 

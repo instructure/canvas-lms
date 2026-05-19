@@ -52,9 +52,9 @@ export function defaultGetLtiAssetProcessorsAndReportsForStudentResult({
 } = {}): GetLtiAssetProcessorsAndReportsForStudentResult {
   return {
     submission: {
-      attempt: submissionAttempt || 1,
       ltiAssetReportsConnection: {
         nodes: defaultLtiAssetReportsForStudent({attachmentId, submissionAttempt, attachmentName}),
+        pageInfo: {hasNextPage: false},
       },
       assignment: {
         name: assignmentName,

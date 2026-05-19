@@ -53,7 +53,6 @@ module Polling
   class PollSubmissionsController < ApplicationController
     include ::Filters::Polling
 
-    before_action :require_user
     before_action :require_poll
     before_action :require_poll_session
 

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ScoreMetadata < ActiveRecord::Base
+class ScoreMetadata < ApplicationRecord
   include Canvas::SoftDeletable
 
   belongs_to :score

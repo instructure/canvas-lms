@@ -28,7 +28,7 @@ import '@canvas/util/templateData'
 import ready from '@instructure/ready'
 import EditUserDetails from '../react/EditUserDetails'
 
-import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import {showConfirmationDialog} from '@canvas/dialogs/react/ConfirmationDialog'
 
 const I18n = createI18nScope('user_name')
 

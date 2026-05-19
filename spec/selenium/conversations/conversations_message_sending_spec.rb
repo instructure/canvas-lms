@@ -62,8 +62,8 @@ describe "conversations new" do
 
             # Groups that are a part of a concluded course should not be visible
             expect(@group.context).to eq(@course)
-            expect(f("body")).to_not contain_jqcss("span:contains('#{@group.name}')")
-            expect(f("body")).to_not contain_jqcss("li:contains('#{@course.name}')")
+            expect(f("body")).not_to contain_jqcss("span:contains('#{@group.name}')")
+            expect(f("body")).not_to contain_jqcss("li:contains('#{@course.name}')")
           end
 
           it "does not allow a teacher to create a new conversation when course is soft concluded" do
@@ -92,7 +92,7 @@ describe "conversations new" do
             get "/conversations"
             f("button[data-testid='compose']").click
             f("input[placeholder='Select Course']").click
-            expect(f("body")).to_not contain_jqcss("li:contains('#{@course.name}')")
+            expect(f("body")).not_to contain_jqcss("li:contains('#{@course.name}')")
           end
         end
       end

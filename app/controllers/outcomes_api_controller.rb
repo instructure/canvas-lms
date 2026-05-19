@@ -167,7 +167,6 @@ class OutcomesApiController < ApplicationController
   include Outcomes::Enrollments
   include CanvasOutcomesHelper
 
-  before_action :require_user
   before_action :get_outcome, except: :outcome_alignments
   before_action :require_context, only: :outcome_alignments
 

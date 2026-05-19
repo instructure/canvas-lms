@@ -27,7 +27,7 @@ describe "quizzes for a public course" do
   include QuizzesCommon
 
   it "displays quizzes list", priority: "1" do
-    course_quiz(:active)
+    course_quiz(active: true)
     @quiz.update(title: "hey you should see me")
 
     get "/courses/#{public_course.id}/quizzes"

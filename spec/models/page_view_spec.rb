@@ -400,7 +400,7 @@ describe PageView do
 
     it "find_for_update returns a dummy record" do
       pv = PageView.find_for_update("someuuid")
-      expect(pv).to_not be_nil
+      expect(pv).not_to be_nil
       expect(pv.id).to eq "someuuid"
     end
   end

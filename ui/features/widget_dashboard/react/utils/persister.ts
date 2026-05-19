@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {experimental_createPersister} from '@tanstack/query-persist-client-core'
+import {experimental_createQueryPersister} from '@tanstack/query-persist-client-core'
 import {v4} from 'uuid'
 
 const ONE_DAY = 1000 * 60 * 60 * 24
@@ -27,11 +27,11 @@ if (localStorage.widgetDashboardCacheBuster === undefined) {
   localStorage.widgetDashboardCacheBuster = v4()
 }
 
-export const widgetDashboardPersister = experimental_createPersister({
+export const widgetDashboardPersister = experimental_createQueryPersister({
   storage: window.sessionStorage,
   maxAge: ONE_DAY,
   buster: localStorage.widgetDashboardCacheBuster,
-})
+}).persisterFn
 
 // Test helper to clear widget dashboard cache
 export const clearWidgetDashboardCache = () => {

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import page from 'page'
 import qs from 'qs'
 import filesEnv from '@canvas/files/react/modules/filesEnv'
@@ -29,7 +29,7 @@ import SearchResults from './react/components/SearchResults'
  * Route Handlers
  */
 function renderShowFolder(ctx) {
-  ReactDOM.render(
+  legacyRender(
     <FilesApp
       query={ctx.query}
       params={ctx.params}
@@ -44,7 +44,7 @@ function renderShowFolder(ctx) {
 }
 
 function renderSearchResults(ctx) {
-  ReactDOM.render(
+  legacyRender(
     <FilesApp
       query={ctx.query}
       params={ctx.params}

@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
 require "webmock/rspec"
 
 RSpec.describe YoutubeMigrationService do
@@ -742,7 +741,7 @@ RSpec.describe YoutubeMigrationService do
       resources = service.scan_course_for_embeds
 
       quiz_key = "Quizzes::Quiz|#{quiz.id}"
-      expect(resources[quiz_key]).to_not be_present
+      expect(resources[quiz_key]).not_to be_present
 
       aq_key = "AssessmentQuestion|#{assessment_question.id}"
       expect(resources[aq_key][:count]).to eq(1)

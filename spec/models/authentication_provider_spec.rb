@@ -244,6 +244,92 @@ describe AuthenticationProvider do
     end
   end
 
+  describe "#not_in_discovery_page validation" do
+    let(:account) { Account.create! }
+    let(:aac) { account.authentication_providers.create!(auth_type: "saml") }
+
+    context "when discovery page feature is enabled and active" do
+      context "when provider is in primary configuration" do
+        before do
+          allow(account).to receive(:discovery_page_allowed?).and_return(true)
+          account.settings[:discovery_page] = {
+            active: true,
+            primary: [{ authentication_provider_id: aac.id, label: "Test Provider" }],
+            secondary: []
+          }
+          account.save!
+        end
+
+        it "prevents deletion" do
+          expect { aac.destroy! }.to raise_error(ActiveRecord::RecordInvalid)
+          expect(aac.errors[:base]).to include(match(/remove.*from the discovery page/))
+        end
+      end
+
+      context "when provider is in secondary configuration" do
+        before do
+          allow(account).to receive(:discovery_page_allowed?).and_return(true)
+          account.settings[:discovery_page] = {
+            active: true,
+            primary: [],
+            secondary: [{ authentication_provider_id: aac.id, label: "Test Provider" }]
+          }
+          account.save!
+        end
+
+        it "prevents deletion" do
+          expect { aac.destroy! }.to raise_error(ActiveRecord::RecordInvalid)
+          expect(aac.errors[:base]).to include(match(/remove.*from the discovery page/))
+        end
+      end
+
+      context "when provider is not on discovery page" do
+        before do
+          allow(account).to receive(:discovery_page_allowed?).and_return(true)
+          account.settings[:discovery_page] = {
+            active: true,
+            primary: [],
+            secondary: []
+          }
+          account.save!
+        end
+
+        it "allows deletion" do
+          expect { aac.destroy! }.not_to raise_error
+          expect(aac.workflow_state).to eq("deleted")
+        end
+      end
+    end
+
+    context "when discovery page is not allowed or active" do
+      context "when discovery page is not active" do
+        before do
+          allow(account).to receive(:discovery_page_allowed?).and_return(true)
+          account.settings[:discovery_page] = {
+            active: false,
+            primary: [{ authentication_provider_id: aac.id, label: "Test Provider" }],
+            secondary: []
+          }
+          account.save!
+        end
+
+        it "allows deletion" do
+          expect { aac.destroy! }.not_to raise_error
+        end
+      end
+
+      context "when discovery page is not allowed" do
+        before do
+          allow(account).to receive(:discovery_page_allowed?).and_return(false)
+        end
+
+        it "allows deletion" do
+          expect { aac.destroy! }.not_to raise_error
+        end
+      end
+    end
+  end
+
   describe "#restore" do
     let(:user) { user_model }
     let(:aac) { account.authentication_providers.create!(auth_type: "cas") }
@@ -294,6 +380,20 @@ describe AuthenticationProvider do
     it "ignores aacs which have been deleted" do
       aac.destroy
       expect(AuthenticationProvider.active).not_to include(aac)
+    end
+  end
+
+  describe ".valid_for_discovery_page" do
+    let!(:cas_provider) { account.authentication_providers.create!(auth_type: "cas") }
+    let!(:canvas_provider) { account.authentication_providers.where(auth_type: "canvas").first }
+
+    it "includes active providers" do
+      expect(account.authentication_providers.valid_for_discovery_page).to include(cas_provider, canvas_provider)
+    end
+
+    it "excludes deleted providers" do
+      cas_provider.destroy
+      expect(account.authentication_providers.valid_for_discovery_page).not_to include(cas_provider)
     end
   end
 
@@ -785,6 +885,77 @@ describe AuthenticationProvider do
           ActionController::UrlGenerationError,
           "No route matches invalid_type authentication provider"
         )
+      end
+    end
+  end
+
+  describe "#creation_timeout_options" do
+    it "returns timeout protection options for OAuth callbacks" do
+      provider = account.authentication_providers.create!(auth_type: "openid_connect")
+      options = provider.creation_timeout_options
+      expect(options).to eq({
+                              raise_on_timeout: true,
+                              fallback_timeout_length: 10.seconds,
+                              exception_class: Timeout::Error
+                            })
+    end
+  end
+
+  describe "#show_mfa_configuration_options?" do
+    let(:aac) { account.authentication_providers.create!(auth_type: "saml") }
+
+    context "when account MFA is disabled" do
+      before do
+        account.settings[:mfa_settings] = :disabled
+        account.save!
+      end
+
+      it "is false" do
+        expect(aac.show_mfa_configuration_options?).to be false
+      end
+    end
+
+    context "when account MFA is required" do
+      before do
+        account.settings[:mfa_settings] = :required
+        account.save!
+      end
+
+      it "is true for SAML provider" do
+        expect(aac.show_mfa_configuration_options?).to be true
+      end
+
+      it "is false for canvas provider" do
+        canvas_aac = account.authentication_providers.find_by(auth_type: "canvas")
+        expect(canvas_aac.show_mfa_configuration_options?).to be false
+      end
+    end
+
+    context "when account MFA is optional" do
+      before do
+        account.settings[:mfa_settings] = :optional
+        account.save!
+      end
+
+      it "is true for SAML provider" do
+        expect(aac.show_mfa_configuration_options?).to be true
+      end
+
+      it "is true for canvas provider" do
+        canvas_aac = account.authentication_providers.find_by(auth_type: "canvas")
+        expect(canvas_aac.show_mfa_configuration_options?).to be true
+      end
+    end
+
+    context "when account MFA is required for admins" do
+      before do
+        account.settings[:mfa_settings] = :required_for_admins
+        account.save!
+      end
+
+      it "is true for canvas provider" do
+        canvas_aac = account.authentication_providers.find_by(auth_type: "canvas")
+        expect(canvas_aac.show_mfa_configuration_options?).to be true
       end
     end
   end

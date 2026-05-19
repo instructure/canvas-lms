@@ -509,12 +509,11 @@ describe DeveloperKeysController do
         end
         let(:tool_config) { lti_registration.manual_configuration }
 
-        it "hard deletes the tool configuration and soft deletes the registration" do
-          # Ensure config is initialized before it's hard deleted
+        it "soft deletes the tool configuration and the registration" do
           tool_config
           delete :destroy, params: { id: dk.id, account_id: account.id }
           expect(lti_registration.reload).to be_deleted
-          expect(Lti::ToolConfiguration.where(id: tool_config.id)).to be_empty
+          expect(tool_config.reload).to be_deleted
         end
 
         context "tools were installed from that config" do
@@ -527,11 +526,10 @@ describe DeveloperKeysController do
           end
 
           it "deletes the tools in a job" do
-            # Ensure config is initialized before it's hard deleted
             tool_config
             expect { delete :destroy, params: { id: dk.id, account_id: account.id } }
               .to change { lti_registration.reload.workflow_state }.to "deleted"
-            expect(Lti::ToolConfiguration.where(id: tool_config.id)).to be_empty
+            expect(tool_config.reload).to be_deleted
             expect(dk.reload).to be_deleted
             run_jobs
             expect(tool.reload).to be_deleted
@@ -674,6 +672,61 @@ describe DeveloperKeysController do
           root_account_key
           get "index", params: { account_id: test_domain_root_account.id, inherited: true }, format: :json
           expect(json_parse(response.body)).to be_blank
+        end
+      end
+
+      context "when lti_deactivate_registrations is enabled" do
+        let(:lti_key) { registration.developer_key }
+        let(:registration) { lti_registration_with_tool(account: test_domain_root_account) }
+
+        before do
+          lti_key
+          allow_any_instance_of(Account).to receive(:feature_enabled?)
+            .with(:lti_deactivate_registrations)
+            .and_return(true)
+        end
+
+        it "includes the real binding in developer_key_account_binding" do
+          get "index", params: { account_id: test_domain_root_account.id }, format: :json
+          key_json = json_parse.find { |k| k["id"] == lti_key.global_id }
+          expect(key_json["developer_key_account_binding"]).to have_key("id")
+          expect(key_json["developer_key_account_binding"]).to have_key("account_id")
+        end
+
+        it "sets lti_registration_workflow_state to active when the registration is active" do
+          get "index", params: { account_id: test_domain_root_account.id }, format: :json
+          key_json = json_parse.find { |k| k["id"] == lti_key.global_id }
+          expect(key_json["lti_registration_workflow_state"]).to eq("active")
+        end
+
+        it "sets lti_registration_workflow_state to inactive when the registration is inactive" do
+          lti_key.lti_registration.deactivate!
+          get "index", params: { account_id: test_domain_root_account.id }, format: :json
+          key_json = json_parse.find { |k| k["id"] == lti_key.global_id }
+          expect(key_json["lti_registration_workflow_state"]).to eq("inactive")
+        end
+
+        it "sets lti_registration_workflow_state to nil when there is no lti_registration" do
+          lti_key.update_column(:lti_registration_id, nil)
+          get "index", params: { account_id: test_domain_root_account.id }, format: :json
+          key_json = json_parse.find { |k| k["id"] == lti_key.global_id }
+          expect(key_json["lti_registration_workflow_state"]).to be_nil
+        end
+
+        context "when the key is not an LTI key" do
+          let(:non_lti_key) do
+            DeveloperKey.create!(account: test_domain_root_account).tap do |key|
+              key.account_binding_for(test_domain_root_account).update!(workflow_state: "on")
+            end
+          end
+
+          before { non_lti_key }
+
+          it "does not include lti_registration_workflow_state" do
+            get "index", params: { account_id: test_domain_root_account.id }, format: :json
+            key_json = json_parse.find { |k| k["id"] == non_lti_key.global_id }
+            expect(key_json).not_to have_key("lti_registration_workflow_state")
+          end
         end
       end
 

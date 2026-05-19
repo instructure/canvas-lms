@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 require "active_record"
 require "after_transaction_commit"
 
@@ -87,6 +85,6 @@ describe BroadcastPolicy::NotificationPolicy do
   it "sends even if there isn't data" do
     subject.data = ->(_) {}
     subject.broadcast(record)
-    expect(BroadcastPolicy.notifier.messages).to_not be_empty
+    expect(BroadcastPolicy.notifier.messages).not_to be_empty
   end
 end

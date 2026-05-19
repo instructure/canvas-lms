@@ -28,7 +28,7 @@ import {View} from '@instructure/ui-view'
 import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints'
+import {WithBreakpoints, type Breakpoints} from '@instructure/platform-with-breakpoints'
 
 const I18n = createI18nScope('download_submissions_modal')
 

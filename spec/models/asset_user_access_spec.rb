@@ -59,7 +59,7 @@ describe AssetUserAccess do
         # so this one should write to the table
         cur_view_count = @asset.view_score
         AssetUserAccess.log @user, @course, { level: "view", code: @assignment.asset_string }
-        expect(@asset.reload.view_score).to_not eq(cur_view_count)
+        expect(@asset.reload.view_score).not_to eq(cur_view_count)
         expect(AssetUserAccessLog.for_today(@asset).count).to eq(0)
         # this time it's just a bump of the views, should get
         # sent to the log

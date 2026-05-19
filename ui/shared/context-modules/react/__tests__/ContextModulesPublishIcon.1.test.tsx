@@ -23,7 +23,7 @@ import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import ContextModulesPublishIcon from '../ContextModulesPublishIcon'
 import {initBody, makeModuleWithItems} from '../../__tests__/testHelpers'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {type Mock} from 'vitest'
 
 const server = setupServer()
@@ -37,7 +37,7 @@ vi.mock('@canvas/context-modules/jquery/utils', async () => {
   }
 })
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+vi.mock('@instructure/platform-alerts', () => ({
   showFlashAlert: vi.fn(),
 }))
 

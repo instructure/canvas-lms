@@ -160,8 +160,8 @@ class BigBlueButtonConference < WebConference
         child_elements.map { |child| xml_to_value(child) }
       # otherwise, make a hash of the child elements
       else
-        child_elements.each_with_object({}) do |child, hash|
-          hash[child.name.to_sym] = xml_to_value(child)
+        child_elements.to_h do |child|
+          [child.name.to_sym, xml_to_value(child)]
         end
       end
     end

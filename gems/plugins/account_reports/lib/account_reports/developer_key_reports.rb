@@ -62,13 +62,21 @@ module AccountReports
       row << key.email
       row << (key.is_lti_key ? "LTI Key" : "API Key")
       row << (placements&.pluck(:placement)&.compact.presence || "None")
-      row << (key.account_binding_for(account)&.workflow_state&.capitalize.presence || "Allow")
+      row << status(key, account)
       row << (key.scopes.presence || "All")
       csv << row
     end
 
+    def status(key, account)
+      if key.is_lti_key && account.root_account.feature_enabled?(:lti_deactivate_registrations)
+        key.usable_in_context?(account) ? "On" : "Off"
+      else
+        key.account_binding_for(account)&.workflow_state&.capitalize.presence || "Allow"
+      end
+    end
+
     def dev_key_scope
-      DeveloperKey.nondeleted.eager_load(:tool_configuration)
+      DeveloperKey.nondeleted.preload(:tool_configuration, :lti_registration)
     end
 
     def account

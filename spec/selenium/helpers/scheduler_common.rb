@@ -110,31 +110,8 @@ module SchedulerCommon
     }
   end
 
-  def submit_appointment_group_form(publish = true)
-    save, save_and_publish = ff(".ui-dialog-buttonset .ui-button")
-    if publish
-      save_and_publish.click
-    else
-      save.click
-    end
-    wait_for_ajaximations
-  end
-
   def reserve_appointment_for(participant, user, appointment_group)
     appointment_group.appointments.first.reserve_for(participant, user)
-  end
-
-  def create_appointment_group_manual(opts = {})
-    opts = {
-      publish: true,
-      new_appointment_text: "new appointment group"
-    }.with_indifferent_access.merge(opts)
-
-    expect do
-      fill_out_appointment_group_form(opts[:new_appointment_text], opts)
-      submit_appointment_group_form(opts[:publish])
-      expect(f(".view_calendar_link").text).to eq opts[:new_appointment_text]
-    end.to change(AppointmentGroup, :count).by(1)
   end
 
   def open_select_courses_modal(course_name)

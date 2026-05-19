@@ -19,7 +19,7 @@
 import {useState, useEffect, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useQuery} from '@apollo/client'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {SEARCH_OUTCOME_ALIGNMENTS} from '../../graphql/Management'
 import useCanvasContext from './useCanvasContext'
 import useSearch from './useSearch'

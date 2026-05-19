@@ -17,7 +17,7 @@
  */
 
 import {useMemo} from 'react'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {SelfAssessmentTray} from './SelfAssessmentTray'
 import {RubricUnderscoreType} from '@canvas/rubrics/react/utils'

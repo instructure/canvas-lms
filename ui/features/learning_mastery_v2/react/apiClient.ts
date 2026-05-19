@@ -17,8 +17,9 @@
  */
 import axios from '@canvas/axios'
 import {AxiosResponse} from 'axios'
-import {GradebookSettings, DisplayFilter} from '@canvas/outcomes/react/utils/constants'
+import {GradebookSettings} from '@canvas/outcomes/react/utils/constants'
 import {Student, Outcome} from '@canvas/outcomes/react/types/rollup'
+import {DisplayFilter} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 /**
  * Parameters for CSV export

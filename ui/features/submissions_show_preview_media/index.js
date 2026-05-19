@@ -19,21 +19,17 @@ import $ from 'jquery'
 import '@canvas/media-comments'
 import CanvasStudioPlayer from '@canvas/canvas-studio-player'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 
 $(document).ready(() => {
-  function isConsolidatedMediaPlayerEnabled() {
-    return ENV?.FEATURES?.consolidated_media_player
-  }
-
   function renderStudioMediaPlayer(domId, media_id, type) {
-    const root = createRoot(document.getElementById(domId))
-    root?.render(
+    render(
       React.createElement(CanvasStudioPlayer, {
         media_id: media_id,
         type: type === 'audio' ? 'audio' : 'video',
         explicitSize: {width: 480, height: 300},
       }),
+      document.getElementById(domId),
     )
   }
 
@@ -41,14 +37,10 @@ $(document).ready(() => {
     event.preventDefault()
     const id = $('.media_comment_id:first').text()
 
-    if (isConsolidatedMediaPlayerEnabled()) {
-      const type = $('.play_media_recording_link').data('media_comment_type')
-      const domId = 'box_content'
+    const type = $('.play_media_recording_link').data('media_comment_type')
+    const domId = 'box_content'
+    renderStudioMediaPlayer(domId, id, type)
 
-      renderStudioMediaPlayer(domId, id, type)
-    } else {
-      $('#media_recording_box .box_content').mediaComment('show_inline', id)
-    }
     $(this).remove()
   })
 

@@ -62,14 +62,19 @@ const mockVideoPlayers = [
   },
 ]
 
+let previousOrigin = ''
+
 beforeAll(() => {
-  contentSelection.asVideoElement = jest.fn(elem => {
-    const vid = elem.parentElement.getAttribute('id')
-    return mockVideoPlayers.find(vp => vp.id === vid)
+  jest.spyOn(contentSelection, 'asVideoElement').mockImplementation(elem => {
+    const vid = elem?.parentElement?.getAttribute('id')
+    return vid ? mockVideoPlayers.find(vp => vp.id === vid) : {}
   })
+  previousOrigin = bridge.canvasOrigin
+  bridge.canvasOrigin = 'http://localhost'
 })
 
 afterAll(() => {
+  bridge.canvasOrigin = previousOrigin
   jest.restoreAllMocks()
 })
 
@@ -89,6 +94,8 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       $videos.push($video)
       editor.appendElement($video)
       editor.setSelectedNode($video)
+      const iframe = findMediaPlayerIframe($video)
+      iframe.contentWindow.postMessage = jest.fn()
     })
 
     trayController = new TrayController()
@@ -259,6 +266,26 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       })
     })
 
+    it('passes viewerRestrictions to updateMediaObject', () => {
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyVideoOptions({
+        displayAs: 'embed',
+        appliedHeight: '101',
+        appliedWidth: '321',
+        titleText: 'new title',
+        media_object_id: 'm_somevideo',
+        attachment_id: '123',
+        viewerRestrictions: {show_rolling_transcript: true},
+        updateMediaObject,
+      })
+      expect(updateMediaObject).toHaveBeenCalledWith(
+        expect.objectContaining({
+          viewerRestrictions: {show_rolling_transcript: true},
+        }),
+      )
+    })
+
     it('does not try to save data to the db on a locked media attachment', () => {
       const updateMediaObject = jest.fn().mockResolvedValue()
       trayController.showTrayForEditor(editors[0])
@@ -292,17 +319,6 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
   })
 
   describe('#requestSubtitlesFromIframe', () => {
-    let previousOrigin = ''
-
-    beforeAll(() => {
-      previousOrigin = bridge.canvasOrigin
-      bridge.canvasOrigin = 'http://localhost'
-    })
-
-    afterAll(() => {
-      bridge.canvasOrigin = previousOrigin
-    })
-
     it('posts message to iframe onload', () => {
       const postMessageMock = jest.fn()
       const iframe = findMediaPlayerIframe(editors[0].selection.getNode())

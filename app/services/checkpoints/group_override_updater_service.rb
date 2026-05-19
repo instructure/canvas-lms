@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Checkpoints::GroupOverrideUpdaterService < ApplicationService
-  require_relative "discussion_checkpoint_error"
   include Checkpoints::DateOverrider
   include Checkpoints::GroupOverrideCommon
 

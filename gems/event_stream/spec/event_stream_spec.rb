@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe EventStream do
   before do
     EventStream.current_shard_lookup = nil

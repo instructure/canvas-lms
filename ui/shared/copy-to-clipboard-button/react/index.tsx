@@ -19,14 +19,12 @@
 import React, {useCallback, useState} from 'react'
 import {IconCheckDarkSolid, IconCopyLine, IconXSolid} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {Tooltip} from '@instructure/ui-tooltip'
-
-const I18n = createI18nScope('copy-to-clipboard-button')
 
 export type CopyToClipboardButtonProps = {
   value: string
-  screenReaderLabel: string
+  screenReaderLabel?: string
   tooltipText?: string
   buttonProps?: Partial<unknown>
   tooltip?: boolean
@@ -39,6 +37,9 @@ export default function CopyToClipboardButton({
   buttonProps,
   tooltip,
 }: CopyToClipboardButtonProps) {
+  const {t} = useTranslation('copy-to-clipboard-button')
+  const resolvedScreenReaderLabel = screenReaderLabel ?? t('Copy')
+  const resolvedTooltipText = tooltipText ?? t('Copy')
   const [feedback, setFeedback] = useState<boolean | null>(null)
 
   const temporarilySetFeedback = useCallback(
@@ -68,7 +69,7 @@ export default function CopyToClipboardButton({
   const button = (
     <IconButton
       size="small"
-      screenReaderLabel={screenReaderLabel}
+      screenReaderLabel={resolvedScreenReaderLabel}
       {...buttonProps}
       onClick={copyToClipboardAction}
     >
@@ -76,16 +77,11 @@ export default function CopyToClipboardButton({
     </IconButton>
   )
 
-  return tooltip && tooltipText ? (
-    <Tooltip renderTip={tooltipText} on={['hover', 'focus']}>
+  return tooltip && resolvedTooltipText ? (
+    <Tooltip renderTip={resolvedTooltipText} on={['hover', 'focus']}>
       {button}
     </Tooltip>
   ) : (
     button
   )
-}
-
-CopyToClipboardButton.defaultProps = {
-  screenReaderLabel: I18n.t('Copy'),
-  tooltipText: I18n.t('Copy'),
 }

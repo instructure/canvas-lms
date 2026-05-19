@@ -1,0 +1,6 @@
+{
+  "name": "@canvas/learning-agent",
+  "private": true,
+  "version": "1.0.0",
+  "main": "./index.tsx"
+}

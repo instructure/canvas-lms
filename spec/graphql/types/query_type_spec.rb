@@ -1543,6 +1543,32 @@ describe Types::QueryType do
         expect(instructor_ids.uniq).to eq(instructor_ids) # No duplicates
       end
 
+      it "returns instructor only once when student is dual-enrolled via multiple sections" do
+        # active_by_date.pluck(:course_id).uniq collapses duplicate course_ids from the student's
+        # two section enrollments, so the instructor is fetched only once
+        course = Course.create!(name: "Dual Student Course", account: Account.default, workflow_state: "available")
+        section1 = course.default_section
+        section2 = course.course_sections.create!(name: "Section B")
+
+        instructor = User.create!(name: "Dual Student Instructor")
+        course.enroll_teacher(instructor).accept!
+
+        student = User.create!(name: "Dual Enrolled Student")
+        course.enroll_student(student, section: section1, enrollment_state: "active")
+        e2 = course.enroll_student(student, section: section2, allow_multiple_enrollments: true)
+        e2.accept!
+
+        result = CanvasSchema.execute(
+          query,
+          variables: { courseIds: [course.id.to_s] },
+          context: { current_user: student }
+        )
+
+        instructors = result.dig("data", "courseInstructorsConnection", "nodes")
+        expect(instructors.length).to eq(1)
+        expect(instructors[0].dig("user", "name")).to eq("Dual Student Instructor")
+      end
+
       it "returns empty result for course with no instructors" do
         course = Course.create!(name: "Empty Course", account: Account.default, workflow_state: "available")
         student = User.create!(name: "Student")
@@ -1556,6 +1582,90 @@ describe Types::QueryType do
 
         instructors = result.dig("data", "courseInstructorsConnection", "nodes")
         expect(instructors).to be_empty
+      end
+    end
+
+    describe "lightweight type fields" do
+      before(:once) do
+        @lt_course = Course.create!(name: "LT Course", course_code: "LTC101", workflow_state: "available")
+        @lt_student = user_factory(name: "LT Student")
+        @lt_course.enroll_student(@lt_student, enrollment_state: "active")
+
+        @lt_teacher = user_factory(name: "LT Teacher", short_name: "LT", sortable_name: "Teacher, LT")
+        @lt_course.enroll_teacher(@lt_teacher).accept!
+      end
+
+      let(:detailed_query) do
+        <<~GQL
+          query($courseIds: [ID!]!) {
+            courseInstructorsConnection(courseIds: $courseIds) {
+              nodes {
+                user {
+                  _id
+                  name
+                  shortName
+                  sortableName
+                  avatarUrl
+                  email
+                }
+                enrollments {
+                  course {
+                    _id
+                    name
+                    courseCode
+                  }
+                  type
+                  role { _id name }
+                  enrollmentState
+                }
+              }
+            }
+          }
+        GQL
+      end
+
+      it "returns all InstructorUserInfo fields" do
+        result = CanvasSchema.execute(
+          detailed_query,
+          variables: { courseIds: [@lt_course.id.to_s] },
+          context: { current_user: @lt_student, domain_root_account: Account.default }
+        )
+
+        user = result.dig("data", "courseInstructorsConnection", "nodes", 0, "user")
+        expect(user["_id"]).to eq(@lt_teacher.id.to_s)
+        expect(user["name"]).to eq("LT Teacher")
+        expect(user["shortName"]).to eq("LT")
+        expect(user["sortableName"]).to eq("Teacher, LT")
+        expect(user).to have_key("avatarUrl")
+        expect(user).to have_key("email")
+      end
+
+      it "returns all InstructorCourseInfo fields" do
+        result = CanvasSchema.execute(
+          detailed_query,
+          variables: { courseIds: [@lt_course.id.to_s] },
+          context: { current_user: @lt_student, domain_root_account: Account.default }
+        )
+
+        enrollment = result.dig("data", "courseInstructorsConnection", "nodes", 0, "enrollments", 0)
+        expect(enrollment.dig("course", "_id")).to eq(@lt_course.id.to_s)
+        expect(enrollment.dig("course", "name")).to eq("LT Course")
+        expect(enrollment.dig("course", "courseCode")).to eq("LTC101")
+        expect(enrollment["type"]).to eq("TeacherEnrollment")
+        expect(enrollment["enrollmentState"]).to be_present
+        expect(enrollment.dig("role", "name")).to be_present
+      end
+
+      it "returns nil for email when not cached on user" do
+        result = CanvasSchema.execute(
+          detailed_query,
+          variables: { courseIds: [@lt_course.id.to_s] },
+          context: { current_user: @lt_student, domain_root_account: Account.default }
+        )
+
+        user = result.dig("data", "courseInstructorsConnection", "nodes", 0, "user")
+        expect(user).to have_key("email")
+        expect(user["email"]).to be_nil
       end
     end
   end

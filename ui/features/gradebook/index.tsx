@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import GradebookData from './react/default_gradebook/GradebookData'
 import type {GradebookOptions} from './react/default_gradebook/gradebook.d'
 import ready from '@instructure/ready'
@@ -52,7 +52,7 @@ ready(() => {
     '[data-component="AnonymousSpeedGraderAlert"]',
   ) as HTMLSpanElement
 
-  ReactDOM.render(
+  legacyRender(
     <GradebookData
       actionMenuNode={actionMenuNode}
       anonymousSpeedGraderAlertNode={anonymousSpeedGraderAlertNode}

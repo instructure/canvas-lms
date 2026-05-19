@@ -43,47 +43,55 @@ describe('formatRuleDescription', () => {
 
   describe('formatFullRuleDescription', () => {
     describe('when appliesToAssessor is true', () => {
-      it('returns "Student A must review Student B" when mustReview=true and reviewPermitted=true', () => {
+      it('returns "Student A will review Student B (strict)" when mustReview=true and reviewPermitted=true', () => {
         const rule = createRule(true, true, true)
-        expect(formatFullRuleDescription(rule)).toBe('Student A must review Student B')
+        expect(formatFullRuleDescription(rule)).toBe('Student A will review Student B (strict)')
       })
 
-      it('returns "Student A must not review Student B" when mustReview=true and reviewPermitted=false', () => {
+      it('returns "Student A will not review Student B (strict)" when mustReview=true and reviewPermitted=false', () => {
         const rule = createRule(true, true, false)
-        expect(formatFullRuleDescription(rule)).toBe('Student A must not review Student B')
+        expect(formatFullRuleDescription(rule)).toBe('Student A will not review Student B (strict)')
       })
 
-      it('returns "Student A should review Student B" when mustReview=false and reviewPermitted=true', () => {
+      it('returns "Student A will review Student B (flexible)" when mustReview=false and reviewPermitted=true', () => {
         const rule = createRule(true, false, true)
-        expect(formatFullRuleDescription(rule)).toBe('Student A should review Student B')
+        expect(formatFullRuleDescription(rule)).toBe('Student A will review Student B (flexible)')
       })
 
-      it('returns "Student A should not review Student B" when mustReview=false and reviewPermitted=false', () => {
+      it('returns "Student A will not review Student B (flexible)" when mustReview=false and reviewPermitted=false', () => {
         const rule = createRule(true, false, false)
-        expect(formatFullRuleDescription(rule)).toBe('Student A should not review Student B')
+        expect(formatFullRuleDescription(rule)).toBe(
+          'Student A will not review Student B (flexible)',
+        )
       })
     })
 
     describe('when appliesToAssessor is false', () => {
-      it('returns "Student B must be reviewed by Student A" when mustReview=true and reviewPermitted=true', () => {
+      it('returns "Student B will be reviewed by Student A (strict)" when mustReview=true and reviewPermitted=true', () => {
         const rule = createRule(false, true, true)
-        expect(formatFullRuleDescription(rule)).toBe('Student B must be reviewed by Student A')
+        expect(formatFullRuleDescription(rule)).toBe(
+          'Student B will be reviewed by Student A (strict)',
+        )
       })
 
-      it('returns "Student B must not be reviewed by Student A" when mustReview=true and reviewPermitted=false', () => {
+      it('returns "Student B will not be reviewed by Student A (strict)" when mustReview=true and reviewPermitted=false', () => {
         const rule = createRule(false, true, false)
-        expect(formatFullRuleDescription(rule)).toBe('Student B must not be reviewed by Student A')
+        expect(formatFullRuleDescription(rule)).toBe(
+          'Student B will not be reviewed by Student A (strict)',
+        )
       })
 
-      it('returns "Student B should be reviewed by Student A" when mustReview=false and reviewPermitted=true', () => {
+      it('returns "Student B will be reviewed by Student A (flexible)" when mustReview=false and reviewPermitted=true', () => {
         const rule = createRule(false, false, true)
-        expect(formatFullRuleDescription(rule)).toBe('Student B should be reviewed by Student A')
+        expect(formatFullRuleDescription(rule)).toBe(
+          'Student B will be reviewed by Student A (flexible)',
+        )
       })
 
-      it('returns "Student B should not be reviewed by Student A" when mustReview=false and reviewPermitted=false', () => {
+      it('returns "Student B will not be reviewed by Student A (flexible)" when mustReview=false and reviewPermitted=false', () => {
         const rule = createRule(false, false, false)
         expect(formatFullRuleDescription(rule)).toBe(
-          'Student B should not be reviewed by Student A',
+          'Student B will not be reviewed by Student A (flexible)',
         )
       })
     })
@@ -91,46 +99,46 @@ describe('formatRuleDescription', () => {
 
   describe('formatRuleDescription', () => {
     describe('when appliesToAssessor is true', () => {
-      it('returns "Must review Student B" when mustReview=true and reviewPermitted=true', () => {
+      it('returns "will review Student B (strict)" when mustReview=true and reviewPermitted=true', () => {
         const rule = createRule(true, true, true)
-        expect(formatRuleDescription(rule)).toBe('Must review Student B')
+        expect(formatRuleDescription(rule)).toBe('will review Student B (strict)')
       })
 
-      it('returns "Must not review Student B" when mustReview=true and reviewPermitted=false', () => {
+      it('returns "will not review Student B (strict)" when mustReview=true and reviewPermitted=false', () => {
         const rule = createRule(true, true, false)
-        expect(formatRuleDescription(rule)).toBe('Must not review Student B')
+        expect(formatRuleDescription(rule)).toBe('will not review Student B (strict)')
       })
 
-      it('returns "Should review Student B" when mustReview=false and reviewPermitted=true', () => {
+      it('returns "will review Student B (flexible)" when mustReview=false and reviewPermitted=true', () => {
         const rule = createRule(true, false, true)
-        expect(formatRuleDescription(rule)).toBe('Should review Student B')
+        expect(formatRuleDescription(rule)).toBe('will review Student B (flexible)')
       })
 
-      it('returns "Should not review Student B" when mustReview=false and reviewPermitted=false', () => {
+      it('returns "will not review Student B (flexible)" when mustReview=false and reviewPermitted=false', () => {
         const rule = createRule(true, false, false)
-        expect(formatRuleDescription(rule)).toBe('Should not review Student B')
+        expect(formatRuleDescription(rule)).toBe('will not review Student B (flexible)')
       })
     })
 
     describe('when appliesToAssessor is false', () => {
-      it('returns "Must be reviewed by Student A" when mustReview=true and reviewPermitted=true', () => {
+      it('returns "will be reviewed by Student A (strict)" when mustReview=true and reviewPermitted=true', () => {
         const rule = createRule(false, true, true)
-        expect(formatRuleDescription(rule)).toBe('Must be reviewed by Student A')
+        expect(formatRuleDescription(rule)).toBe('will be reviewed by Student A (strict)')
       })
 
-      it('returns "Must not be reviewed by Student A" when mustReview=true and reviewPermitted=false', () => {
+      it('returns "will not be reviewed by Student A (strict)" when mustReview=true and reviewPermitted=false', () => {
         const rule = createRule(false, true, false)
-        expect(formatRuleDescription(rule)).toBe('Must not be reviewed by Student A')
+        expect(formatRuleDescription(rule)).toBe('will not be reviewed by Student A (strict)')
       })
 
-      it('returns "Should be reviewed by Student A" when mustReview=false and reviewPermitted=true', () => {
+      it('returns "will be reviewed by Student A (flexible)" when mustReview=false and reviewPermitted=true', () => {
         const rule = createRule(false, false, true)
-        expect(formatRuleDescription(rule)).toBe('Should be reviewed by Student A')
+        expect(formatRuleDescription(rule)).toBe('will be reviewed by Student A (flexible)')
       })
 
-      it('returns "Should not be reviewed by Student A" when mustReview=false and reviewPermitted=false', () => {
+      it('returns "will not be reviewed by Student A (flexible)" when mustReview=false and reviewPermitted=false', () => {
         const rule = createRule(false, false, false)
-        expect(formatRuleDescription(rule)).toBe('Should not be reviewed by Student A')
+        expect(formatRuleDescription(rule)).toBe('will not be reviewed by Student A (flexible)')
       })
     })
   })

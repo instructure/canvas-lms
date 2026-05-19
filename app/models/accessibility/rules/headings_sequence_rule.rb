@@ -47,12 +47,13 @@ module Accessibility
       end
 
       def form(_elem)
+        default_value = I18n.t("Fix heading level")
         Accessibility::Forms::RadioInputGroupField.new(
           label: I18n.t("How would you like to proceed?"),
           undo_text: I18n.t("Heading hierarchy is now correct"),
-          value: I18n.t("Fix heading hierarchy"),
+          value: default_value,
           options: [
-            I18n.t("Fix heading level"),
+            default_value,
             I18n.t("Turn into a paragraph")
           ],
           action: I18n.t("Reformat")

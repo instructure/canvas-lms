@@ -96,7 +96,7 @@ describe SharedBrandConfigsController, type: :request do
       expect do
         json = api_call(:put, url, api_args_for_update, params)
         expect(json["name"]).to eq("Updated Name")
-      end.to_not change(Account.default.shared_brand_configs, :count)
+      end.not_to change(Account.default.shared_brand_configs, :count)
       expect(Account.default.shared_brand_configs.find(shared_config.id).name).to eq("Updated Name")
     end
 

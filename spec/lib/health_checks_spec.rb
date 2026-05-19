@@ -100,7 +100,7 @@ describe HealthChecks do
       allow(CanvasHttp).to receive(:get).with(any_args).and_return(success_response)
       allow(ConfigFile).to receive(:load).and_call_original
       allow(ConfigFile).to receive(:load)
-        .with("pv4").and_return({ "uri" => "https://pv4.instructure.com/api/123/" })
+        .with("pv5").and_return({ "uri" => "https://pv5.instructure.com" })
       allow(PageView).to receive(:pv4?).and_return({})
 
       expect(described_class.process_deep_checks[:secondary][:pv4][:status]).to be true

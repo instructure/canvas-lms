@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe CanvasQuizStatistics::Analyzers::Matching do
   subject { described_class.new(question_data) }
 
@@ -40,7 +38,7 @@ describe CanvasQuizStatistics::Analyzers::Matching do
   end
 
   it "does not blow up when no responses are provided" do
-    expect { subject.run([]) }.to_not raise_error
+    expect { subject.run([]) }.not_to raise_error
   end
 
   describe "[:responses]" do

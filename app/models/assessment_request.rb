@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AssessmentRequest < ActiveRecord::Base
+class AssessmentRequest < ApplicationRecord
   include Workflow
   include SendToStream
   include Plannable
@@ -36,9 +36,9 @@ class AssessmentRequest < ActiveRecord::Base
   validates :user_id, :asset_id, :asset_type, :workflow_state, presence: true
 
   before_save :infer_uuid
+  after_destroy :update_peer_review_submission
   after_save :delete_ignores
   after_save :update_planner_override
-  after_save :update_peer_review_submission
   has_a_broadcast_policy
 
   def infer_uuid
@@ -204,16 +204,14 @@ class AssessmentRequest < ActiveRecord::Base
   end
 
   def update_peer_review_submission
-    return unless assessment_request_was_completed?
-    return unless peer_review_sub_assignment
+    # To maintain backward compatibility, we update peer review submissions when
+    # an assessment request is deleted in both legacy and peer review modes
+    return unless peer_review_sub_assignment_id.present?
+    return unless workflow_state == "completed"
 
-    PeerReview::PeerReviewSubmitterService.new(
+    PeerReview::SubmissionUpdaterService.new(
       parent_assignment: asset.assignment,
       assessor:
     ).call
-  end
-
-  def assessment_request_was_completed?
-    saved_change_to_workflow_state? && workflow_state_before_last_save == "assigned" && workflow_state == "completed"
   end
 end

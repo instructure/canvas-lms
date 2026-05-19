@@ -298,8 +298,8 @@ RSpec.shared_examples "a submission update action" do |controller|
       course_with_student_logged_in(active_all: true)
       @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
       @submission = @assignment.submit_homework(@user)
-      data1 = fixture_file_upload("docs/doc.doc", "application/msword", true)
-      data2 = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      data1 = fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
+      data2 = fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       @resource_pair = (controller == :anonymous_submissions) ? { anonymous_id: @submission.anonymous_id } : { id: @user.id }
       @params = {
         course_id: @course.id,
@@ -324,7 +324,7 @@ RSpec.shared_examples "a submission update action" do |controller|
       course_with_student_logged_in(active_all: true)
       @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
       @submission = @assignment.submit_homework(@user)
-      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       @resource_pair = (controller == :anonymous_submissions) ? { anonymous_id: @submission.anonymous_id } : { id: @user.id }
       @params = {
         course_id: @course.id,

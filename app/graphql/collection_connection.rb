@@ -17,8 +17,24 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+# Custom GraphQL connection for BookmarkedCollection::Proxy.
+#
+# Cursors are page-level, not per-item — BookmarkedCollection doesn't expose
+# bookmark_for(item), so cursor_for returns the *next page's* bookmark for
+# every item on the current page. Consequences:
+#
+#   - Forward pagination (first/after/endCursor/hasNextPage) works correctly
+#   - endCursor is nil on the last page (consistent with hasNextPage: false)
+#   - startCursor equals endCursor (unavoidable without per-item bookmarks)
+#   - Edge cursors are all identical within a page
+#   - Backward pagination (last/before) is not supported
+#
+# Cursors pass through without encoding: cursor_for returns a raw bookmark
+# string like "bookmark:W1tdXQ" directly to the client, and the client sends
+# it back as-is via `after`. No base64 layer — encoding is opt-in per
+# Connection subclass (via encode/decode), and we don't use it.
 class CollectionConnection < GraphQL::Pagination::Connection
-  def cursor_for(*)
+  def cursor_for(_item)
     @next_page
   end
 
@@ -26,24 +42,15 @@ class CollectionConnection < GraphQL::Pagination::Connection
     !!@next_page
   end
 
+  def has_previous_page
+    !!after
+  end
+
   def nodes
-    if first
-      batch = items.paginate(page: after, per_page: first)
+    @nodes ||= begin
+      batch = items.paginate(page: after, per_page: first || 100)
       @next_page = batch.next_page
       batch
-    else
-      # This is not very performant, but i'm not sure how else to get all items from a BookmarkedCollection
-      # As a result these connections should really only be used if they are paginated
-      users = []
-      if items
-        batch = items.paginate(per_page: 100)
-        users += batch
-        while batch.next_page
-          batch = items.paginate(page: batch.next_page, per_page: 100)
-          users += batch
-        end
-      end
-      users
     end
   end
 end

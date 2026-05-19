@@ -34,7 +34,6 @@ export const RatingDisplaySelect = ({buttonDisplay, onChange}: RatingDisplaySele
   return (
     <SimpleSelect
       renderLabel={I18n.t('Rating Display')}
-      width="10.563rem"
       value={buttonDisplay}
       onChange={(_e, {value}) => handleChange(value !== undefined ? value.toString() : '')}
       data-testid="rubric-rating-display-select"

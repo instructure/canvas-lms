@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ready from '@instructure/ready'
 import {PresentationContent} from '@instructure/ui-a11y-content'
@@ -62,7 +62,7 @@ function handleFavoriteCourseClick(): void {
 function renderAccessibilityCells(): void {
   // Issue count pills
   document.querySelectorAll('.status-pill').forEach(element => {
-    createRoot(element).render(
+    render(
       React.createElement(
         // @ts-expect-error - InstUI component type issue with React.createElement
         Pill,
@@ -77,18 +77,18 @@ function renderAccessibilityCells(): void {
         },
         [element.textContent],
       ),
+      element,
     )
   })
 
   // Accessibility checking spinners
   document.querySelectorAll('.course-list-checking-spinner').forEach(element => {
-    createRoot(element).render(
+    render(
       React.createElement(
-        // @ts-expect-error - InstUI component type issue with React.createElement
         PresentationContent,
         null,
         React.createElement(
-          // @ts-expect-error - InstUI component type issue with React.createElement
+          // @ts-expect-error - InstUI Spinner type issue with React.createElement
           Spinner,
           {
             as: 'div',
@@ -97,6 +97,7 @@ function renderAccessibilityCells(): void {
           },
         ),
       ),
+      element,
     )
   })
 }

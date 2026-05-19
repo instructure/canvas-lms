@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class SisBatchRollBackData < ActiveRecord::Base
+class SisBatchRollBackData < ApplicationRecord
   belongs_to :sis_batch, inverse_of: :roll_back_data
   belongs_to :context, polymorphic: %i[abstract_course
                                        account
@@ -31,6 +31,9 @@ class SisBatchRollBackData < ActiveRecord::Base
                                        group
                                        group_category
                                        group_membership
+                                       institutional_tag
+                                       institutional_tag_association
+                                       institutional_tag_category
                                        pseudonym
                                        user_observer]
 
@@ -50,6 +53,9 @@ class SisBatchRollBackData < ActiveRecord::Base
                      CommunicationChannel
                      Enrollment
                      GroupMembership
+                     InstitutionalTagCategory
+                     InstitutionalTag
+                     InstitutionalTagAssociation
                      UserObserver
                      AccountUser
                      AssignmentOverrideStudent].freeze

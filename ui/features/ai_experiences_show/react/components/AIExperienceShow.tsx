@@ -16,21 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useRef} from 'react'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {IconAiLine, IconMoreLine} from '@instructure/ui-icons'
+import {Tabs} from '@instructure/ui-tabs'
+import {IconMoreLine, IconClockLine} from '@instructure/ui-icons'
 import {IconButton, Button} from '@instructure/ui-buttons'
+import {Alert} from '@instructure/ui-alerts'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+
+declare const ENV: GlobalEnv & {
+  FEATURES?: {ai_experiences_context_file_upload?: boolean}
+}
 import {Menu} from '@instructure/ui-menu'
 import {Modal} from '@instructure/ui-modal'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess, showFlashError} from '@instructure/platform-alerts'
 import {AIExperience} from '../../types'
+import {FileList} from '@canvas/canvas-file-upload/react/FileList'
 import LLMConversationView from '../../../../shared/ai-experiences/react/components/LLMConversationView'
 import AIExperiencePublishButton from './AIExperiencePublishButton'
+import AIConversationsContainer from '@canvas/ai-experiences/react/components/AIConversationsContainer'
+import {navyButtonTheme, roundedTheme} from '../../../../shared/ai-experiences/react/brand'
 
 const I18n = createI18nScope('ai_experiences_show')
 
@@ -40,6 +51,9 @@ interface AIExperienceShowProps {
 
 const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
   const canManage = aiExperience.can_manage
+  const indexStatus = aiExperience.context_index_status
+  const isIndexing = indexStatus === 'in_progress'
+  const isIndexFailed = indexStatus === 'failed'
   const [workflowState, setWorkflowState] = useState(aiExperience.workflow_state)
   const [isPreviewExpanded, setIsPreviewExpanded] = useState(() => {
     const params = new URLSearchParams(window.location.search)
@@ -50,16 +64,10 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
     }
     return shouldPreview
   })
+  const [selectedTab, setSelectedTab] = useState<number>(0)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const previewCardRef = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search)
-    if (urlParams.get('preview') === 'true') {
-      setIsPreviewExpanded(true)
-    }
-  }, [])
 
   const handleEdit = () => {
     window.location.href = `/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}/edit`
@@ -72,10 +80,10 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
         path: `/api/v1/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}`,
         method: 'DELETE',
       })
-      showFlashSuccess(I18n.t('AI Experience deleted successfully'))()
+      showFlashSuccess(I18n.t('Knowledge Chat deleted successfully'))()
       window.location.href = `/courses/${aiExperience.course_id}/ai_experiences`
     } catch (_error) {
-      showFlashError(I18n.t('Failed to delete AI Experience'))()
+      showFlashError(I18n.t('Failed to delete Knowledge Chat'))()
       setIsDeleting(false)
       setIsDeleteModalOpen(false)
     }
@@ -83,76 +91,61 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
 
   return (
     <View as="div" maxWidth="1080px" margin="0 auto" padding="medium">
-      <Flex justifyItems="space-between" alignItems="start">
-        <Flex.Item shouldGrow shouldShrink>
-          <Heading level="h1" margin="0 0 large 0">
-            {aiExperience.title}
-          </Heading>
-        </Flex.Item>
-        {canManage && (
-          <Flex.Item>
-            <Flex gap="small">
-              <Flex.Item>
-                <AIExperiencePublishButton
-                  experienceId={aiExperience.id!}
-                  courseId={aiExperience.course_id!}
-                  isPublished={workflowState === 'published'}
-                  canUnpublish={aiExperience.can_unpublish ?? true}
-                  onPublishChange={setWorkflowState}
-                />
-              </Flex.Item>
-              <Flex.Item>
-                <Button
-                  color="primary"
-                  href={`/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}/ai_conversations`}
-                  data-testid="ai-experience-show-ai-conversations-button"
-                >
-                  {I18n.t('AI Conversations')}
-                </Button>
-              </Flex.Item>
-              <Flex.Item>
-                <Menu
-                  placement="bottom end"
-                  trigger={
-                    <IconButton
-                      screenReaderLabel={I18n.t('AI Experience settings')}
-                      withBackground={false}
-                      withBorder={false}
-                    >
-                      <IconMoreLine />
-                    </IconButton>
-                  }
-                >
-                  <Menu.Item data-testid="ai-experience-show-edit-menu-item" onSelect={handleEdit}>
-                    {I18n.t('Edit')}
-                  </Menu.Item>
-                  <Menu.Item
-                    data-testid="ai-experience-show-run-chat-simulation-menu-item"
-                    disabled={true}
-                  >
-                    <Flex justifyItems="space-between" gap="small">
-                      <Flex.Item>
-                        <Text>{I18n.t('Run chat simulation')}</Text>
-                      </Flex.Item>
-                      <Flex.Item>
-                        <Text size="small" color="secondary">
-                          {I18n.t('Coming soon')}
-                        </Text>
-                      </Flex.Item>
-                    </Flex>
-                  </Menu.Item>
-                  <Menu.Item
-                    data-testid="ai-experience-show-delete-menu-item"
-                    onSelect={() => setIsDeleteModalOpen(true)}
-                  >
-                    {I18n.t('Delete')}
-                  </Menu.Item>
-                </Menu>
-              </Flex.Item>
-            </Flex>
+      <View as="div" margin="0 0 large 0">
+        <Flex justifyItems="space-between" alignItems="center">
+          <Flex.Item shouldGrow shouldShrink>
+            <Heading level="h1">{aiExperience.title}</Heading>
           </Flex.Item>
-        )}
-      </Flex>
+          {canManage && (
+            <Flex.Item margin="0 0 0 medium">
+              <Flex gap="small">
+                <Flex.Item>
+                  <AIExperiencePublishButton
+                    experienceId={aiExperience.id!}
+                    courseId={aiExperience.course_id!}
+                    isPublished={workflowState === 'published'}
+                    canUnpublish={aiExperience.can_unpublish ?? true}
+                    contextReady={aiExperience.context_ready ?? true}
+                    indexFailed={isIndexFailed}
+                    onPublishChange={setWorkflowState}
+                  />
+                </Flex.Item>
+                <Flex.Item>
+                  <Button
+                    color="primary"
+                    onClick={handleEdit}
+                    themeOverride={navyButtonTheme}
+                    data-testid="ai-experience-show-edit-button"
+                  >
+                    {I18n.t('Edit')}
+                  </Button>
+                </Flex.Item>
+                <Flex.Item>
+                  <Menu
+                    placement="bottom end"
+                    trigger={
+                      <IconButton
+                        screenReaderLabel={I18n.t('Knowledge Chat settings')}
+                        withBackground={false}
+                        withBorder={false}
+                      >
+                        <IconMoreLine />
+                      </IconButton>
+                    }
+                  >
+                    <Menu.Item
+                      data-testid="ai-experience-show-delete-menu-item"
+                      onSelect={() => setIsDeleteModalOpen(true)}
+                    >
+                      {I18n.t('Delete')}
+                    </Menu.Item>
+                  </Menu>
+                </Flex.Item>
+              </Flex>
+            </Flex.Item>
+          )}
+        </Flex>
+      </View>
 
       {aiExperience.description && (
         <View as="div" margin="0 0 medium 0">
@@ -162,124 +155,208 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
         </View>
       )}
 
-      {aiExperience.learning_objective && !canManage && (
-        <View as="div" margin="large 0">
-          <Heading level="h2" margin="0 0 small 0">
-            {I18n.t('Learning Objectives')}
-          </Heading>
-          <View
-            as="div"
-            padding="medium"
-            background="primary"
-            borderWidth="small"
-            borderRadius="medium"
+      {canManage ? (
+        <Tabs onRequestTabChange={(_e, {index}) => setSelectedTab(index)}>
+          <Tabs.Panel
+            id="knowledge-chat-tab"
+            renderTitle={I18n.t('Knowledge chat')}
+            isSelected={selectedTab === 0}
           >
-            <Text size="medium" data-testid="ai-experience-show-student-goals-text">
-              <span style={{whiteSpace: 'pre-wrap'}}>{aiExperience.learning_objective}</span>
-            </Text>
-          </View>
-        </View>
-      )}
-
-      <Heading level="h2" margin="large 0 small 0">
-        {I18n.t('Experience')}
-      </Heading>
-
-      <LLMConversationView
-        isOpen={true}
-        onClose={() => setIsPreviewExpanded(false)}
-        returnFocusRef={previewCardRef}
-        courseId={aiExperience.course_id}
-        aiExperienceId={aiExperience.id}
-        aiExperienceTitle={aiExperience.title}
-        facts={aiExperience.facts}
-        learningObjectives={aiExperience.learning_objective}
-        scenario={aiExperience.pedagogical_guidance}
-        isExpanded={isPreviewExpanded}
-        onToggleExpanded={() => setIsPreviewExpanded(!isPreviewExpanded)}
-        isTeacherPreview={canManage}
-      />
-
-      {canManage && (
-        <>
-          <Heading level="h2" margin="large 0 0 0">
-            {I18n.t('Configurations')}
-          </Heading>
-
-          <div
-            style={{
-              margin: '0.75rem 0 0 0',
-              borderRadius: '0.5rem',
-              overflow: 'hidden',
-              border: '3px solid transparent',
-              backgroundImage:
-                'linear-gradient(white, white), linear-gradient(90deg, rgb(106, 90, 205) 0%, rgb(70, 130, 180) 100%)',
-              backgroundOrigin: 'border-box',
-              backgroundClip: 'padding-box, border-box',
-            }}
-          >
-            <div
-              style={{
-                padding: '1rem',
-                background: 'linear-gradient(90deg, rgb(106, 90, 205) 0%, rgb(70, 130, 180) 100%)',
-              }}
-            >
-              <Flex gap="small" alignItems="start">
-                <Flex.Item>
-                  <IconAiLine color="primary-inverse" size="small" />
-                </Flex.Item>
-                <Flex.Item shouldGrow shouldShrink>
-                  <View>
-                    <Text color="primary-inverse" weight="bold" size="large">
-                      {I18n.t('Learning Design')}
+            {isIndexFailed ? (
+              <Alert
+                variant="error"
+                renderCloseButtonLabel={false}
+                data-testid="ai-experience-show-index-failed-notice"
+              >
+                {I18n.t(
+                  "Activity couldn't be loaded. A source file has an issue. To try again, remove %{names} from ",
+                  {
+                    names: aiExperience.failed_context_file_names?.length
+                      ? aiExperience.failed_context_file_names.join(', ')
+                      : I18n.t('the file'),
+                  },
+                )}
+                <a
+                  href={`/courses/${aiExperience.course_id}/ai_experiences/${aiExperience.id}/edit`}
+                  data-testid="ai-experience-show-index-failed-edit-button"
+                >
+                  {I18n.t('your configurations')}
+                </a>
+                {I18n.t('.')}
+              </Alert>
+            ) : isIndexing ? (
+              <View
+                as="div"
+                padding="large"
+                background="secondary"
+                borderWidth="small"
+                borderRadius="medium"
+                textAlign="center"
+                data-testid="ai-experience-show-indexing-notice"
+              >
+                <Flex direction="column" alignItems="center" gap="small">
+                  <Flex.Item>
+                    <IconClockLine size="medium" color="secondary" />
+                  </Flex.Item>
+                  <Flex.Item>
+                    <Text weight="bold">{I18n.t('Source files are still being processed')}</Text>
+                  </Flex.Item>
+                  <Flex.Item>
+                    <Text color="secondary">
+                      {I18n.t(
+                        'Preview and Conversations will be available once processing is complete. Check back later.',
+                      )}
                     </Text>
-                    <View as="div" margin="xx-small 0 0 0">
-                      <Text color="primary-inverse" size="small">
-                        {I18n.t('What should students know and how should the AI behave?')}
-                      </Text>
-                    </View>
+                  </Flex.Item>
+                </Flex>
+              </View>
+            ) : (
+              <LLMConversationView
+                isOpen={true}
+                onClose={() => setIsPreviewExpanded(false)}
+                returnFocusRef={previewCardRef}
+                courseId={aiExperience.course_id}
+                aiExperienceId={aiExperience.id}
+                aiExperienceTitle={aiExperience.title}
+                facts={aiExperience.facts}
+                learningObjectives={aiExperience.learning_objective}
+                scenario={aiExperience.pedagogical_guidance}
+                isExpanded={isPreviewExpanded}
+                onToggleExpanded={() => setIsPreviewExpanded(!isPreviewExpanded)}
+                isTeacherPreview={true}
+              />
+            )}
+
+            <InstUISettingsProvider theme={roundedTheme}>
+              <View
+                as="div"
+                margin="large 0 0 0"
+                borderWidth="small"
+                borderRadius="medium"
+                background="primary"
+                padding="medium"
+              >
+                <View as="div" margin="0 0 medium 0">
+                  <Heading level="h2" margin="0 0 xx-small 0">
+                    {I18n.t('Configurations')}
+                  </Heading>
+                  <Text size="small" color="secondary">
+                    {I18n.t(
+                      'The completion rules, pedagogical guidance, and sources of the large language model (LLM).',
+                    )}
+                  </Text>
+                </View>
+
+                {aiExperience.learning_objective && (
+                  <View as="div" margin="0 0 medium 0">
+                    <Heading level="h3" margin="0 0 small 0">
+                      {I18n.t('Learning Objectives')}
+                    </Heading>
+                    <Text data-testid="ai-experience-show-learning-objectives-text">
+                      <span style={{whiteSpace: 'pre-wrap'}}>
+                        {aiExperience.learning_objective}
+                      </span>
+                    </Text>
                   </View>
-                </Flex.Item>
-              </Flex>
-            </div>
+                )}
 
-            <View as="div" padding="medium" background="primary">
-              {aiExperience.facts && (
-                <View as="div" margin="0 0 medium 0">
-                  <Heading level="h3" margin="0 0 small 0">
-                    {I18n.t('Facts Students Should Know')}
-                  </Heading>
-                  <Text data-testid="ai-experience-show-facts-text">
-                    <span style={{whiteSpace: 'pre-wrap'}}>{aiExperience.facts}</span>
-                  </Text>
-                </View>
-              )}
+                {aiExperience.pedagogical_guidance && (
+                  <View as="div" margin="0 0 medium 0">
+                    <Heading level="h3" margin="0 0 small 0">
+                      {I18n.t('Pedagogical activity guidance')}
+                    </Heading>
+                    <Text data-testid="ai-experience-show-pedagogical-guidance-text">
+                      <span style={{whiteSpace: 'pre-wrap'}}>
+                        {aiExperience.pedagogical_guidance}
+                      </span>
+                    </Text>
+                  </View>
+                )}
 
-              {aiExperience.learning_objective && (
-                <View as="div" margin="0 0 medium 0">
-                  <Heading level="h3" margin="0 0 small 0">
-                    {I18n.t('Learning Objectives')}
-                  </Heading>
-                  <Text data-testid="ai-experience-show-learning-objectives-text">
-                    <span style={{whiteSpace: 'pre-wrap'}}>{aiExperience.learning_objective}</span>
-                  </Text>
-                </View>
-              )}
+                {aiExperience.facts && (
+                  <View as="div" margin="0 0 medium 0">
+                    <Heading level="h3" margin="0 0 small 0">
+                      {I18n.t('Text source')}
+                    </Heading>
+                    <Text data-testid="ai-experience-show-facts-text">
+                      <span style={{whiteSpace: 'pre-wrap'}}>{aiExperience.facts}</span>
+                    </Text>
+                  </View>
+                )}
 
-              {aiExperience.pedagogical_guidance && (
-                <View as="div" margin="0 0 0 0">
-                  <Heading level="h3" margin="0 0 small 0">
-                    {I18n.t('Pedagogical Guidance')}
-                  </Heading>
-                  <Text data-testid="ai-experience-show-pedagogical-guidance-text">
-                    <span style={{whiteSpace: 'pre-wrap'}}>
-                      {aiExperience.pedagogical_guidance}
-                    </span>
-                  </Text>
-                </View>
-              )}
+                {ENV?.FEATURES?.ai_experiences_context_file_upload &&
+                  (aiExperience.context_files?.length ?? 0) > 0 && (
+                    <View as="div" margin="medium 0 0 0">
+                      <Heading level="h3" margin="0 0 small 0">
+                        {I18n.t('File sources')}
+                      </Heading>
+                      <FileList
+                        files={aiExperience.context_files!.filter(
+                          f => !aiExperience.failed_context_file_names?.includes(f.display_name),
+                        )}
+                        uploadingFileNames={new Set()}
+                        failedFileNames={new Set(aiExperience.failed_context_file_names ?? [])}
+                      />
+                    </View>
+                  )}
+              </View>
+            </InstUISettingsProvider>
+          </Tabs.Panel>
+
+          <Tabs.Panel
+            id="conversations-tab"
+            renderTitle={I18n.t('Conversations')}
+            isSelected={selectedTab === 1}
+          >
+            <AIConversationsContainer
+              aiExperience={{
+                id: aiExperience.id as string,
+                course_id: aiExperience.course_id as string | number,
+                title: aiExperience.title,
+                can_manage: aiExperience.can_manage,
+                description: aiExperience.description,
+                facts: aiExperience.facts,
+                learning_objective: aiExperience.learning_objective,
+                pedagogical_guidance: aiExperience.pedagogical_guidance,
+              }}
+              courseId={aiExperience.course_id as string | number}
+            />
+          </Tabs.Panel>
+        </Tabs>
+      ) : (
+        <>
+          {aiExperience.learning_objective && (
+            <View as="div" margin="large 0">
+              <Heading level="h2" margin="0 0 small 0">
+                {I18n.t('Learning Objectives')}
+              </Heading>
+              <View
+                as="div"
+                padding="medium"
+                background="primary"
+                borderWidth="small"
+                borderRadius="medium"
+              >
+                <Text size="medium" data-testid="ai-experience-show-student-goals-text">
+                  <span style={{whiteSpace: 'pre-wrap'}}>{aiExperience.learning_objective}</span>
+                </Text>
+              </View>
             </View>
-          </div>
+          )}
+          <LLMConversationView
+            isOpen={true}
+            onClose={() => setIsPreviewExpanded(false)}
+            returnFocusRef={previewCardRef}
+            courseId={aiExperience.course_id}
+            aiExperienceId={aiExperience.id}
+            aiExperienceTitle={aiExperience.title}
+            facts={aiExperience.facts}
+            learningObjectives={aiExperience.learning_objective}
+            scenario={aiExperience.pedagogical_guidance}
+            isExpanded={isPreviewExpanded}
+            onToggleExpanded={() => setIsPreviewExpanded(!isPreviewExpanded)}
+            isTeacherPreview={false}
+          />
         </>
       )}
 
@@ -287,11 +364,11 @@ const AIExperienceShow: React.FC<AIExperienceShowProps> = ({aiExperience}) => {
         open={isDeleteModalOpen}
         onDismiss={() => setIsDeleteModalOpen(false)}
         size="small"
-        label={I18n.t('Delete AI Experience')}
+        label={I18n.t('Delete Knowledge Chat')}
         shouldCloseOnDocumentClick={true}
       >
         <Modal.Header>
-          <Heading>{I18n.t('Delete AI Experience')}</Heading>
+          <Heading>{I18n.t('Delete Knowledge Chat')}</Heading>
         </Modal.Header>
         <Modal.Body>
           <Text>

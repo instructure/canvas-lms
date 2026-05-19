@@ -20,7 +20,7 @@
 
 # @API Services
 class ServicesApiController < ApplicationController
-  before_action :require_user, :get_context, only: [:rce_config]
+  before_action :get_context, only: [:rce_config]
 
   # @API Get Kaltura config
   # Return the config information for the Kaltura plugin in json format.
@@ -46,19 +46,15 @@ class ServicesApiController < ApplicationController
   #       'enabled': false
   #     }
   def show_kaltura_config
-    if @current_user
-      @kal = CanvasKaltura::ClientV3.config
-      response = { "enabled" => !@kal.nil? }
-      if @kal
-        response["domain"] = @kal["domain"]
-        response["resource_domain"] = @kal["resource_domain"]
-        response["rtmp_domain"] = @kal["rtmp_domain"]
-        response["partner_id"] = @kal["partner_id"]
-      end
-      render json: response
-    else
-      render_unauthorized_action
+    @kal = CanvasKaltura::ClientV3.config
+    response = { "enabled" => !@kal.nil? }
+    if @kal
+      response["domain"] = @kal["domain"]
+      response["resource_domain"] = @kal["resource_domain"]
+      response["rtmp_domain"] = @kal["rtmp_domain"]
+      response["partner_id"] = @kal["partner_id"]
     end
+    render json: response
   end
 
   # @API Start Kaltura session
@@ -75,10 +71,6 @@ class ServicesApiController < ApplicationController
   #     }
   def start_kaltura_session
     @user = @current_user
-    unless @current_user
-      payload = { errors: { base: t("must_be_logged_in", "You must be logged in to use Kaltura") }, logged_in: false }
-      return render json: payload, status: :unauthorized
-    end
     client = CanvasKaltura::ClientV3.new
     uid = "#{@user.id}_#{@domain_root_account.id}"
     res = client.startSession(CanvasKaltura::SessionType::USER, uid)
@@ -133,6 +125,7 @@ class ServicesApiController < ApplicationController
     locales = env[:LOCALES] || ["en"]
 
     render json: {
+      RICH_CONTENT_APP_HOST: env[:RICH_CONTENT_APP_HOST],
       RICH_CONTENT_CAN_UPLOAD_FILES: env[:RICH_CONTENT_CAN_UPLOAD_FILES],
       RICH_CONTENT_INST_RECORD_TAB_DISABLED: env[:RICH_CONTENT_INST_RECORD_TAB_DISABLED],
       RICH_CONTENT_FILES_TAB_DISABLED: env[:RICH_CONTENT_FILES_TAB_DISABLED],

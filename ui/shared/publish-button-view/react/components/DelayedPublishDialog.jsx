@@ -18,7 +18,8 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Button} from '@instructure/ui-buttons'
 import {IconUnpublishedSolid, IconCompleteSolid, IconCalendarMonthLine} from '@instructure/ui-icons'
@@ -116,6 +117,8 @@ export default function DelayedPublishDialog({
       label={I18n.t('Publication Options')}
       shouldCloseOnDocumentClick={false}
       footer={<Footer />}
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
     >
       {error && <Alert variant="error">{I18n.t('Failed to update publication date')}</Alert>}
       <RadioInputGroup

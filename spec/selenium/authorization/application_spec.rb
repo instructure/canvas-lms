@@ -38,7 +38,7 @@ describe "Authenticity Tokens" do
     user_logged_in
     get("/")
     token = driver.execute_script "return $.cookie('_csrf_token')"
-    expect_new_page_load(:accept_alert) { expect_logout_link_present.click }
+    expect_new_page_load(accept_alert: true) { expect_logout_link_present.click }
     token2 = driver.execute_script "return $.cookie('_csrf_token')"
     expect(token).not_to eq token2
     expect(CanvasBreachMitigation::MaskingSecrets.send(:unmasked_token, token)).not_to eq(

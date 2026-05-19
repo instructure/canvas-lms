@@ -29,7 +29,7 @@
 #
 # @see AssessmentQuestion#create_quiz_question()
 # @see AssessmentQuestionBank#select_for_submission()
-class Quizzes::QuizQuestion < ActiveRecord::Base
+class Quizzes::QuizQuestion < ApplicationRecord
   extend RootAccountResolver
 
   self.table_name = "quiz_questions"

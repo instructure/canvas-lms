@@ -20,7 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {uniqueId, sortBy} from 'es-toolkit/compat'
 import {fromNow} from '@canvas/fuzzy-relative-time'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {
   enhanceUserContent,

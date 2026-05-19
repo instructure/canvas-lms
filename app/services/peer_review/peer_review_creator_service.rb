@@ -33,7 +33,8 @@ class PeerReview::PeerReviewCreatorService < PeerReview::PeerReviewCommonService
     validate_assignment_submission_types(@parent_assignment)
     validate_feature_enabled(@parent_assignment)
     validate_peer_review_sub_assignment_not_exist(@parent_assignment)
-    validate_dates
+    validate_grading_type(@grading_type) if @grading_type != NOT_PROVIDED
+    validate_dates unless @skip_date_validation
   end
 
   def create_peer_review_sub_assignment

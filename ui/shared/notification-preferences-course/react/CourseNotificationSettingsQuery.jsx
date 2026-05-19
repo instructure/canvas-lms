@@ -18,10 +18,11 @@
 
 import {COURSE_NOTIFICATIONS_QUERY} from '../graphql/Queries'
 import CourseNotificationSettingsManager from './CourseNotificationSettingsManager'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import React from 'react'
 import {string} from 'prop-types'
 import {useQuery} from '@apollo/client'
@@ -41,6 +42,8 @@ export default function CourseNotificationSettingsQuery(props) {
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject={I18n.t('Course Notification Settings initial query error')}
         errorCategory={I18n.t('Course Notification Settings Error Page')}
       />

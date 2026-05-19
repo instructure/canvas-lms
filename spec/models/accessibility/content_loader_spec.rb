@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe Accessibility::ContentLoader do
   include Factories
 
@@ -215,6 +213,29 @@ describe Accessibility::ContentLoader do
       expect(content_loader.instance_variable_get(:@resource)).to eq(wiki_page)
       expect(content_loader.instance_variable_get(:@rule_id)).to eq("img-alt")
       expect(content_loader.instance_variable_get(:@path)).to eq(".//div")
+    end
+  end
+
+  describe "#resource_updated_since_issue?" do
+    let!(:issue) { accessibility_issue_model(course:, context: wiki_page, node_path: nil) }
+    let(:content_loader) { described_class.new(issue_id: issue.id) }
+
+    context "when resource was updated after the issue was created" do
+      it "returns true" do
+        issue.update_columns(created_at: 1.hour.ago)
+        wiki_page.update_columns(updated_at: Time.now.utc)
+
+        expect(content_loader.resource_updated_since_issue?).to be true
+      end
+    end
+
+    context "when resource was updated before the issue was created" do
+      it "returns false" do
+        wiki_page.update_columns(updated_at: 1.hour.ago)
+        issue.update_columns(created_at: Time.now.utc)
+
+        expect(content_loader.resource_updated_since_issue?).to be false
+      end
     end
   end
 

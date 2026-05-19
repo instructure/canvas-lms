@@ -35,19 +35,18 @@ const server = setupServer()
 // Track API calls for caching tests
 let apiCallCount = 0
 
-// Mock the MessageStudents component
-vi.mock('@canvas/message-students-modal', () => {
-  return {
-    default: function MessageStudents({open, onRequestClose, title}: any) {
-      return open ? (
-        <div data-testid="message-students-modal">
-          <h2>{title}</h2>
-          <button onClick={onRequestClose}>Close Modal</button>
-        </div>
-      ) : null
-    },
-  }
-})
+// Mock the MessageStudentsWhoDialog component
+vi.mock(
+  '@instructure/outcomes-ui/es/components/Gradebook/dialogs/MessageStudentsWhoDialog',
+  () => ({
+    default: ({onClose}: {onClose: () => void}) => (
+      <div data-testid="message-students-modal">
+        <h2>Compose Message</h2>
+        <button onClick={onClose}>Close Modal</button>
+      </div>
+    ),
+  }),
+)
 
 // Helper to render with QueryClientProvider
 const renderWithQueryClient = (ui: React.ReactElement) => {
@@ -438,7 +437,7 @@ describe('StudentCellPopover', () => {
       // Message modal should open
       await waitFor(() => {
         expect(screen.getByTestId('message-students-modal')).toBeInTheDocument()
-        expect(screen.getByText('Send a message')).toBeInTheDocument()
+        expect(screen.getByText('Compose Message')).toBeInTheDocument()
       })
     })
 

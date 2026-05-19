@@ -20,7 +20,7 @@ import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.instructure_forms' // brings in $.fn.formSubmit
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
@@ -92,8 +92,7 @@ export function setupSubmitHandler(userAssetString) {
       if (uploadedFileTagContainer) {
         const fileName = files[0].name
         const isZip = fileName.match(/\.zip$/)
-        fileRoot = createRoot(uploadedFileTagContainer)
-        fileRoot.render(
+        fileRoot = render(
           <Flex direction="column" margin="0 0 small 0">
             <Flex.Item>
               <Tag
@@ -110,6 +109,7 @@ export function setupSubmitHandler(userAssetString) {
               />
             )}
           </Flex>,
+          uploadedFileTagContainer,
         )
       }
     }

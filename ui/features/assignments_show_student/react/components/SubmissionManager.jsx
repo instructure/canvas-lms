@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect, useContext, useRef, useMemo} from 'react'
 import {useApolloClient, useMutation} from '@apollo/client'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {
   CREATE_SUBMISSION,
@@ -33,9 +33,9 @@ import {
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import Confetti from '@canvas/confetti/react/Confetti'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import {showConfirmationDialog} from '@canvas/dialogs/react/ConfirmationDialog'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'

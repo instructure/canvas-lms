@@ -38,7 +38,7 @@ describe "enhanceable_content" do
       student_in_course(course: @course, active_user: true)
       user_session(@student)
       get "/courses/#{@course.id}/wiki/#{@page.url}"
-      expect(f("#media_comment_0_deadbeef span.media_comment_thumbnail")).to_not be_nil
+      expect(f("#media_comment_0_deadbeef span.media_comment_thumbnail")).not_to be_nil
     end
 
     describe "for locked files" do
@@ -58,7 +58,7 @@ describe "enhanceable_content" do
         teacher_in_course(course: @course, active_user: true)
         user_session(@teacher)
         get "/courses/#{@course.id}/wiki/#{@page.url}"
-        expect(f("#media_comment_0_deadbeef span.media_comment_thumbnail")).to_not be_nil
+        expect(f("#media_comment_0_deadbeef span.media_comment_thumbnail")).not_to be_nil
       end
     end
   end

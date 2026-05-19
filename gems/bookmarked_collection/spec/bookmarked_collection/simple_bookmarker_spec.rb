@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe BookmarkedCollection::SimpleBookmarker do
   before do
     @example_class = Class.new(ActiveRecord::Base) do

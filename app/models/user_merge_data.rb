@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class UserMergeData < ActiveRecord::Base
+class UserMergeData < ApplicationRecord
   belongs_to :user
   belongs_to :from_user, class_name: "User"
   has_many :records, class_name: "UserMergeDataRecord", inverse_of: :merge_data, autosave: false

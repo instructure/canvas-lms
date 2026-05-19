@@ -285,6 +285,7 @@ describe AttachmentHelper do
         allow(kaltura_client).to receive(:media_download_url)
           .with("0_feedbeef")
           .and_return("https://kaltura.example.com/download/asset1")
+        allow(@kaltura_attachment).to receive(:kaltura_manifest_file?).and_return(true)
       end
 
       it "redirects to Kaltura URL when downloading Kaltura media" do
@@ -299,6 +300,17 @@ describe AttachmentHelper do
           .with(a_string_including("kaltura.example.com"))
         expect(self).to receive(:send_file)
         render_or_redirect_to_stored_file(attachment: @kaltura_attachment, inline: true)
+      end
+
+      it "does not redirect to Kaltura URL when file is not a manifest" do
+        allow(@kaltura_attachment).to receive_messages(
+          kaltura_manifest_file?: false,
+          stored_locally?: true
+        )
+        expect(self).not_to receive(:redirect_to)
+          .with(a_string_including("kaltura.example.com"))
+        expect(self).to receive(:send_file)
+        render_or_redirect_to_stored_file(attachment: @kaltura_attachment, inline: false)
       end
     end
 
@@ -339,6 +351,77 @@ describe AttachmentHelper do
           .with(a_string_including("kaltura"))
         expect(self).to receive(:render_file_location)
         render_or_redirect_to_stored_file(attachment: @attachment, inline: false)
+      end
+    end
+  end
+
+  describe "#access_allowed" do
+    before :once do
+      course_with_student(active_all: true)
+      @attachment = attachment_model(context: @course)
+    end
+
+    context "when location parameter is present" do
+      let(:user) { @student }
+
+      before do
+        @domain_root_account = @course.root_account
+      end
+
+      it "skips UUID verifier validation and uses location-based access instead" do
+        allow(self).to receive_messages(params: {
+                                          location: "course_syllabus_#{@course.id}",
+                                          verifier: @attachment.uuid
+                                        },
+                                        access_via_location?: true)
+
+        result = access_allowed(
+          attachment: @attachment,
+          user:,
+          access_type: :read,
+          no_error_on_failure: true
+        )
+
+        expect(result).to be_truthy
+      end
+
+      it "does not validate verifier when location is present" do
+        allow(self).to receive_messages(params: {
+                                          location: "course_syllabus_#{@course.id}",
+                                          verifier: @attachment.uuid
+                                        },
+                                        access_via_location?: false)
+
+        expect(Attachments::Verification).not_to receive(:new)
+
+        access_allowed(
+          attachment: @attachment,
+          user:,
+          access_type: :read,
+          no_error_on_failure: true
+        )
+      end
+    end
+
+    context "when location parameter is not present but verifier is" do
+      let(:user) { user_factory }
+
+      before do
+        @domain_root_account = @course.root_account
+        @course.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
+      end
+
+      it "validates verifier when location is not present" do
+        allow(self).to receive_messages(params: { verifier: @attachment.uuid }, access_via_location?: false)
+
+        result = access_allowed(
+          attachment: @attachment,
+          user:,
+          access_type: :read,
+          no_error_on_failure: true
+        )
+
+        expect(result).to be_truthy
       end
     end
   end

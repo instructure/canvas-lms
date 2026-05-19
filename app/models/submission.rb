@@ -20,7 +20,7 @@
 
 require "anonymity"
 
-class Submission < ActiveRecord::Base
+class Submission < ApplicationRecord
   include Canvas::GradeValidations
   include CustomValidations
   include SendToStream
@@ -409,7 +409,7 @@ class Submission < ActiveRecord::Base
   end
 
   # see .needs_grading_conditions
-  def needs_grading?(was = false)
+  def needs_grading?(was: false)
     suffix = was ? "_before_last_save" : ""
 
     !send(:"submission_type#{suffix}").nil? &&
@@ -427,7 +427,7 @@ class Submission < ActiveRecord::Base
     Submission.active.having_submission.where(user_id:)
               .where(assignment_id: SubAssignment.active.select(:id).where(parent_assignment_id: assignment_id))
               .find_each do |sub_assignment_submission|
-                return true if sub_assignment_submission.needs_grading?
+      return true if sub_assignment_submission.needs_grading?
     end
     false
   end
@@ -441,7 +441,7 @@ class Submission < ActiveRecord::Base
   end
 
   def needs_grading_changed?
-    needs_grading? != needs_grading?(:was)
+    needs_grading? != needs_grading?(was: true)
   end
 
   def submitted_changed?
@@ -759,7 +759,9 @@ class Submission < ActiveRecord::Base
   end
 
   def can_read_submission_user_name?(user, session)
-    return false if user_id != user.id && assignment.anonymize_students?
+    if user_id != user.id && (assignment.anonymize_students? || assignment.new_quizzes_anonymous_participants?)
+      return false
+    end
 
     !assignment.anonymous_peer_reviews? ||
       user_id == user.id ||
@@ -790,14 +792,28 @@ class Submission < ActiveRecord::Base
   def create_alert
     return unless saved_change_to_score? && grader_id && !autograded? &&
                   assignment.points_possible && assignment.points_possible > 0
+    return if hide_grade_from_student?
 
+    prev_score = saved_changes["score"][0]
+    prev_percentage = prev_score.present? ? prev_score.to_f / assignment.points_possible * 100 : nil
+    percentage = score.present? ? score.to_f / assignment.points_possible * 100 : nil
+    create_assignment_grade_alerts(prev_percentage, percentage)
+  end
+
+  def create_alert_on_post
+    return unless grader_id && !autograded? &&
+                  assignment.points_possible && assignment.points_possible > 0
+    return unless graded?
+
+    percentage = score.present? ? score.to_f / assignment.points_possible * 100 : nil
+    create_assignment_grade_alerts(nil, percentage)
+  end
+
+  def create_assignment_grade_alerts(prev_percentage, percentage)
     thresholds = ObserverAlertThreshold.active.where(student: user,
                                                      alert_type: ["assignment_grade_high", "assignment_grade_low"])
 
     thresholds.each do |threshold|
-      prev_score = saved_changes["score"][0]
-      prev_percentage = prev_score.present? ? prev_score.to_f / assignment.points_possible * 100 : nil
-      percentage = score.present? ? score.to_f / assignment.points_possible * 100 : nil
       next unless threshold.did_pass_threshold(prev_percentage, percentage)
 
       observer = threshold.observer
@@ -827,6 +843,7 @@ class Submission < ActiveRecord::Base
       end
     end
   end
+  private :create_assignment_grade_alerts
 
   def update_quiz_submission
     return true if @saved_by == :quiz_submission || !quiz_submission_id || entered_score == quiz_submission.kept_score
@@ -962,18 +979,19 @@ class Submission < ActiveRecord::Base
   def originality_data
     return {} if assignment.cpf_migrated?
 
-    data = originality_reports_for_display.each_with_object({}) do |originality_report, hash|
-      hash[originality_report.asset_key] = {
-        similarity_score: originality_report.originality_score&.round(2),
-        state: originality_report.state,
-        attachment_id: originality_report.attachment_id,
-        report_url: originality_report.report_launch_path(assignment),
-        view_report_url: view_report_url("originality_report", originality_report.asset_key),
-        status: originality_report.workflow_state,
-        error_message: originality_report.error_message,
-        created_at: originality_report.created_at,
-        updated_at: originality_report.updated_at,
-      }
+    data = originality_reports_for_display.to_h do |originality_report|
+      [originality_report.asset_key,
+       {
+         similarity_score: originality_report.originality_score&.round(2),
+         state: originality_report.state,
+         attachment_id: originality_report.attachment_id,
+         report_url: originality_report.report_launch_path(assignment),
+         view_report_url: view_report_url("originality_report", originality_report.asset_key),
+         status: originality_report.workflow_state,
+         error_message: originality_report.error_message,
+         created_at: originality_report.created_at,
+         updated_at: originality_report.updated_at,
+       }]
     end
 
     legacy_turnitin_data = turnitin_data.except(:webhook_info, :provider, :last_processed_attempt)
@@ -1090,10 +1108,10 @@ class Submission < ActiveRecord::Base
   end
   private :all_versioned_attachments
 
-  def attachment_ids_for_version
+  def attachment_ids_for_version(include_attachment_id: true)
     ids = (attachment_ids || "").split(",").map(&:to_i)
-    ids << attachment_id if attachment_id
-    ids
+    ids << attachment_id if include_attachment_id && attachment_id
+    ids.uniq
   end
 
   def delete_turnitin_errors
@@ -1158,7 +1176,7 @@ class Submission < ActiveRecord::Base
 
   # this function will check if the score needs to be updated and update/save the new score if so,
   # otherwise, it just returns the vericite_data_hash
-  def vericite_data(lookup_data = false)
+  def vericite_data(lookup_data: false)
     self.vericite_data_hash ||= {}
     # check to see if the score is stale, if so, fetch it again
     update_scores = false
@@ -1290,7 +1308,7 @@ class Submission < ActiveRecord::Base
     if data_changed
       vericite_data_changed!
       if recheck_score_all
-        with_versioning(false, &:save!)
+        without_versioning(&:save!)
       else
         save
       end
@@ -1593,17 +1611,12 @@ class Submission < ActiveRecord::Base
       self.updating_user = user
       super
     else
-      association_ids = attachment_associations.pluck(:attachment_id)
-      ids = (attachment_ids || "").split(",").map(&:to_i)
-      ids << attachment_id if attachment_id
-      ids.uniq!
-      associations_to_delete = association_ids - ids
-      attachment_associations.where(attachment_id: associations_to_delete).delete_all unless associations_to_delete.empty?
-      unassociated_ids = ids - association_ids
+      attachments_with_associations_ids = attachment_associations.pluck(:attachment_id)
+      unassociated_ids = attachment_ids_for_version - attachments_with_associations_ids
       return if unassociated_ids.empty?
 
-      attachments = Attachment.where(id: unassociated_ids)
-      attachments.each do |a|
+      unassociated_attachments = Attachment.where(id: unassociated_ids)
+      unassociated_attachments.each do |a|
         next unless (a.context_type == "User" && a.context_id == user_id) ||
                     (a.context_type == "Group" && (a.context_id == group_id || user.membership_for_group_id?(a.context_id))) ||
                     (a.context_type == "Assignment" && a.context_id == assignment_id && a.available?) ||
@@ -1792,7 +1805,7 @@ class Submission < ActiveRecord::Base
         model = version.model
         # since vericite_data is a function, make sure you are cloning the most recent vericite_data_hash
         if vericiteable?
-          model.turnitin_data = vericite_data(true)
+          model.turnitin_data = vericite_data(lookup_data: true)
         # only use originality data if it's loaded, we want to avoid making N+1 queries
         elsif association(:originality_reports).loaded?
           model.turnitin_data = originality_data
@@ -2072,9 +2085,7 @@ class Submission < ActiveRecord::Base
     # look equal to the Hash key and the attachments for the last one
     # will cancel out the former ones.
     submissions_with_index_and_attachment_ids = submissions.each_with_index.map do |s, index|
-      attachment_ids = (s.attachment_ids || "").split(",").map(&:to_i)
-      attachment_ids << s.attachment_id if s.attachment_id
-      [[s, index], attachment_ids]
+      [[s, index], s.attachment_ids_for_version]
     end
     submissions_with_index_and_attachment_ids.to_h
   end
@@ -2166,13 +2177,17 @@ class Submission < ActiveRecord::Base
   # Otherwise, returns a hash of submission to attachments.
   def self.bulk_load_attachments_for_submissions(submissions, preloads: nil, preload_only: false)
     submissions = Array(submissions)
-    attachment_ids_by_submission =
-      submissions.index_with { |s| s.attachment_associations.map(&:attachment_id) }
+    attachment_ids_by_submission = submissions.index_with(&:attachment_ids_for_version)
     bulk_attachment_ids = attachment_ids_by_submission.values.flatten.uniq
     if bulk_attachment_ids.empty?
       attachments_by_id = {}
     else
-      attachments_by_id = Attachment.where(id: bulk_attachment_ids)
+      # join by attachment_associations here to filter out attachments that don't contain an
+      # AttachmentAssociation linking them to the submissions, even though the attachment is
+      # referenced in a submission's attachment_ids field. See 5e327e3.
+      attachments_by_id = Attachment.joins(:attachment_associations)
+                                    .where(id: bulk_attachment_ids, attachment_associations: { context: submissions })
+                                    .distinct
       attachments_by_id = attachments_by_id.preload(*preloads) unless preloads.nil?
       attachments_by_id = attachments_by_id.group_by(&:id)
     end
@@ -2196,7 +2211,15 @@ class Submission < ActiveRecord::Base
   end
 
   def includes_attachment?(attachment)
-    versions.map(&:model).any? { |v| (v.attachment_ids || "").split(",").map(&:to_i).include?(attachment.id) }
+    # TODO: after GROW-239, change this to check if the attachment
+    # is referenced in one of the associated AttachmentAssociation records.
+    #
+    # attachment_associations.where(attachment_id: attachment.id).exists?
+    #
+    versions.any? do |v|
+      ids = v.model.attachment_ids_for_version(include_attachment_id: false)
+      ids.include?(attachment.id)
+    end
   end
 
   def <=>(other)
@@ -2285,8 +2308,13 @@ class Submission < ActiveRecord::Base
     true
   end
 
+  # Note that this only returns attachments for the current version of the submission.
   def attachments
-    Attachment.where(id: attachment_associations.pluck(:attachment_id))
+    if attachment_ids_for_version.blank?
+      Attachment.none
+    else
+      Attachment.where(id: attachment_associations.where(attachment_id: attachment_ids_for_version).pluck(:attachment_id))
+    end
   end
 
   def attachments=(attachments)
@@ -2295,8 +2323,16 @@ class Submission < ActiveRecord::Base
     # one student from sneakily getting access to files in another user's comments,
     # since they're all being held on the assignment for now.
     attachments ||= []
-    old_ids = Array(attachment_ids || "").join(",").split(",").map(&:to_i)
-    self.attachment_ids = attachments.select { |a| (a && a.id && old_ids.include?(a.id)) || (a.recently_created? && a.context == assignment) || a.context != assignment }.map(&:id).join(",")
+
+    old_ids = attachment_ids_for_version(include_attachment_id: false)
+    self.attachment_ids = attachments.filter_map do |a|
+      next nil if a.blank?
+      next a.id if a.id && old_ids.include?(a.id)
+      next a.id if a.recently_created? && a.context == assignment
+      next a.id if a.context != assignment
+
+      nil
+    end.join(",")
   end
 
   # someday code-archaeologists will wonder how this method came to be named
@@ -2396,6 +2432,29 @@ class Submission < ActiveRecord::Base
   scope :speed_grader_includes, -> { preload(:versions, :submission_comments, :attachments, :rubric_assessment) }
   scope :for_user, ->(user) { where(user_id: user) }
   scope :needing_screenshot, -> { where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL").order(:updated_at) }
+
+  # returns submissions that reference the given attachment in their attachment_ids or attachment_id fields.
+  scope :referencing_attachment, lambda { |attachment| # you can also provide an attachment ID
+    where(
+      "submissions.attachment_id = ? " \
+      "OR ? = ANY(regexp_split_to_array(NULLIF(submissions.attachment_ids, ''), ',')::INT8[])",
+      attachment,
+      attachment
+    )
+  }
+
+  # returns submissions that reference the given attachment in their attachment_ids or attachment_id fields,
+  # and have an associated AttachmentAssociation linking that attachment to the submission.
+  # web snapshot attachments do not get AttachmentAssociations generated, therefore they will not be included
+  # in the results of this scope, whereas they could be in the referencing_attachment scope
+  scope :referencing_linked_attachment, lambda { |attachment| # you can also provide an attachment ID
+    referencing_attachment(attachment).where(
+      AttachmentAssociation.where("attachment_associations.context_id = submissions.id")
+                           .where(context_type: "Submission", attachment:)
+                           .arel
+                           .exists
+    )
+  }
 
   def assignment_visible_to_user?(user)
     return visible_to_user unless visible_to_user.nil?
@@ -2709,10 +2768,13 @@ class Submission < ActiveRecord::Base
     res.user_id = user_id
     res.workflow_state = "assigned" if res.new_record?
 
-    if res.new_record? && assignment.context.feature_enabled?(:peer_review_allocation_and_grading) &&
+    # To maintain backward compatibility with legacy peer reviews, we link the assessment
+    # request to the peer_review_sub_assignment regardless of the feature flag state
+    peer_review_sub = assignment.peer_review_sub_assignment
+    if res.new_record? &&
        assignment.peer_reviews? &&
-       assignment.peer_review_sub_assignment.present?
-      res.peer_review_sub_assignment_id = assignment.peer_review_sub_assignment.id
+       peer_review_sub.present?
+      res.peer_review_sub_assignment_id = peer_review_sub.id
     end
 
     res.send_reminder! # this method also saves the assessment_request
@@ -2832,7 +2894,7 @@ class Submission < ActiveRecord::Base
       return nil if required_count <= 0
 
       discussion_topic.discussion_entries
-                      .non_top_level_for_user(user)
+                      .non_top_level_for_user(user_id)
                       .order(created_at: :asc)
                       .offset(required_count - 1)
                       .limit(1)
@@ -3227,6 +3289,8 @@ class Submission < ActiveRecord::Base
 
     # When grades are published in moderated grading, only show the selected rubric assessment
     if assignment.moderated_grading? && assignment.grades_published?
+      return unposted_rubric_assessments_for(viewing_user, attempt:) if !posted? && !grants_right?(viewing_user, :read_grade)
+
       selected_assessment = rubric_assessments_for_attempt(attempt:).find do |a|
         a.assessment_type == "grading" &&
           a.rubric_association == assignment.rubric_association
@@ -3234,22 +3298,7 @@ class Submission < ActiveRecord::Base
       return selected_assessment ? [selected_assessment] : []
     end
 
-    unless posted? || grants_right?(viewing_user, :read_grade)
-      assessments = rubric_assessments_for_attempt(attempt:)
-
-      if posted_comments_at.present?
-        # Comments are posted but grades are not, so show assessments without point information
-        return assessments.map do |assessment|
-          strip_rubric_assessment_points(assessment)
-        end
-      end
-
-      # If this submission is unposted and the viewer can't view the grade,
-      # show only that viewer's assessments
-      return assessments.select do |assessment|
-        assessment.assessor_id == viewing_user.id
-      end
-    end
+    return unposted_rubric_assessments_for(viewing_user, attempt:) if !posted? && !grants_right?(viewing_user, :read_grade)
 
     can_moderate = include_provisional && assignment.permits_moderation?(viewing_user)
     target_rubric_association = assignment.rubric_association
@@ -3302,6 +3351,16 @@ class Submission < ActiveRecord::Base
     end
   end
   private :rubric_assessments_for_attempt
+
+  def unposted_rubric_assessments_for(viewing_user, attempt:)
+    assessments = rubric_assessments_for_attempt(attempt:)
+    if posted_comments_at.present?
+      return assessments.map { |a| strip_rubric_assessment_points(a) }
+    end
+
+    assessments.select { |a| a.assessor_id == viewing_user.id }
+  end
+  private :unposted_rubric_assessments_for
 
   # Strips point information from a rubric assessment while preserving comments
   # Used when comments are posted but grades are not (posted_comments_at set but not posted_at)

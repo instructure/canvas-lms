@@ -19,10 +19,10 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
+import type {Root} from 'react-dom/client'
 import type Gradebook from '../../Gradebook'
 import type GridSupport from '../GridSupport'
-import type {Root} from 'react-dom/client'
 
 import TotalGradeOverrideColumnHeader from './TotalGradeOverrideColumnHeader'
 
@@ -42,8 +42,12 @@ export default class TotalGradeOverrideColumnHeaderRenderer {
 
   render(_column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(options)
-    this.root = createRoot($container)
-    this.root.render(<TotalGradeOverrideColumnHeader {...props} />)
+    const element = <TotalGradeOverrideColumnHeader {...props} />
+    if (this.root) {
+      rerender(this.root, element)
+    } else {
+      this.root = render(element, $container)
+    }
   }
 
   destroy(_column, $container: HTMLElement, _gridSupport: GridSupport) {

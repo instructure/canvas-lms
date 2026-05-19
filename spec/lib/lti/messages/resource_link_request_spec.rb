@@ -321,7 +321,7 @@ describe Lti::Messages::ResourceLinkRequest do
           end
 
           it "doesn't include the resource_link_id property" do
-            expect(message_lti1p1).to_not include "resource_link_id"
+            expect(message_lti1p1).not_to include "resource_link_id"
           end
         end
 

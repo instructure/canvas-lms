@@ -48,6 +48,13 @@ describe UserSearch do
       expect(UserSearch.for_user_in_context("steWArt", course, user).size).to eq 3
     end
 
+    it "searches by both name and short_name" do
+      user_with_short_name = User.create!(name: "Nicknamed Student", short_name: "Name is Little")
+      StudentEnrollment.create!(user: user_with_short_name, course:, workflow_state: "active")
+
+      expect(UserSearch.for_user_in_context("little", course, user).size).to eq 2
+    end
+
     it "uses postgres lower(), not ruby downcase()" do
       # ruby 1.9 downcase doesn't handle the downcasing of many multi-byte characters correctly
       expect(UserSearch.for_user_in_context("Ĭńşŧřůćƭǜȑȩ", course, user).size).to eq 1
@@ -414,6 +421,7 @@ describe UserSearch do
         it "doesn't try to query cross-shard when the search term is a foreign global id in account context with include_deleted_users" do
           user = @shard1.activate { user_model }
           course.enroll_student(user)
+          allow(described_class).to receive(:specific_ids).and_return([user.global_id])
           scope = UserSearch.for_user_in_context(user.global_id, Account.default, account_admin_user, nil, include_deleted_users: true)
           sql = scope.to_sql
           expect(sql).to include user.global_id.to_s
@@ -450,6 +458,10 @@ describe UserSearch do
           teacher = User.create!(name:)
           TeacherEnrollment.create!(user: teacher, course: course1, workflow_state: "active")
         end
+      end
+
+      it "constructs an SQL query with materialized CTE" do
+        expect(UserSearch.for_user_in_context("Tyler", course.account, user, nil, enrollment_type: "student").to_sql).to include("WITH inner_user_scope AS MATERIALIZED")
       end
 
       describe "to a single role" do

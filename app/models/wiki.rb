@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Wiki < ActiveRecord::Base
+class Wiki < ApplicationRecord
   has_many :wiki_pages, dependent: :destroy
   has_one :course
   has_one :group

@@ -17,7 +17,7 @@
  */
 
 import {useState, useEffect} from 'react'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {RubricAssessmentData} from '@canvas/rubrics/react/types/rubric'
 import type {ViewMode} from '@canvas/rubrics/react/RubricAssessment/ViewModeSelect'

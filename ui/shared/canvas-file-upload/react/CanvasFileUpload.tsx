@@ -16,15 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useRef, useState, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {FileDrop} from '@instructure/ui-file-drop'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {Billboard} from '@instructure/ui-billboard'
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {IconFolderLine, IconUploadLine} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import {ContextFile} from './types'
@@ -32,7 +29,7 @@ import FileList from './FileList'
 import {useFileUpload} from './hooks/useFileUpload'
 import CanvasFilesBrowser from './components/CanvasFilesBrowser/CanvasFilesBrowser'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('canvas_file_upload')
 
@@ -43,6 +40,9 @@ interface CanvasFileUploadProps {
   allowedFileTypes?: string[]
   maxFileSizeMB?: number // Maximum file size in MB, undefined = unlimited
   maxFiles?: number // Maximum number of files, undefined = unlimited
+  initialFailedFileNames?: string[] // Pine indexing failures from the API
+  primaryButtonThemeOverride?: Record<string, unknown>
+  secondaryButtonThemeOverride?: Record<string, unknown>
 }
 
 const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
@@ -52,29 +52,65 @@ const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
   allowedFileTypes,
   maxFileSizeMB,
   maxFiles,
+  initialFailedFileNames,
+  primaryButtonThemeOverride,
+  secondaryButtonThemeOverride,
 }) => {
-  // Use custom hook for upload logic
-  const {uploadingFileNames, handleDrop, isUploading} = useFileUpload({
-    files,
-    onFilesChange,
-    courseId,
-    allowedFileTypes,
-    maxFileSizeMB,
-    maxFiles,
-  })
+  const {uploadingFileNames, failedFileNames, clearFailedFile, handleDrop, isUploading} =
+    useFileUpload({
+      files,
+      onFilesChange,
+      courseId,
+      allowedFileTypes,
+      maxFileSizeMB,
+      maxFiles,
+    })
 
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const isSelectingRef = useRef(false)
   const [showBrowserModal, setShowBrowserModal] = useState(false)
+  // Track Pine-failed names the user has explicitly dismissed this session
+  const [dismissedPineFailed, setDismissedPineFailed] = useState<Set<string>>(new Set())
+
+  // Derive active Pine failures from the prop minus anything dismissed
+  const pineFailed = useMemo(
+    () => new Set((initialFailedFileNames ?? []).filter(n => !dismissedPineFailed.has(n))),
+    [initialFailedFileNames, dismissedPineFailed],
+  )
 
   const handleRemoveFile = (fileId: string) => {
     const updatedFiles = files.filter(file => file.id !== fileId)
     onFilesChange(updatedFiles)
   }
 
+  const allFailedFileNames = new Set([...failedFileNames, ...pineFailed])
+
+  const handleClearFailedFile = (name: string) => {
+    if (pineFailed.has(name)) {
+      // Pine indexing failure — remove file from list and clear the failed indicator
+      const file = files.find(f => f.display_name === name)
+      if (file) handleRemoveFile(file.id)
+      setDismissedPineFailed(prev => new Set([...prev, name]))
+    } else {
+      // Upload failure — just clear the failed indicator
+      clearFailedFile(name)
+    }
+  }
+
+  const visibleFiles = files.filter(f => !pineFailed.has(f.display_name))
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      handleDrop(e.target.files, [])
+      e.target.value = ''
+    }
+  }
+
   const handleFileSelect = async (fileID: string) => {
-    if (!fileID) return
+    if (!fileID || isSelectingRef.current) return
+    isSelectingRef.current = true
 
     try {
-      // Fetch file metadata
       const {json} = await doFetchApi<ContextFile>({
         path: `/api/v1/files/${fileID}`,
         method: 'GET',
@@ -82,7 +118,6 @@ const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
 
       if (!json) return
 
-      // Check if file already exists
       if (files.some(f => f.id === json.id)) {
         showFlashAlert({
           message: I18n.t('This file has already been added.'),
@@ -91,7 +126,6 @@ const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
         return
       }
 
-      // Check max files limit
       if (maxFiles && files.length >= maxFiles) {
         showFlashAlert({
           message: I18n.t('Maximum number of files reached (%{max})', {max: maxFiles}),
@@ -100,168 +134,75 @@ const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
         return
       }
 
-      // Add to files list
-      const newFiles = [...files, json]
-      onFilesChange(newFiles)
+      onFilesChange([...files, json])
 
       showFlashAlert({
         message: I18n.t('File added successfully from Canvas Files'),
         type: 'success',
       })
 
-      // Close modal
       setShowBrowserModal(false)
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error'
       showFlashAlert({
-        message: I18n.t('Failed to add file: %{error}', {
-          error: error.message || 'Unknown error',
-        }),
+        message: I18n.t('Failed to add file: %{error}', {error: message}),
         type: 'error',
       })
+    } finally {
+      isSelectingRef.current = false
     }
   }
 
   return (
     <View as="div">
-      <View
-        as="div"
-        borderWidth="small"
-        borderRadius="medium"
-        borderColor="primary"
-        background="secondary"
-        padding="large small"
-        margin="medium 0"
-        height="400px"
-      >
-        <Flex
-          as="div"
-          justifyItems="space-between"
-          alignItems="stretch"
-          wrap="no-wrap"
-          direction="row"
-          height="100%"
-          padding="small 0"
-        >
-          {/* Upload from Computer */}
-          <Flex.Item width="45%">
-            <View
-              as="div"
-              background="primary"
-              borderRadius="medium"
-              height="100%"
-              margin="0 large"
-            >
-              <FileDrop
-                data-testid="context-files-drop"
-                height="100%"
-                shouldAllowMultiple={true}
-                onDrop={handleDrop}
-                accept={allowedFileTypes?.join(',')}
-                renderLabel={
-                  <Flex height="100%" justifyItems="center" alignItems="center">
-                    <Billboard
-                      size="small"
-                      hero={<IconUploadLine size="large" />}
-                      as="div"
-                      headingAs="span"
-                      headingLevel="h3"
-                      heading={I18n.t('Upload from Computer')}
-                      message={
-                        <Text color="brand">
-                          {isUploading ? I18n.t('Uploading...') : I18n.t('Drag files or click')}
-                        </Text>
-                      }
-                      disabled={isUploading}
-                    />
-                  </Flex>
-                }
-              />
-            </View>
-          </Flex.Item>
-
-          {/* Separator with "or" */}
-          <Flex.Item width="10%" textAlign="center" as="div">
-            <div
-              style={{
-                display: 'flex',
-                height: '100%',
-                position: 'relative',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <span
-                style={{
-                  display: 'block',
-                  width: '100%',
-                  zIndex: 99,
-                  backgroundColor: '#F5F5F5',
-                  padding: '0.75rem 0',
-                  position: 'relative',
-                }}
-              >
-                {I18n.t('or')}
-              </span>
-              <div
-                style={{
-                  height: '100%',
-                  width: '1px',
-                  left: '50%',
-                  top: 0,
-                  position: 'absolute',
-                  backgroundColor: '#C7CDD1',
-                  transform: 'translateX(-50%)',
-                }}
-              >
-                &nbsp;
-              </div>
-            </div>
-          </Flex.Item>
-
-          {/* Select from Canvas Files - Stub for future work */}
-          <Flex.Item width="45%" as="div">
-            <Flex height="100%" justifyItems="center" alignItems="center">
-              <View
-                as="div"
-                background="primary"
-                borderColor="primary"
-                borderWidth="small"
-                borderRadius="medium"
-                width="80%"
-              >
-                <Button
-                  display="block"
-                  height="100%"
-                  onClick={() => setShowBrowserModal(true)}
-                  themeOverride={{borderWidth: '0'}}
-                  withBackground={false}
-                >
-                  <Flex direction="row" justifyItems="center" padding="xxx-small 0">
-                    <Flex.Item margin="0 0 0 small">
-                      <IconFolderLine size="medium" color="primary" width="24px" height="24px" />
-                    </Flex.Item>
-                    <Flex.Item margin="0 small" shouldShrink={true}>
-                      <Text color="primary" size="large">
-                        {I18n.t('Canvas Files')}
-                      </Text>
-                    </Flex.Item>
-                  </Flex>
-                </Button>
-              </View>
-            </Flex>
-          </Flex.Item>
-        </Flex>
+      <View as="div" margin="0 0 small 0">
+        <Text weight="bold">
+          {I18n.t('Up to %{maxFiles} file sources (Maximum of %{maxSize}MB)', {
+            maxFiles: maxFiles ?? 10,
+            maxSize: maxFileSizeMB,
+          })}
+        </Text>
       </View>
-
-      {/* File List Component */}
-      {(files.length > 0 || uploadingFileNames.size > 0) && (
+      {(files.length > 0 || uploadingFileNames.size > 0 || allFailedFileNames.size > 0) && (
         <FileList
-          files={files}
+          files={visibleFiles}
           uploadingFileNames={uploadingFileNames}
+          failedFileNames={allFailedFileNames}
           onRemoveFile={handleRemoveFile}
+          onClearFailedFile={handleClearFailedFile}
         />
       )}
+
+      <Flex as="div" wrap="wrap">
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple={true}
+          accept={allowedFileTypes?.join(',')}
+          onChange={handleFileInputChange}
+          style={{display: 'none'}}
+          data-testid="context-files-input"
+        />
+        <Flex.Item margin="0 small 0 0">
+          <Button
+            color="primary"
+            themeOverride={primaryButtonThemeOverride}
+            onClick={() => fileInputRef.current?.click()}
+            interaction={isUploading ? 'disabled' : 'enabled'}
+          >
+            {isUploading ? I18n.t('Uploading...') : I18n.t('Upload from computer')}
+          </Button>
+        </Flex.Item>
+        <Flex.Item>
+          <Button
+            color="primary"
+            themeOverride={secondaryButtonThemeOverride}
+            onClick={() => setShowBrowserModal(true)}
+          >
+            {I18n.t('Choose from Canvas files')}
+          </Button>
+        </Flex.Item>
+      </Flex>
 
       {/* Canvas Files Browser Modal */}
       <Modal
@@ -290,7 +231,12 @@ const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
           </View>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={() => setShowBrowserModal(false)} margin="0 xx-small 0 0">
+          <Button
+            color="primary"
+            onClick={() => setShowBrowserModal(false)}
+            themeOverride={secondaryButtonThemeOverride}
+            margin="0 xx-small 0 0"
+          >
             {I18n.t('Cancel')}
           </Button>
         </Modal.Footer>

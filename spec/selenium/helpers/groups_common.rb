@@ -40,7 +40,7 @@ module GroupsCommon
   end
 
   # Creates group sets equal to groupset_count and groups within each group set equal to groups_per_set
-  def seed_groups(groupset_count, groups_per_set, differentiate_groups = false)
+  def seed_groups(groupset_count, groups_per_set, differentiate_groups: false)
     @group_category = []
     @testgroup = []
     groupset_count.times do |n|
@@ -53,12 +53,12 @@ module GroupsCommon
   end
 
   # Sets up groups and users for testing. Default is 1 user, 1 groupset, and 1 group per groupset.
-  def group_test_setup(user_count = 1, groupset_count = 1, groups_per_set = 1, differentiate_groups = false)
+  def group_test_setup(user_count = 1, groupset_count = 1, groups_per_set = 1, differentiate_groups: false)
     seed_students(user_count)
-    seed_groups(groupset_count, groups_per_set, differentiate_groups)
+    seed_groups(groupset_count, groups_per_set, differentiate_groups:)
   end
 
-  def add_user_to_group(user, group, is_leader = false)
+  def add_user_to_group(user, group, is_leader: false)
     group.add_user user
     group.leader = user if is_leader
     group.save!
@@ -136,13 +136,13 @@ module GroupsCommon
     end
 
     if params[:add_self_to_group] == true
-      add_user_to_group(@student, group, params[:is_leader])
+      add_user_to_group(@student, group, is_leader: params[:is_leader])
     end
 
     seed_students(params[:enroll_student_count]) if params[:enroll_student_count] > 0
     if params[:add_students_to_group]
       @students.each do |student|
-        add_user_to_group(student, group, false)
+        add_user_to_group(student, group, is_leader: false)
       end
     end
 
@@ -154,13 +154,13 @@ module GroupsCommon
     @course.enroll_student(@student).accept!
 
     group = @course.groups.create!(name: group_name)
-    add_user_to_group(@student, group, false)
+    add_user_to_group(@student, group, is_leader: false)
 
     enroll_student_count.times do |n|
       @student = User.create!(name: "Test Student #{n + 2}")
       @course.enroll_student(@student).accept!
 
-      add_user_to_group(@student, group, false)
+      add_user_to_group(@student, group, is_leader: false)
     end
 
     group
@@ -213,7 +213,7 @@ module GroupsCommon
     wait_for_ajaximations
   end
 
-  def set_cloned_groupset_name(groupset_name = "Test Group Set Clone", page_reload = false)
+  def set_cloned_groupset_name(groupset_name = "Test Group Set Clone", page_reload: false)
     replace_content(f("#cloned_category_name"), groupset_name)
     if page_reload
       expect_new_page_load { f("#clone_category_submit_button").click }
@@ -333,7 +333,7 @@ module GroupsCommon
 
   # context test. if true, allows you to test files both in and out of group context,
   #   otherwise it adds two files to the group
-  def add_test_files(context_test = true)
+  def add_test_files(context_test: true)
     second_file_context = if context_test
                             @course
                           else

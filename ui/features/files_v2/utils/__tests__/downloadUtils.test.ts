@@ -27,9 +27,13 @@ import {FAKE_FILES, FAKE_FOLDERS} from '../../fixtures/fakeData'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: vi.fn(() => vi.fn()),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn(() => vi.fn()),
+  }
+})
 vi.mock('@canvas/util/globalUtils', () => ({
   assignLocation: vi.fn(),
 }))

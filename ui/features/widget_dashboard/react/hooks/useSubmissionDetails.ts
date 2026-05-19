@@ -45,7 +45,7 @@ const SUBMISSION_DETAILS_QUERY = gql`
             }
           }
         }
-        recentCommentsConnection: commentsConnection(first: 5, sortOrder: desc) {
+        recentCommentsConnection: commentsConnection(first: 5, sortOrder: desc, filter: {allComments: true}) {
           nodes {
             _id
             comment
@@ -57,7 +57,7 @@ const SUBMISSION_DETAILS_QUERY = gql`
             createdAt
           }
         }
-        allCommentsConnection: commentsConnection(first: 1) {
+        allCommentsConnection: commentsConnection(first: 1, filter: {allComments: true}) {
           pageInfo {
             totalCount
           }

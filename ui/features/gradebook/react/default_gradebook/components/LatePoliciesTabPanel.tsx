@@ -26,7 +26,7 @@ import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-con
 import {Spinner} from '@instructure/ui-spinner'
 import {Checkbox} from '@instructure/ui-checkbox'
 import type {LatePolicyCamelized, LatePolicyValidationErrors} from '../gradebook.d'
-import CanvasSelect from '@canvas/instui-bindings/react/Select'
+import {CanvasSelect} from '@instructure/platform-instui-bindings'
 import NumberHelper from '@canvas/i18n/numberHelper'
 import {IconWarningSolid} from '@instructure/ui-icons'
 

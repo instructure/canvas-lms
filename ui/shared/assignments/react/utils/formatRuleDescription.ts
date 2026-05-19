@@ -28,79 +28,61 @@ const I18n = createI18nScope('peer_review_allocation_rules')
  */
 export const formatFullRuleDescription = (rule: AllocationRuleType): string => {
   const {mustReview, reviewPermitted, appliesToAssessor, assessor, assessee} = rule
+  const enforcement = mustReview ? I18n.t('strict') : I18n.t('flexible')
+
+  let action: string
   if (appliesToAssessor) {
-    if (mustReview && reviewPermitted) {
-      return I18n.t('%{assessor} must review %{assessee}', {
-        assessor: assessor.name,
-        assessee: assessee.name,
-      })
-    } else if (mustReview && !reviewPermitted) {
-      return I18n.t('%{assessor} must not review %{assessee}', {
-        assessor: assessor.name,
-        assessee: assessee.name,
-      })
-    } else if (!mustReview && reviewPermitted) {
-      return I18n.t('%{assessor} should review %{assessee}', {
+    if (reviewPermitted) {
+      action = I18n.t('%{assessor} will review %{assessee}', {
         assessor: assessor.name,
         assessee: assessee.name,
       })
     } else {
-      return I18n.t('%{assessor} should not review %{assessee}', {
+      action = I18n.t('%{assessor} will not review %{assessee}', {
         assessor: assessor.name,
         assessee: assessee.name,
       })
     }
   } else {
-    if (mustReview && reviewPermitted) {
-      return I18n.t('%{assessee} must be reviewed by %{assessor}', {
-        assessee: assessee.name,
-        assessor: assessor.name,
-      })
-    } else if (mustReview && !reviewPermitted) {
-      return I18n.t('%{assessee} must not be reviewed by %{assessor}', {
-        assessee: assessee.name,
-        assessor: assessor.name,
-      })
-    } else if (!mustReview && reviewPermitted) {
-      return I18n.t('%{assessee} should be reviewed by %{assessor}', {
+    if (reviewPermitted) {
+      action = I18n.t('%{assessee} will be reviewed by %{assessor}', {
         assessee: assessee.name,
         assessor: assessor.name,
       })
     } else {
-      return I18n.t('%{assessee} should not be reviewed by %{assessor}', {
+      action = I18n.t('%{assessee} will not be reviewed by %{assessor}', {
         assessee: assessee.name,
         assessor: assessor.name,
       })
     }
   }
+
+  return I18n.t('%{action} (%{enforcement})', {action, enforcement})
 }
 
 /**
  * Formats a rule description with only the action and subject.
  * Used for displaying on allocation rule cards where the main student is already visible.
- * Example: "Must review Student B"
+ * Example: "will review Student B (strict)"
  */
 export const formatRuleDescription = (rule: AllocationRuleType): string => {
   const {mustReview, reviewPermitted, appliesToAssessor, assessor, assessee} = rule
+  const enforcement = mustReview ? I18n.t('strict') : I18n.t('flexible')
+
+  let action: string
   if (appliesToAssessor) {
-    if (mustReview && reviewPermitted) {
-      return I18n.t('Must review %{subject}', {subject: assessee.name})
-    } else if (mustReview && !reviewPermitted) {
-      return I18n.t('Must not review %{subject}', {subject: assessee.name})
-    } else if (!mustReview && reviewPermitted) {
-      return I18n.t('Should review %{subject}', {subject: assessee.name})
+    if (reviewPermitted) {
+      action = I18n.t('will review %{subject}', {subject: assessee.name})
     } else {
-      return I18n.t('Should not review %{subject}', {subject: assessee.name})
+      action = I18n.t('will not review %{subject}', {subject: assessee.name})
     }
   } else {
-    if (mustReview && reviewPermitted) {
-      return I18n.t('Must be reviewed by %{subject}', {subject: assessor.name})
-    } else if (mustReview && !reviewPermitted) {
-      return I18n.t('Must not be reviewed by %{subject}', {subject: assessor.name})
-    } else if (!mustReview && reviewPermitted) {
-      return I18n.t('Should be reviewed by %{subject}', {subject: assessor.name})
+    if (reviewPermitted) {
+      action = I18n.t('will be reviewed by %{subject}', {subject: assessor.name})
     } else {
-      return I18n.t('Should not be reviewed by %{subject}', {subject: assessor.name})
+      action = I18n.t('will not be reviewed by %{subject}', {subject: assessor.name})
     }
   }
+
+  return I18n.t('%{action} (%{enforcement})', {action, enforcement})
 }

@@ -47,6 +47,15 @@ export type NavigationTab = Omit<EnvNavigationTab, 'id'> & {
 
 export const isLinkTab = (tab: NavigationTab) => tab.href === NAV_MENU_LINK_HREF
 
+export function getLinkTabUrl(tab: NavigationTab): string | undefined {
+  if (!isLinkTab(tab)) {
+    return undefined
+  }
+  const first = Array.isArray(tab.args) ? tab.args[0] : undefined
+  if (typeof first !== 'string') return undefined
+  return first.startsWith('/') ? window.location.origin + first : first
+}
+
 // The Navigation Tab as provided from the ENV variable
 type EnvNavigationTab = {
   id: number | string // to go in externalId

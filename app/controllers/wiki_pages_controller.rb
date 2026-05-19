@@ -34,6 +34,7 @@ class WikiPagesController < ApplicationController
   before_action :set_js_rights
   before_action :set_js_wiki_data
   before_action :rce_js_env, only: %i[edit index new]
+  skip_before_action :require_user, only: %i[front_page index show show_redirect]
 
   include K5Mode
 
@@ -53,10 +54,12 @@ class WikiPagesController < ApplicationController
   def set_pandapub_read_token
     if @page&.grants_right?(@current_user, session, :read) && CanvasPandaPub.enabled?
       channel = "/private/wiki_page/#{@page.global_id}/update"
-      js_env WIKI_PAGE_PANDAPUB: {
-        CHANNEL: channel,
-        TOKEN: CanvasPandaPub.generate_token(channel, true)
-      }
+      js_env({
+               WIKI_PAGE_PANDAPUB: {
+                 CHANNEL: channel,
+                 TOKEN: CanvasPandaPub.generate_token(channel, read: true)
+               }
+             })
     end
   end
 
@@ -124,6 +127,25 @@ class WikiPagesController < ApplicationController
         set_master_course_js_env_data(@page, @context)
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
         @padless = true
+        if @context.is_a?(Course) && @context.feature_enabled?(:study_assist) && @context.user_is_student?(@current_user)
+          @show_study_assist = true
+          js_env[:FEATURES][:study_assist] = true
+          js_env({
+                   WIKI_PAGE_ID: @page.url,
+                   STUDY_ASSIST_TOOLS: study_assist_enabled_tools
+                 })
+          js_bundle :study_assist
+        end
+        if @context.is_a?(Course) && @context.account.feature_enabled?(:notebook) && @context.user_is_student?(@current_user)
+          @show_notebook = true
+          js_env[:FEATURES][:notebook] = true
+          js_env({
+                   WIKI_PAGE_ID: @page.url,
+                   WIKI_PAGE_UPDATED_AT: @page.updated_at.iso8601,
+                   JOURNEY_URL: CanvasCareer::Config.new(@domain_root_account).public_app_config(request).dig("hosts", "journey"),
+                 })
+          js_bundle :notebook
+        end
       end
 
       js_bundle :wiki_page_show
@@ -245,7 +267,7 @@ class WikiPagesController < ApplicationController
 
     ai_alt_text_generation_url = ai_enabled ? ai_alt_text_generation_url_for_context(@context) : nil
 
-    js_env(ai_alt_text_generation_url:)
+    js_env({ ai_alt_text_generation_url: })
   end
 
   def ai_alt_text_generation_url_for_context(context)

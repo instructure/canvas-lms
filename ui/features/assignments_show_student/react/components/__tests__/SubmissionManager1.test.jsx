@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {CREATE_SUBMISSION} from '@canvas/assignments/graphql/student/Mutations'
 import {SUBMISSION_HISTORIES_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'

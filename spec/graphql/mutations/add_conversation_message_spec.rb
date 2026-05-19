@@ -124,7 +124,7 @@ RSpec.describe Mutations::AddConversationMessage do
       result.dig("data", "addConversationMessage", "conversationMessage", "body")
     ).to eq "This is a neat message"
     cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
-    expect(cm).to_not be_nil
+    expect(cm).not_to be_nil
     expect(cm.conversation_id).to eq @conversation.conversation_id
   end
 
@@ -153,7 +153,7 @@ RSpec.describe Mutations::AddConversationMessage do
       result.dig("data", "addConversationMessage", "conversationMessage", "body")
     ).to eq "This should still send"
     cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
-    expect(cm).to_not be_nil
+    expect(cm).not_to be_nil
     expect(cm.conversation_id).to eq nil_context_convo.conversation_id
   end
 

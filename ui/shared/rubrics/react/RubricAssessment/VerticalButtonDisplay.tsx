@@ -29,6 +29,7 @@ import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment
 
 type VerticalButtonDisplayProps = {
   buttonDisplay: string
+  criterionId: string
   hidePoints: boolean
   isPreviewMode: boolean
   isSelfAssessment: boolean
@@ -42,6 +43,7 @@ type VerticalButtonDisplayProps = {
 }
 export const VerticalButtonDisplay = ({
   buttonDisplay,
+  criterionId,
   hidePoints,
   isPreviewMode,
   isSelfAssessment,
@@ -68,6 +70,7 @@ export const VerticalButtonDisplay = ({
     <Flex
       as="div"
       direction={ratingOrder === 'ascending' ? 'column-reverse' : 'column'}
+      data-criterion-id={criterionId}
       data-testid="rubric-assessment-vertical-display"
     >
       {ratings.map((rating, index) => {
@@ -79,15 +82,19 @@ export const VerticalButtonDisplay = ({
         const isSelfAssessmentSelected =
           rating.id != null && rating.id === selectedSelfAssessmentRatingId
 
-        const min = criterionUseRange ? rangingFrom(ratings, index, undefined, true) : undefined
+        const min = criterionUseRange ? rangingFrom(ratings, index) : undefined
 
         const getPossibleText = (points?: number) => {
           return min != null ? possibleStringRange(min, points) : possibleString(points)
         }
 
-        const buttonAriaLabel = `${rating.description} ${rating.longDescription} ${getPossibleText(
-          rating.points,
-        )}`
+        const buttonAriaLabel = [
+          rating.description,
+          rating.longDescription,
+          getPossibleText(rating.points),
+        ]
+          .filter(Boolean)
+          .join(' ')
 
         return (
           <Flex.Item key={`${rating.id}-${buttonLabel}`} padding="xx-small 0 0 0">
@@ -95,7 +102,6 @@ export const VerticalButtonDisplay = ({
               <Flex.Item
                 align={isSelected ? 'start' : 'center'}
                 data-testid={`rating-button-${rating.id}-${index}`}
-                aria-label={buttonAriaLabel}
                 elementRef={ref => {
                   if (index === 0) {
                     firstRatingRef.current = ref
@@ -104,6 +110,7 @@ export const VerticalButtonDisplay = ({
               >
                 {isSelfAssessment ? (
                   <SelfAssessmentRatingButton
+                    ariaLabel={buttonAriaLabel}
                     buttonLabel={buttonLabel}
                     isPreviewMode={isPreviewMode}
                     isSelected={isSelected}
@@ -111,6 +118,7 @@ export const VerticalButtonDisplay = ({
                   />
                 ) : (
                   <RatingButton
+                    ariaLabel={buttonAriaLabel}
                     buttonLabel={buttonLabel}
                     isPreviewMode={isPreviewMode}
                     isSelected={isSelected}

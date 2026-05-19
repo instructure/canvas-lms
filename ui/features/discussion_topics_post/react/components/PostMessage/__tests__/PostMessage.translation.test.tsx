@@ -22,13 +22,13 @@ import {User} from '../../../../graphql/User'
 import {responsiveQuerySizes} from '../../../utils'
 import {useTranslationStore} from '../../../hooks/useTranslationStore'
 import {ObserverContext} from '../../../utils/ObserverContext'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 vi.mock('../../../utils')
 
 vi.mock('../../../hooks/useTranslationStore')
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 const useTranslationStoreMock = useTranslationStore as unknown as any
 const responsiveQuerySizesMock = responsiveQuerySizes as any

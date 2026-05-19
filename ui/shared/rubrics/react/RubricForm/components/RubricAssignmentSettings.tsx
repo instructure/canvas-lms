@@ -40,7 +40,7 @@ export const RubricAssignmentSettings = ({
   setRubricFormField,
 }: RubricAssignmentSettingsProps) => {
   return (
-    <Flex margin="medium 0 0" gap="medium">
+    <Flex margin="medium 0 0" gap="medium" wrap="wrap">
       <Flex.Item>
         <Checkbox
           label={I18n.t("Don't post to Learning Mastery Gradebook")}

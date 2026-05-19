@@ -19,7 +19,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import AssignmentGroupColumnHeader from './AssignmentGroupColumnHeader'
 import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
 import type GridSupport from '../GridSupport/index'
@@ -126,10 +126,10 @@ export default class AssignmentGroupColumnHeaderRenderer {
   render(column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, options)
 
-    ReactDOM.render(<AssignmentGroupColumnHeader {...props} />, $container)
+    legacyRender(<AssignmentGroupColumnHeader {...props} />, $container)
   }
 
   destroy(_column, $container: HTMLElement, _gridSupport: GridSupport) {
-    ReactDOM.unmountComponentAtNode($container)
+    legacyUnmountComponentAtNode($container)
   }
 }

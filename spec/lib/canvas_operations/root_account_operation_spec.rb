@@ -25,6 +25,8 @@ RSpec.describe CanvasOperations::RootAccountOperation do
   shared_context "simple root account operation" do
     before do
       stub_const("MyRootAccountOperation", Class.new(described_class) do
+        self.progress_tracking = true
+
         def execute
           log_message("Executing MyRootAccountOperation for account #{root_account.global_id}")
           results[:account_id] = root_account.global_id

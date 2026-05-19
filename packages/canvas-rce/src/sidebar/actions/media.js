@@ -88,6 +88,7 @@ export function fetchInitialMedia() {
  * @param {string} params.title - New title for the media
  * @param {Array} params.subtitles - Subtitle/caption data (optional)
  * @param {boolean} params.skipCaptionUpdate - If true, skip updating captions even if subtitles provided (default: false)
+ * @param {Object} params.viewerRestrictions - Viewer restrictions to apply for this media (default: {})
  * @returns {Function} Redux thunk
  */
 export function updateMediaObject({
@@ -96,11 +97,12 @@ export function updateMediaObject({
   title,
   subtitles,
   skipCaptionUpdate = false,
+  viewerRestrictions,
 }) {
   return (dispatch, getState) => {
     const state = getState()
     const moUpdate = state.source
-      .updateMediaObject(state, {media_object_id, title, attachment_id})
+      .updateMediaObject(state, {media_object_id, title, attachment_id, viewerRestrictions})
       .catch(e => {
         alertHandler.handleAlert({
           text: formatMessage(

@@ -19,7 +19,7 @@
 import React, {useContext, useEffect, useState} from 'react'
 import {DiscussionDueDatesContext} from '../../util/constants'
 import AssignToContent from '@canvas/due-dates/react/AssignToContent'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {View} from '@instructure/ui-view'
 
 const DEFAULT_SECTION_ID = '0'

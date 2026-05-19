@@ -18,17 +18,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe PageViews::EnqueueBatchQueryService do
-  let(:configuration) { instance_double(PageViews::Configuration, uri: URI.parse("http://pv5.instructure.com"), access_token: "token") }
+  let(:configuration) { instance_double(PageViews::Configuration, uri: URI.parse("http://pv5.instructure.com")) }
   let(:account) { instance_double(Account, id: 1, uuid: "abc") }
   let(:admin) { instance_double(User, global_id: 1, shard: Shard.default, root_account_ids: [account.id]) }
   let(:user1) { instance_double(User, id: 2, global_id: 2, shard: Shard.default, root_account_ids: [account.id]) }
   let(:user2) { instance_double(User, id: 3, global_id: 3, shard: Shard.default, root_account_ids: [account.id]) }
+  let(:user1_array) do
+    [user1].tap { allow(it).to receive(:all?).with(User).and_return(true) }
+  end
+  let(:users) do
+    [user1, user2].tap { allow(it).to receive(:all?).with(User).and_return(true) }
+  end
   let(:service) { PageViews::EnqueueBatchQueryService.new(configuration, requestor_user: admin) }
 
   before do
+    allow(Account).to receive(:find_cached).and_call_original
     allow(Account).to receive(:find_cached).with(1).and_return(account)
-    allow(user1).to receive(:is_a?).with(User).and_return(true)
-    allow(user2).to receive(:is_a?).with(User).and_return(true)
+    allow(account).to receive(:environment_specific_domain).and_return("canvas.instructure.com")
+    allow(admin).to receive(:uuid).and_return("admin-uuid-123")
   end
 
   it "returns query ID from API response" do
@@ -36,7 +43,7 @@ describe PageViews::EnqueueBatchQueryService do
     response = double(code: 201, header: { "Location" => "http://pv5.instructure.com/api/v5/pageviews/batch-query/#{expected_uuid}" })
     allow(CanvasHttp).to receive(:post).and_yield(response)
 
-    query_id = service.call("2025-03-01", "2025-06-01", [user1, user2], "csv")
+    query_id = service.call("2025-03-01", "2025-06-01", users, "csv")
 
     expect(query_id).to eq(expected_uuid)
   end
@@ -45,7 +52,7 @@ describe PageViews::EnqueueBatchQueryService do
     response = double(code: 201, header: { "Location" => "http://pv5.instructure.com/api/v5/pageviews/batch-query/123" })
     allow(CanvasHttp).to receive(:post).and_yield(response)
 
-    service.call("2025-03-01", "2025-06-01", [user1, user2], "csv")
+    service.call("2025-03-01", "2025-06-01", users, "csv")
 
     expect(CanvasHttp).to have_received(:post) do |uri, _headers, options|
       expect(uri).to eq("http://pv5.instructure.com/api/v5/pageviews/batch-query")
@@ -82,19 +89,19 @@ describe PageViews::EnqueueBatchQueryService do
 
   it "raises ArgumentError when start_date is invalid" do
     expect do
-      service.call("", "2025-04-01", [user1], "csv")
+      service.call("", "2025-04-01", user1_array, "csv")
     end.to raise_error(ArgumentError, "Date must be in YYYY-MM-DD format")
   end
 
   it "raises ArgumentError when end_date is invalid" do
     expect do
-      service.call("2025-03-01", "", [user1], "csv")
+      service.call("2025-03-01", "", user1_array, "csv")
     end.to raise_error(ArgumentError, "Date must be in YYYY-MM-DD format")
   end
 
   it "raises ArgumentError when format is invalid" do
     expect do
-      service.call("2025-03-01", "2025-04-01", [user1], "xml")
+      service.call("2025-03-01", "2025-04-01", user1_array, "xml")
     end.to raise_error(ArgumentError, "Format must be one of csv, jsonl")
   end
 
@@ -103,7 +110,7 @@ describe PageViews::EnqueueBatchQueryService do
     allow(CanvasHttp).to receive(:post).and_yield(response)
 
     expect do
-      service.call("2025-03-01", "2025-04-01", [user1], "csv")
+      service.call("2025-03-01", "2025-04-01", user1_array, "csv")
     end.not_to raise_error
   end
 
@@ -112,7 +119,7 @@ describe PageViews::EnqueueBatchQueryService do
     allow(CanvasHttp).to receive(:post).and_yield(response)
 
     expect do
-      service.call("2025-03-01", "2025-04-01", [user1], "jsonl")
+      service.call("2025-03-01", "2025-04-01", user1_array, "jsonl")
     end.not_to raise_error
   end
 
@@ -121,7 +128,7 @@ describe PageViews::EnqueueBatchQueryService do
     allow(CanvasHttp).to receive(:post).and_yield(response)
 
     expect do
-      service.call("2024-12-01", "2025-01-01", [user1, user2], "jsonl")
+      service.call("2024-12-01", "2025-01-01", users, "jsonl")
     end.to raise_error(PageViews::Common::InvalidRequestError) do |error|
       expect(error.message).to eq("Invalid request: invalid root account uuid")
     end
@@ -132,7 +139,7 @@ describe PageViews::EnqueueBatchQueryService do
     allow(CanvasHttp).to receive(:post).and_yield(response)
 
     expect do
-      service.call("2024-12-01", "2025-01-01", [user1, user2], "jsonl")
+      service.call("2024-12-01", "2025-01-01", users, "jsonl")
     end.to raise_error(PageViews::Common::NotFoundError) do |error|
       expect(error.message).to eq("Resource not found")
     end
@@ -143,9 +150,19 @@ describe PageViews::EnqueueBatchQueryService do
     allow(CanvasHttp).to receive(:post).and_yield(response)
 
     expect do
-      service.call("2024-12-01", "2025-01-01", [user1, user2], "csv")
+      service.call("2024-12-01", "2025-01-01", users, "csv")
     end.to raise_error(PageViews::Common::TooManyRequestsError) do |error|
       expect(error.message).to eq("Rate limit exceeded")
+    end
+  end
+
+  it "raises ServiceUnavailable when PV5 API query queue is at capacity" do
+    response = instance_double(Net::HTTPResponse, code: 503)
+    allow(CanvasHttp).to receive(:post).and_yield(response)
+    expect do
+      service.call("2024-12-01", "2025-01-01", users, "csv")
+    end.to raise_error(PageViews::Common::ServiceUnavailable) do |error|
+      expect(error.message).to eq("Service temporarily unavailable")
     end
   end
 
@@ -154,7 +171,7 @@ describe PageViews::EnqueueBatchQueryService do
     allow(CanvasHttp).to receive(:post).and_yield(response)
 
     expect do
-      service.call("2024-12-01", "2025-01-01", [user1, user2], "csv")
+      service.call("2024-12-01", "2025-01-01", users, "csv")
     end.to raise_error(PageViews::Common::InternalServerError) do |error|
       expect(error.message).to eq("Internal server error")
     end
@@ -165,17 +182,17 @@ describe PageViews::EnqueueBatchQueryService do
     allow(RequestContext::Generator).to receive(:request_id).and_return(expected_request_id)
     allow(CanvasHttp).to receive(:post).and_yield(double(code: 201, header: { "Location" => "http://pv5.instructure.com/api/v5/pageviews/batch-query/123456" }))
 
-    service.call("2025-03-01", "2025-06-01", [user1, user2], "csv")
+    service.call("2025-03-01", "2025-06-01", users, "csv")
 
     expect(CanvasHttp).to have_received(:post).with(anything, hash_including("X-Request-Context-Id" => expected_request_id), anything)
   end
 
-  it "includes requestor's global user ID in headers when provided" do
+  it "includes JWT authorization in headers when requestor is provided" do
     allow(CanvasHttp).to receive(:post).and_yield(double(code: 201, header: { "Location" => "http://pv5.instructure.com/api/v5/pageviews/batch-query/123456" }))
 
-    service.call("2025-03-01", "2025-06-01", [user1, user2], "csv")
+    service.call("2025-03-01", "2025-06-01", users, "csv")
 
-    expect(CanvasHttp).to have_received(:post).with(anything, hash_including("X-Canvas-User-Id" => "1"), anything)
+    expect(CanvasHttp).to have_received(:post).with(anything, hash_including("Authorization" => /^Bearer /), anything)
   end
 
   it "collects all unique root account UUIDs when users have multiple root accounts" do
@@ -185,15 +202,14 @@ describe PageViews::EnqueueBatchQueryService do
     user_multi_accounts = instance_double(User, id: 4, global_id: 4, shard: Shard.default, root_account_ids: [1, 2])
     user_shared_account = instance_double(User, id: 5, global_id: 5, shard: Shard.default, root_account_ids: [2, 3])
 
-    allow(user_multi_accounts).to receive(:is_a?).with(User).and_return(true)
-    allow(user_shared_account).to receive(:is_a?).with(User).and_return(true)
+    users = [user_multi_accounts, user_shared_account].tap { allow(it).to receive(:all?).with(User).and_return(true) }
     allow(Account).to receive(:find_cached).with(2).and_return(account2)
     allow(Account).to receive(:find_cached).with(3).and_return(account3)
 
     response = double(code: 201, header: { "Location" => "http://pv5.instructure.com/api/v5/pageviews/batch-query/123" })
     allow(CanvasHttp).to receive(:post).and_yield(response)
 
-    service.call("2025-03-01", "2025-06-01", [user_multi_accounts, user_shared_account], "csv")
+    service.call("2025-03-01", "2025-06-01", users, "csv")
 
     expect(CanvasHttp).to have_received(:post) do |_uri, _headers, options|
       body = JSON.parse(options[:body])

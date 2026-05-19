@@ -67,8 +67,7 @@ improved_lmgb:
   type: setting
   state: hidden
   applies_to: Course
-  shadow: true
-  display_name: Learning Mastery Gradebook Redesign
+  display_name: Learning Mastery Gradebook Enhancements
   description: Improvements made to enhance the user experience within the Learning Mastery Gradebook.
   beta: true
   environments:
@@ -220,3 +219,9 @@ default_to_learning_mastery_gradebook:
       state: allowed
     ci:
       state: allowed
+outcomes_service_api_write:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Outcomes Service Api Write
+  description:
+    When enabled, Canvas performs CRUD operations via API to the Outcomes Service.

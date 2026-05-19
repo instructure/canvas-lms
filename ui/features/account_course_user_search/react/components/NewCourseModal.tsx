@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useState} from 'react'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {Button} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -25,7 +25,7 @@ import SearchableSelect from './SearchableSelect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import CoursesStore from '../store/CoursesStore'
 import AccountsTreeStore from '../store/AccountsTreeStore'
-import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError} from '@instructure/platform-alerts'
 import {flatten} from 'es-toolkit/compat'
 import {clearDashboardCache} from '../../../../shared/dashboard-card/dashboardCardQueries'
 import * as z from 'zod'

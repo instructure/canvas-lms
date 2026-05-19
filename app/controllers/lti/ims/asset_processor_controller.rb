@@ -20,7 +20,6 @@
 
 module Lti::IMS
   # @API Asset Processor
-  # @internal
   #
   # 1EdTech Asset Processor services: Asset Service and Asset Report Service.
   #
@@ -109,7 +108,7 @@ module Lti::IMS
     #
     # @argument timestamp [String]
     #   An ISO8601 date time value with microsecond precision. Reports with newer
-    #   timetamps for the same asset and report type supersede
+    #   timestamps for the same asset and report type supersede
     #   previously submitted reports with older (or equal) timestamps. Likewise,
     #   if the timestamp provided is older than the latest timestamp for an
     #   existing report (of same asset and type), the new report will be

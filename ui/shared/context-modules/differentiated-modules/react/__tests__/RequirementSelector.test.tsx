@@ -88,6 +88,24 @@ describe('RequirementSelector', () => {
     expect(props.onDropRequirement).toHaveBeenCalledWith(0)
   })
 
+  it('selects the correct item by id when two items share the same name', () => {
+    // file and assignment both named "New Assignment" — assignment must win
+    const {getByDisplayValue, getAllByText} = renderComponent({
+      requirement: {id: '1', name: 'New Assignment', resource: 'file', type: 'view'},
+      moduleItems: [
+        {id: '1', name: 'New Assignment', resource: 'file'},
+        {id: '2', name: 'New Assignment', resource: 'assignment'},
+      ],
+    })
+    getByDisplayValue('New Assignment').click()
+    // two options with the same label — click the second one (the assignment)
+    getAllByText('New Assignment')[1].click()
+    expect(props.onUpdateRequirement).toHaveBeenCalledWith(
+      {id: '2', name: 'New Assignment', resource: 'assignment', type: 'view'},
+      0,
+    )
+  })
+
   const minScoreTests = () => {
     it('renders the minimum score field if the requirement type is score', () => {
       const {getByLabelText} = renderComponent({

@@ -25,10 +25,8 @@ import {
 import {sendOpenAssetReportModalMessage} from '@canvas/lti-asset-processor/react/StudentAssetReportModalWrapper'
 import LtiAssetReportStatus from '@canvas/lti-asset-processor/shared-with-sg/replicated/components/LtiAssetReportStatus'
 import {z} from 'zod'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {renderAPComponent} from '@canvas/lti-asset-processor/react/util/renderToElements'
-
-const I18n = createI18nScope('lti_asset_reports_for_student')
 
 /**
  * This code, which renders Asset Report statuses, is used inside an iframe in
@@ -70,8 +68,9 @@ const ZDocumentProcessorsHeaderProps = z.object({
   submissionType: z.string(),
 })
 function DocumentProcessorsHeader(submission: z.infer<typeof ZDocumentProcessorsHeaderProps>) {
+  const {t} = useTranslation('lti_asset_reports_for_student')
   const shouldShow = useShouldShowLtiAssetReportsForStudent(submission)
-  return shouldShow ? <>{I18n.t('Document Processors')}</> : null
+  return shouldShow ? <>{t('Document Processors')}</> : null
 }
 
 ready(() => {

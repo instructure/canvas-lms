@@ -18,7 +18,7 @@
 
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {IconDownloadLine, IconTrashLine} from '@instructure/ui-icons'
+import {IconDownloadLine, IconRefreshLine, IconTrashLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
@@ -29,32 +29,35 @@ import formatMessage from 'format-message'
  */
 interface BaseCaptionRowProps {
   captionName: string
-  liveRegion: () => HTMLElement | null
+  deleteButtonRef?: (el: Element | null) => void
 }
 
 /**
  * Props for a caption in processing state
  */
 interface ProcessingCaptionRowProps extends BaseCaptionRowProps {
-  status: 'processing'
-  processingText?: string
+  workflow_state: 'processing'
 }
 
 /**
  * Props for a caption in failed state
  */
 interface FailedCaptionRowProps extends BaseCaptionRowProps {
-  status: 'failed'
-  errorMessage?: string
+  workflow_state: 'failed'
+  failedOperation?: 'upload' | 'delete' | 'asr'
+  asr?: boolean
+  onRetry?: () => void
+  onDelete?: () => void
 }
 
 /**
- * Props for a caption in uploaded state
+ * Props for a caption in ready state
  */
 interface UploadedCaptionRowProps extends BaseCaptionRowProps {
-  status: 'uploaded'
-  onDownload?: () => void
-  onDelete: () => void
+  workflow_state: 'ready'
+  filename?: string
+  url?: string
+  onDelete?: () => void
   isInherited?: boolean
 }
 
@@ -70,21 +73,43 @@ const CAPTIONS_MESSAGE =
   'Captions inherited from a parent course cannot be removed. You can replace by uploading a new caption file.'
 const DELETE_CAPTIONS_MESSAGE = 'Delete {captionName}'
 
+export function getStatusText(
+  workflow_state: CaptionRowProps['workflow_state'],
+  failedOperation?: 'upload' | 'delete' | 'asr',
+  asr?: boolean,
+): string | undefined {
+  if (workflow_state === 'processing') {
+    return formatMessage('Processing...')
+  }
+  if (workflow_state === 'failed') {
+    if (failedOperation === 'delete') return formatMessage('Delete failed')
+    if (failedOperation === 'asr' || asr) return formatMessage('Generation failed')
+    return formatMessage('Upload failed')
+  }
+  return undefined
+}
+
 /**
  * Displays a single caption row with status-specific UI
  */
 export function CaptionRow(props: CaptionRowProps) {
-  const {status, captionName} = props
+  const {workflow_state, captionName} = props
+
+  const {failedOperation, asr} = props as FailedCaptionRowProps
+  const statusText = getStatusText(workflow_state, failedOperation, asr)
+  const ariaLabel = statusText ? `${captionName}, ${statusText}` : captionName
 
   return (
-    <View as="div" padding="space8 0" borderWidth="0 0 small 0">
+    <View as="div" padding="space8 0" borderWidth="0 0 small 0" tabIndex={0} aria-label={ariaLabel}>
       <Flex justifyItems="space-between" alignItems="center">
         {/* Left side: Language and filename */}
         <Flex.Item shouldGrow shouldShrink>
           <View as="div">
             <View as="div" margin="xx-small 0 0 0">
               <TruncateText maxLines={1}>
-                <Text variant="contentImportant">{captionName}</Text>
+                <Text variant="contentImportant" aria-hidden="true">
+                  {captionName}
+                </Text>
               </TruncateText>
             </View>
           </View>
@@ -92,37 +117,63 @@ export function CaptionRow(props: CaptionRowProps) {
 
         {/* Right side: Status-specific content */}
         <Flex.Item>
-          {status === 'processing' && (
+          {workflow_state === 'processing' && (
             <Flex alignItems="center" gap="small">
-              <Text variant="content">
-                {props.processingText || formatMessage('Processing...')}
+              <Text variant="content" aria-hidden="true">
+                {statusText}
               </Text>
             </Flex>
           )}
 
-          {status === 'failed' && (
+          {workflow_state === 'failed' && (
             <Flex alignItems="center" gap="small">
-              <Text size="small" color="danger">
-                {props.errorMessage || 'Upload failed'}
+              <Text size="small" color="danger" aria-hidden="true">
+                {statusText}
               </Text>
-            </Flex>
-          )}
-
-          {status === 'uploaded' && (
-            <Flex alignItems="center" gap="small">
-              {props.onDownload && (
+              {props.onRetry && (
                 <IconButton
-                  screenReaderLabel={formatMessage('Download {captionName}', {
+                  screenReaderLabel={formatMessage('Retry {captionName}', {
                     captionName: props.captionName,
                   })}
-                  onClick={props.onDownload}
+                  onClick={props.onRetry}
                   size="small"
                   withBackground={false}
                   withBorder={false}
                 >
-                  <IconDownloadLine />
+                  <IconRefreshLine />
                 </IconButton>
               )}
+              {props.onDelete && (
+                <IconButton
+                  screenReaderLabel={formatMessage(DELETE_CAPTIONS_MESSAGE, {
+                    captionName: props.captionName,
+                  })}
+                  onClick={props.onDelete}
+                  size="small"
+                  withBackground={false}
+                  withBorder={false}
+                  elementRef={props.deleteButtonRef}
+                >
+                  <IconTrashLine />
+                </IconButton>
+              )}
+            </Flex>
+          )}
+
+          {workflow_state === 'ready' && (
+            <Flex alignItems="center" gap="small">
+              <IconButton
+                screenReaderLabel={formatMessage('Download {captionName}', {
+                  captionName: props.captionName,
+                })}
+                size="small"
+                withBackground={false}
+                withBorder={false}
+                href={props.url}
+                download={props.filename}
+              >
+                <IconDownloadLine />
+              </IconButton>
 
               <IconButton
                 screenReaderLabel={
@@ -136,6 +187,7 @@ export function CaptionRow(props: CaptionRowProps) {
                 withBackground={false}
                 withBorder={false}
                 interaction={props.isInherited ? 'disabled' : 'enabled'}
+                elementRef={props.deleteButtonRef}
               >
                 <IconTrashLine />
               </IconButton>
@@ -143,7 +195,7 @@ export function CaptionRow(props: CaptionRowProps) {
           )}
         </Flex.Item>
       </Flex>
-      {status === 'uploaded' && props.isInherited && (
+      {workflow_state === 'ready' && props.isInherited && (
         <Text variant="legend" aria-hidden>
           {formatMessage(CAPTIONS_MESSAGE)}
         </Text>

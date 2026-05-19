@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class EnrollmentTerm < ActiveRecord::Base
+class EnrollmentTerm < ApplicationRecord
   DEFAULT_TERM_NAME = "Default Term"
   include Workflow
 

@@ -17,12 +17,13 @@
  */
 
 import * as apiClient from './apiClient'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import ReactDOM from 'react-dom'
 import SVGWrapper from '@canvas/svg-wrapper'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {FileDrop} from '@instructure/ui-file-drop'
@@ -88,6 +89,8 @@ export default function ImportGroupsModal(props: Props): JSX.Element {
       open={true}
       onDismiss={hide}
       footer={null}
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
     >
       <FileDrop
         accept=".csv"

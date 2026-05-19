@@ -666,8 +666,8 @@ describe ContentMigration do
 
       run_course_copy
 
-      expect(assmt_to.reload.due_at.to_i).to_not eq assmt.due_at.to_i # shifted the date on the assignment
-      expect(sub_to.reload.cached_due_date.to_i).to_not eq assmt.due_at.to_i # shifted the cached date too
+      expect(assmt_to.reload.due_at.to_i).not_to eq assmt.due_at.to_i # shifted the date on the assignment
+      expect(sub_to.reload.cached_due_date.to_i).not_to eq assmt.due_at.to_i # shifted the cached date too
     end
   end
 end

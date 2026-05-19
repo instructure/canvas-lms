@@ -17,7 +17,7 @@
  */
 
 import {z} from 'zod'
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import type {Submission} from 'api'
 

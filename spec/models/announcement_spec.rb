@@ -105,7 +105,7 @@ describe Announcement do
       Timecop.freeze(2.weeks.from_now) do
         run_jobs
         expect(announcement.reload).to be_active
-        expect(att.reload).to_not be_locked
+        expect(att.reload).not_to be_locked
       end
     end
   end
@@ -336,7 +336,7 @@ describe Announcement do
       announcement_model(user: @teacher)
       to_users = @a.messages_sent[notification_name].map(&:user)
       expect(to_users).to include(@student)
-      expect(to_users).to_not include(other_student)
+      expect(to_users).not_to include(other_student)
     end
 
     it "does not broadcast if it just got edited to active, if notify_users is false" do
@@ -459,7 +459,7 @@ describe Announcement do
         participant = announcement.discussion_topic_participants.find_by(user: student)
         expect(participant).to be_present
         expect(participant.workflow_state).to eq("unread")
-        expect(participant.unread_entry_count).to eq(1)
+        expect(participant.unread_entry_count).to eq(0)
         expect(participant.subscribed).to be_falsey
         expect(participant.root_account_id).to eq(announcement.root_account_id)
       end
@@ -501,7 +501,7 @@ describe Announcement do
         participant = announcement.discussion_topic_participants.find_by(user: student)
         expect(participant).to be_present
         expect(participant.workflow_state).to eq("unread")
-        expect(participant.unread_entry_count).to eq(1)
+        expect(participant.unread_entry_count).to eq(0)
         expect(participant.subscribed).to be_falsey
         expect(participant.root_account_id).to eq(announcement.root_account_id)
       end
@@ -572,7 +572,7 @@ describe Announcement do
 
       student_participant = announcement.discussion_topic_participants.find_by(user: @student1)
       expect(student_participant.workflow_state).to eq("unread")
-      expect(student_participant.unread_entry_count).to eq(1)
+      expect(student_participant.unread_entry_count).to eq(0)
       expect(student_participant.subscribed).to be_falsey
       expect(student_participant.root_account_id).to eq(announcement.root_account_id)
     end
@@ -622,7 +622,7 @@ describe Announcement do
         participants.each do |participant|
           expect(participant.discussion_topic_id).to eq(@announcement.id)
           expect(participant.workflow_state).to eq("unread")
-          expect(participant.unread_entry_count).to eq(1)
+          expect(participant.unread_entry_count).to eq(0)
           expect(participant.subscribed).to be_falsey
           expect(participant.root_account_id).to eq(@announcement.root_account_id)
         end

@@ -538,7 +538,7 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
           wait_for_ajaximations
 
           # The use same grade link disappears after the grade is set
-          expect(f("body")).to_not contain_jqcss("[data-testid='use-same-grade-link']")
+          expect(f("body")).not_to contain_jqcss("[data-testid='use-same-grade-link']")
         end
 
         it "changes grade and status and persist it correctly" do
@@ -577,7 +577,7 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
           wait_for_ajaximations
 
           # should not contain use same grade links
-          expect(f("body")).to_not contain_jqcss("[data-testid='use-same-grade-link']")
+          expect(f("body")).not_to contain_jqcss("[data-testid='use-same-grade-link']")
 
           reply_to_topic_grade_input = ff("[data-testid='grade-input']")[0]
           expect(reply_to_topic_grade_input).to have_value "5"
@@ -622,14 +622,14 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
           # Sets resubmission grade to 5 and replay to topic use same grade link is no longer present
           expect(reply_to_entry_submission.grade).to eq("5")
           expect(reply_to_entry_submission.grade_matches_current_submission).to be true
-          expect(f("body")).to_not contain_jqcss("[data-testid='use-same-grade-link']")
+          expect(f("body")).not_to contain_jqcss("[data-testid='use-same-grade-link']")
 
           # reload speedgrader to check that grades persist and are correct
           get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
           wait_for_ajaximations
 
           # should not contain use same grade links
-          expect(f("body")).to_not contain_jqcss("[data-testid='use-same-grade-link']")
+          expect(f("body")).not_to contain_jqcss("[data-testid='use-same-grade-link']")
 
           reply_to_topic_grade_input = ff("[data-testid='grade-input']")[0]
           expect(reply_to_topic_grade_input).to have_value "2"
@@ -792,7 +792,7 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
           wait_for_ajaximations
           expect(f("div[data-testid='discussion-root-entry-container']").text).to include(de.message)
         end
-        expect(f("#this_student_does_not_have_a_submission")).to_not be_displayed
+        expect(f("#this_student_does_not_have_a_submission")).not_to be_displayed
 
         de.destroy
 
@@ -823,7 +823,7 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
           wait_for_ajaximations
           expect(f("div[data-testid='discussion-root-entry-container']").text).to include(teacher_de.message)
         end
-        expect(f("#this_student_does_not_have_a_submission")).to_not be_displayed
+        expect(f("#this_student_does_not_have_a_submission")).not_to be_displayed
 
         student_des.each(&:destroy)
 
@@ -838,7 +838,7 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
 
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
         wait_for_ajaximations
-        expect(f("#this_student_does_not_have_a_submission")).to_not be_displayed
+        expect(f("#this_student_does_not_have_a_submission")).not_to be_displayed
       end
 
       it "displays the no submission message if student has no submission" do
@@ -853,20 +853,20 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
           get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_discussion.assignment.id}&student_id=#{@student.id}"
           wait_for_ajaximations
 
-          expect(f("body")).to_not contain_jqcss("button[data-testid='discussions-previous-reply-button']")
-          expect(f("body")).to_not contain_jqcss("button[data-testid='discussions-next-reply-button']")
+          expect(f("body")).not_to contain_jqcss("button[data-testid='discussions-previous-reply-button']")
+          expect(f("body")).not_to contain_jqcss("button[data-testid='discussions-next-reply-button']")
         end
 
         it "does not display if not discussion assignment" do
           non_discussion_assignment = @course.assignments.create!(points_possible: 10, submission_types: "online_text_entry")
           non_discussion_assignment.submit_homework(@student, body: "hi")
 
-          expect(non_discussion_assignment.submission_types).to_not eq("discussion_topic")
+          expect(non_discussion_assignment.submission_types).not_to eq("discussion_topic")
           get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{non_discussion_assignment.id}&student_id=#{@student.id}"
           wait_for_ajaximations
 
-          expect(f("body")).to_not contain_jqcss("button[data-testid='discussions-previous-reply-button']")
-          expect(f("body")).to_not contain_jqcss("button[data-testid='discussions-next-reply-button']")
+          expect(f("body")).not_to contain_jqcss("button[data-testid='discussions-previous-reply-button']")
+          expect(f("body")).not_to contain_jqcss("button[data-testid='discussions-next-reply-button']")
         end
 
         it "does display if student has submission" do

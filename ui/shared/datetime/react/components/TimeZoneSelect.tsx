@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import CanvasSelect from '@canvas/instui-bindings/react/Select'
-import type {CanvasSelectProps} from '@canvas/instui-bindings/react/Select'
+import {CanvasSelect} from '@instructure/platform-instui-bindings'
+import type {CanvasSelectProps} from '@instructure/platform-instui-bindings'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {captureException} from '@sentry/react'
 

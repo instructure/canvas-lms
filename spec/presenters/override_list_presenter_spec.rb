@@ -301,7 +301,7 @@ describe OverrideListPresenter do
 
           expect(visible_due_dates.length).to eq 1
           expect(visible_due_dates.first[:due_for]).to eq "section 1"
-          expect(visible_due_dates.first[:due_at]).to_not be_nil
+          expect(visible_due_dates.first[:due_at]).not_to be_nil
         end
 
         it "ignores unassigned module overrides" do

@@ -35,7 +35,11 @@ import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
 import {DEFAULT_COURSE_COLOR, FOCUS_TARGETS} from '@canvas/k5/react/utils'
 import instFSOptimizedImageUrl from '@canvas/dashboard-card/util/instFSOptimizedImageUrl'
 
-const k5ThemeVariables = getK5ThemeVars()
+const k5ThemeVariables = getK5ThemeVars(
+  Boolean(ENV.use_high_contrast),
+  Boolean(ENV.USE_CLASSIC_FONT),
+  Boolean(ENV.use_dyslexic_font),
+)
 
 const I18n = createI18nScope('k5_dashboard_card')
 

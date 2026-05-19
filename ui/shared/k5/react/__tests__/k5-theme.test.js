@@ -16,57 +16,38 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getK5ThemeVars, registerK5Theme} from '../k5-theme'
+import {getK5ThemeVars, getBaseThemeVars} from '../k5-theme'
 
 describe('k5-theme', () => {
-  let originalEnv
-
-  beforeEach(() => {
-    originalEnv = JSON.parse(JSON.stringify(window.ENV))
-  })
-
-  afterEach(() => {
-    window.ENV = originalEnv
-    vi.clearAllMocks()
-    vi.resetModules()
-  })
-
-  describe('K-5 theme', () => {
+  describe('getK5ThemeVars', () => {
     it('is based off of the standard canvas theme', () => {
-      const k5ThemeVariables = getK5ThemeVars()
-      registerK5Theme()
+      const k5ThemeVariables = getK5ThemeVars(false, false, false)
       expect(k5ThemeVariables.colors.contrasts.blue4570).toBe('#2B7ABC')
     })
 
-    it('is based off of the high contrast canvas theme when ENV.use_high_contrast is set', () => {
-      window.ENV.use_high_contrast = true
-      const k5ThemeVariables = getK5ThemeVars()
-      registerK5Theme()
-
+    it('is based off of the high contrast canvas theme when highContrast is true', () => {
+      const k5ThemeVariables = getK5ThemeVars(true, false, false)
       expect(k5ThemeVariables.colors.contrasts.blue4570).toBe('#0A5A9E')
     })
 
     it('overrides base variables with K-5-specific values', () => {
-      const k5ThemeVariables = getK5ThemeVars()
-      registerK5Theme()
-
+      const k5ThemeVariables = getK5ThemeVars(false, false, false)
       expect(k5ThemeVariables.typography.fontFamily).toMatch(/Balsamiq Sans/)
       expect(k5ThemeVariables.typography.fontSizeLarge).toBe('1.5rem')
     })
 
-    it('does not override font when ENV.USE_CLASSIC_FONT is true', () => {
-      window.ENV.USE_CLASSIC_FONT = true
-      const k5ThemeVariables = getK5ThemeVars()
-      registerK5Theme()
+    it('does not override font when useClassicFont is true', () => {
+      const k5ThemeVariables = getK5ThemeVars(false, true, false)
       expect(k5ThemeVariables.typography.fontFamily).not.toMatch(/Balsamiq Sans/)
     })
 
-    it('only overrides base variables with font overrides if specified', () => {
-      const k5ThemeVariables = getK5ThemeVars()
-      registerK5Theme({fontOnly: true})
-
-      expect(k5ThemeVariables.typography.fontFamily).toMatch(/Balsamiq Sans/)
-      expect(k5ThemeVariables.typography.fontSizeLarge).toBe('1.5rem')
+    it('baseFont only includes font family without size overrides', () => {
+      const {baseFont, baseTheme} = getBaseThemeVars(false, false, false)
+      expect(baseFont.typography.fontFamily).toMatch(/Balsamiq Sans/)
+      // baseFont should not include size overrides
+      expect(baseFont.typography.fontSizeLarge).toBeUndefined()
+      // but the base theme's original sizes should still be present
+      expect(baseTheme.typography.fontSizeLarge).toBeDefined()
     })
   })
 })

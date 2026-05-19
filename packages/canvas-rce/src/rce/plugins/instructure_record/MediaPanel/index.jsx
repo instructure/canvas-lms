@@ -16,20 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef} from 'react'
-import {func, oneOf, shape, string} from 'prop-types'
-import {contentTrayDocumentShape} from '../../shared/fileShape'
-import formatMessage from '../../../../format-message'
-
+import {trackPendoEvent} from '@instructure/canvas-media'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import Link from '../../instructure_documents/components/Link'
+import {func, oneOf, shape, string} from 'prop-types'
+import React, {useRef} from 'react'
 import {
-  LoadMoreButton,
   LoadingIndicator,
   LoadingStatus,
+  LoadMoreButton,
   useIncrementalLoading,
 } from '../../../../common/incremental-loading'
+import formatMessage from '../../../../format-message'
+import RCEGlobals from '../../../RCEGlobals'
+import Link from '../../instructure_documents/components/Link'
+import {contentTrayDocumentShape} from '../../shared/fileShape'
 
 const PENDING_MEDIA_ENTRY_ID = 'maybe'
 
@@ -87,6 +88,15 @@ export default function MediaPanel(props) {
   })
 
   const handleFileClick = file => {
+    if (RCEGlobals.getFeatures()?.rce_asr_captioning_improvements) {
+      const contentType = file.content_type || file['content-type'] || ''
+      trackPendoEvent('canvas_native_media_embedded', {
+        insertion_method: 'select_existing',
+        media_id: file.id,
+        media_kind: contentType.startsWith('audio/') ? 'audio' : 'video',
+        resourceType: props.contextType,
+      })
+    }
     props.onMediaEmbed(file)
   }
 

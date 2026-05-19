@@ -251,13 +251,16 @@ module AdheresToPolicy
     def check_right?(user, session, sought_right, with_justifications: false)
       return with_justifications ? Failure.instance : false unless sought_right
 
+      config = AdheresToPolicy.configuration
+      override = config.override_proc&.call(user, sought_right)
+      return with_justifications ? override : override.success? if override
+
       if Thread.current[:primary_permission_under_evaluation].nil?
         Thread.current[:primary_permission_under_evaluation] = true
       end
 
       sought_right_cookie = "#{self.class.name&.underscore}.#{sought_right}"
 
-      config = AdheresToPolicy.configuration
       blacklist = config.blacklist
 
       use_rails_cache = config.cache_permissions &&

@@ -30,7 +30,7 @@ import {datetimeString} from '@canvas/datetime/date-functions'
 import ready from '@instructure/ready'
 import {AccessTokensSection} from '@canvas/access-tokens/AccessTokensSection'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const I18n = createI18nScope('context.roster_user')
 
@@ -134,10 +134,7 @@ ready(() => {
     )
   }
 
-  if (
-    ENV.FEATURES.student_access_token_management &&
-    ENV.PERMISSIONS?.can_view_user_generated_access_tokens
-  ) {
+  if (ENV.PERMISSIONS?.can_view_user_generated_access_tokens) {
     const accessTokensContainer = document.getElementById('user_access_tokens_react_mount_point')
     if (accessTokensContainer) {
       render(

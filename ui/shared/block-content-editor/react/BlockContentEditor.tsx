@@ -28,7 +28,7 @@ import {components} from './block-content-editor-components'
 import {BlockContentEditorContent} from './BlockContentEditorContent'
 import {BlockContentEditorErrorBoundary} from './BlockContentEditorErrorBoundary'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const BlockContentEditorWrapper = (props: BlockContentEditorProps) => {
   const {mode} = useEditorMode()

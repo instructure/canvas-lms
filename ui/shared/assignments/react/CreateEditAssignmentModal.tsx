@@ -47,6 +47,7 @@ export type ModalAssignment = {
   isPublished: boolean
   multipleDueDates: boolean
   differentiatedAssignment: boolean
+  peerReviewInGradedMode?: boolean
   frozenFields: string[] | undefined
 }
 
@@ -155,7 +156,8 @@ const CreateEditAssignmentModal = ({
   const enablePointsInput = !assignment?.frozenFields?.includes('points')
   const enableDueDateInput = !assignment?.frozenFields?.includes('due_at')
 
-  const showDueDateInput = !assignment?.differentiatedAssignment
+  const showDueDateInput =
+    !assignment?.differentiatedAssignment && !assignment?.peerReviewInGradedMode
   const [showDueDatePreviewMessage, setShowDueDatePreviewMessage] = useState<boolean>(true)
 
   // Sanatize default due time (remove milliseconds if present)
@@ -225,12 +227,12 @@ const CreateEditAssignmentModal = ({
     // So we will proritize accordingly
     if (errors.unlock_at) {
       setDueDateInputMessage([
-        {text: I18n.t('Due date cannot be before unlock date'), type: 'newError'},
+        {text: I18n.t('Due date cannot be before available from date'), type: 'newError'},
       ])
     }
     if (errors.lock_at) {
       setDueDateInputMessage([
-        {text: I18n.t('Due date cannot be after lock date'), type: 'newError'},
+        {text: I18n.t('Due date cannot be after until date'), type: 'newError'},
       ])
     }
     if (errors.due_at) {
@@ -520,9 +522,11 @@ const CreateEditAssignmentModal = ({
               renderLabel={I18n.t('Due at')}
               interaction="disabled"
               value={
-                assignment.multipleDueDates
-                  ? I18n.t('Multiple Due Dates')
-                  : I18n.t('Differentiated Due Date')
+                assignment.peerReviewInGradedMode
+                  ? I18n.t('Peer Review Due Date')
+                  : assignment.multipleDueDates
+                    ? I18n.t('Multiple Due Dates')
+                    : I18n.t('Differentiated Due Date')
               }
               onChange={() => {}}
               data-testid="multiple-due-dates-message"

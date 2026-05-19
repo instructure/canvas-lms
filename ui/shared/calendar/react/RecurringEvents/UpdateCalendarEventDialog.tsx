@@ -20,7 +20,8 @@ import React, {useCallback, useState} from 'react'
 import type {Root} from 'react-dom/client'
 import {render} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {Button} from '@instructure/ui-buttons'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {View} from '@instructure/ui-view'
@@ -80,6 +81,8 @@ const UpdateCalendarEventDialog = ({event, isOpen, onUpdate, onCancel}: Props) =
       label={I18n.t('Confirm Changes')}
       footer={renderFooter}
       data-testid="update-calendar-dialog"
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
     >
       <View as="div" margin="0 small">
         <RadioInputGroup

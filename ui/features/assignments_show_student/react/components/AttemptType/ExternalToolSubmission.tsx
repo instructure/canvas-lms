@@ -19,7 +19,6 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useEffect, useState, MutableRefObject} from 'react'
 
-import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {Button} from '@instructure/ui-buttons'
 // Removed unused import for ExternalToolModel
 import {isSubmitted} from '../../helpers/SubmissionHelpers'
@@ -39,7 +38,6 @@ interface ContentLaunchViewProps {
 // launching the LTI to select content and showing selected content
 const ContentLaunchView = ({launchURL}: ContentLaunchViewProps) => (
   <ToolLaunchIframe
-    allow={iframeAllowances()}
     data-testid="lti-launch-frame"
     src={launchURL}
     title={I18n.t('Tool content')}

@@ -137,6 +137,7 @@ class FeatureFlagsController < ApplicationController
   include Api::V1::FeatureFlag
 
   before_action :get_context
+  skip_before_action :require_user, only: %i[environment]
 
   # @API List features
   #
@@ -191,7 +192,7 @@ class FeatureFlagsController < ApplicationController
   def enabled_features
     if authorized_action(@context, @current_user, :read)
       features = Feature.applicable_features(@context).filter_map { |fd| @context.lookup_feature_flag(fd.feature) }
-                        .select(&:enabled?).map(&:feature)
+                                                      .select(&:enabled?).map(&:feature)
       render json: features
     end
   end
@@ -212,6 +213,10 @@ class FeatureFlagsController < ApplicationController
   #   { "telepathic_navigation": true, "fancy_wickets": true, "automatic_essay_grading": false }
   #
   def environment
+    unless mobile_device?
+      return unless require_user
+    end
+
     render json: cached_js_env_account_features
   end
 
@@ -328,7 +333,7 @@ class FeatureFlagsController < ApplicationController
       if @context.save
         render json: { early_access_program: true }
       else
-        render json: { errors: @context.errors }, status: :unprocessable_entity
+        render json: { errors: @context.errors }, status: :unprocessable_content
       end
     end
   end
@@ -348,19 +353,30 @@ class FeatureFlagsController < ApplicationController
   # @returns FeatureFlag
   def delete
     if authorized_action(@context, @current_user, :manage_feature_flags)
-      return render json: { message: "must specify feature" }, status: :bad_request unless params[:feature].present?
+      feature_param = params[:feature]
+      return render json: { message: "must specify feature" }, status: :bad_request unless feature_param.present?
 
-      flag = @context.feature_flags.find_by!(feature: params[:feature])
+      feature_def = Feature.definitions[feature_param]
+      return render json: { message: "invalid feature" }, status: :bad_request unless feature_def&.applies_to_object(@context)
+
+      if feature_def.root_opt_in && @context.is_a?(Account) && @context.root_account?
+        # Root account flags with root_opt_in=true must not be deleted once the user opted in. Knowing that the flag once set is essential
+        # for the inheritance lookup logic to work correctly.
+        return render json: { message: "once a root account has opted in with root_opt_in: true, it cannot be deleted" }, status: :forbidden
+      end
+
+      flag = @context.feature_flags.find_by!(feature: feature_param)
       prior_state = flag.state
       return render json: { message: "flag is locked" }, status: :forbidden if flag.locked?(@context)
 
       flag.current_user = @current_user # necessary step for audit log
       if flag.destroy
-        feature_def = Feature.definitions[params[:feature]]
         if feature_def.after_state_change_proc
-          current_state = @context.lookup_feature_flag(params[:feature], skip_cache: true).state
+          current_state = @context.lookup_feature_flag(feature_param, skip_cache: true).state
           feature_def.after_state_change_proc.call(@current_user, @context, prior_state, current_state)
         end
+      else
+        render json: { errors: flag.errors.full_messages }, status: :unprocessable_content
       end
       render json: feature_flag_json(flag, @context, @current_user, session)
     end

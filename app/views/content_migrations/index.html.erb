@@ -22,7 +22,7 @@
 
   provide :page_title, join_title(t(:page_title, "Import Content"), @context.name)
   deferred_js_bundle :content_migrations
-  js_env :FOLDER_OPTIONS => folders_as_options(root_folders, :all_folders => folders)
+  js_env({ FOLDER_OPTIONS: folders_as_options(root_folders, :all_folders => folders) })
   css_bundle :content_migrations
 %>
 

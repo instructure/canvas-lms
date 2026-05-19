@@ -29,7 +29,17 @@ import {
 import {monitorProgress, cancelProgressAction} from '@canvas/progress/ProgressHelpers'
 
 import ContextModulesPublishMenu from '../ContextModulesPublishMenu'
+import {destroyContainer, showFlashAlert} from '@instructure/platform-alerts'
 import {type Mock} from 'vitest'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+    destroyContainer: vi.fn(),
+  }
+})
 
 const server = setupServer()
 
@@ -90,6 +100,7 @@ describe('ContextModulesPublishMenu', () => {
     mockBatchUpdateAllModulesApiCall.mockReset()
     mockCancelProgressAction.mockReset()
     mockFetchAllItemPublishedStates.mockReset()
+    vi.clearAllMocks()
     document.body.innerHTML = ''
   })
 
@@ -194,10 +205,9 @@ describe('ContextModulesPublishMenu', () => {
           })
         })
 
-        // Wait for the alert to be added to the DOM
         await waitFor(() => {
-          expect(document.querySelector('[role="alert"]')).toHaveTextContent(
-            'Publishing modules has started.',
+          expect(showFlashAlert).toHaveBeenCalledWith(
+            expect.objectContaining({message: 'Publishing modules has started.'}),
           )
         })
       })
@@ -230,10 +240,9 @@ describe('ContextModulesPublishMenu', () => {
           })
         })
 
-        // Wait for the alert to be added to the DOM
         await waitFor(() => {
-          expect(document.querySelector('[role="alert"]')).toHaveTextContent(
-            'Publishing progress is 50 percent complete',
+          expect(showFlashAlert).toHaveBeenCalledWith(
+            expect.objectContaining({message: 'Publishing progress is 50 percent complete'}),
           )
         })
       })
@@ -266,10 +275,11 @@ describe('ContextModulesPublishMenu', () => {
           })
         })
 
-        // Wait for the alert to be added to the DOM
         await waitFor(() => {
-          expect(document.querySelector('[role="alert"]')).toHaveTextContent(
-            'Publishing progress is complete. Refreshing item status.',
+          expect(showFlashAlert).toHaveBeenCalledWith(
+            expect.objectContaining({
+              message: 'Publishing progress is complete. Refreshing item status.',
+            }),
           )
         })
       })
@@ -303,10 +313,11 @@ describe('ContextModulesPublishMenu', () => {
           })
         })
 
-        // Wait for the alert to be added to the DOM
         await waitFor(() => {
-          expect(document.querySelector('[role="alert"]')).toHaveTextContent(
-            'Your publishing job was canceled before it completed.',
+          expect(showFlashAlert).toHaveBeenCalledWith(
+            expect.objectContaining({
+              message: 'Your publishing job was canceled before it completed.',
+            }),
           )
         })
       })

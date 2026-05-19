@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 describe CanvasTime do
   around do |example|
     Timecop.freeze(Time.zone.local(2010, 10, 1, 0, 0), &example)

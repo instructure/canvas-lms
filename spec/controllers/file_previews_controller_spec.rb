@@ -197,4 +197,30 @@ describe FilePreviewsController do
       expect(response).to have_http_status :ok
     end
   end
+
+  context "unauthenticated access" do
+    before do
+      remove_user_session
+    end
+
+    it "allows unauthenticated access with valid course syllabus location parameter" do
+      @account.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+      @account.root_account.enable_feature!(:file_association_access)
+      course_factory(account: @account, active_all: true, is_public: true)
+      @attachment = attachment_model(context: @course, content_type: "image/png")
+
+      html = "<p><img src='/courses/#{@course.id}/files/#{@attachment.id}/preview' alt='test'></p>"
+      @course.syllabus_body = html
+      @course.updating_user = @user
+      @course.save!
+
+      get :show, params: {
+        course_id: @course.id,
+        file_id: @attachment.id,
+        location: "course_syllabus_#{@course.id}"
+      }
+      expect(response).to have_http_status :ok
+      expect(response).to render_template "img_preview"
+    end
+  end
 end

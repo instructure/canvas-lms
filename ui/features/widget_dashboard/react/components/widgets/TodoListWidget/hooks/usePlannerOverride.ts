@@ -21,7 +21,7 @@ import {createPlannerOverride, updatePlannerOverride} from '../api'
 import type {PlannerItem, PlannerOverride} from '../types'
 import {PLANNER_ITEMS_QUERY_KEY} from './usePlannerItems'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -30,7 +30,11 @@ interface ToggleCompleteParams {
   markedComplete: boolean
 }
 
-export function usePlannerOverride() {
+interface UsePlannerOverrideOptions {
+  onSuccess?: (override: PlannerOverride, params: ToggleCompleteParams) => void
+}
+
+export function usePlannerOverride(options: UsePlannerOverrideOptions = {}) {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
@@ -47,8 +51,8 @@ export function usePlannerOverride() {
         })
       }
     },
-    onSuccess: () => {
-      // Invalidate queries to trigger a refetch with updated data
+    onSuccess: (data, variables) => {
+      options.onSuccess?.(data, variables)
       queryClient.invalidateQueries({queryKey: [PLANNER_ITEMS_QUERY_KEY]})
     },
     onError: () => {

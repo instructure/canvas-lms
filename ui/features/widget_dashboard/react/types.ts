@@ -80,6 +80,8 @@ export interface WidgetRenderer {
   component: React.ComponentType<BaseWidgetProps>
   displayName: string
   description: string
+  roles?: string[]
+  props?: Record<string, unknown>
 }
 
 export type WidgetRegistry = Record<string, WidgetRenderer>

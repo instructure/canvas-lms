@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 describe Assignment::GradeError do
   subject { Assignment::GradeError.new("test message", :bad_status, error_code: "CATASTROPHE") }
 

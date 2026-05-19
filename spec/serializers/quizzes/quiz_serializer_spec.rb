@@ -290,7 +290,7 @@ describe Quizzes::QuizSerializer do
   describe "preview_url" do
     it "is only present when the user can grade the quiz" do
       course_with_teacher(active_all: true)
-      course_quiz(true)
+      course_quiz(active: true)
       expect(quiz_serializer(scope: @teacher).as_json[:quiz][:preview_url])
         .to eq controller.send(:course_quiz_take_url, @quiz.context, @quiz, preview: "1")
       course_with_student(active_all: true, course: @course)
@@ -408,7 +408,7 @@ describe Quizzes::QuizSerializer do
 
   it "displays overridden dates for students" do
     course_with_student(active_all: true)
-    course_quiz(true)
+    course_quiz(active: true)
     serializer = quiz_serializer(scope: @student)
     student_overrides = {
       due_at: 5.minutes.from_now,
@@ -472,7 +472,7 @@ describe Quizzes::QuizSerializer do
     context "as a teacher" do
       before :once do
         course_with_teacher(active_all: true)
-        course_quiz(true)
+        course_quiz(active: true)
       end
 
       it "returns the value for DA" do
@@ -490,7 +490,7 @@ describe Quizzes::QuizSerializer do
     context "as a student" do
       before :once do
         course_with_student(active_all: true)
-        course_quiz(true)
+        course_quiz(active: true)
       end
 
       it "is not in the hash" do
@@ -502,7 +502,7 @@ describe Quizzes::QuizSerializer do
   end
 
   it "includes anonymous_submisions if quiz is a survey quiz" do
-    expect(json.keys).to_not include(:anonymous_submissions)
+    expect(json.keys).not_to include(:anonymous_submissions)
 
     quiz.quiz_type = "survey"
     quiz.anonymous_submissions = true

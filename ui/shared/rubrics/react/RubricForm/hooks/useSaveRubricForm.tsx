@@ -18,10 +18,10 @@
 
 import {useMutation} from '@tanstack/react-query'
 import {RubricFormProps} from '../types/RubricForm'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {saveRubric} from '../queries/RubricFormQueries'
 import {SaveRubricResponse} from 'features/rubrics/queries/RubricFormQueries'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('rubrics-form-save')

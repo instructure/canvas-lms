@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {SortBy, SortOrder} from '../utils/constants'
+import {SortBy} from '../utils/constants'
+import {SortOrder} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 export interface Sorting {
   sortOrder: SortOrder

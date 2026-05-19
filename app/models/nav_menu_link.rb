@@ -18,7 +18,7 @@
 
 # Custom (teacher/admin-added) Links (aka "tabs") for Navigation
 # Menus. Referenced in the contexts' tabs_available
-class NavMenuLink < ActiveRecord::Base
+class NavMenuLink < ApplicationRecord
   extend RootAccountResolver
   include Canvas::SoftDeletable
   include CustomValidations
@@ -31,36 +31,62 @@ class NavMenuLink < ActiveRecord::Base
 
   validates :label, presence: true, length: { maximum: 255 }
   validates :url, presence: true, length: { maximum: 2048 }
-  validates_as_url :url
+  validate :validate_and_normalize_url
 
   # See also corresponding Postgres check constraints
   validate :at_least_one_nav_type_enabled
   validate :nav_types_match_context
 
+  def validate_and_normalize_url
+    return if url.blank? # presence validation will catch this
+
+    if url.start_with?("//")
+      # UI rejects these but may be present during old tool migration
+      # CanvasHttp.validate_url with add http://, which is wrong for production
+      self.url = "https:" + url
+    end
+
+    if url.start_with?("/")
+      # Allow relative URLs (needed to support internal link translation during course copy)
+      with_host = "https://canvas.instructure.com" + url
+      normalized, = CanvasHttp.validate_url(with_host, allowed_schemes: %w[http https])
+      unless normalized.start_with?("https://canvas.instructure.com/")
+        errors.add(:url, t("nav_menu_link.errors.url_invalid_relative", "invalid relative URL"))
+        return
+      end
+      # remove host and replace potential // with just /
+      self.url = normalized.gsub(%r{\Ahttps://canvas.instructure.com/+}, "/")
+    else
+      normalized, = CanvasHttp.validate_url(url, allowed_schemes: %w[http https])
+      self.url = normalized
+    end
+  rescue CanvasHttp::Error, URI::Error, ArgumentError
+    errors.add(:url, t("nav_menu_link.errors.url_invalid", "is not a valid URL"))
+  end
+
   def at_least_one_nav_type_enabled
     unless course_nav || account_nav || user_nav
-      errors.add(:base, "at least one nav type must be enabled")
+      errors.add(:base, t("nav_menu_link.errors.nav_type_required", "at least one nav type must be enabled"))
     end
   end
 
   def nav_types_match_context
     if context_type == "Course" && (account_nav || user_nav)
-      errors.add(:base, "course-context link can only have course navigation enabled")
+      errors.add(:base, t("nav_menu_link.errors.course_context_nav_only", "course-context link can only have course navigation enabled"))
     end
   end
 
   # See useNavMenuLinksStore.ts
   def self.as_existing_link_objects
-    pluck(:id, :label).map do |(id, label)|
-      { type: "existing", id:, label: }
+    pluck(:id, :label, :url, :course_nav, :account_nav, :user_nav).map do |(id, label, url, course_nav, account_nav, user_nav)|
+      { type: "existing", id:, label:, url:, placements: { course_nav:, account_nav:, user_nav: } }
     end
   end
 
-  def self.sync_with_link_objects_json(context:, link_objects_json:)
-    if context.root_account.feature_enabled?(:nav_menu_links) && link_objects_json
+  def self.sync_with_link_objects_json(context:, link_objects_json:, can_manage_links: false)
+    if context.root_account.feature_enabled?(:nav_menu_links) && link_objects_json && can_manage_links
       sync_with_link_objects(context:, link_objects: JSON.parse(link_objects_json))
     end
-
     true
   rescue JSON::ParserError => e
     Rails.logger.error("Failed to parse link_objects_json: #{e.message}")
@@ -76,17 +102,24 @@ class NavMenuLink < ActiveRecord::Base
     link_objects = link_objects.map(&:with_indifferent_access)
 
     current_link_ids = Set.new(active.where(context:).pluck(:id).map(&:to_s))
-    link_ids_to_remove = current_link_ids - link_objects.pluck(:id).compact.map(&:to_s)
+    link_ids_to_remove = current_link_ids - link_objects.filter_map { |obj| obj[:id]&.to_s }
+
+    new_links = link_objects.select { |link| link[:type] == "new" }
 
     transaction do
-      link_objects.select { |link| link[:type] == "new" }.each do |link|
-        NavMenuLink.create!(url: link[:url]&.to_s, label: link[:label]&.to_s, context:, course_nav: true)
+      new_links.each do |link|
+        placements = link[:placements] || {}
+        course_nav = placements[:course_nav] || false
+        account_nav = placements[:account_nav] || false
+        user_nav = placements[:user_nav] || false
+        NavMenuLink.create!(url: link[:url]&.to_s, label: link[:label]&.to_s, context:, course_nav:, account_nav:, user_nav:)
       end
-      where(context:, id: link_ids_to_remove.to_a).destroy_all
+      where(context:, id: link_ids_to_remove.to_a).destroy_all if link_ids_to_remove.any?
     end
 
-    if link_ids_to_remove.any? || link_objects.any? { |link| link[:type] == "new" }
+    if link_ids_to_remove.any? || new_links.any?
       Lti::NavigationCache.new(context.root_account).invalidate_cache_key
     end
   end
+  private_class_method :sync_with_link_objects
 end

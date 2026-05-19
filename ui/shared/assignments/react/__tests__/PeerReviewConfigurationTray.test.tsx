@@ -216,6 +216,17 @@ describe('PeerReviewConfigurationTray', () => {
   })
 
   describe('Configuration display', () => {
+    it('renders config rows as a semantic list for screen readers', () => {
+      mockUsePeerReviewConfiguration.mockReturnValue(mockConfig)
+      renderWithQueryClient()
+
+      const list = screen.getByTestId('peer-review-config-list')
+      expect(list).toBeInTheDocument()
+
+      const items = screen.getAllByTestId('peer-review-config-row')
+      expect(items).toHaveLength(6)
+    })
+
     it('displays all configuration fields for regular assignment', () => {
       mockUsePeerReviewConfiguration.mockReturnValue(mockConfig)
       renderWithQueryClient()
@@ -252,6 +263,14 @@ describe('PeerReviewConfigurationTray', () => {
 
       expect(screen.getByText('Within Groups')).toBeInTheDocument()
       expect(screen.getAllByText('Allowed')).toHaveLength(1)
+    })
+
+    it('includes Within Groups in list for group assignments', () => {
+      mockUsePeerReviewConfiguration.mockReturnValue(mockGroupConfig)
+      renderWithQueryClient()
+
+      const items = screen.getAllByTestId('peer-review-config-row')
+      expect(items).toHaveLength(7)
     })
 
     it('displays correct values for group assignment configuration', () => {

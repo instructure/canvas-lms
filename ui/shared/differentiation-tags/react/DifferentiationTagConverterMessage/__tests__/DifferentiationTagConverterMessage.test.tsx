@@ -20,12 +20,16 @@ import {render, screen, waitFor} from '@testing-library/react'
 import {userEvent} from '@testing-library/user-event'
 import DifferentiationTagConverterMessage from '../DifferentiationTagConverterMessage'
 import axios from 'axios'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 vi.mock('axios')
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 describe('DifferentiationTagConverterMessage', () => {
   let user: ReturnType<typeof userEvent.setup>
@@ -137,7 +141,9 @@ describe('DifferentiationTagConverterMessage', () => {
     })
 
     it('shows error message when query fails', async () => {
-      vi.mocked(axios.put).mockRejectedValueOnce(new Error('Failed to convert differentiation tags.'))
+      vi.mocked(axios.put).mockRejectedValueOnce(
+        new Error('Failed to convert differentiation tags.'),
+      )
 
       renderComponent({})
 

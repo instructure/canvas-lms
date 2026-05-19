@@ -20,10 +20,18 @@ import {assignLocation} from '@canvas/util/globalUtils'
 import {cleanup, render, screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import {MemoryRouter} from 'react-router-dom'
+import {MemoryRouter, useNavigate} from 'react-router-dom'
 import {NewLoginDataProvider, NewLoginProvider, useNewLoginData} from '../../../context'
 import {createStudentAccount} from '../../../services'
 import Student from '../Student'
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
+  return {
+    ...actual,
+    useNavigate: vi.fn(),
+  }
+})
 
 vi.mock('@canvas/util/globalUtils', () => ({
   assignLocation: vi.fn(),
@@ -42,6 +50,9 @@ vi.mock('../../../context', async () => {
     })),
   }
 })
+
+const mockNavigate = vi.fn()
+const mockedUseNavigate = useNavigate as ReturnType<typeof vi.fn>
 
 describe('Student - form submission', () => {
   let user: ReturnType<typeof userEvent.setup>
@@ -62,6 +73,12 @@ describe('Student - form submission', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.restoreAllMocks()
+    mockedUseNavigate.mockReturnValue(mockNavigate)
+    Object.defineProperty(window, 'history', {
+      value: {length: 1},
+      writable: true,
+      configurable: true,
+    })
     ;(useNewLoginData as ReturnType<typeof vi.fn>).mockImplementation(() => ({
       isDataLoading: false,
       loginHandleName: 'Email',
@@ -190,7 +207,7 @@ describe('Student - form submission', () => {
     const backButton = screen.getByTestId('back-button')
     await user.click(backButton)
     await waitFor(() => {
-      expect(assignLocation).toHaveBeenCalledWith('/login')
+      expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
     })
   })
 })

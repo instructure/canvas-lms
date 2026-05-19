@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import page from 'page'
 import FocusStore from '../legacy/modules/FocusStore'
 import openMoveDialog from '../../openMoveDialog'
@@ -37,7 +37,7 @@ import '@canvas/rails-flash-notifications'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {reloadWindow} from '@canvas/util/globalUtils'
 import filesEnv from '@canvas/files/react/modules/filesEnv'
 
@@ -122,14 +122,14 @@ export default class Toolbar extends React.Component {
       width: 800,
       minHeight: 400,
       close() {
-        ReactDOM.unmountComponentAtNode(this)
+        legacyUnmountComponentAtNode(this)
         $(this).remove()
       },
       modal: true,
       zIndex: 1000,
     })
 
-    ReactDOM.render(
+    legacyRender(
       <RestrictedDialogForm
         models={this.props.selectedItems}
         usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
@@ -224,7 +224,7 @@ export default class Toolbar extends React.Component {
       }
     }
 
-    ReactDOM.render(
+    legacyRender(
       <ContentTypeExternalToolTray
         tool={tool}
         placement="file_index_menu"

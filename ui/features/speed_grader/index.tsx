@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 
 import {captureException} from '@sentry/browser'
 import {Spinner} from '@instructure/ui-spinner'
@@ -25,13 +25,15 @@ import ready from '@instructure/ready'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {executeQuery} from '@canvas/graphql'
 import {initializePendo} from '@canvas/pendo'
 import speedGrader from './jquery/speed_grader'
 import SGUploader from './sg_uploader'
 import getRCSProps from '@canvas/rce/getRCSProps'
+import * as amsAuth from '@canvas/ams/react/auth'
 
 const I18n = createI18nScope('speed_grader')
 
@@ -59,6 +61,8 @@ ready(() => {
       mutationFns: {
         postSubmissionCommentMedia: sgUploader?.doUploadByFile,
       },
+      amsRemote: window.REMOTES?.ams || null,
+      amsAuth,
       context: {
         userId: window.ENV.current_user_id,
         assignmentId: params.get('assignment_id'),
@@ -73,8 +77,11 @@ ready(() => {
         mediaSettings: window.INST.kalturaSettings,
         lang: ENV.LOCALE || ENV.BIGEASY_LOCALE || window.navigator.language,
         currentUserIsAdmin: ENV.current_user_is_admin ?? false,
+        canDeleteAttachments: window.ENV.can_delete_attachments,
         themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES ?? null,
+        useDyslexicFont: window.ENV.use_dyslexic_font ?? false,
         useHighContrast: window.ENV.use_high_contrast ?? false,
+        disableKeyboardShortcuts: window.ENV.disable_keyboard_shortcuts ?? false,
         commentLibrarySuggestionsEnabled: window.ENV.comment_library_suggestions_enabled ?? false,
         lateSubmissionInterval: window.ENV.late_policy?.late_submission_interval || 'day',
         ltiIframeAllowances: iframeAllowances(),
@@ -113,7 +120,7 @@ ready(() => {
         enhancedRubricsEnabled: window.ENV.ENHANCED_RUBRICS_ENABLED ?? false,
         // @ts-expect-error
         commentLibraryEnabled: window.ENV.COMMENT_LIBRARY_FEATURE_ENABLED ?? false,
-        consolidatedMediaPlayerEnabled: window.ENV.FEATURES.consolidated_media_player ?? false,
+        consolidatedMediaPlayerEnabled: true,
         // @ts-expect-error
         restrictQuantitativeDataEnabled: window.ENV.RESTRICT_QUANTITATIVE_DATA_ENABLED ?? false,
         // @ts-expect-error
@@ -151,7 +158,7 @@ ready(() => {
 
     const mountPoint = document.getElementById('speed_grader_loading')
 
-    ReactDOM.render(
+    legacyRender(
       <div
         style={{
           position: 'fixed',
@@ -179,17 +186,19 @@ ready(() => {
   // The feature must be enabled AND we must be handed the speedgrader platform URL
   // @ts-expect-error
   if (!window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED || !window.REMOTES?.speedgrader) {
-    ReactDOM.render(
+    legacyRender(
       <GenericErrorPage
         imageUrl={errorShipUrl}
-        errorMessage={
-          <>
-            {/* @ts-expect-error */}
-            {window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED ||
-              I18n.t('SpeedGrader Platform is not enabled')}
-            {window.REMOTES?.speedgrader || 'window.REMOTES?.speedgrader is missing'}
-          </>
-        }
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
+        errorMessage={[
+          // @ts-expect-error
+          !window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED &&
+            I18n.t('SpeedGrader Platform is not enabled'),
+          !window.REMOTES?.speedgrader && 'window.REMOTES?.speedgrader is missing',
+        ]
+          .filter(Boolean)
+          .join('; ')}
         errorSubject={I18n.t('SpeedGrader loading error')}
         errorCategory={I18n.t('SpeedGrader Error Page')}
       />,
@@ -208,9 +217,11 @@ ready(() => {
       console.error('Failed to load SpeedGrader', error)
       captureException(error)
 
-      ReactDOM.render(
+      legacyRender(
         <GenericErrorPage
           imageUrl={errorShipUrl}
+          onReportError={reportError}
+          translations={canvasErrorPageTranslations}
           errorMessage={error.message}
           errorSubject={I18n.t('SpeedGrader loading error')}
           errorCategory={I18n.t('SpeedGrader Error Page')}

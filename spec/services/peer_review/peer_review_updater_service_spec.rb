@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 RSpec.describe PeerReview::PeerReviewUpdaterService do
   include PeerReviewHelpers
 
@@ -314,6 +312,18 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
         )
       end
 
+      it "raises error when grading_type is not_graded" do
+        invalid_service = described_class.new(
+          parent_assignment:,
+          grading_type: "not_graded"
+        )
+
+        expect { invalid_service.call }.to raise_error(
+          PeerReview::InvalidGradingTypeError,
+          "Peer review sub assignments cannot have a not_graded grading type"
+        )
+      end
+
       it "raises error when feature is disabled" do
         course.disable_feature!(:peer_review_allocation_and_grading)
         expect { service.call }.to raise_error(
@@ -403,7 +413,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review unlock date cannot be before assignment due date/
+            /Peer review available from date cannot be before assignment due date/
           )
         end
 
@@ -415,7 +425,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review due date cannot be before assignment unlock date/
+            /Peer review due date cannot be before assignment available from date/
           )
         end
 
@@ -427,7 +437,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review due date cannot be after assignment lock date/
+            /Peer review due date cannot be after assignment until date/
           )
         end
 
@@ -439,7 +449,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Peer review lock date cannot be after assignment lock date/
+            /Peer review until date cannot be after assignment until date/
           )
         end
 
@@ -452,7 +462,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Due date cannot be before unlock date/
+            /Due date cannot be before available from date/
           )
         end
 
@@ -465,7 +475,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Due date cannot be after lock date/
+            /Due date cannot be after until date/
           )
         end
 
@@ -478,7 +488,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
 
           expect { service.call }.to raise_error(
             PeerReview::InvalidDatesError,
-            /Unlock date cannot be after lock date/
+            /Available from date cannot be after until date/
           )
         end
       end
@@ -491,6 +501,7 @@ RSpec.describe PeerReview::PeerReviewUpdaterService do
       expect(service).to receive(:validate_assignment_submission_types)
       expect(service).to receive(:validate_feature_enabled)
       expect(service).to receive(:validate_peer_review_sub_assignment_exists)
+      expect(service).to receive(:validate_dates)
 
       service.send(:run_validations)
     end

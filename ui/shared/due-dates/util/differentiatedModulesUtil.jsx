@@ -19,7 +19,7 @@
 import React from 'react'
 import {compact, flatMap, groupBy, map} from 'es-toolkit/compat'
 import {getOverriddenAssignees} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
 import {useScope as createI18nScope} from '@canvas/i18n'

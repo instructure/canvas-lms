@@ -731,6 +731,7 @@ export const ZSpeedGraderResponse = z
     anonymize_graders: z.boolean(),
     anonymize_students: z.boolean(),
     anonymous_grading: z.boolean(),
+    anonymous_participants: z.boolean(),
     anonymous_instructor_annotations: z.boolean(),
     anonymous_peer_reviews: z.boolean(),
     assignment_group_id: z.string(),

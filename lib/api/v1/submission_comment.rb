@@ -144,7 +144,7 @@ module Api::V1::SubmissionComment
 
     # ensure each student has membership, even without a submission
     student_ids = students(current_user:, assignment:, course:).pluck(:id)
-    @student_ids_to_anonymous_ids = student_ids.each_with_object({}) { |student_id, map| map[student_id.to_s] = nil }
+    @student_ids_to_anonymous_ids = student_ids.to_h { |student_id| [student_id.to_s, nil] }
     missing_student_ids = student_ids - submissions.map(&:user_id)
     missing_submissions = if missing_student_ids.empty?
                             []

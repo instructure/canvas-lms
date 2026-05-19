@@ -357,8 +357,8 @@ describe DiscussionTopicsController, type: :request do
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")
-      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
-      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(force: true)
+      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(force: true)
       @group_category = @course.group_categories.create(name: "gc")
       @group = @course.groups.create!(group_category: @group_category)
       api_call(:post,
@@ -694,7 +694,7 @@ describe DiscussionTopicsController, type: :request do
 
   context "when file_association_access feature flag is enabled" do
     before do
-      @attachment = create_attachment(@course)
+      @attachment = create_attachment(@user)
       @attachment.root_account.enable_feature!(:file_association_access)
       @topic = create_topic(@course, title: "Topic 1", message: "/users/#{@user.id}/files/#{@attachment.id}", attachment: @attachment)
     end
@@ -1760,7 +1760,7 @@ describe DiscussionTopicsController, type: :request do
 
         gtopic.reload
         expect(gtopic.allow_rating).to be_truthy
-        expect(gtopic.require_initial_post).to_not be_truthy
+        expect(gtopic.require_initial_post).not_to be_truthy
       end
 
       it "does not allow updating certain attributes for group sub-discussions" do
@@ -2318,7 +2318,7 @@ describe DiscussionTopicsController, type: :request do
   end
 
   it "translates user content in topics without verifiers" do
-    should_translate_user_content(@course, false) do |user_content|
+    should_translate_user_content(@course, include_verifiers: false) do |user_content|
       @topic ||= create_topic(@course, title: "Topic 1", message: user_content)
       json = api_call(
         :get,
@@ -2770,7 +2770,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "allows including attachments on top-level entries" do
-      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       json = api_call(
         :post,
         "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
@@ -2788,7 +2788,7 @@ describe DiscussionTopicsController, type: :request do
 
     it "includes attachments on replies to top-level entries" do
       top_entry = create_entry(@topic, message: "top-level message")
-      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       json = api_call(
         :post,
         "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{top_entry.id}/replies.json",
@@ -3100,7 +3100,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "translates user content in replies without verifiers" do
-      should_translate_user_content(@course, false) do |user_content|
+      should_translate_user_content(@course, include_verifiers: false) do |user_content|
         @reply.saving_user = @user
         @reply.update_attribute("message", user_content)
         json = api_call(
@@ -4153,9 +4153,9 @@ describe DiscussionTopicsController, type: :request do
                         { controller: "discussion_topics_api", action: "view", format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s },
                         { include_new_entries: "1" })
 
-        expect(json["view"].first["message"]).to_not start_with(@tag)
-        expect(json["view"].first["replies"].first["message"]).to_not start_with(@tag)
-        expect(json["new_entries"].first["message"]).to_not start_with(@tag)
+        expect(json["view"].first["message"]).not_to start_with(@tag)
+        expect(json["view"].first["replies"].first["message"]).not_to start_with(@tag)
+        expect(json["new_entries"].first["message"]).not_to start_with(@tag)
       end
     end
 
@@ -4246,10 +4246,10 @@ describe DiscussionTopicsController, type: :request do
 
       new_entry = json["new_entries"].first
       message = new_entry["message"]
-      expect(message).to_not include("placeholder.invalid")
+      expect(message).not_to include("placeholder.invalid")
       expect(message).to include("www.example.com#{link}")
       att_url = new_entry["attachments"].first["url"]
-      expect(att_url).to_not include("placeholder.invalid")
+      expect(att_url).not_to include("placeholder.invalid")
       expect(att_url).to include("www.example.com")
     end
   end

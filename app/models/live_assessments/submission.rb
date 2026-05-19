@@ -19,7 +19,7 @@
 #
 
 module LiveAssessments
-  class Submission < ActiveRecord::Base
+  class Submission < ApplicationRecord
     belongs_to :user
     belongs_to :assessment, class_name: "LiveAssessments::Assessment"
 

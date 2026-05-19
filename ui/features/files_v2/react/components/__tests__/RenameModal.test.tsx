@@ -24,7 +24,7 @@ import {http, HttpResponse} from 'msw'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../fixtures/fakeData'
 import {userEvent} from '@testing-library/user-event'
 import {Folder, File} from '../../../interfaces/File'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer} from '@instructure/platform-alerts'
 import {RowsProvider} from '../../contexts/RowsContext'
 import {mockRowsContext} from '../FileFolderTable/__tests__/testUtils'
 

@@ -43,10 +43,7 @@ module AssignmentsHelper
   def student_peer_review_link_for(context, assignment, assessment)
     options = assessment.completed? ? completed_link_options : in_progress_link_options
     icon_class = assessment.completed? ? "icon-check" : "icon-warning"
-    text = safe_join [
-      "<i class='#{icon_class}' aria-hidden='true'></i>".html_safe,
-      submission_author_name_for(assessment)
-    ]
+    text = tag.i(class: icon_class, aria: { hidden: true }) + submission_author_name_for(assessment)
     href = if assignment.anonymous_peer_reviews?
              context_url(context, :context_assignment_anonymous_submission_url, assignment.id, assessment.asset.anonymous_id)
            else
@@ -157,7 +154,8 @@ module AssignmentsHelper
     !@context.horizon_course? &&
       @can_grade &&
       @context.feature_enabled?(:peer_review_allocation_and_grading) &&
-      @assignment.has_peer_reviews?
+      @assignment.has_peer_reviews? &&
+      @assignment.peer_review_sub_assignment.present?
   end
 
   def show_rubric_section?
@@ -167,6 +165,7 @@ module AssignmentsHelper
   def show_legacy_peer_reviews_link?
     @can_grade &&
       @assignment.has_peer_reviews? &&
-      !@assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+      (!@assignment.context.feature_enabled?(:peer_review_allocation_and_grading) ||
+        @assignment.peer_review_sub_assignment.blank?)
   end
 end

@@ -1,0 +1,397 @@
+{
+  "ConfirmationDialog": {
+    "Cancel": "Cancel",
+    "Confirm": "Confirm"
+  },
+  "DueDateOverrideView": {
+    "Mark as important date and show on homeroom sidebar": "Mark as important date and show on homeroom sidebar"
+  },
+  "GradingSchemeManagement": {
+    "Account default grading scheme": "Account default grading scheme",
+    "Account default grading scheme was successfully saved.": "Account default grading scheme was successfully saved.",
+    "Active Grading Schemes": "Active Grading Schemes",
+    "Applied": "Applied",
+    "Apply": "Apply",
+    "Archive Grading Scheme": "Archive Grading Scheme",
+    "Archived": "Archived",
+    "Archived Grading Schemes": "Archived Grading Schemes",
+    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.",
+    "Are you sure you want to delete this grading scheme?": "Are you sure you want to delete this grading scheme?",
+    "Cancel": "Cancel",
+    "Canvas Default": "Canvas Default",
+    "Canvas Default Grading Scheme": "Canvas Default Grading Scheme",
+    "Close": "Close",
+    "Confirm": "Confirm",
+    "Confirm Default Grading Scheme Change": "Confirm Default Grading Scheme Change",
+    "Copy": "Copy",
+    "Delete Grading Scheme": "Delete Grading Scheme",
+    "Duplicate Grading Scheme": "Duplicate Grading Scheme",
+    "Edit Grading Scheme": "Edit Grading Scheme",
+    "Grading Scheme Name": "Grading Scheme Name",
+    "Grading scheme was successfully archived.": "Grading scheme was successfully archived.",
+    "Grading scheme was successfully created.": "Grading scheme was successfully created.",
+    "Grading scheme was successfully removed.": "Grading scheme was successfully removed.",
+    "Grading scheme was successfully saved.": "Grading scheme was successfully saved.",
+    "Grading scheme was successfully unarchived.": "Grading scheme was successfully unarchived.",
+    "Locations Used": "Locations Used",
+    "Lower limit of range": "Lower limit of range",
+    "New Grading Scheme": "New Grading Scheme",
+    "Next Page": "Next Page",
+    "No account default": "No account default",
+    "Previous Page": "Previous Page",
+    "Save": "Save",
+    "Search": "Search",
+    "Search...": "Search...",
+    "Show courses and assignments": "Show courses and assignments",
+    "Show locations used": "Show locations used",
+    "Sort by": "Sort by",
+    "There was an error while archiving the grading scheme": "There was an error while archiving the grading scheme",
+    "There was an error while creating the grading scheme": "There was an error while creating the grading scheme",
+    "There was an error while loading grading schemes": "There was an error while loading grading schemes",
+    "There was an error while loading the default canvas grading scheme": "There was an error while loading the default canvas grading scheme",
+    "There was an error while loading the default grading scheme": "There was an error while loading the default grading scheme",
+    "There was an error while removing the grading scheme": "There was an error while removing the grading scheme",
+    "There was an error while saving the grading scheme": "There was an error while saving the grading scheme",
+    "There was an error while unarchiving the grading scheme": "There was an error while unarchiving the grading scheme",
+    "There was an error while updating the default grading scheme": "There was an error while updating the default grading scheme",
+    "There was an error while updating the grading scheme": "There was an error while updating the grading scheme",
+    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.",
+    "Unarchive Grading Scheme": "Unarchive Grading Scheme",
+    "Upper limit of range": "Upper limit of range",
+    "View Grading Scheme": "View Grading Scheme",
+    "View/Copy Grading Scheme": "View/Copy Grading Scheme",
+    "View/Edit Grading Scheme": "View/Edit Grading Scheme",
+    "You can't archive this grading scheme because it is set as a default for a course or account.": "You can't archive this grading scheme because it is set as a default for a course or account.",
+    "You can't delete this grading scheme because it is in use.": "You can't delete this grading scheme because it is in use.",
+    "You have no active grading schemes.": "You have no active grading schemes.",
+    "You have no archived grading schemes.": "You have no archived grading schemes.",
+    "Your Grading Schemes": "Your Grading Schemes",
+    "to": "to"
+  },
+  "GradingSchemeViewModal": {
+    "Are you sure you want to delete this grading scheme?": "Are you sure you want to delete this grading scheme?",
+    "Are you sure you want to duplicate this grading scheme?": "Are you sure you want to duplicate this grading scheme?",
+    "Cancel": "Cancel",
+    "Close": "Close",
+    "Delete": "Delete",
+    "Delete ": "Delete ",
+    "Duplicate": "Duplicate",
+    "Duplicate ": "Duplicate ",
+    "Edit Grading Scheme": "Edit Grading Scheme",
+    "New Grading Scheme": "New Grading Scheme",
+    "Percentages and points can't be edited because it is an account level grading scheme.": "Percentages and points can't be edited because it is an account level grading scheme.",
+    "Percentages and points can't be edited because it is being used as the default grading scheme.": "Percentages and points can't be edited because it is being used as the default grading scheme.",
+    "Percentages and points can't be edited because it is currently being used.": "Percentages and points can't be edited because it is currently being used.",
+    "Save": "Save"
+  },
+  "GradingSchemes": {
+    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.",
+    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.",
+    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.",
+    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.",
+    "Delete grading scheme": "Delete grading scheme",
+    "Edit Grading Scheme": "Edit Grading Scheme",
+    "Edit a copy of this grading scheme": "Edit a copy of this grading scheme",
+    "Edit grading scheme": "Edit grading scheme",
+    "Grade By": "Grade By",
+    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Grading Scheme Name is required. Add a name and try clicking 'Save' again.",
+    "Grading scheme title": "Grading scheme title",
+    "Invalid grading scheme": "Invalid grading scheme",
+    "Letter Grade": "Letter Grade",
+    "Looks great!": "Looks great!",
+    "Percentage": "Percentage",
+    "Points": "Points",
+    "Range": "Range",
+    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.",
+    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.",
+    "edit a copy": "edit a copy"
+  },
+  "OutcomeManagement": {
+    "Course": "Course",
+    "Institution": "Institution",
+    "This is a course-level outcome": "This is a course-level outcome",
+    "This is an institution-level outcome": "This is an institution-level outcome"
+  },
+  "UsedLocationsModal": {
+    "Accounts": "Accounts",
+    "Close": "Close",
+    "Concluded": "Concluded",
+    "Courses": "Courses",
+    "Failed to load account used locations": "Failed to load account used locations",
+    "Failed to load assignments used locations": "Failed to load assignments used locations",
+    "Failed to load used locations": "Failed to load used locations",
+    "Load Assignments ...": "Load Assignments ...",
+    "Load More Assignments ...": "Load More Assignments ...",
+    "Loading": "Loading",
+    "Locations Used": "Locations Used",
+    "Search": "Search",
+    "Search...": "Search..."
+  },
+  "acceptable_use_policy": {
+    "Acceptable Use Policy": "Acceptable Use Policy",
+    "Close": "Close",
+    "Loading page": "Loading page",
+    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.",
+    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists."
+  },
+  "account_reports": {
+    "Close": "Close",
+    "Configure Report": "Configure Report",
+    "Failed to start report.": "Failed to start report.",
+    "Invalid date and time.": "Invalid date and time.",
+    "Next month": "Next month",
+    "Previous month": "Previous month",
+    "Report Description": "Report Description",
+    "Run Report": "Run Report",
+    "Starting report": "Starting report",
+    "Time": "Time"
+  },
+  "admin_split": {
+    "Cancel": "Cancel",
+    "Failed to split users.": "Failed to split users.",
+    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.",
+    "OK": "OK",
+    "Split": "Split",
+    "The following users will be split into separate user accounts:": "The following users will be split into separate user accounts:",
+    "There are no user accounts to split from this user.": "There are no user accounts to split from this user.",
+    "User split complete. Links to split user accounts follow:": "User split complete. Links to split user accounts follow:"
+  },
+  "assignment_2_teacher_assignment_details": {
+    "Description": "Description"
+  },
+  "assignment_footer": {
+    "An error occurred while loading sequential module items.": "An error occurred while loading sequential module items.",
+    "Next": "Next",
+    "Previous": "Previous"
+  },
+  "assignment_tabs": {
+    "Assignment": "Assignment",
+    "Create Allocation Rules for Peer Reviews": "Create Allocation Rules for Peer Reviews",
+    "Peer Review": "Peer Review"
+  },
+  "assignments.grading_type_selector": {
+    "(course default)": "(course default)",
+    "Account Level": "Account Level",
+    "Canvas Grading Scheme (course default)": "Canvas Grading Scheme (course default)",
+    "Close": "Close",
+    "Copy": "Copy",
+    "Course Default Grading Scheme": "Course Default Grading Scheme",
+    "Course Level": "Course Level",
+    "Default Canvas Grading Scheme": "Default Canvas Grading Scheme",
+    "Grading scheme was successfully removed.": "Grading scheme was successfully removed.",
+    "Grading scheme was successfully updated.": "Grading scheme was successfully updated.",
+    "Manage All Grading Schemes": "Manage All Grading Schemes",
+    "New Grading Scheme": "New Grading Scheme",
+    "Select a grading scheme": "Select a grading scheme",
+    "There was an error while loading grading schemes": "There was an error while loading grading schemes",
+    "There was an error while loading the grading scheme": "There was an error while loading the grading scheme",
+    "There was an error while refreshing grading schemes": "There was an error while refreshing grading schemes",
+    "There was an error while removing the grading scheme": "There was an error while removing the grading scheme",
+    "There was an error while saving the grading scheme": "There was an error while saving the grading scheme",
+    "View": "View",
+    "View/Edit": "View/Edit"
+  },
+  "assignments_2": {
+    "Assignments 2 Teacher Error Page": "Assignments 2 Teacher Error Page",
+    "Assignments 2 Teacher initial query error": "Assignments 2 Teacher initial query error",
+    "Loading": "Loading"
+  },
+  "catalog": {
+    "Close enrollment dialog": "Close enrollment dialog",
+    "Course Catalog": "Course Catalog",
+    "Enroll in a Course": "Enroll in a Course",
+    "Loading enrollment form": "Loading enrollment form"
+  },
+  "confetti": {
+    "Great work! From the Canvas developers": "Great work! From the Canvas developers"
+  },
+  "content_copy_redesign": {
+    "Cancel": "Cancel",
+    "Copy course": "Copy course",
+    "Course code": "Course code",
+    "Course code must be 255 characters or less": "Course code must be 255 characters or less",
+    "Course name must be 255 characters or less": "Course name must be 255 characters or less",
+    "Create course": "Create course",
+    "Creating...": "Creating...",
+    "End date": "End date",
+    "End date must be after start date": "End date must be after start date",
+    "Name": "Name",
+    "No results": "No results",
+    "Please enter the details for the new course.": "Please enter the details for the new course.",
+    "Select a new beginning date": "Select a new beginning date",
+    "Select a new end date": "Select a new end date",
+    "Select end date": "Select end date",
+    "Select start date": "Select start date",
+    "Start date": "Start date",
+    "Start date must be before end date": "Start date must be before end date",
+    "Start typing to search...": "Start typing to search...",
+    "Term": "Term",
+    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Term start and end dates cannot be modified here, only on the Term Details page under Admin.",
+    "Type to navigate options.": "Type to navigate options.",
+    "Use arrow keys to navigate options.": "Use arrow keys to navigate options."
+  },
+  "content_share_preview_overlay": {
+    "Close": "Close",
+    "Content Share Preview": "Content Share Preview",
+    "Preview": "Preview"
+  },
+  "copy-to-clipboard-button": {
+    "Copy": "Copy"
+  },
+  "copy_warnings_modal": {
+    "Attention": "Attention"
+  },
+  "course_logging_content": {
+    "No results": "No results",
+    "Type to search": "Type to search"
+  },
+  "create_course_modal": {
+    "Begin typing to search": "Begin typing to search",
+    "Cancel": "Cancel",
+    "Course Details": "Course Details",
+    "Course Name": "Course Name",
+    "Create": "Create",
+    "Create Course": "Create Course",
+    "Create Subject": "Create Subject",
+    "Creating new course...": "Creating new course...",
+    "Creating new subject...": "Creating new subject...",
+    "Error creating new course": "Error creating new course",
+    "Error creating new subject": "Error creating new subject",
+    "Loading accounts...": "Loading accounts...",
+    "Name...": "Name...",
+    "No Results": "No Results",
+    "Select a homeroom": "Select a homeroom",
+    "Subject Details": "Subject Details",
+    "Subject Name": "Subject Name",
+    "Sync enrollments and subject start/end dates from homeroom": "Sync enrollments and subject start/end dates from homeroom",
+    "Unable to get accounts": "Unable to get accounts",
+    "Unable to get homerooms": "Unable to get homerooms",
+    "Use arrow keys to navigate options.": "Use arrow keys to navigate options.",
+    "Which account will this course be associated with?": "Which account will this course be associated with?",
+    "Which account will this subject be associated with?": "Which account will this subject be associated with?"
+  },
+  "enhanced_individual_gradebook": {
+    "Final Grade Override": "Final Grade Override"
+  },
+  "feature_flags": {
+    "Accept": "Accept",
+    "Access & Use: ": "Access & Use: ",
+    "An error occurred accepting the Early Access Program terms": "An error occurred accepting the Early Access Program terms",
+    "Anything you upload or use with these features stays yours. We may use it in limited ways to improve the features, but you're responsible for keeping your own backups. We may use your data to provide and maintain the features. Any aggregated or anonymized data stays with Instructure, and we may also use it to help improve our products.": "Anything you upload or use with these features stays yours. We may use it in limited ways to improve the features, but you're responsible for keeping your own backups. We may use your data to provide and maintain the features. Any aggregated or anonymized data stays with Instructure, and we may also use it to help improve our products.",
+    "Cancel": "Cancel",
+    "Confidentiality: ": "Confidentiality: ",
+    "Do you accept the Early Access Program Terms and Conditions?": "Do you accept the Early Access Program Terms and Conditions?",
+    "Early Access Program Terms and Conditions": "Early Access Program Terms and Conditions",
+    "Here's a quick overview of what to expect:": "Here's a quick overview of what to expect:",
+    "No Warranties / Limited Liability: ": "No Warranties / Limited Liability: ",
+    "Please keep what you see in this program confidential.": "Please keep what you see in this program confidential.",
+    "Please only let your team members who are covered under your active subscription try these out.": "Please only let your team members who are covered under your active subscription try these out.",
+    "Proprietary Rights: ": "Proprietary Rights: ",
+    "Responsibilities: ": "Responsibilities: ",
+    "Termination & Support: ": "Termination & Support: ",
+    "Thanks for partnering with us, and we're looking forward to hearing what you think.": "Thanks for partnering with us, and we're looking forward to hearing what you think.",
+    "These features (and the tech behind them) belong to Instructure. You'll have access for your internal use only. No sharing or reselling.": "These features (and the tech behind them) belong to Instructure. You'll have access for your internal use only. No sharing or reselling.",
+    "We'd love to hear your thoughts; what's working well and what could be improved. We may use any feedback you share with us to help improve our products and services.": "We'd love to hear your thoughts; what's working well and what could be improved. We may use any feedback you share with us to help improve our products and services.",
+    "We're excited to invite you to try our pre-release features! This gives you early access to some of our new features before they're generally available. Participation is optional and outside the scope of your existing customer agreement. There is no charge for participation and we just ask for your feedback to help us improve.": "We're excited to invite you to try our pre-release features! This gives you early access to some of our new features before they're generally available. Participation is optional and outside the scope of your existing customer agreement. There is no charge for participation and we just ask for your feedback to help us improve.",
+    "We're grateful for your willingness to test things out and help shape the future of our platform. If you have ideas, suggestions, or feedback, please share as it makes a big difference!": "We're grateful for your willingness to test things out and help shape the future of our platform. If you have ideas, suggestions, or feedback, please share as it makes a big difference!",
+    "You or we can end your participation anytime and we may disable the features without notice. Features may change, and support is limited. Continued availability of the features is not a guarantee that the features will become generally available.": "You or we can end your participation anytime and we may disable the features without notice. Features may change, and support is limited. Continued availability of the features is not a guarantee that the features will become generally available.",
+    "You'll get to try out new features that are still in development. Since they're pre-release, things may change along the way.": "You'll get to try out new features that are still in development. Since they're pre-release, things may change along the way.",
+    "Your Content: ": "Your Content: ",
+    "Your Feedback Matters: ": "Your Feedback Matters: "
+  },
+  "filter_bar": {
+    "All": "All",
+    "Clear": "Clear",
+    "Filter by": "Filter by",
+    "Search": "Search",
+    "Use arrow keys to navigate options.": "Use arrow keys to navigate options."
+  },
+  "groupNavigationSelector": {
+    "Select Group": "Select Group",
+    "Use arrow keys to navigate options.": "Use arrow keys to navigate options."
+  },
+  "jobs": {
+    "Close": "Close",
+    "show": "show"
+  },
+  "lti_asset_reports_for_student": {
+    "Document Processors": "Document Processors"
+  },
+  "media_immersive_view": {
+    "Go Back to Course": "Go Back to Course",
+    "There is no transcript yet.": "There is no transcript yet.",
+    "Transcript": "Transcript"
+  },
+  "modules_home_page": {
+    "Create a new Module": "Create a new Module"
+  },
+  "not_found_page_slide_puzzle": {
+    "A studious panda": "A studious panda",
+    "Moves:": "Moves:"
+  },
+  "overview_page": {
+    "Edit home page": "Edit home page",
+    "Subject Home Page": "Subject Home Page"
+  },
+  "pages": {
+    "Block Content Editor": "Block Content Editor",
+    "Page title": "Page title"
+  },
+  "pages_edit_title": {
+    "Page Title": "Page Title"
+  },
+  "quizzes_regrade_modal": {
+    "Award points for both corrected and previously correct answers (no scores will be reduced)": "Award points for both corrected and previously correct answers (no scores will be reduced)",
+    "Cancel": "Cancel",
+    "Choose a regrade option for students who have already taken the quiz. Canvas will regrade all your submissions after you save the quiz (students' scores MAY be affected).": "Choose a regrade option for students who have already taken the quiz. Canvas will regrade all your submissions after you save the quiz (students' scores MAY be affected).",
+    "Close": "Close",
+    "Give everyone full credit for this question": "Give everyone full credit for this question",
+    "Only award points for the correct answer (some students' scores may be reduced)": "Only award points for the correct answer (some students' scores may be reduced)",
+    "Regrade Options": "Regrade Options",
+    "Regrade options": "Regrade options",
+    "Regrade options modal": "Regrade options modal",
+    "Regrading is not allowed on this question because either an answer was removed or the question type was changed after a student completed a submission.": "Regrading is not allowed on this question because either an answer was removed or the question type was changed after a student completed a submission.",
+    "Update": "Update",
+    "Update question without regrading": "Update question without regrading"
+  },
+  "study_assist": {
+    "AI Privacy Notice": "AI Privacy Notice",
+    "AI information": "AI information",
+    "Back": "Back",
+    "Claude 3 Haiku": "Claude 3 Haiku",
+    "Close": "Close",
+    "Data is not stored or reused by the model.": "Data is not stored or reused by the model.",
+    "Does Not Log Data": "Does Not Log Data",
+    "Generated study content may be inaccurate or incomplete.": "Generated study content may be inaccurate or incomplete.",
+    "No study tools are currently available.": "No study tools are currently available.",
+    "Nutrition Facts": "Nutrition Facts",
+    "PII in page content may be included, but no PII is intentionally sent to the model.": "PII in page content may be included, but no PII is intentionally sent to the model.",
+    "Page": "Page",
+    "Page content is sent to the model to generate study materials.": "Page content is sent to the model to generate study materials.",
+    "Students are able to efficiently study course material through AI-generated summaries, quizzes, and flashcards.": "Students are able to efficiently study course material through AI-generated summaries, quizzes, and flashcards.",
+    "Study Tools": "Study Tools",
+    "Study tools": "Study tools",
+    "US": "US"
+  },
+  "submissions": {
+    "Document Processors:": "Document Processors:"
+  },
+  "submit_online_url_assignment": {
+    "A valid URL is required": "A valid URL is required",
+    "Website URL": "Website URL"
+  },
+  "terms_of_service_modal": {
+    "Acceptable Use Policy": "Acceptable Use Policy",
+    "Loading...": "Loading...",
+    "Preview": "Preview"
+  },
+  "todos_page": {
+    "Failed to load todos": "Failed to load todos",
+    "Loading Additional Todo Details": "Loading Additional Todo Details",
+    "Loading Todo Course Name": "Loading Todo Course Name",
+    "Loading Todo Title": "Loading Todo Title"
+  },
+  "tray": {
+    "Close": "Close"
+  }
+}

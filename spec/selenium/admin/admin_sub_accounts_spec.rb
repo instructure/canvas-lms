@@ -100,7 +100,7 @@ describe "admin sub accounts" do
   end
 
   it "hides sub accounts and re-expand them" do
-    def check_sub_accounts(displayed = true)
+    def check_sub_accounts(displayed: true)
       sub_accounts = Account.default.sub_accounts
       if displayed
         sub_accounts.each { |account| expect(f("[data-testid='header_#{account.id}']")).to be_displayed }
@@ -116,7 +116,7 @@ describe "admin sub accounts" do
     click_account_action_link(default_account_id, "collapse")
     wait_for_ajaximations
     check_element_has_focus f("[data-testid='expand-#{default_account_id}']")
-    check_sub_accounts(false)
+    check_sub_accounts(displayed: false)
     click_account_action_link(default_account_id, "expand")
     wait_for_ajaximations
     # TODO: add this back in subsequent commit

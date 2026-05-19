@@ -22,7 +22,7 @@ import {UploadFile, type UploadFilePanelId} from '@instructure/canvas-rce'
 import {prepEmbedSrc} from '@instructure/canvas-rce/es/common/fileUrl'
 import {RCSPropsContext} from '../../../Contexts'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('block-editor')
 

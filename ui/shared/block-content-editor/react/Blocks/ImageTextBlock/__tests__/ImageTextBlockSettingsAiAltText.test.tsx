@@ -140,13 +140,13 @@ describe('ImageTextBlockSettings - AI Alt Text', () => {
   })
 
   it('shows generating state while processing', async () => {
-    // Make the API call take longer to resolve
-    vi.mocked(generateAiAltText).mockImplementation(
-      () =>
-        new Promise(resolve =>
-          setTimeout(() => resolve({image: {altText: 'AI generated alt text'}}), 100),
-        ),
-    )
+    // Use a deferred promise so the generating state is stable — a fixed
+    // setTimeout delay can expire before the assertion runs in slow CI.
+    let resolveGenerate: (value: {image: {altText: string}}) => void
+    const deferred = new Promise<{image: {altText: string}}>(resolve => {
+      resolveGenerate = resolve
+    })
+    vi.mocked(generateAiAltText).mockReturnValue(deferred)
 
     const component = renderBlock(ImageTextBlockSettings, defaultProps, aiAltTextOptions)
     const button = component.getByTestId('generate-alt-text-button')
@@ -155,6 +155,8 @@ describe('ImageTextBlockSettings - AI Alt Text', () => {
 
     expect(component.getByText('Generating Alt Text...')).toBeInTheDocument()
 
+    // Resolve so the mutation settles and the button returns
+    resolveGenerate!({image: {altText: 'AI generated alt text'}})
     await waitFor(() => {
       expect(component.queryByText(/\(Re\)generate Alt Text/i)).toBeInTheDocument()
     })

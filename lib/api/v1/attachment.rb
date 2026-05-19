@@ -41,7 +41,7 @@ module Api::V1::Attachment
       options[:master_course_status] = setup_master_course_restrictions(files, options[:context])
     end
 
-    ActiveRecord::Associations::Preloader.new(records: files, associations: [:root_account]).call
+    ActiveRecord::Associations::Preloader.new(records: files, associations: [:root_account, :last_attachment_upload_status]).call
 
     files.map do |f|
       attachment_json(f, user, url_options, options)
@@ -92,7 +92,7 @@ module Api::V1::Attachment
     downloadable = skip_permission_checks || !attachment.locked_for?(user, check_policies: true)
 
     if downloadable
-      url_options[:location] = nil unless attachment.root_account.feature_enabled?(:file_association_access) || attachment.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
+      url_options[:location] = nil unless attachment.root_account.feature_enabled?(:file_association_access)
       # using the multi-parameter form because not every class that mixes in
       # this api helper also mixes in ApplicationHelper (I'm looking at you,
       # DiscussionTopic::MaterializedView), and in those cases we need to

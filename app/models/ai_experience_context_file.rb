@@ -27,6 +27,7 @@ class AiExperienceContextFile < ApplicationRecord
   validates :ai_experience, presence: true
   validates :attachment, presence: true
   validates :attachment_id, uniqueness: { scope: :ai_experience_id }
+  validates :llm_conversation_service_document_id, length: { maximum: 255 }, allow_nil: true
   validate :attachment_file_size
 
   before_validation :set_root_account

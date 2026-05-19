@@ -20,9 +20,9 @@ import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ActionButtons from '../ActionButtons'
-import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
+import {confirmDanger} from '@instructure/platform-instui-bindings'
 
-vi.mock('@canvas/instui-bindings/react/Confirm')
+vi.mock('@instructure/platform-instui-bindings')
 
 const defaultProps = ({
   showVisibilityToggle = true,
@@ -115,13 +115,16 @@ describe('ActionButtons', () => {
 
     fireEvent.click(getByText('Delete key Unnamed Tool'))
 
-    expect(confirmDanger).toHaveBeenCalledWith({
-      confirmButtonLabel: 'Delete',
-      heading: undefined,
-      title: 'Delete LTI Developer Key',
-      message:
-        'Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context.',
-    })
+    expect(confirmDanger).toHaveBeenCalledWith(
+      expect.objectContaining({
+        confirmButtonLabel: 'Delete',
+        cancelButtonLabel: 'Cancel',
+        closeButtonLabel: 'Close',
+        title: 'Delete LTI Developer Key',
+        message:
+          'Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context.',
+      }),
+    )
   })
 
   describe('when devKeysReadOnly is true', () => {

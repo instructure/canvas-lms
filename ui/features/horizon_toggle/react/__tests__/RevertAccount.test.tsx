@@ -22,17 +22,17 @@ import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import {RevertAccount} from '../RevertAccount'
 import * as globalUtils from '@canvas/util/globalUtils'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const server = setupServer()
 
 vi.mock('@canvas/util/globalUtils', async () => ({
-  ...await vi.importActual('@canvas/util/globalUtils'),
+  ...(await vi.importActual('@canvas/util/globalUtils')),
   reloadWindow: vi.fn(),
 }))
 
-vi.mock('@canvas/alerts/react/FlashAlert', async () => ({
-  ...await vi.importActual('@canvas/alerts/react/FlashAlert'),
+vi.mock('@instructure/platform-alerts', async () => ({
+  ...(await vi.importActual('@instructure/platform-alerts')),
   showFlashError: vi.fn(),
 }))
 

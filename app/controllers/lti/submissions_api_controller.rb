@@ -160,7 +160,7 @@ module Lti
       }.freeze
     ].freeze
 
-    skip_before_action :load_user
+    skip_before_action :load_user, :require_user
     around_action :activate_tool_shard, only: :attachment
     before_action :authorized_lti2_tool
     before_action :authorized?

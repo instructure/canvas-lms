@@ -52,7 +52,7 @@ describe Canvas::Errors::Reporter do
     new_class = error_instance
     old_class = MyTestError.new("i am a message")
 
-    expect(new_class).to_not be_nil
+    expect(new_class).not_to be_nil
     expect(old_class.respond_to?(:canvas_error_info)).to be false
   end
 

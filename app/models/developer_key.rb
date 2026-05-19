@@ -20,7 +20,7 @@
 
 require "aws-sdk-sns"
 
-class DeveloperKey < ActiveRecord::Base
+class DeveloperKey < ApplicationRecord
   class CacheOnAssociation < ActiveRecord::Associations::BelongsToAssociation
     def find_target(...)
       if owner.instance_variable_get(:@skip_dev_key_cache)
@@ -104,8 +104,8 @@ class DeveloperKey < ActiveRecord::Base
   attr_reader :private_jwk
   attr_accessor :skip_lti_sync, :current_user
 
-  scope :nondeleted, -> { where("workflow_state<>'deleted'") }
-  scope :not_active, -> { where("workflow_state<>'active'") } # search for deleted & inactive keys
+  scope :nondeleted, -> { where.not(workflow_state: "deleted") }
+  scope :not_active, -> { where.not(workflow_state: "active") } # search for deleted & inactive keys
   scope :visible, -> { where(visible: true) }
   scope :site_admin, -> { where(account_id: nil) } # site_admin keys have a nil account_id
   scope :site_admin_lti, lambda { |key_ids|
@@ -162,6 +162,10 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def usable_in_context?(context)
+    if is_lti_key && context.try(:root_account)&.feature_enabled?(:lti_deactivate_registrations)
+      return usable? && !!lti_registration&.active?
+    end
+
     account_binding_for(context.try(:account) || context)&.on? && usable?
   end
 
@@ -199,7 +203,7 @@ class DeveloperKey < ActiveRecord::Base
     self.icon_url = nil if icon_url.blank?
   end
 
-  def generate_api_key(overwrite = false)
+  def generate_api_key(overwrite: false)
     self.api_key = CanvasSlug.generate(nil, 64) if overwrite || !api_key
   end
 
@@ -318,7 +322,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def authorized_for_account?(target_account)
-    return false unless binding_on_in_account?(target_account)
+    return false unless usable_in_context?(target_account)
     return true if account_id.blank?
     return true if target_account.id == account_id
 
@@ -394,10 +398,6 @@ class DeveloperKey < ActiveRecord::Base
 
   def owner_account
     account || Account.site_admin
-  end
-
-  def binding_on_in_account?(target_account)
-    account_binding_for(target_account)&.on?
   end
 
   def disable_external_tools!(binding_account)
@@ -652,6 +652,14 @@ class DeveloperKey < ActiveRecord::Base
       # Skip them.
       ContextExternalTool.where(id: tool_ids).preload(:context).each do |tool|
         next unless tool.context
+
+        if (account.blank? || account.site_admin?) && !tool.root_account.feature_enabled?(:lti_registrations_templates)
+          Rails.logger.info(
+            "Replacing tool configuration for tool #{tool.global_id} " \
+            "(registration #{lti_registration.global_id}) with site admin configuration. " \
+            "Old settings: #{tool.settings.to_json}"
+          )
+        end
 
         lti_registration.new_external_tool(
           tool.context,

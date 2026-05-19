@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect, useCallback, useMemo} from 'react'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import {View} from '@instructure/ui-view'
 import {uid} from '@instructure/uid'
@@ -31,8 +31,6 @@ import type {
   exportedOverride,
 } from '@canvas/context-modules/differentiated-modules/react/Item/types'
 import type {ItemType} from '@canvas/context-modules/differentiated-modules/react/types'
-
-const I18n = createI18nScope('DueDateOverrideView')
 
 interface AssignToContentProps {
   onSync: (overrides?: DateDetailsOverride[], importantDates?: boolean) => void
@@ -241,6 +239,7 @@ const AssignToContent = ({
   defaultGroupCategoryId = null,
   discussionId = null,
 }: AssignToContentProps) => {
+  const {t} = useTranslation('DueDateOverrideView')
   const [stagedImportantDates, setStagedImportantDates] = useState(importantDates)
   const [groupCategoryId, setGroupCategoryId] = useState(getGroupCategoryId?.())
   const [assignToCards, setAssignToCards] = useState<ItemAssignToCardSpec[]>([])
@@ -385,7 +384,7 @@ const AssignToContent = ({
     return (
       <div id="important-dates">
         <Checkbox
-          label={I18n.t('Mark as important date and show on homeroom sidebar')}
+          label={t('Mark as important date and show on homeroom sidebar')}
           name="important_dates"
           data-testid="important_dates"
           size="small"

@@ -17,4 +17,5 @@
  */
 
 export {default as CanvasFileUpload} from './CanvasFileUpload'
+export {default as ContextFilePill} from './ContextFilePill'
 export type {ContextFile, CanvasFolder, CanvasFile, ColumnWidths} from './types'

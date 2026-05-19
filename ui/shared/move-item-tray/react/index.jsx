@@ -25,7 +25,7 @@ import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {CloseButton} from '@instructure/ui-buttons'
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {itemShape, moveOptionsType} from './propTypes'
 import MoveSelect from './MoveSelect'
 

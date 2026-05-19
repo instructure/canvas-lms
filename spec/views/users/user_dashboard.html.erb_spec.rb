@@ -51,8 +51,8 @@ describe "users/user_dashboard" do
                                                        subject: "My Global Announcement",
                                                        account: Account.default)])
     render "users/user_dashboard"
-    expect(response.body).to match(/My\sGlobal\sAnnouncement/)
-    expect(response.body).to match(/(This\sis\sa\smessage\sfrom\s<b>Default\sAccount)/)
+    expect(rendered).to match(/My Global Announcement/)
+    expect(rendered).to match(/This is an announcement from <b>Default Account/)
   end
 
   it "shows announcements (site_admin) to users with no enrollments" do
@@ -71,6 +71,6 @@ describe "users/user_dashboard" do
                                                        subject: "My Global Announcement",
                                                        account: Account.site_admin)])
     render "users/user_dashboard"
-    expect(response.body).to match(/(This\sis\sa\smessage\sfrom\s<b>Canvas\sAdministration)/)
+    expect(rendered).to match(/This is an announcement from <b>Canvas Administration/)
   end
 end

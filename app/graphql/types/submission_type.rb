@@ -138,10 +138,7 @@ module Types
         if object.assignment.context.grants_any_right?(current_user, :manage_grades, :view_all_grades)
           Loaders::SubmissionLtiAssetReportsLoader.for(for_student: false, latest:).load(object.id)
         else
-          # If the user can read the submission (student or observer), they can
-          # get student-visible reports. (this is the essentially behavior of
-          # user_can_read_grade?(for_plagiarism:true))
-          Loaders::SubmissionLtiAssetReportsLoader.for(for_student: true, latest: true).load(object.id)
+          Loaders::SubmissionLtiAssetReportsLoader.for(for_student: true, latest:).load(object.id)
         end
       end
     end
@@ -169,22 +166,30 @@ module Types
       end
     end
 
-    field :auto_grade_submission_issues, Types::EligibilityIssueType, null: true, description: "Issues related to the submission"
+    field :auto_grade_submission_issues, Types::EligibilityIssueType, null: true, description: "Issues related to the submission", deprecation_reason: "Use autoGradeEligibility instead"
     def auto_grade_submission_issues
       load_association(:course).then do |course|
         next nil unless course.feature_enabled?(:project_lhotse)
 
-        GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
+        GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:).first
       end
     end
 
-    field :auto_grade_submission_errors, [String], null: false, description: "Errors related to the submission"
+    field :auto_grade_submission_errors, [String], null: false, description: "Errors related to the submission", deprecation_reason: "Use autoGradeEligibility instead"
     def auto_grade_submission_errors
       load_association(:course).then do |course|
         next [] unless course.feature_enabled?(:project_lhotse)
 
-        issues = GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
-        issues ? [issues[:message]] : []
+        GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:).pluck(:message)
+      end
+    end
+
+    field :auto_grade_eligibility, Types::AutoGradeEligibilityType, null: true, description: "Eligibility for auto-grading"
+    def auto_grade_eligibility
+      load_association(:course).then do |course|
+        next nil unless course.feature_enabled?(:project_lhotse)
+
+        { issues: GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:) }
       end
     end
 
@@ -214,10 +219,8 @@ module Types
       load_association(:quiz_submission).then do |quiz_submission|
         next nil unless quiz_submission
 
-        # Load all versions for this quiz submission
         Loaders::AssociationLoader.for(Quizzes::QuizSubmission, :versions).load(quiz_submission).then do |versions|
-          # Map each version to its model representation
-          versions.map(&:model)
+          quiz_submission.quiz_submission_histories(versions:)
         end
       end
     end

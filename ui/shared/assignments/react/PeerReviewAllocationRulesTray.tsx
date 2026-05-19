@@ -40,7 +40,7 @@ import {List} from '@instructure/ui-list'
 import {debounce} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import pandasBalloonUrl from './images/pandasBalloon.svg'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {
   SCREENREADER_ALERT_TIMEOUT,
   SEARCH_RESULT_ANNOUNCEMENT_DELAY,

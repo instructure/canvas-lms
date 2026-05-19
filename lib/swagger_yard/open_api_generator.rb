@@ -77,12 +77,12 @@ module SwaggerYard
         SwaggerYard.configure do |config|
           config.swagger_version = "3.0.0"
           config.api_version = "1.0.0"
-          config.api_base_path = "/api/v1"
           config.title = "Canvas LMS API"
           config.description = "Canvas LMS REST API - Generated from YARD documentation"
 
-          # Point to Canvas controllers
-          config.controller_path = File.join(canvas_root, "app/controllers/*_controller.rb")
+          # Point to Canvas controllers (recursively, including plugins)
+          # Single source of truth defined in CanvasAdapter
+          config.controller_path = SwaggerYard::CanvasAdapter.controller_patterns(canvas_root)
         end
       end
 
@@ -589,7 +589,7 @@ module SwaggerYard
       def add_server_config(openapi_spec)
         openapi_spec["servers"] = [
           {
-            "url" => "https://{instance}.instructure.com/api/v1",
+            "url" => "https://{instance}.instructure.com",
             "description" => "Canvas LMS Instance",
             "variables" => {
               "instance" => {

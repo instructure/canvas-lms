@@ -8,7 +8,6 @@ addAssignees: true
 reviewers:
   - spencerolson
   - maths22
-  - slaughter550
   - dustin-cowles
 
 # A list of keywords to be skipped if pull requests include it

@@ -123,8 +123,8 @@ describe RubricAssessmentsController do
       put "update", params: { course_id: @course.id, rubric_association_id: @rubric_association.id, id: @rubric_assessment.id, rubric_assessment: { user_id: @user.to_param, assessment_type: "no_reason" } }
       response_json = response.parsed_body
       expect(response_json.dig("artifact", "submission_comments").first).to have_key("anonymous_id")
-      expect(response_json.dig("artifact", "submission_comments").first).to_not have_key("author_id")
-      expect(response_json.dig("artifact", "submission_comments").first).to_not have_key("author_name")
+      expect(response_json.dig("artifact", "submission_comments").first).not_to have_key("author_id")
+      expect(response_json.dig("artifact", "submission_comments").first).not_to have_key("author_name")
     end
 
     it "returns anonymized user comments when anonymous grading and moderated grading are enabled" do
@@ -140,8 +140,8 @@ describe RubricAssessmentsController do
       response_json = response.parsed_body
       expect(response_json.dig("artifact", "submission_comments").first).to have_key("anonymous_id")
       expect(response_json.dig("artifact", "submission_comments").first["anonymous_id"]).to eq(submission.anonymous_id)
-      expect(response_json.dig("artifact", "submission_comments").first).to_not have_key("author_id")
-      expect(response_json.dig("artifact", "submission_comments").first).to_not have_key("author_name")
+      expect(response_json.dig("artifact", "submission_comments").first).not_to have_key("author_id")
+      expect(response_json.dig("artifact", "submission_comments").first).not_to have_key("author_name")
     end
 
     context "setting a provisional grade to be final" do

@@ -257,7 +257,6 @@ const CourseSelect = props => {
   }
 
   return (
-    // @ts-expect-error TS2769 (typescriptify)
     <Select
       renderLabel={
         <ScreenReaderContent>
@@ -273,7 +272,9 @@ const CourseSelect = props => {
       onInputChange={handleInputChange}
       onRequestShowOptions={handleShowOptions}
       onRequestHideOptions={handleHideOptions}
+      // @ts-expect-error TS7 migration
       onRequestHighlightOption={handleHighlightOption}
+      // @ts-expect-error TS7 migration
       onRequestSelectOption={handleSelectOption}
       renderAfterInput={
         selectedOptionId !== null ? (

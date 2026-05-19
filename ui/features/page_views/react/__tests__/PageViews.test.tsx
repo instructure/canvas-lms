@@ -46,6 +46,10 @@ function formatForDisplay(date: Date): string {
 }
 
 describe('PageViews', () => {
+  beforeEach(() => {
+    window.ENV.PV5_ENABLED = true
+  })
+
   afterEach(() => {
     MockPageViewsTable.mockReset()
   })
@@ -117,5 +121,16 @@ describe('PageViews', () => {
     expect(input).toBeInTheDocument()
     const endInput = getByLabelText('Filter end date') as HTMLInputElement
     expect(endInput).toBeInTheDocument()
+  })
+
+  it('renders the 1-year activity tab when PV5_ENABLED is true', () => {
+    const {getByText} = render(<Subject userId="1" />)
+    expect(getByText('1-year activity')).toBeInTheDocument()
+  })
+
+  it('does not render the 1-year activity tab when PV5_ENABLED is false', () => {
+    window.ENV.PV5_ENABLED = false
+    const {queryByText} = render(<Subject userId="1" />)
+    expect(queryByText('1-year activity')).not.toBeInTheDocument()
   })
 })

@@ -20,11 +20,15 @@ import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import MigrationFileInput from '../file_input'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: vi.fn().mockReturnValue(vi.fn()),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
 
 const onChange = vi.fn()
 

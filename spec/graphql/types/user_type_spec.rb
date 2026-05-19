@@ -124,6 +124,20 @@ describe Types::UserType do
         expect(user_type_as_admin.resolve("loginId", current_user: @other_student)).to be_nil
       end
     end
+
+    # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+    # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+    it "passes current_user to SisPseudonym.for" do
+      tester = GraphQLTypeTester.new(
+        @student,
+        current_user: admin,
+        domain_root_account: @course.account.root_account,
+        course: @course,
+        request: ActionDispatch::TestRequest.create
+      )
+      expect(SisPseudonym).to receive(:for).with(@student, anything, hash_including(current_user: admin)).and_call_original
+      tester.resolve("loginId")
+    end
   end
 
   context "shortName" do
@@ -312,6 +326,13 @@ describe Types::UserType do
         end
       end
     end
+
+    # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+    # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+    it "passes current_user to SisPseudonym.for" do
+      expect(SisPseudonym).to receive(:for).with(@student, anything, hash_including(current_user: @admin)).and_call_original
+      @resolver.resolve("sisId", current_user: @admin)
+    end
   end
 
   context "integrationId" do
@@ -440,6 +461,13 @@ describe Types::UserType do
           expect(@resolver.resolve("integrationId", current_user: @other_student)).to be_nil
         end
       end
+    end
+
+    # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+    # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+    it "passes current_user to SisPseudonym.for" do
+      expect(SisPseudonym).to receive(:for).with(@student, anything, hash_including(current_user: @admin)).and_call_original
+      @resolver.resolve("integrationId", current_user: @admin)
     end
   end
 
@@ -1118,6 +1146,139 @@ describe Types::UserType do
         expect(enrollments_result["nodes"]).to be_empty
       end
     end
+
+    context "cross-shard" do
+      specs_require_sharding
+
+      before :once do
+        @shard1.activate do
+          @cross_shard_user = user_with_pseudonym(active_all: true)
+        end
+
+        @shard2.activate do
+          @cross_shard_account = Account.create!
+          @cross_shard_course = @cross_shard_account.courses.create!
+          @cross_shard_course.offer!
+          @cross_shard_enrollment = @cross_shard_course.enroll_student(@cross_shard_user, enrollment_state: "active")
+        end
+      end
+
+      let(:cross_shard_user_type) { GraphQLTypeTester.new(@cross_shard_user, current_user: @cross_shard_user) }
+
+      def resolve_enrollment_ids(tester, query_args = nil)
+        tester.extract_result = false
+        args_str = query_args ? "(#{query_args})" : ""
+        result = tester.resolve("enrollmentsConnection#{args_str} { nodes { _id } }")
+        result["enrollmentsConnection"]["nodes"].pluck("_id")
+      end
+
+      it "returns enrollments from other shards" do
+        @shard1.activate do
+          node_ids = resolve_enrollment_ids(cross_shard_user_type)
+          expect(node_ids).to eq([@cross_shard_enrollment.id.to_s])
+        end
+      end
+
+      context "with enrollment on both shards" do
+        before :once do
+          @shard1.activate do
+            @shard1_account = Account.create!
+            @shard1_course = @shard1_account.courses.create!
+            @shard1_course.offer!
+            @shard1_enrollment = @shard1_course.enroll_student(@cross_shard_user, enrollment_state: "active")
+          end
+        end
+
+        it "returns enrollments from multiple shards" do
+          @shard1.activate do
+            node_ids = resolve_enrollment_ids(cross_shard_user_type)
+            expect(node_ids.length).to eq(2)
+          end
+        end
+
+        it "filters by course_id across shards" do
+          @shard1.activate do
+            node_ids = resolve_enrollment_ids(cross_shard_user_type, %(courseId: "#{@cross_shard_course.id}"))
+            expect(node_ids).to eq([@cross_shard_enrollment.id.to_s])
+          end
+        end
+
+        it "excludes concluded enrollments across shards with currentOnly" do
+          @cross_shard_enrollment.complete!
+
+          @shard1.activate do
+            node_ids = resolve_enrollment_ids(cross_shard_user_type, "currentOnly: true")
+            expect(node_ids.length).to eq(1)
+          end
+        end
+
+        it "includes active enrollments from all shards with currentOnly" do
+          @shard1.activate do
+            node_ids = resolve_enrollment_ids(cross_shard_user_type, "currentOnly: true")
+            expect(node_ids.length).to eq(2)
+          end
+        end
+      end
+
+      context "permission handling" do
+        before :once do
+          @shard1.activate do
+            @cs_teacher = user_with_pseudonym(active_all: true)
+          end
+
+          @shard2.activate do
+            @cross_shard_course.enroll_teacher(@cs_teacher, enrollment_state: "active")
+          end
+        end
+
+        it "only shows enrollments in courses shared with the viewing teacher" do
+          @shard1.activate do
+            shard1_account = Account.create!
+            shard1_course = shard1_account.courses.create!
+            shard1_course.offer!
+            unshared_enrollment = shard1_course.enroll_student(@cross_shard_user, enrollment_state: "active")
+
+            teacher_viewing = GraphQLTypeTester.new(
+              @cross_shard_user,
+              current_user: @cs_teacher,
+              domain_root_account: shard1_account,
+              request: ActionDispatch::TestRequest.create
+            )
+
+            node_ids = resolve_enrollment_ids(teacher_viewing)
+            expect(node_ids).to include(@cross_shard_enrollment.id.to_s)
+            expect(node_ids).not_to include(unshared_enrollment.id.to_s)
+          end
+        end
+
+        it "scopes admin with manage_students to their own root account" do
+          shard1_account = nil
+          shard1_admin = nil
+          shard1_enrollment = nil
+
+          @shard1.activate do
+            shard1_account = Account.create!
+            shard1_course = shard1_account.courses.create!
+            shard1_course.offer!
+            shard1_enrollment = shard1_course.enroll_student(@cross_shard_user, enrollment_state: "active")
+            shard1_admin = account_admin_user(account: shard1_account)
+          end
+
+          admin_viewing = GraphQLTypeTester.new(
+            @cross_shard_user,
+            current_user: shard1_admin,
+            domain_root_account: shard1_account,
+            request: ActionDispatch::TestRequest.create
+          )
+
+          @shard1.activate do
+            node_ids = resolve_enrollment_ids(admin_viewing)
+            expect(node_ids).to include(shard1_enrollment.id.to_s)
+            expect(node_ids).not_to include(@cross_shard_enrollment.id.to_s)
+          end
+        end
+      end
+    end
   end
 
   context "email" do
@@ -1382,6 +1543,64 @@ describe Types::UserType do
         .and_return(loader_instance)
 
       resolve_user_type
+    end
+  end
+
+  context "institutional_tags_connection" do
+    def resolve_institutional_tags(account_id = @root_account.id, tester: nil)
+      tester ||= user_type
+      tester.resolve(%|institutionalTagsConnection(accountId: "#{account_id}") { nodes { _id } }|)
+    end
+
+    before(:once) do
+      @root_account = Account.default
+      @root_account.enable_feature!(:institutional_tags)
+      @admin = account_admin_user(account: @root_account)
+      @category = institutional_tag_category_model(account: @root_account)
+      @tag1 = institutional_tag_model(account: @root_account, category: @category, name: "Alumni")
+      @tag2 = institutional_tag_model(account: @root_account, category: @category, name: "Staff")
+      institutional_tag_association_model(account: @root_account, institutional_tag: @tag1, user: @student)
+      institutional_tag_association_model(account: @root_account, institutional_tag: @tag2, user: @student)
+    end
+
+    let(:admin_tester) do
+      GraphQLTypeTester.new(
+        @student,
+        current_user: @admin,
+        domain_root_account: @root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    it "calls InstitutionalTagsLoader" do
+      loader_instance = instance_double(GraphQL::Schema::Loader)
+      expect(loader_instance).to receive(:load).with(@student.id).and_return([])
+      expect(Loaders::UserLoaders::InstitutionalTagsLoader)
+        .to receive(:for)
+        .and_return(loader_instance)
+
+      resolve_institutional_tags(tester: admin_tester)
+    end
+
+    it "passes correct arguments to InstitutionalTagsLoader" do
+      loader_instance = instance_double(GraphQL::Schema::Loader)
+      expect(loader_instance).to receive(:load).with(@student.id).and_return([])
+      expect(Loaders::UserLoaders::InstitutionalTagsLoader)
+        .to receive(:for)
+        .with(@admin, anything, @root_account.id.to_s)
+        .and_return(loader_instance)
+
+      resolve_institutional_tags(tester: admin_tester)
+    end
+
+    it "returns institutional tags for the user" do
+      result = resolve_institutional_tags(tester: admin_tester)
+      expect(result).to match_array([@tag1.id.to_s, @tag2.id.to_s])
+    end
+
+    it "returns nil when the current_user lacks permission" do
+      # @teacher is not an account admin so lacks manage_institutional_tags_view
+      expect(resolve_institutional_tags).to be_nil
     end
   end
 
@@ -2384,6 +2603,47 @@ describe Types::UserType do
         expect(type.resolve("courseProgression { requirements { total } }")).to be_truthy
       end
     end
+
+    context "via enrollments → course → usersConnection" do
+      it "returns progression for every course when enrollments returns multiple courses" do
+        second_course = course_factory(active_all: true)
+        second_course.enroll_student(@student, enrollment_state: "active")
+
+        query = <<~GQL
+          query($id: ID!) {
+            legacyNode(_id: $id, type: User) {
+              ... on User {
+                enrollments {
+                  course {
+                    _id
+                    usersConnection(filter: { userIds: [$id] }) {
+                      nodes {
+                        courseProgression { requirements { total } }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        GQL
+
+        result = CanvasSchema.execute(
+          query,
+          context: { current_user: @student, domain_root_account: @course.account.root_account, request: ActionDispatch::TestRequest.create },
+          variables: { id: @student.id.to_s }
+        )
+
+        expect(result["errors"]).to be_nil
+        enrollments = result.dig("data", "legacyNode", "enrollments")
+        expect(enrollments.length).to eq 2
+        enrollments.each do |enrollment|
+          progression = enrollment.dig("course", "usersConnection", "nodes", 0, "courseProgression")
+          expect(progression).not_to be_nil,
+                                     "expected courseProgression to be present for course #{enrollment.dig("course", "_id")}, got nil"
+        end
+      end
+    end
   end
 
   describe "submission comments" do
@@ -2872,6 +3132,77 @@ describe Types::UserType do
         expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
         expect(titles).not_to include("Unpublished Course Announcement")
       end
+
+      it "excludes announcements from courses with past enrollment term" do
+        past_term = @course1.account.enrollment_terms.create!(
+          name: "Past Term",
+          start_at: 6.months.ago,
+          end_at: 1.month.ago
+        )
+        past_term_course = course_factory(active_all: true, account: @course1.account)
+        past_term_course.update!(enrollment_term: past_term)
+        past_term_course.enroll_student(@student_user, enrollment_state: "active")
+
+        past_term_course.announcements.create!(
+          title: "Past Term Announcement",
+          message: "This should not appear"
+        )
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Past Term Announcement")
+      end
+
+      it "excludes announcements from formally concluded courses" do
+        concluded_course = course_factory(active_all: true)
+        concluded_course.enroll_student(@student_user, enrollment_state: "active")
+        concluded_course.announcements.create!(
+          title: "Concluded Course Announcement",
+          message: "This should not appear"
+        )
+
+        concluded_course.complete!
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Concluded Course Announcement")
+      end
+
+      it "excludes announcements from courses where student has only an invited enrollment" do
+        invited_course = course_factory(active_all: true)
+        invited_course.enroll_student(@student_user, enrollment_state: "invited")
+        invited_announcement = invited_course.announcements.create!(
+          title: "Invited Course Announcement",
+          message: "Should not appear"
+        )
+        @student_user.discussion_topic_participants.find_or_create_by!(discussion_topic: invited_announcement)
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Invited Course Announcement")
+      end
+
+      it "returns each announcement exactly once when student has multiple enrollments in same course" do
+        section_b = @course1.course_sections.create!(name: "Section B")
+        @course1.enroll_student(
+          @student_user,
+          section: section_b,
+          enrollment_state: "active",
+          allow_multiple_enrollments: true
+        )
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(titles.count("Course 1 Announcement")).to eq(1)
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+      end
     end
   end
 
@@ -3125,6 +3456,101 @@ describe Types::UserType do
 
         result = student_user_type.resolve("courseWorkSubmissionsConnection(onlySubmitted: true) { edges { node { assignment { title } } } }")
         expect(result).to include("Excused Assignment")
+      end
+    end
+
+    context "onlyGradedOrWithFeedback filter" do
+      before(:once) do
+        Timecop.freeze(@frozen_time) do
+          @graded_assignment = @course.assignments.create!(
+            title: "Graded Assignment",
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          @graded_submission = @graded_assignment.submissions.find_or_create_by(user: @student)
+          @graded_submission.update!(
+            workflow_state: "graded",
+            score: 85,
+            grade: "B",
+            submitted_at: @frozen_time - 1.week,
+            posted_at: @frozen_time - 1.week,
+            grader_id: @teacher.id
+          )
+
+          @feedback_only_assignment = @course.assignments.create!(
+            title: "Feedback Only Assignment",
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          @feedback_only_submission = @feedback_only_assignment.submissions.find_or_create_by(user: @student)
+          @feedback_only_submission.update!(
+            workflow_state: "submitted",
+            submitted_at: @frozen_time - 2.weeks,
+            posted_at: @frozen_time - 2.weeks
+          )
+          @feedback_only_submission.update_column(:last_comment_at, @frozen_time - 2.weeks)
+
+          @no_feedback_assignment = @course.assignments.create!(
+            title: "Submitted No Feedback Assignment",
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          @no_feedback_submission = @no_feedback_assignment.submissions.find_or_create_by(user: @student)
+          @no_feedback_submission.update!(
+            workflow_state: "submitted",
+            submitted_at: @frozen_time - 1.week
+          )
+        end
+      end
+
+      it "returns graded submissions" do
+        Timecop.freeze(@frozen_time) do
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).to include("Graded Assignment")
+        end
+      end
+
+      it "returns submissions with recent instructor feedback" do
+        Timecop.freeze(@frozen_time) do
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).to include("Feedback Only Assignment")
+        end
+      end
+
+      it "does not return submitted submissions without a grade or feedback" do
+        Timecop.freeze(@frozen_time) do
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).not_to include("Submitted No Feedback Assignment")
+        end
+      end
+
+      it "does not return unsubmitted assignments" do
+        Timecop.freeze(@frozen_time) do
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).not_to include("Test Assignment")
+        end
+      end
+
+      it "does not return graded submissions older than 4 weeks" do
+        Timecop.freeze(@frozen_time) do
+          old_assignment = @course.assignments.create!(
+            title: "Old Graded Assignment",
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          old_submission = old_assignment.submissions.find_or_create_by(user: @student)
+          old_submission.update!(
+            workflow_state: "graded",
+            score: 90,
+            submitted_at: @frozen_time - 5.weeks,
+            posted_at: @frozen_time - 5.weeks,
+            grader_id: @teacher.id
+          )
+          old_submission.update_column(:created_at, @frozen_time - 5.weeks)
+
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).not_to include("Old Graded Assignment")
+        end
       end
     end
 
@@ -3700,6 +4126,39 @@ describe Types::UserType do
           expect(result).to include("Assignment in Current Period")
           expect(result).not_to include("Assignment in Closed Period")
         end
+      end
+    end
+
+    it "excludes parent assignments with checkpoints, shows only SubAssignments" do
+      Timecop.freeze(@frozen_time) do
+        @course.account.enable_feature!(:discussion_checkpoints)
+
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Checkpointed Discussion")
+        parent_assignment = topic.assignment
+        parent_assignment.update!(has_sub_assignments: true)
+
+        checkpoint1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: @frozen_time + 1.day }],
+          points_possible: 5
+        )
+        checkpoint2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: @frozen_time + 2.days }],
+          points_possible: 10
+        )
+
+        # Create submissions for all (parent + checkpoints)
+        parent_assignment.submissions.find_or_create_by(user: @student)
+        checkpoint1.submissions.find_or_create_by(user: @student)
+        checkpoint2.submissions.find_or_create_by(user: @student)
+
+        ids = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { assignment { _id } } } }")
+
+        expect(ids).not_to include(parent_assignment.id.to_s)
+        expect(ids).to include(checkpoint1.id.to_s, checkpoint2.id.to_s)
       end
     end
   end

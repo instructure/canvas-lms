@@ -348,7 +348,7 @@ describe Api::V1::AssignmentOverride do
           invisible_ids, _ = subject.invisible_users_and_overrides_for_user(
             @course, @teacher, @assignment.assignment_overrides.active
           )
-          expect(invisible_ids).to_not include(@student_invisible.id)
+          expect(invisible_ids).not_to include(@student_invisible.id)
         end
 
         it "returns no override ids in the second param" do

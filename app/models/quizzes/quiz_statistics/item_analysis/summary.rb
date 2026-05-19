@@ -24,12 +24,12 @@ class Quizzes::QuizStatistics::ItemAnalysis::Summary
 
   def_delegators :sorted_items, :size, :length, :each
 
-  def initialize(quiz, options = {}, param_options = {})
+  def initialize(quiz, options = {}, section_ids: nil)
     @quiz = quiz
     @items = {}
     attempts_query = quiz.quiz_submissions.for_students(quiz)
-    if param_options[:section_ids].present?
-      user_ids = Enrollment.active.where(course_section_id: param_options[:section_ids], course_id: quiz.context).distinct.pluck(:user_id)
+    if section_ids.present?
+      user_ids = Enrollment.active.where(course_section_id: section_ids, course_id: quiz.context).distinct.pluck(:user_id)
       attempts_query = attempts_query.where(user_id: user_ids)
     end
     @attempts = attempts_query.filter_map { |qs| qs.submitted_attempts.first }

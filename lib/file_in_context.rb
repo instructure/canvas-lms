@@ -21,7 +21,7 @@
 # Attaches a file generally to another file, using the attachment_fu gateway.
 class FileInContext
   class << self
-    def queue_files_to_delete(queue = true)
+    def queue_files_to_delete(queue: true)
       @queue_files_to_delete = queue
     end
 

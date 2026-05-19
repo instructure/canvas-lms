@@ -29,7 +29,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconArrowOpenEndLine, IconArrowOpenStartLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {PresentationContent} from '@instructure/ui-a11y-content'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import doFetchApi from '@canvas/do-fetch-api-effect'

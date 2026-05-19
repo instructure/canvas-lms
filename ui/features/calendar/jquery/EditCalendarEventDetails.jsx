@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import CalendarEventDetailsForm from '../react/CalendarEventDetailsForm'
 
 export default class EditCalendarEventDetails {
@@ -29,7 +29,7 @@ export default class EditCalendarEventDetails {
     }
 
     if (formHolder) {
-      ReactDOM.render(
+      legacyRender(
         <CalendarEventDetailsForm
           event={event}
           closeCB={closeCB}

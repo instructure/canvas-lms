@@ -24,7 +24,6 @@ import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SubmissionHtmlComment} from '@canvas/assignments/graphql/student/SubmissionComment'
-import {MediaPlayer} from '@instructure/ui-media-player'
 import {Link} from '@instructure/ui-link'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import CanvasStudioPlayer from '@canvas/canvas-studio-player'
@@ -34,25 +33,7 @@ const I18n = createI18nScope('assignments_2')
 
 export default function CommentRow(props) {
   const {author, mediaObject, read, htmlComment} = props.comment
-  let mediaSources = null
-  let mediaTracks = null
-  if (mediaObject) {
-    mediaSources = mediaObject.mediaSources.map(mediaSource => {
-      return {
-        ...mediaSource,
-        label: `${mediaSource.width}x${mediaSource.height}`,
-      }
-    })
-    mediaTracks = mediaObject?.mediaTracks.map(track => {
-      return {
-        id: track._id,
-        src: `/media_objects/${mediaObject._id}/media_tracks/${track._id}`,
-        label: track.locale,
-        type: track.kind,
-        language: track.locale,
-      }
-    })
-  }
+
   return (
     <div className="comment-row-container" data-testid="comment-row">
       <div className="comment-avatar-container">
@@ -73,7 +54,7 @@ export default function CommentRow(props) {
       </div>
       <div className="comment-text-comment-container">
         {!read && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
-        <Text weight="light" size="small">
+        <Text id={`comment-header-${props.comment._id}`} weight="light" size="small">
           {author ? stripHtmlTags(author.shortName) : I18n.t('Anonymous')}{' '}
           <FriendlyDatetime
             prefix={I18n.t('at')}
@@ -102,15 +83,9 @@ export default function CommentRow(props) {
             {attachment.displayName}
           </Link>
         ))}
-        {mediaObject &&
-          (ENV.FEATURES?.consolidated_media_player ? (
-            <CanvasStudioPlayer
-              media_id={mediaObject._id}
-              explicitSize={{width: 368, height: 206}}
-            />
-          ) : (
-            <MediaPlayer tracks={mediaTracks} sources={mediaSources} />
-          ))}
+        {mediaObject && (
+          <CanvasStudioPlayer media_id={mediaObject._id} explicitSize={{width: 368, height: 206}} />
+        )}
       </div>
     </div>
   )

@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import CoursesPane from '../components/CoursesPane'
-import UsersPane from '../components/UsersPane'
+import UsersTabbedPane from '../components/UsersTabbedPane'
 
 const I18n = createI18nScope('account_course_user_search')
 
@@ -31,7 +31,7 @@ export default [
     button_class: 'courses',
   },
   {
-    pane: UsersPane,
+    pane: UsersTabbedPane,
     path: '/users',
     title: I18n.t('People'),
     permissions: ['can_read_roster'],

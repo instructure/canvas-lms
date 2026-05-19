@@ -30,12 +30,16 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {setupTabKeyboardNavigation} from '@canvas/util/tabKeyboardNavigation'
 
 const I18n = createI18nScope('GroupCategoriesView')
+// @ts-expect-error TS7 migration
 export default class GroupCategoriesView extends CollectionView {
   static initClass() {
+    // @ts-expect-error TS7 migration
     this.prototype.template = groupCategoriesTemplate
 
+    // @ts-expect-error TS7 migration
     this.prototype.className = 'group_categories_area'
 
+    // @ts-expect-error TS7 migration
     this.prototype.els = {
       ...CollectionView.prototype.els,
       '#group_categories_tabs': '$tabs',
@@ -77,11 +81,11 @@ export default class GroupCategoriesView extends CollectionView {
     return url.slice(url.lastIndexOf('/') + 1)
   }
 
-  // @ts-expect-error - Legacy Backbone typing
   render() {
-    // @ts-expect-error - Legacy Backbone typing
     super.render(...arguments)
+    // @ts-expect-error TS7 migration
     if (this.collection.length > 1) {
+      // @ts-expect-error TS7 migration
       this.reorder()
     }
     this.refreshTabs()
@@ -89,6 +93,7 @@ export default class GroupCategoriesView extends CollectionView {
   }
 
   refreshTabs() {
+    // @ts-expect-error TS7 migration
     if (this.collection.length > 0) {
       // @ts-expect-error - Backbone View property
       this.$tabs.find('ul.ui-tabs-nav li.static').remove()
@@ -130,6 +135,7 @@ export default class GroupCategoriesView extends CollectionView {
     })
 
     // hide/show the instruction text
+    // @ts-expect-error TS7 migration
     if (this.collection.length > 0) {
       // @ts-expect-error - Backbone View property
       this.$emptyInstructions.hide()
@@ -171,6 +177,7 @@ export default class GroupCategoriesView extends CollectionView {
       this.pendingCreation = false
       const id = window.location.hash.split('-')[1]
       if (id != null) {
+        // @ts-expect-error TS7 migration
         const model = this.collection.get(id)
         if (model) {
           // @ts-expect-error - Backbone View property
@@ -182,6 +189,7 @@ export default class GroupCategoriesView extends CollectionView {
 
   // @ts-expect-error - Legacy Backbone typing
   tabOffsetOfModel(model) {
+    // @ts-expect-error TS7 migration
     const index = this.collection.indexOf(model)
     // @ts-expect-error - Backbone View property
     const numStatic = this.$static.length
@@ -210,22 +218,20 @@ export default class GroupCategoriesView extends CollectionView {
     view.listenTo(model, 'change', () => {
       // e.g. change name
       view.render()
+      // @ts-expect-error TS7 migration
       this.reorder()
       return this.refreshTabs()
     })
     return view
   }
 
-  // @ts-expect-error - Legacy Backbone typing
   renderItem() {
-    // @ts-expect-error - Legacy Backbone typing
     super.renderItem(...arguments)
     return this.refreshTabs()
   }
 
   // @ts-expect-error - Legacy Backbone typing
   removeItem(model) {
-    // @ts-expect-error - Legacy Backbone typing
     super.removeItem(...arguments)
     // remove the linked panel and refresh the tabs
     model.itemView.remove()
@@ -243,12 +249,14 @@ export default class GroupCategoriesView extends CollectionView {
     const mountPoint = await awaitElement('create-group-set-modal-mountpoint')
     const createResult = await renderCreateDialog(mountPoint)
     if (createResult) {
+      // @ts-expect-error TS7 migration
       const cat = new GroupCategory()
-      // @ts-expect-error - Backbone View property
       cat.set(createResult)
+      // @ts-expect-error TS7 migration
       this.collection.add(cat)
       // @ts-expect-error - Backbone View property
       window.location.hash = `tab-${createResult.id}`
+      // @ts-expect-error TS7 migration
       this.reorder()
       this.refreshTabs()
       // @ts-expect-error - Backbone View property
@@ -282,7 +290,6 @@ export default class GroupCategoriesView extends CollectionView {
   }
 
   toJSON() {
-    // @ts-expect-error - Legacy Backbone typing
     const json = super.toJSON(...arguments)
     json.ENV = ENV
     const context = ENV.context_asset_string.split('_')

@@ -20,6 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import bridge from '../../../../bridge'
+import {showFlashAlert} from '../../../../common/FlashAlert'
+import formatMessage from '../../../../format-message'
 import RCEGlobals from '../../../RCEGlobals'
 import {asAudioElement} from '../../shared/ContentSelection'
 import {findMediaPlayerIframe} from '../../shared/iframeUtils'
@@ -34,6 +36,7 @@ export default class TrayController {
     this._editor = null
     this._audioContainer = null
     this._captionsModified = false
+    this.requestSubtitlesFromIframe = this.requestSubtitlesFromIframe.bind(this)
   }
 
   get container() {
@@ -55,20 +58,55 @@ export default class TrayController {
     this._editor = editor
     this._audioContainer = findMediaPlayerIframe(editor.selection.getNode())
     this._captionsModified = false
+    this._isPlayerReady = false
 
     if (bridge.focusedEditor) {
       // Dismiss any content trays that may already be open
       bridge.hideTrays()
     }
 
-    const trayProps = bridge.trayProps.get(editor)
-    this._renderTray(trayProps)
+    this._renderTray()
+
+    const audioOptions = asAudioElement(this._audioContainer)
+    // Clean broadcast listeners for any existing trays which are not shown (if not cleaned automatically)
+    this._iframeLoadingListener?.abort()
+    this._listenForPlayerIframeToLoad(audioOptions.id)
   }
 
   hideTrayForEditor(editor) {
     if (this._editor === editor) {
       this._dismissTray()
     }
+  }
+
+  _listenForPlayerIframeToLoad(currentMediaId) {
+    if (!bridge.canvasOrigin) return
+
+    this._iframeLoadingListener = new AbortController()
+
+    // Wait for player iframe to be loaded
+    window.addEventListener(
+      'message',
+      event => {
+        // If tray was opened before player iframe was ready it will catch ready event.
+        // If not it will request it later and catch it here anyway.
+        if (
+          event.data?.subject === 'media_player.iframe_ready' &&
+          event.data?.mediaId === currentMediaId
+        ) {
+          this._iframeLoadingListener.abort()
+          this._isPlayerReady = true
+          this._renderTray()
+        }
+      },
+      {signal: this._iframeLoadingListener.signal},
+    )
+
+    // If tray was opened after player was loaded we need to request iframe_ready state
+    this._audioContainer?.contentWindow?.postMessage(
+      {subject: 'media_player.get_ready_state'},
+      bridge.canvasOrigin,
+    )
   }
 
   _reloadAudioPlayer() {
@@ -93,15 +131,34 @@ export default class TrayController {
 
   _resetController() {
     this._shouldOpen = false
-    const trayProps = bridge.trayProps.get(this._editor)
-    this._renderTray(trayProps)
+    this._renderTray()
     this._editor = null
     this._audioContainer = null
+    this._iframeLoadingListener?.abort()
     const elem = document.getElementById(CONTAINER_ID)
     return elem.parentNode.removeChild(elem)
   }
 
+  _resizeContainer({height, width}) {
+    const styles = {
+      height: `${height}px`,
+      width: `${width}px`,
+    }
+
+    this._editor.dom.setStyles(this._audioContainer.parentElement, styles)
+    this._editor.dom.setStyles(this._audioContainer, styles)
+
+    // tell tinymce so the context toolbar resets
+    this._editor.fire('ObjectResized', {
+      target: this._audioContainer,
+      width: width,
+      height: height,
+    })
+  }
+
   _applyAudioOptions(audioOptions) {
+    this._resizeContainer({width: audioOptions.appliedWidth, height: audioOptions.appliedHeight})
+
     const hasAttachmentId = audioOptions.attachment_id
 
     if (
@@ -119,6 +176,7 @@ export default class TrayController {
       attachment_id: audioOptions.attachment_id,
       subtitles: audioOptions.subtitles,
       skipCaptionUpdate: isCaptionImprovements,
+      viewerRestrictions: audioOptions.viewerRestrictions,
     }
 
     return audioOptions
@@ -150,11 +208,12 @@ export default class TrayController {
     )
   }
 
-  _renderTray(trayProps) {
+  _renderTray() {
     const audioOptions = asAudioElement(this._audioContainer) || {}
 
     const element = (
       <AudioOptionsTray
+        key={audioOptions.id}
         audioOptions={audioOptions}
         onEntered={() => {
           this._isOpen = true
@@ -163,18 +222,24 @@ export default class TrayController {
           bridge.focusActiveEditor(false)
           this._isOpen = false
           this._subtitleListener?.abort()
+          this._iframeLoadingListener?.abort()
+          this._isPlayerReady = false
         }}
         onSave={options => {
           this._applyAudioOptions(options)
           this._dismissTray()
+          setTimeout(() => {
+            showFlashAlert({message: formatMessage('Media options saved.'), type: 'success'})
+          }, 0)
         }}
         onDismiss={() => this._dismissTray()}
         onCaptionsModified={() => {
           this._captionsModified = true
         }}
         open={this._shouldOpen}
-        trayProps={trayProps}
-        requestSubtitlesFromIframe={cb => this.requestSubtitlesFromIframe(cb)}
+        trayProps={bridge.trayProps.get(this._editor)}
+        requestSubtitlesFromIframe={this.requestSubtitlesFromIframe}
+        isLoading={!this._isPlayerReady}
       />
     )
     ReactDOM.render(element, this.container)

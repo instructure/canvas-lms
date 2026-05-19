@@ -487,6 +487,14 @@ PERMISSION_GROUPS = {
         description: -> { I18n.t("If any of these permissions are granted to a user role, that role will be able to view and access data about differentiation tags.") } }
     ]
   },
+  manage_institutional_tags: {
+    label: -> { I18n.t("Manage Institutional Tags") },
+    subtitle: -> { I18n.t("view / create / edit") },
+    account_details: [
+      { title: -> { I18n.t("Overview") },
+        description: -> { I18n.t("These permissions control the ability to view, create, and edit institutional tags.") } }
+    ]
+  },
   manage_files: {
     label: -> { I18n.t("Manage Course Files") },
     subtitle: -> { I18n.t("add / delete / edit") },
@@ -701,6 +709,10 @@ PERMISSION_GROUPS = {
         title: -> { I18n.t("Access Tokens - view") },
         description: -> { I18n.t("Allows user to view access tokens on behalf of another user. This does not include viewing the token string, which is only shown at the time of creation.") }
       }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Not available at the subaccount level") } }
     ]
   },
   manage_temporary_enrollments: {
@@ -737,11 +749,19 @@ PERMISSION_GROUPS = {
     ],
     account_considerations: [
       { title: -> { I18n.t("Site Admin Only") },
-        description: -> { I18n.t("This permission is only available to Site Admin users and requires the api_rate_limits feature flag to be enabled.") } },
+        description: -> { I18n.t("This permission is only available to Site Admin users.") } },
       { title: -> { I18n.t("External Tools") },
         description: -> { I18n.t("Rate limiting settings apply to external tools and integrations that use OAuth client configurations with throttling parameters.") } },
       { title: -> { I18n.t("UTID Integration") },
         description: -> { I18n.t("This feature supports UTID (Unified Tool ID) based rate limiting for partner tools and products.") } }
+    ]
+  },
+  manage_rules: {
+    label: -> { I18n.t("Automation Rules") },
+    subtitle: -> { I18n.t("view / add / edit / delete") },
+    account_details: [
+      { title: -> { I18n.t("Overview") },
+        description: -> { I18n.t("These permissions control the ability to manage automation rules on the account.") } }
     ]
   }
 }.freeze

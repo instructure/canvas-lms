@@ -76,7 +76,7 @@ export const RatingRowCompact = ({
                   margin="medium small 0"
                   themeOverride={{marginMedium: '2rem'}}
                 >
-                  {rangeStart ? I18n.t('%{rangeStart} to ', {rangeStart}) : `--`}
+                  {rangeStart != null ? I18n.t('>%{rangeStart} to ', {rangeStart}) : `--`}
                 </View>
               )}
               <RatingPointsInput

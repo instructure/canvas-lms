@@ -29,7 +29,7 @@ import {
 } from '@canvas/outcomes/graphql/MasteryCalculation'
 import {useQuery, useMutation} from '@apollo/client'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('MasteryScale')
 

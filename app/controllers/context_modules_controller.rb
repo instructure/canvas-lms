@@ -25,6 +25,7 @@ class ContextModulesController < ApplicationController
   include ObserverModuleInfo
 
   before_action :require_context
+  skip_before_action :require_user, only: %i[content_tag_assignment_data index item_redirect module_redirect progressions]
 
   include HorizonMode
 
@@ -42,13 +43,14 @@ class ContextModulesController < ApplicationController
 
     def load_module_file_details
       attachment_tags = GuardRail.activate(:secondary) { @context.module_items_visible_to(@current_user).where(content_type: "Attachment").preload(content: :folder).to_a }
-      attachment_tags.each_with_object({}) do |file_tag, items|
-        items[file_tag.id] = {
-          id: file_tag.id,
-          content_id: file_tag.content_id,
-          content_details: content_details(file_tag, @current_user, for_admin: true),
-          module_id: file_tag.context_module_id
-        }
+      attachment_tags.to_h do |file_tag|
+        [file_tag.id,
+         {
+           id: file_tag.id,
+           content_id: file_tag.content_id,
+           content_details: content_details(file_tag, @current_user, for_admin: true),
+           module_id: file_tag.context_module_id
+         }]
       end
     end
 
@@ -299,8 +301,10 @@ class ContextModulesController < ApplicationController
       end
       add_body_class("padless-content")
 
-      js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
-      js_env(CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url))
+      js_env({
+               CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url),
+               CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url)
+             })
 
       if @context.use_modules_rewrite_view?(@current_user, session)
         # Load new modules page assets
@@ -340,7 +344,7 @@ class ContextModulesController < ApplicationController
             visible: !@last_web_export.nil?
           },
         }
-        js_env(CONTEXT_MODULES_HEADER_PROPS: context_modules_header_props)
+        js_env({ CONTEXT_MODULES_HEADER_PROPS: context_modules_header_props })
 
         modules_permissions = {
           canAdd: @can_add,
@@ -357,20 +361,23 @@ class ContextModulesController < ApplicationController
         if @current_user
           observed_users_list = observed_users(@current_user, session, @context.id)
           if observed_users_list.present?
-            js_env({ OBSERVER_OPTIONS: {
-                     OBSERVED_USERS_LIST: observed_users_list,
-                     CAN_ADD_OBSERVEE: @current_user
-                                        .profile
-                                        .tabs_available(@current_user, root_account: @domain_root_account)
-                                        .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
-                   } })
+            js_env({
+                     OBSERVER_OPTIONS: {
+                       OBSERVED_USERS_LIST: observed_users_list,
+                       CAN_ADD_OBSERVEE: @current_user
+                                         .profile
+                                         .tabs_available(@current_user, root_account: @domain_root_account)
+                                         .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                     }
+                   })
           end
         end
 
-        js_env(MODULES_PERMISSIONS: modules_permissions)
-        js_env(MODULES_OBSERVER_INFO: observer_module_info)
-
-        js_env(PAGE_TITLE: "#{t("titles.course_modules", "Course Modules")}: #{@context.name}")
+        js_env({
+                 MODULES_PERMISSIONS: modules_permissions,
+                 MODULES_OBSERVER_INFO: observer_module_info,
+                 PAGE_TITLE: "#{t("titles.course_modules", "Course Modules")}: #{@context.name}"
+               })
 
         js_bundle :context_modules_v2
         css_bundle :content_next, :context_modules2, :context_modules_v2
@@ -1210,7 +1217,7 @@ class ContextModulesController < ApplicationController
     if authorized_action(@module, @current_user, :update)
       if params[:publish]
         @module.publish
-        @module.publish_items!
+        @module.publish_items!(user: @current_user)
       elsif params[:unpublish]
         @module.unpublish
       end

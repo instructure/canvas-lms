@@ -43,7 +43,7 @@ describe K5Mode do
   describe "set_k5_mode" do
     shared_examples_for ":show_left_side" do
       it "does not set :show_left_side in non-k5 contexts" do
-        toggle_k5_setting(@course.account, false)
+        toggle_k5_setting(@course.account, enable: false)
         get :index, params: { course_id: @course.id }
         expect(assigns(:show_left_side)).to be_nil
       end
@@ -61,7 +61,6 @@ describe K5Mode do
         expect(assigns(:k5_details_view)).to be(false)
         expect(assigns(:show_left_side)).to be(true)
         expect(assigns(:css_bundles).flatten).to include(:k5_theme, :k5_font)
-        expect(assigns(:js_bundles).flatten).to include(:k5_theme)
       end
 
       context "when the user prefers the dyslexia friendly font" do
@@ -88,7 +87,6 @@ describe K5Mode do
           expect(assigns(:k5_details_view)).to be(false)
           expect(assigns(:show_left_side)).to be(true)
           expect(assigns(:css_bundles).flatten).to include(:k5_theme, :k5_font)
-          expect(assigns(:js_bundles).flatten).to include(:k5_theme)
         end
       end
     end
@@ -105,7 +103,6 @@ describe K5Mode do
         expect(assigns(:k5_details_view)).to be(false)
         expect(assigns(:show_left_side)).to be(true)
         expect(assigns(:css_bundles).flatten).to include(:k5_theme, :k5_font)
-        expect(assigns(:js_bundles).flatten).to include(:k5_theme)
       end
     end
 
@@ -121,7 +118,6 @@ describe K5Mode do
         expect(assigns(:k5_details_view)).to be(true)
         expect(assigns(:show_left_side)).to be(false)
         expect(assigns(:css_bundles).flatten).to include(:k5_theme, :k5_font)
-        expect(assigns(:js_bundles).flatten).to include(:k5_theme)
       end
     end
 
@@ -130,7 +126,6 @@ describe K5Mode do
       user_session(@teacher)
       get :index, params: { course_id: @course.id }
       expect(assigns(:css_bundles).flatten).to include(:k5_theme, :k5_font)
-      expect(assigns(:js_bundles).flatten).to include(:k5_theme)
     end
 
     it "prefers the K5 theme to the old elementary theme if both apply" do
@@ -138,8 +133,7 @@ describe K5Mode do
       user_session(@teacher)
       get :index, params: { course_id: @course.id }
       expect(assigns(:css_bundles).flatten).to include(:k5_theme, :k5_font)
-      expect(assigns(:js_bundles).flatten).to include(:k5_theme)
-      expect(assigns(:js_bundles).flatten).not_to include(:k6_theme)
+      expect(Array(assigns(:js_bundles)).flatten).not_to include(:k6_theme)
     end
 
     it "uses the old elementary theme if the flag is on and K5 mode is off" do

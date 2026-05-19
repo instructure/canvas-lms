@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 # FIXME: these tests should all exist in a controller test,
 # since that's the context required to run any of them
 describe AuthenticationMethods do
@@ -202,7 +200,7 @@ describe AuthenticationMethods do
       def build_encoded_token(user_id, real_user_id: nil)
         payload = { sub: user_id }
         payload[:masq_sub] = real_user_id if real_user_id
-        crypted_token = CanvasSecurity::ServicesJwt.generate(payload, false, symmetric: true)
+        crypted_token = CanvasSecurity::ServicesJwt.generate(payload, base64: false, symmetric: true)
         payload = {
           iss: "some other service",
           user_token: crypted_token
@@ -238,6 +236,7 @@ describe AuthenticationMethods do
         expect(controller.send(:load_user)).to eq @user
         expect(controller.instance_variable_get(:@current_user)).to eq @user
         expect(controller.instance_variable_get(:@real_current_user)).to eq @real_user
+        expect(controller.instance_variable_get(:@current_user).impersonated).to be true
       end
 
       it "sets current_pseudonym" do
@@ -247,6 +246,7 @@ describe AuthenticationMethods do
         expect(controller.send(:load_user)).to eq @user
         expect(controller.instance_variable_get(:@current_pseudonym)).to eq @user.pseudonym
         expect(controller.instance_variable_get(:@real_current_pseudonym)).to be_nil
+        expect(controller.instance_variable_get(:@current_user).impersonated).to be false
       end
 
       it "sets real current_pseudonym if masquerading user id present" do
@@ -256,6 +256,7 @@ describe AuthenticationMethods do
         expect(controller.send(:load_user)).to eq @user
         expect(controller.instance_variable_get(:@current_pseudonym)).to eq @user.pseudonym
         expect(controller.instance_variable_get(:@real_current_pseudonym)).to eq @real_user.pseudonym
+        expect(controller.instance_variable_get(:@current_user).impersonated).to be true
       end
     end
 
@@ -295,6 +296,7 @@ describe AuthenticationMethods do
         expect(controller.send(:load_user)).to eq @user
         expect(controller.instance_variable_get(:@current_user)).to eq @user
         expect(controller.instance_variable_get(:@real_current_user)).to eq @real_user
+        expect(controller.instance_variable_get(:@current_user).impersonated).to be true
       end
 
       it "sets current_pseudonym" do
@@ -353,6 +355,7 @@ describe AuthenticationMethods do
         expect(controller.send(:load_user)).to eq @user
         expect(controller.instance_variable_get(:@current_user)).to eq @user
         expect(controller.instance_variable_get(:@real_current_user)).to eq @real_user
+        expect(controller.instance_variable_get(:@current_user).impersonated).to be true
       end
 
       it "rejects as_user_id on a masquerading token if masquerade does not match" do
@@ -437,6 +440,7 @@ describe AuthenticationMethods do
               controller.send(:load_user)
               expect(controller.instance_variable_get(:@current_user)).to eq user
               expect(controller.instance_variable_get(:@current_pseudonym)).to eq @pseudonym
+              expect(controller.instance_variable_get(:@current_user).impersonated).to be false
             end
 
             it "sends an InstStatsd event for monitoring" do
@@ -512,7 +516,7 @@ describe AuthenticationMethods do
     end
   end
 
-  describe "#load_user with federated_pseudonym_attributes flag" do
+  describe "#load_user with FederatedPseudonymAttributes" do
     let(:user) { user_with_pseudonym }
     let(:test_pseudonym) { @pseudonym }
 
@@ -529,31 +533,13 @@ describe AuthenticationMethods do
       allow(PseudonymSession).to receive(:find_with_validation).and_return(@pseudonym_session)
     end
 
-    context "when feature flag is enabled" do
-      before do
-        Account.site_admin.enable_feature!(:federated_pseudonym_attributes)
-      end
-
-      it "calls FederatedPseudonymAttributes.load_from with session" do
-        expect(AuthenticationMethods::FederatedPseudonymAttributes).to receive(:load_from).with(@controller.session)
-        @controller.send(:load_user)
-      end
-    end
-
-    context "when feature flag is disabled" do
-      before do
-        Account.site_admin.disable_feature!(:federated_pseudonym_attributes)
-      end
-
-      it "does not call FederatedPseudonymAttributes.load_from" do
-        expect(AuthenticationMethods::FederatedPseudonymAttributes).not_to receive(:load_from)
-        @controller.send(:load_user)
-      end
+    it "calls FederatedPseudonymAttributes.load_from with session" do
+      expect(AuthenticationMethods::FederatedPseudonymAttributes).to receive(:load_from).with(@controller.session)
+      @controller.send(:load_user)
     end
 
     context "when current_pseudonym is nil" do
       before do
-        Account.site_admin.enable_feature!(:federated_pseudonym_attributes)
         @controller.instance_variable_set(:@current_pseudonym, nil)
         allow(@controller).to receive(:load_pseudonym_from_access_token).and_return(nil)
         allow(PseudonymSession).to receive(:find_with_validation).and_return(nil)

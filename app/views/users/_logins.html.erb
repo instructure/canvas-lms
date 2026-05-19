@@ -21,15 +21,17 @@
 <% if can_do(@user, @current_user, :manage, :manage_user_details) %>
   <% css_bundle :user_logins %>
   <% js_bundle :user_logins %>
-  <% js_env :PASSWORD_POLICY => (@domain_root_account.try(:password_policy) || {}) %>
+  <% js_env({ PASSWORD_POLICY: (@domain_root_account.try(:password_policy) || {}) }) %>
   <%
     if can_do(Account.site_admin, @current_user, :manage_user_logins)
-      js_env :PASSWORD_POLICIES => Hash[Account.root_accounts.active.non_shadow.map{ |a| [a.id, a.password_policy]}]
-      js_env :ACCOUNT_SELECT_OPTIONS => Account.root_accounts
-                .active
-                .non_shadow
-                .map { |a| {label:(a.name || t("Unnamed Account (%{id})", id: a.id)), value: a.id} }
-                .sort_by(&:first)
+      js_env({
+        PASSWORD_POLICIES: Hash[Account.root_accounts.active.non_shadow.map{ |a| [a.id, a.password_policy]}],
+        ACCOUNT_SELECT_OPTIONS: Account.root_accounts
+                                       .active
+                                       .non_shadow
+                                       .map { |a| {label:(a.name || t("Unnamed Account (%{id})", id: a.id)), value: a.id} }
+                                       .sort_by(&:first)
+      })
     end
   %>
   <fieldset

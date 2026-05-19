@@ -232,10 +232,10 @@ describe "Outcome Reports" do
         @account.set_feature_flag!(:account_level_mastery_scales, "on")
         expect(report.length).to eq 4
         report.each do |r|
-          expect(r).to_not have_key("mastery_points")
-          expect(r).to_not have_key("calculation_method")
-          expect(r).to_not have_key("calculation_int")
-          expect(r).to_not have_key("ratings")
+          expect(r).not_to have_key("mastery_points")
+          expect(r).not_to have_key("calculation_method")
+          expect(r).not_to have_key("calculation_int")
+          expect(r).not_to have_key("ratings")
         end
       end
 
@@ -284,7 +284,7 @@ describe "Outcome Reports" do
           LearningOutcomeGroup.where.not(learning_outcome_group_id: nil).to_a
                               .product(LearningOutcome.all)
                               .each do |group, outcome|
-                                expect(row_index(group)).to be < row_index(outcome)
+            expect(row_index(group)).to be < row_index(outcome)
           end
         end
 

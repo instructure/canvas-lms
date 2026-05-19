@@ -58,9 +58,8 @@ module PageViews
     def validate_users!(users)
       raise ArgumentError, "users must be an array" unless users.is_a?(Array)
       raise ArgumentError, "users cannot be empty" if users.empty?
-      # rubocop:disable Performance/RedundantEqualityComparisonBlock
-      raise ArgumentError, "all elements must be User objects" unless users.all? { |u| u.is_a?(User) }
-      # rubocop:enable Performance/RedundantEqualityComparisonBlock
+
+      raise ArgumentError, "all elements must be User objects" unless users.all?(User)
     end
 
     def parse_date_only(date_string)

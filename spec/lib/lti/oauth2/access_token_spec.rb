@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 module Lti
   module OAuth2
     describe AccessToken do
@@ -41,7 +39,7 @@ module Lti
         let(:access_token) { Lti::OAuth2::AccessToken.create_jwt(aud:, sub:) }
 
         it "is signed by the canvas secret" do
-          expect { Canvas::Security.decode_jwt(access_token.to_s) }.to_not raise_error
+          expect { Canvas::Security.decode_jwt(access_token.to_s) }.not_to raise_error
         end
 
         it "has an 'iss' set to 'Canvas'" do
@@ -139,7 +137,7 @@ module Lti
 
         it "handles an array for aud" do
           body[:aud] = [aud, "file_host"]
-          expect { access_token.validate! }.to_not raise_error
+          expect { access_token.validate! }.not_to raise_error
         end
 
         it "raises an InvalidTokenError if the 'iat' is in the future" do

@@ -4,6 +4,60 @@
 <link rel="stylesheet" href="<%= url_for("css/common.css") %>" type="text/css" media="screen" charset="utf-8" />
 <link rel="stylesheet" href="<%= url_for("css/cookie-consent.css") %>" type="text/css" media="screen" />
 <link href="<%= url_for("css/prettify.css") %>" rel="stylesheet" type="text/css" media="screen" />
+<%
+  # Load redirect URL from generated mappings (available via options)
+  @redirect_url = nil
+
+  if options[:url_mappings]
+    current_object = options[:object].to_s
+
+    current_filename = if current_object.end_with?('.html')
+      current_object
+    else
+      "#{DocumentationHelpers.topicize(current_object)}.html"
+    end
+
+    mapping = options[:url_mappings].find do |m|
+      # Extract filename from URL and compare exactly to avoid substring matches
+      m['old_url'].split('/').last == current_filename
+    end
+
+    if mapping
+      @redirect_url = mapping['new_url']
+    end
+  end
+%>
+<script>
+  (function() {
+    var redirectUrl = <%= @redirect_url.to_json %>;
+
+    function isTest() {
+      var testHosts = [
+        'canvas.cd.instructure.com',
+        'canvas.test.instructure.com'
+      ];
+      var currentHost = window.location.hostname;
+      return testHosts.indexOf(currentHost) !== -1;
+    }
+
+    if (redirectUrl && isTest()) {
+      // Add canonical link for SEO
+      var canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      canonical.href = redirectUrl;
+      document.head.appendChild(canonical);
+
+      // Add meta refresh as non-JavaScript fallback
+      var metaRefresh = document.createElement('meta');
+      metaRefresh.httpEquiv = 'refresh';
+      metaRefresh.content = '0; url=' + redirectUrl;
+      document.head.appendChild(metaRefresh);
+
+      // Perform redirect
+      window.location.href = redirectUrl;
+    }
+  })();
+</script>
 <script src="<%= url_for("js/jquery.min.js") %>" type="text/javascript"></script>
 <script src="<%= url_for("js/prettify.js") %>" type="text/javascript"></script>
 <script src="<%= url_for("js/pendo.min.js") %>" type="text/javascript"></script>

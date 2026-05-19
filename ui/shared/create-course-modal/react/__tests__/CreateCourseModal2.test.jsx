@@ -157,28 +157,32 @@ describe('CreateCourseModal (2)', () => {
       unmount1()
 
       requestUrls = []
-      const {unmount: unmount2} = render(<CreateCourseModal {...getProps({permissions: 'teacher'})} />)
+      const {unmount: unmount2} = render(
+        <CreateCourseModal {...getProps({permissions: 'teacher'})} />,
+      )
       await waitFor(() => expect(requestUrls.length).toBeGreaterThan(0))
       expect(requestUrls[0]).toContain('/api/v1/course_creation_accounts')
       unmount2()
 
       requestUrls = []
-      const {unmount: unmount3} = render(<CreateCourseModal {...getProps({permissions: 'student'})} />)
+      const {unmount: unmount3} = render(
+        <CreateCourseModal {...getProps({permissions: 'student'})} />,
+      )
       await waitFor(() => expect(requestUrls.length).toBeGreaterThan(0))
       expect(requestUrls[0]).toContain('/api/v1/course_creation_accounts')
       unmount3()
 
       requestUrls = []
-      const {unmount: unmount4} = render(<CreateCourseModal {...getProps({permissions: 'no_enrollments'})} />)
+      const {unmount: unmount4} = render(
+        <CreateCourseModal {...getProps({permissions: 'no_enrollments'})} />,
+      )
       await waitFor(() => expect(requestUrls.length).toBeGreaterThan(0))
       expect(requestUrls[0]).toContain('/api/v1/course_creation_accounts')
       unmount4()
     })
 
     it('account selection dropdown is shown', async () => {
-      server.use(
-        http.get('/api/v1/course_creation_accounts', () => HttpResponse.json(ENROLLMENTS)),
-      )
+      server.use(http.get('/api/v1/course_creation_accounts', () => HttpResponse.json(ENROLLMENTS)))
       const {getByLabelText, queryByText} = render(
         <CreateCourseModal {...getProps({permissions: 'teacher'})} />,
       )
@@ -187,9 +191,7 @@ describe('CreateCourseModal (2)', () => {
     })
 
     it('account selection dropdown is not shown when only MCC Account', async () => {
-      server.use(
-        http.get('/api/v1/course_creation_accounts', () => HttpResponse.json(MCC_ACCOUNT)),
-      )
+      server.use(http.get('/api/v1/course_creation_accounts', () => HttpResponse.json(MCC_ACCOUNT)))
       const {getByLabelText, queryByText} = render(
         <CreateCourseModal {...getProps({permissions: 'teacher'})} />,
       )
@@ -200,9 +202,7 @@ describe('CreateCourseModal (2)', () => {
     })
 
     it('Create button is enabled when Course name is added', async () => {
-      server.use(
-        http.get('/api/v1/course_creation_accounts', () => HttpResponse.json(MCC_ACCOUNT)),
-      )
+      server.use(http.get('/api/v1/course_creation_accounts', () => HttpResponse.json(MCC_ACCOUNT)))
       const {getByLabelText, queryByText, getByRole} = render(
         <CreateCourseModal {...getProps({permissions: 'teacher'})} />,
       )
@@ -222,9 +222,7 @@ describe('CreateCourseModal (2)', () => {
 
     it('Create button is enabled when Course name is added and account is selected', async () => {
       server.use(
-        http.get('/api/v1/course_creation_accounts', () =>
-          HttpResponse.json(MANAGEABLE_COURSES),
-        ),
+        http.get('/api/v1/course_creation_accounts', () => HttpResponse.json(MANAGEABLE_COURSES)),
       )
 
       const CreateCourseModalWithMockedState = props => {
@@ -255,9 +253,7 @@ describe('CreateCourseModal (2)', () => {
 
     it('shows form fields for account and subject name and homeroom sync after loading accounts', async () => {
       server.use(
-        http.get('/api/v1/course_creation_accounts', () =>
-          HttpResponse.json(MANAGEABLE_COURSES),
-        ),
+        http.get('/api/v1/course_creation_accounts', () => HttpResponse.json(MANAGEABLE_COURSES)),
       )
       const {getByLabelText} = render(<CreateCourseModal {...getProps()} />)
       await waitFor(() => {
@@ -275,9 +271,7 @@ describe('CreateCourseModal (2)', () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       let homeroomRequestUrl = null
       server.use(
-        http.get('/api/v1/course_creation_accounts', () =>
-          HttpResponse.json(MANAGEABLE_COURSES),
-        ),
+        http.get('/api/v1/course_creation_accounts', () => HttpResponse.json(MANAGEABLE_COURSES)),
         http.get('/api/v1/users/self/courses', ({request}) => {
           const url = new URL(request.url)
           if (url.searchParams.get('homeroom') === 'true') {
@@ -305,9 +299,7 @@ describe('CreateCourseModal (2)', () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       let homeroomRequestUrl = null
       server.use(
-        http.get('/api/v1/course_creation_accounts', () =>
-          HttpResponse.json(MANAGEABLE_COURSES),
-        ),
+        http.get('/api/v1/course_creation_accounts', () => HttpResponse.json(MANAGEABLE_COURSES)),
         http.get('/api/v1/accounts/:accountId/courses', ({request, params}) => {
           const url = new URL(request.url)
           if (url.searchParams.get('homeroom') === 'true') {
@@ -329,6 +321,60 @@ describe('CreateCourseModal (2)', () => {
       expect(homeroomRequestUrl).toContain('/api/v1/accounts/4/courses')
       expect(homeroomRequestUrl).toContain('homeroom=true')
       expect(homeroomRequestUrl).toContain('per_page=100')
+    })
+
+    it('homeroom endpoint is not called when selected account is not in viewableAccountIds', async () => {
+      let homeroomRequested = false
+      server.use(
+        http.get('/api/v1/course_creation_accounts', () => HttpResponse.json(MANAGEABLE_COURSES)),
+        http.get('/api/v1/accounts/:accountId/courses', ({request}) => {
+          const url = new URL(request.url)
+          if (url.searchParams.get('homeroom') === 'true') {
+            homeroomRequested = true
+          }
+          return HttpResponse.json([])
+        }),
+        http.get('/api/v1/users/self/courses', ({request}) => {
+          const url = new URL(request.url)
+          if (url.searchParams.get('homeroom') === 'true') {
+            homeroomRequested = true
+          }
+          return HttpResponse.json([])
+        }),
+      )
+      // viewableAccountIds=[] means admin has read_course_list on no accounts
+      const {getByLabelText} = render(<CreateCourseModal {...getProps({viewableAccountIds: []})} />)
+      await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+      // wait a tick to ensure any async requests would have fired
+      await new Promise(resolve => setTimeout(resolve, 100))
+      expect(homeroomRequested).toBe(false)
+    })
+
+    it('homeroom endpoint is called only for accounts in viewableAccountIds', async () => {
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
+      let homeroomRequestedForAccount4 = false
+      let homeroomRequestedForAccount5 = false
+      server.use(
+        http.get('/api/v1/course_creation_accounts', () => HttpResponse.json(MANAGEABLE_COURSES)),
+        http.get('/api/v1/accounts/:accountId/courses', ({request, params}) => {
+          const url = new URL(request.url)
+          if (url.searchParams.get('homeroom') === 'true') {
+            if (params.accountId === '4') homeroomRequestedForAccount4 = true
+            if (params.accountId === '5') homeroomRequestedForAccount5 = true
+          }
+          return HttpResponse.json([])
+        }),
+      )
+      // only account '4' (CPMS) can view courses
+      const {getByText, getByLabelText} = render(
+        <CreateCourseModal {...getProps({viewableAccountIds: ['4']})} />,
+      )
+      await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+      await user.click(getByLabelText('Which account will this subject be associated with?'))
+      await user.click(getByText('CPMS'))
+      await user.click(getByLabelText('Sync enrollments and subject start/end dates from homeroom'))
+      await waitFor(() => expect(homeroomRequestedForAccount4).toBe(true), {timeout: 5000})
+      expect(homeroomRequestedForAccount5).toBe(false)
     })
   })
 })

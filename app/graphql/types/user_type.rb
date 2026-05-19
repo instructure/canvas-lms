@@ -190,7 +190,8 @@ module Types
                                      type: :implicit,
                                      require_sis: false,
                                      root_account: domain_root_account,
-                                     in_region: true)
+                                     in_region: true,
+                                     current_user:)
         pseudonym&.sis_user_id
       end
     end
@@ -217,7 +218,8 @@ module Types
                                      type: :implicit,
                                      require_sis: false,
                                      root_account: domain_root_account,
-                                     in_region: true)
+                                     in_region: true,
+                                     current_user:)
         pseudonym&.integration_id
       end
     end
@@ -270,7 +272,8 @@ module Types
           type: :implicit,
           require_sis: false,
           root_account: context[:domain_root_account],
-          in_region: true
+          in_region: true,
+          current_user:
         )
         pseudonym&.unique_id
       end
@@ -338,35 +341,33 @@ module Types
         return Enrollment.none
       end
 
-      enrollments = object.enrollments.joins(:course)
+      enrollments = object.enrollments.shard(object.in_region_associated_shards).joins(:course)
 
       if object != current_user
         domain_root_account = context[:domain_root_account]
         has_manage_students = domain_root_account&.grants_right?(current_user, session, :manage_students)
 
-        unless has_manage_students
-          permitted_course_conditions = []
+        if has_manage_students
+          enrollments = enrollments.where(root_account_id: domain_root_account.id)
+        else
+          permitted_course_ids = current_user.enrollments
+                                             .shard(current_user.in_region_associated_shards)
+                                             .joins(:course)
+                                             .where(courses: { workflow_state: ["available", "completed"] })
+                                             .distinct
+                                             .pluck(:course_id)
 
-          user_enrolled_courses = current_user.enrollments
-                                              .joins(:course)
-                                              .where(courses: { workflow_state: ["available", "completed"] })
-                                              .select(:course_id)
+          observer_course_ids = current_user.observer_enrollments
+                                            .shard(current_user.in_region_associated_shards)
+                                            .active
+                                            .where(associated_user: object)
+                                            .distinct
+                                            .pluck(:course_id)
 
-          if user_enrolled_courses.exists?
-            permitted_course_conditions << "courses.id IN (#{user_enrolled_courses.to_sql})"
-          end
+          all_permitted_course_ids = (permitted_course_ids | observer_course_ids)
 
-          observer_courses = current_user.observer_enrollments
-                                         .active
-                                         .where(associated_user: object)
-                                         .select(:course_id)
-
-          if observer_courses.exists?
-            permitted_course_conditions << "courses.id IN (#{observer_courses.to_sql})"
-          end
-
-          if permitted_course_conditions.any?
-            enrollments = enrollments.where(permitted_course_conditions.join(" OR "))
+          if all_permitted_course_ids.any?
+            enrollments = enrollments.where(course_id: all_permitted_course_ids)
           else
             return Enrollment.none
           end
@@ -695,11 +696,12 @@ module Types
       argument :include_overdue, Boolean, required: false, description: "Include overdue assignments"
       argument :observed_user_id, ID, required: false, description: "ID of the observed user"
       argument :only_current_grading_period, Boolean, required: false, default_value: true, description: "Only include missing submissions from current grading period (default: true)"
+      argument :only_graded_or_with_feedback, Boolean, required: false, description: "Show only graded submissions or submissions with instructor feedback"
       argument :only_submitted, Boolean, required: false, description: "Show only submitted assignments"
       argument :order_by, CourseWorkSubmissionsOrderField, required: false, description: "Field to order results by"
       argument :start_date, GraphQL::Types::ISO8601DateTime, required: false, description: "Start date for due date range filter"
     end
-    def course_work_submissions_connection(course_filter: nil, start_date: nil, end_date: nil, include_overdue: false, include_no_due_date: false, only_submitted: false, observed_user_id: nil, order_by: nil, only_current_grading_period: true)
+    def course_work_submissions_connection(course_filter: nil, start_date: nil, end_date: nil, include_overdue: false, include_no_due_date: false, only_submitted: false, only_graded_or_with_feedback: false, observed_user_id: nil, order_by: nil, only_current_grading_period: true)
       return [] unless object == current_user
 
       # Get active course enrollments using the same filtering as dashboard
@@ -730,6 +732,8 @@ module Types
       user_for_submissions = observed_user_id.present? ? User.find_by(id: observed_user_id) : object
       return [] unless user_for_submissions
 
+      return user_for_submissions.recent_feedback(course_ids: active_course_ids) if only_graded_or_with_feedback
+
       submissions_query = Submission
                           .joins(assignment: :course)
                           .where(user: user_for_submissions)
@@ -737,6 +741,7 @@ module Types
                           .where(assignments: { workflow_state: "published" })
                           .where(courses: { workflow_state: "available" })
                           .where.not(workflow_state: "deleted")
+                          .where(assignments: { has_sub_assignments: false })
 
       # Filter by submission status
       submissions_query = if only_submitted
@@ -1027,6 +1032,18 @@ module Types
       context.scoped_set!(:only_active_courses, only_active_courses)
       context.scoped_set!(:context_type, "User")
       object
+    end
+
+    field :institutional_tags_connection,
+          Types::InstitutionalTagType.connection_type,
+          null: true do
+      argument :account_id,
+               ID,
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Account")
+    end
+    def institutional_tags_connection(account_id:)
+      Loaders::UserLoaders::InstitutionalTagsLoader.for(current_user, session, account_id).load(object.id)
     end
   end
 end

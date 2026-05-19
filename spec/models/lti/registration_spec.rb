@@ -45,7 +45,7 @@ RSpec.describe Lti::Registration do
       non_site_admin_template = lti_registration_model(account: account_model)
       registration.template_registration = non_site_admin_template
       expect(subject).to be false
-      expect(registration.errors[:template_registration]).to include("must be inherited from Site Admin")
+      expect(registration.errors[:template_registration]).to include(a_string_starting_with("must be inherited from Site Admin"))
     end
 
     it "allows site admin template registrations" do
@@ -211,7 +211,7 @@ RSpec.describe Lti::Registration do
           overlay.data["placements"] = { "new_placement" => { "text" => "New Placement" } }
           overlay.update_column(:data, overlay.data)
 
-          # The new placement should not be added since IMS registrations use additive: false
+          # The new placement should not be added
           placement_names = subject["placements"].pluck("placement")
           expect(placement_names).not_to include("new_placement")
         end
@@ -253,6 +253,39 @@ RSpec.describe Lti::Registration do
           expect(global_nav_config["icon_url"]).to eq("https://example.com/icon.png")
           expect(global_nav_config["text"]).to eq("A Better Title")
         end
+
+        context "when an overlay parameter is provided" do
+          subject { registration.internal_lti_configuration(context: account, overlay: supplied_overlay) }
+
+          let(:other_account) { Account.create! }
+          let(:supplied_overlay) do
+            Lti::Overlay.create!(account: other_account,
+                                 registration: ims_registration.lti_registration,
+                                 updated_by: user,
+                                 data: {
+                                   title: "Supplied Overlay Title",
+                                   privacy_level: "public"
+                                 })
+          end
+
+          it "uses the supplied overlay instead of overlay_for(context)" do
+            overlay # create the context-based overlay
+            supplied_overlay
+
+            config = subject
+
+            expect(config["privacy_level"]).to eq("public")
+            expect(config["title"]).to eq("Supplied Overlay Title")
+            expect(config["scopes"]).to include(TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE)
+          end
+
+          it "does not call overlay_for when overlay is supplied" do
+            supplied_overlay
+
+            expect(registration).not_to receive(:overlay_for)
+            subject
+          end
+        end
       end
     end
 
@@ -272,14 +305,17 @@ RSpec.describe Lti::Registration do
             title: "A Better Title",
             privacy_level: "anonymous",
             placements: {
+              course_navigation: {
+                icon_url: "https://example.com/icon.png",
+                text: "Updated Course Nav"
+              },
+              account_navigation: {
+                icon_url: "https://example.com/account-icon.png",
+                text: "Updated Account Nav"
+              },
+              # New placements that don't exist in the base config
               global_navigation: {
                 target_link_uri: "https://example.com/launch?placement=global_navigation",
-                icon_url: "https://example.com/icon.png",
-                title: "A Better Title",
-                message_type: "LtiDeepLinkingRequest"
-              },
-              module_index_menu_modal: {
-                target_link_uri: "https://example.com/launch?placement=module_index_menu_modal",
                 icon_url: "https://example.com/icon.png",
                 title: "A Better Title",
                 message_type: "LtiDeepLinkingRequest"
@@ -294,22 +330,24 @@ RSpec.describe Lti::Registration do
                                data:)
         end
 
-        it "overlays all fields on top of the configuration" do
+        it "overlays fields on existing placements but does not add new placements" do
           overlay
 
           expect(subject["privacy_level"]).to eq("anonymous")
           expect(subject["title"]).to eq("A Better Title")
-          global_nav_config = subject["placements"].find { |p| p["placement"] == "global_navigation" }
-          module_config = subject["placements"].find { |p| p["placement"] == "module_index_menu_modal" }
 
-          expect(global_nav_config).to include("target_link_uri" => "https://example.com/launch?placement=global_navigation",
-                                               "icon_url" => "https://example.com/icon.png",
-                                               "title" => "A Better Title",
-                                               "message_type" => "LtiDeepLinkingRequest")
-          expect(module_config).to include("target_link_uri" => "https://example.com/launch?placement=module_index_menu_modal",
-                                           "icon_url" => "https://example.com/icon.png",
-                                           "title" => "A Better Title",
-                                           "message_type" => "LtiDeepLinkingRequest")
+          course_nav_config = subject["placements"].find { |p| p["placement"] == "course_navigation" }
+          account_nav_config = subject["placements"].find { |p| p["placement"] == "account_navigation" }
+          global_nav_config = subject["placements"].find { |p| p["placement"] == "global_navigation" }
+
+          # Existing placements should be modified
+          expect(course_nav_config["icon_url"]).to eq("https://example.com/icon.png")
+          expect(course_nav_config["text"]).to eq("Updated Course Nav")
+          expect(account_nav_config["icon_url"]).to eq("https://example.com/account-icon.png")
+          expect(account_nav_config["text"]).to eq("Updated Account Nav")
+
+          # New placements should not be added
+          expect(global_nav_config).to be_nil
         end
 
         context "with include_overlay: false" do
@@ -606,25 +644,17 @@ RSpec.describe Lti::Registration do
     let(:registration) { lti_registration_model(account: context) }
     let(:context) { account_model }
 
-    context "when flag is disabled" do
-      before do
-        context.disable_feature! :lti_registrations_templates
-      end
+    context "when account matches registration account" do
+      let(:account) { context }
 
-      context "when account matches registration account" do
-        let(:account) { context }
-
-        it { is_expected.to be false }
-      end
-
-      context "when account does not match registration account" do
-        let(:account) { account_model }
-
-        it { is_expected.to be true }
-      end
+      it { is_expected.to be false }
     end
 
-    it { is_expected.to be false }
+    context "when account does not match registration account" do
+      let(:account) { account_model }
+
+      it { is_expected.to be true }
+    end
 
     context "when template registration is present" do
       let(:template_registration) { lti_registration_model(account: Account.site_admin) }
@@ -636,13 +666,74 @@ RSpec.describe Lti::Registration do
       end
 
       it { is_expected.to be true }
+    end
+  end
 
-      context "and flag is disabled" do
-        before do
-          context.disable_feature! :lti_registrations_templates
+  describe "#local_copy_for" do
+    subject { registration.local_copy_for(target_account) }
+
+    specs_require_sharding
+
+    let_once(:sa_registration) do
+      Shard.default.activate { lti_registration_with_tool(account: Account.site_admin) }
+    end
+    let_once(:shard2_account) { @shard2.activate { account_model } }
+    let_once(:shard2_admin) { @shard2.activate { account_admin_user(account: shard2_account) } }
+
+    let(:registration) { sa_registration }
+    let(:target_account) { shard2_account }
+
+    context "when the registration belongs to the target account" do
+      let_once(:local_reg) do
+        @shard2.activate do
+          Lti::InstallTemplateRegistrationService.call(
+            account: shard2_account, user: shard2_admin, template: sa_registration
+          )[:local_copy]
         end
+      end
+      let(:registration) { local_reg }
+      let(:target_account) { shard2_account }
 
-        it { is_expected.to be false }
+      it "returns self" do
+        @shard2.activate { expect(subject).to be(local_reg) }
+      end
+    end
+
+    context "when a local copy exists for the target account" do
+      let_once(:local_copy) do
+        @shard2.activate do
+          Lti::InstallTemplateRegistrationService.call(
+            account: shard2_account, user: shard2_admin, template: sa_registration
+          )[:local_copy]
+        end
+      end
+
+      before { local_copy }
+
+      it "returns the local copy" do
+        @shard2.activate { expect(subject).to eql(local_copy) }
+      end
+    end
+
+    context "when no local copy exists" do
+      context "when :lti_registrations_templates feature is enabled" do
+        before { @shard2.activate { shard2_account.enable_feature!(:lti_registrations_templates) } }
+
+        it "raises Lti::LocalAppNotFound" do
+          @shard2.activate { expect { subject }.to raise_error(Lti::LocalAppNotFound) }
+        end
+      end
+
+      context "when :lti_registrations_templates feature is disabled" do
+        before { @shard2.activate { shard2_account.disable_feature!(:lti_registrations_templates) } }
+
+        it "returns nil and captures the exception" do
+          allow(Canvas::Errors).to receive(:capture_exception).with(
+            Lti::LocalAppNotFound,
+            include("No local copy found")
+          )
+          @shard2.activate { expect(subject).to be_nil }
+        end
       end
     end
   end

@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
 require_relative "../views_helper"
 require_relative "../../selenium/helpers/groups_common"
 
@@ -38,7 +37,7 @@ describe "gradebooks/speed_grader" do
 
     @group_category = @course.group_categories.create!(name: "Test Group Set")
     @group = @course.groups.create!(name: "a group", group_category: @group_category)
-    add_user_to_group(@user, @group, true)
+    add_user_to_group(@user, @group, is_leader: true)
     @assignment = @course.assignments.create!(assignment_valid_attributes.merge(
                                                 group_category: @group_category,
                                                 grade_group_students_individually: true

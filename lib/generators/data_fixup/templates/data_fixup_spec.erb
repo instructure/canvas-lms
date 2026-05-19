@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe DataFixup::<%= class_name %> do
+  include_context "data fixup auditing"
   specs_require_sharding
 
   subject(:fixup) { operation_shard.activate { described_class.new } }

@@ -306,8 +306,8 @@ describe SubmissionsController do
       course_with_student_logged_in(active_all: true)
       @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
-      att1 = attachment_model(context: @user, uploaded_data: fixture_file_upload("docs/doc.doc", "application/msword", true))
-      att2 = attachment_model(context: @user, uploaded_data: fixture_file_upload("docs/txt.txt", "application/vnd.ms-excel", true))
+      att1 = attachment_model(context: @user, uploaded_data: fixture_file_upload("docs/doc.doc", "application/msword", binary: true))
+      att2 = attachment_model(context: @user, uploaded_data: fixture_file_upload("docs/txt.txt", "application/vnd.ms-excel", binary: true))
       post "create", params: { course_id: @course.id,
                                assignment_id: @assignment.id,
                                submission: { submission_type: "online_upload", attachment_ids: [att1.id, att2.id].join(",") },
@@ -362,7 +362,7 @@ describe SubmissionsController do
       request.path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions"
       post "create", params: { course_id: @course.id, assignment_id: @assignment.id, submission: { submission_type: "basic_lti_launch", url: "http://www.google.com" } }
       expect(response).to be_redirect
-      expect(assigns[:submission]).to_not be_nil
+      expect(assigns[:submission]).not_to be_nil
       expect(assigns[:submission].submission_type).to eq "basic_lti_launch"
       expect(assigns[:submission].url).to eq "http://www.google.com"
     end
@@ -686,7 +686,7 @@ describe SubmissionsController do
               submission: { submission_type: "online_url", url: "url" }
             }
             expect(response).to be_redirect
-            expect(response).to_not redirect_to(/[?&]confetti=true/)
+            expect(response).not_to redirect_to(/[?&]confetti=true/)
           end
         end
       end
@@ -700,7 +700,7 @@ describe SubmissionsController do
         it "redirects without confetti" do
           post "create", params: { course_id: @course.id, assignment_id: @assignment.id, submission: { submission_type: "online_url", url: "url" } }
           expect(response).to be_redirect
-          expect(response).to_not redirect_to(/[?&]confetti=true/)
+          expect(response).not_to redirect_to(/[?&]confetti=true/)
         end
       end
 
@@ -728,7 +728,7 @@ describe SubmissionsController do
               submission: { submission_type: "online_url", url: "url" }
             }
             expect(response).to be_redirect
-            expect(response).to_not redirect_to(/[?&]confetti=true/)
+            expect(response).not_to redirect_to(/[?&]confetti=true/)
           end
         end
       end
@@ -1626,7 +1626,7 @@ describe SubmissionsController do
         qsub.workflow_state = "complete"
         qsub.submission = quiz.assignment.find_or_create_submission(first_student)
         qsub.submission.audit_grade_changes = true
-        qsub.with_versioning(true) { qsub.save! }
+        qsub.with_versioning { qsub.save! }
 
         quiz
       end

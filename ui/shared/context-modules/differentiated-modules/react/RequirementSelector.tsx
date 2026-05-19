@@ -24,7 +24,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {NumberInput} from '@instructure/ui-number-input'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
-import CanvasSelect from '@canvas/instui-bindings/react/Select'
+import {CanvasSelect} from '@instructure/platform-instui-bindings'
 import type {Requirement, ModuleItem, PointsInputMessages} from './types'
 import {requirementTypesForResource} from '../utils/miscHelpers'
 import {groupBy} from 'es-toolkit/compat'
@@ -176,10 +176,10 @@ export default function RequirementSelector({
           <CanvasSelect
             id={`requirement-item-${index}`}
             inputRef={el => (dropdown.current = el)}
-            value={requirement.name}
+            value={requirement.id}
             label={<ScreenReaderContent>{I18n.t('Select Module Item')}</ScreenReaderContent>}
             onChange={(_event, value) => {
-              const moduleItem = moduleItems.find(item => item.name === value)!
+              const moduleItem = moduleItems.find(item => item.id === value)!
               onUpdateRequirement({...moduleItem, type: 'view'} as Requirement, index)
             }}
           >
@@ -190,7 +190,7 @@ export default function RequirementSelector({
                     <CanvasSelect.Option
                       id={moduleItem.id}
                       key={moduleItem.id}
-                      value={moduleItem.name}
+                      value={moduleItem.id}
                     >
                       {moduleItem.name}
                     </CanvasSelect.Option>

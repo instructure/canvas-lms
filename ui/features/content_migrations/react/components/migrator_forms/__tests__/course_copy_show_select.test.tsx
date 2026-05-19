@@ -49,6 +49,9 @@ const server = setupServer(
   http.get('/users/:userId/manageable_courses', () => {
     return HttpResponse.json(fakeCourses)
   }),
+  http.get('/api/v1/courses/:courseId/late_policy', () => {
+    return HttpResponse.json({late_policy: {missing_submission_deduction_enabled: false}})
+  }),
 )
 
 const renderComponent = (overrideProps?: any) =>

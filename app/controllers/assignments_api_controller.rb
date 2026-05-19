@@ -772,6 +772,9 @@
 #     }
 #
 class AssignmentsApiController < ApplicationController
+  include HorizonMode
+
+  allow_public_horizon_access :index, :show
   before_action :require_context
   before_action :require_user_visibility, only: [:user_index]
   include Api::V1::Assignment
@@ -836,7 +839,7 @@ class AssignmentsApiController < ApplicationController
   #   Optional information:
   #   When the root account has the feature `newquizzes_on_quiz_page` enabled
   #   and this argument is set to "Quiz" the response will be serialized into a
-  #   quiz format({file:doc/api/quizzes.html#Quiz});
+  #   {file:quizzes.html#Quiz quiz format};
   #   When this argument isn't specified the response will be serialized into an
   #   assignment format;
   #
@@ -1000,7 +1003,8 @@ class AssignmentsApiController < ApplicationController
                                        .eager_load(:assignment_group)
                                        .preload(:rubric_association, :rubric)
                                        .reorder("assignment_groups.position, assignments.position, assignments.id")
-      scope = Assignment.search_by_attribute(scope, :title, params[:search_term])
+      assignment_search_min_length = 1
+      scope = Assignment.search_by_attribute(scope, :title, params[:search_term], min_length: assignment_search_min_length)
       include_params = Array(params[:include])
 
       if params[:bucket]
@@ -1112,18 +1116,25 @@ class AssignmentsApiController < ApplicationController
       if @context.feature_enabled?(:peer_review_allocation_and_grading)
         # Only preload for Assignment instances since SubAssignment and PeerReviewSubAssignment
         # cannot have AssessmentRequests
-        assignment_instances = assignments.select { |a| a.is_a?(Assignment) }
+        assignment_instances = assignments.grep(Assignment)
         Assignment.preload_peer_review_submissions(assignment_instances) if assignment_instances.any?
+      end
+
+      # Prewarm the request cache for needs_grading_count so that assignment_json
+      # can read results without triggering per-assignment queries.
+      # Permission check must match the condition in assignment_json:
+      #   include_needs_grading_count && assignment.context.grants_right?(user, :manage_grades)
+      # exclude_response_fields is not passed from this action so needs_grading_count
+      # is never excluded here — manage_grades is the only effective condition.
+      if @context.grants_right?(user, session, :manage_grades)
+        grading_query = Assignments::NeedsGradingCountQuery.new(assignments, user)
+        grading_query.count
+        grading_query.count_by_section if needs_grading_count_by_section
       end
 
       assignments.map do |assignment|
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]
-        needs_grading_course_proxy = if @context.grants_right?(user, session, :manage_grades)
-                                       Assignments::NeedsGradingCountQuery::CourseProxy.new(@context, user)
-                                     else
-                                       nil
-                                     end
 
         assignment_json(assignment,
                         user,
@@ -1133,7 +1144,6 @@ class AssignmentsApiController < ApplicationController
                         include_visibility:,
                         assignment_visibilities: visibility_array,
                         needs_grading_count_by_section:,
-                        needs_grading_course_proxy:,
                         include_all_dates:,
                         bucket: params[:bucket],
                         include_overrides: include_override_objects,
@@ -1170,8 +1180,9 @@ class AssignmentsApiController < ApplicationController
   #   requires that the Differentiated Assignments course feature be turned on. If
   #   "observed_users" is passed, submissions for observed users will also be included.
   #   For "score_statistics" to be included, the "submission" option must also be set.
-  #   The "peer_review" option requires that the Peer Review Allocation and Grading
-  #   course feature be turned on.
+  #   The "peer_review" option returns peer review sub assignment data if it exists, regardless
+  #   of the Peer Review Allocation and Grading feature state. If no peer review sub assignment
+  #   exists, the feature must be enabled to receive a null value; otherwise the key is omitted.
   # @argument override_assignment_dates [Boolean]
   #   Apply assignment overrides to the assignment, defaults to true.
   # @argument needs_grading_count_by_section [Boolean]
@@ -1415,7 +1426,7 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[peer_review][points_possible] [Float]
   #   The maximum points possible for peer reviews.
   #
-  # @argument assignment[peer_review][grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"|"not_graded"]
+  # @argument assignment[peer_review][grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading peer reviews.
   #  Defaults to "points" if this field is omitted.
   #
@@ -1659,7 +1670,7 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[peer_review][points_possible] [Float]
   #   The maximum points possible for peer reviews.
   #
-  # @argument assignment[peer_review][grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"|"not_graded"]
+  # @argument assignment[peer_review][grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading peer reviews.
   #  Defaults to "points" if this field is omitted.
   #

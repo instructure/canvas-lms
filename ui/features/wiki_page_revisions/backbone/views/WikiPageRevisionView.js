@@ -18,7 +18,7 @@
 import Backbone from '@canvas/backbone'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import template from '../../jst/WikiPageRevision.handlebars'
-import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import {showConfirmationDialog} from '@canvas/dialogs/react/ConfirmationDialog'
 import {datetimeString} from '@canvas/datetime/date-functions'
 
 const I18n = createI18nScope('pages')

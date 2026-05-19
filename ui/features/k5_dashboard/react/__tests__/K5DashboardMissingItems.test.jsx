@@ -19,7 +19,7 @@
 import {resetCardCache} from '@canvas/dashboard-card'
 import {MOCK_CARDS} from '@canvas/k5/react/__tests__/fixtures'
 import {resetPlanner} from '@canvas/planner'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer} from '@instructure/platform-alerts'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {render as testingLibraryRender} from '@testing-library/react'

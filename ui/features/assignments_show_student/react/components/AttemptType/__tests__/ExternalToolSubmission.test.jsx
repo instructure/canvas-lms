@@ -35,6 +35,7 @@ describe('ExternalToolSubmission', () => {
       ASSIGNMENT_ID: '200',
       DEEP_LINKING_POST_MESSAGE_ORIGIN: windowOrigin,
       COURSE_ID: '100',
+      LTI_LAUNCH_FRAME_ALLOWANCES: ['geolocation *', 'microphone *', 'camera *'],
     }
 
     tool = {name: 'some external tool', _id: '1'}
@@ -54,6 +55,14 @@ describe('ExternalToolSubmission', () => {
       expect(iframe.src).toBe(
         'http://localhost/courses/100/external_tools/retrieve?assignment_id=200&display=borderless&resource_link_lookup_uuid=some_uuid&url=%2Fsubmitted-lti-launch',
       )
+    })
+
+    it('sets iframe allow attribute at render time for microphone and camera permissions', () => {
+      const submission = SubmissionMocks.basicLtiLaunchSubmitted
+      const {getByTestId} = render(<ExternalToolSubmission submission={submission} tool={tool} />)
+
+      const iframe = getByTestId('lti-launch-frame')
+      expect(iframe).toHaveAttribute('allow', ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
     })
   })
 

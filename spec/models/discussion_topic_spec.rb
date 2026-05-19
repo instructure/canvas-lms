@@ -2293,6 +2293,29 @@ describe DiscussionTopic do
       check_read_state_scopes read: true, user: @student
     end
 
+    context "for announcements" do
+      before(:once) do
+        @announcement = @course.announcements.create!(title: "announcement", message: "msg", user: @teacher)
+        # Simulate a stale participant with unread_entry_count > 0 (legacy data)
+        @participant = @announcement.update_or_create_participant(current_user: @student, new_state: "unread", new_count: 1)
+      end
+
+      it "resets unread_entry_count to 0 when marking as read" do
+        @announcement.change_read_state("read", @student)
+        participant = @announcement.discussion_topic_participants.find_by(user: @student)
+        expect(participant.unread_entry_count).to eq(0)
+        expect(participant.workflow_state).to eq("read")
+      end
+
+      it "does not reset unread_entry_count for regular discussion topics" do
+        @topic.update_or_create_participant(current_user: @student, new_state: "unread", new_count: 2)
+        @topic.change_read_state("read", @student)
+        participant = @topic.discussion_topic_participants.find_by(user: @student)
+        # Regular topics keep their unread_entry_count (controlled by reply reads)
+        expect(participant.workflow_state).to eq("read")
+      end
+    end
+
     it "uses unique_constaint_retry when updating read state" do
       expect(DiscussionTopic).to receive(:unique_constraint_retry).once
       @topic.change_read_state("read", @student)
@@ -3028,7 +3051,7 @@ describe DiscussionTopic do
     end
 
     it "returns active entries by default" do
-      expect(@topic.entries_for_feed(@student)).to_not be_empty
+      expect(@topic.entries_for_feed(@student)).not_to be_empty
     end
 
     it "returns empty if user cannot see posts" do
@@ -3042,12 +3065,12 @@ describe DiscussionTopic do
 
     it "returns student entries if specified" do
       @topic.update(podcast_has_student_posts: true)
-      expect(@topic.entries_for_feed(@student, true)).to match_array([@entry1, @entry2])
+      expect(@topic.entries_for_feed(@student, podcast_feed: true)).to match_array([@entry1, @entry2])
     end
 
     it "only returns admin entries if specified" do
       @topic.update(podcast_has_student_posts: false)
-      expect(@topic.entries_for_feed(@student, true)).to match_array([@entry1])
+      expect(@topic.entries_for_feed(@student, podcast_feed: true)).to match_array([@entry1])
     end
 
     it "returns student entries for group discussions even if not specified" do
@@ -3056,7 +3079,7 @@ describe DiscussionTopic do
       @topic = @group.discussion_topics.create(title: "group topic", user: @teacher)
       @topic.discussion_entries.create(message: "some message", user: @student)
       @topic.update(podcast_has_student_posts: false)
-      expect(@topic.entries_for_feed(@student, true)).to_not be_empty
+      expect(@topic.entries_for_feed(@student, podcast_feed: true)).not_to be_empty
     end
   end
 
@@ -3872,6 +3895,7 @@ describe DiscussionTopic do
     end
 
     it "allows instructors and read admins to summarize if the feature is enabled" do
+      allow(FeatureFlags::Hooks).to receive(:tier_1_visible_on_hook).and_return(true)
       @course.enable_feature!(:discussion_summary)
 
       expect(@topic.user_can_summarize?(@teacher)).to be true
@@ -3926,6 +3950,7 @@ describe DiscussionTopic do
     end
 
     it "allows instructors and read admins to access insights if the feature is enabled" do
+      allow(FeatureFlags::Hooks).to receive(:tier_2_visible_on_hook).and_return(true)
       @course.enable_feature!(:discussion_insights)
 
       expect(@topic.user_can_access_insights?(@teacher)).to be true
@@ -4669,6 +4694,45 @@ describe DiscussionTopic do
 
         expect { topic.destroy! }.to change { AccessibilityResourceScan.where(discussion_topic_id: topic.id).count }.from(1).to(0)
       end
+    end
+  end
+
+  describe "#needs_normalizing?" do
+    let(:course) { course_model }
+    let(:topic) { discussion_topic_model(context: course) }
+
+    before do
+      Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+      course.root_account.enable_feature!(:a11y_checker)
+      course.enable_feature!(:a11y_checker_eap)
+      Progress.create!(
+        tag: Accessibility::CourseScanService::SCAN_TAG,
+        context: course,
+        workflow_state: "completed"
+      )
+    end
+
+    it "returns false when @capture_changed_a11y_attributes is nil (safe navigation guard)" do
+      # Instance variable is never set, so it remains nil.
+      # The safe navigation (&.) returns nil, which is falsy.
+      expect(topic.instance_variable_get(:@capture_changed_a11y_attributes)).to be_nil
+      expect(topic.send(:needs_normalizing?)).to be_falsey
+    end
+
+    it "returns false when @capture_changed_a11y_attributes is set but does not include :assignment_id" do
+      topic.instance_variable_set(:@capture_changed_a11y_attributes, Set[:message])
+      expect(topic.send(:needs_normalizing?)).to be false
+    end
+
+    it "returns true when all conditions are met and :assignment_id is included" do
+      topic.instance_variable_set(:@capture_changed_a11y_attributes, Set[:assignment_id])
+      expect(topic.send(:needs_normalizing?)).to be true
+    end
+
+    it "returns false when topic is an announcement even if other conditions pass" do
+      announcement = course.announcements.create!(title: "Test Announcement", message: "Hello")
+      announcement.instance_variable_set(:@capture_changed_a11y_attributes, Set[:assignment_id])
+      expect(announcement.send(:needs_normalizing?)).to be false
     end
   end
 end

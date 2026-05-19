@@ -110,7 +110,7 @@ describe('CreateOrEditSetModal::SelfSignup::', () => {
       render(<Wrapper state={state} props={{...defaultProps, selfSignupEndDateEnabled: true}} />)
       expect(
         screen.getByText(
-          'Students who are enrolled in multiple sections will be put in a group by themselves.',
+          'Restrict by Section keeps students in the same section, but students enrolled in multiple sections may be grouped unpredictably. For exact section groupings, create groups manually.',
         ),
       ).toBeInTheDocument()
     })
@@ -119,7 +119,7 @@ describe('CreateOrEditSetModal::SelfSignup::', () => {
       render(<Wrapper state={state} props={{...defaultProps, selfSignupEndDateEnabled: true}} />)
       expect(
         screen.queryByText(
-          'Students who are enrolled in multiple sections will be put in a group by themselves.',
+          'Restrict by Section keeps students in the same section, but students enrolled in multiple sections may be grouped unpredictably. For exact section groupings, create groups manually.',
         ),
       ).not.toBeInTheDocument()
     })

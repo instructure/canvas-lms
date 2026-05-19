@@ -179,6 +179,53 @@ describe SIS::CSV::ChangeSisIdImporter do
     end
   end
 
+  describe "global lookups" do
+    before { allow(GlobalLookups).to receive(:enabled?).and_return(true) }
+
+    it "re-indexes pseudonym global lookups after changing sis_user_id" do
+      pseudonym = user_with_managed_pseudonym(account: @account, sis_user_id: "U001").pseudonym
+      expect_any_instance_of(Pseudonym).to receive(:ensure_global_lookup_record).with(force: true)
+      process_csv_data_cleanly(
+        "old_id,new_id,type",
+        "U001,U002,user"
+      )
+      expect(pseudonym.reload.sis_user_id).to eq "U002"
+    end
+
+    it "re-indexes pseudonym global lookups after changing integration_id" do
+      pseudonym = user_with_managed_pseudonym(account: @account, sis_user_id: "U001").pseudonym
+      pseudonym.update!(integration_id: "int1")
+      expect_any_instance_of(Pseudonym).to receive(:ensure_global_lookup_record).with(force: true)
+      process_csv_data_cleanly(
+        "old_integration_id,new_integration_id,type",
+        "int1,int2,user"
+      )
+      expect(pseudonym.reload.integration_id).to eq "int2"
+    end
+
+    it "does not re-index global lookups when GlobalLookups is disabled" do
+      pseudonym = user_with_managed_pseudonym(account: @account, sis_user_id: "U001").pseudonym
+      allow(GlobalLookups).to receive(:enabled?).and_return(false)
+      expect_any_instance_of(Pseudonym).not_to receive(:ensure_global_lookup_record)
+      process_csv_data_cleanly(
+        "old_id,new_id,type",
+        "U001,U002,user"
+      )
+      expect(pseudonym.reload.sis_user_id).to eq "U002"
+    end
+
+    it "does not re-index global lookups for non-pseudonym types" do
+      c = course_model(account: @account)
+      c.update!(sis_source_id: "c001")
+      expect_any_instance_of(Pseudonym).not_to receive(:ensure_global_lookup_record)
+      process_csv_data_cleanly(
+        "old_id,new_id,type",
+        "c001,c002,course"
+      )
+      expect(c.reload.sis_source_id).to eq "c002"
+    end
+  end
+
   describe "caching" do
     it "invalidates the association cache" do
       enable_cache do

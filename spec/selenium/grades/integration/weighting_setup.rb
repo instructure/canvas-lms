@@ -28,7 +28,7 @@ module WeightingSetup
     enrollment.workflow_state = "active"
     enrollment.save!
     @course2 = Course.create!(name: "Course 2", account: Account.default, is_public: true)
-    @course2.enroll_student(@student, allow_multiple_enrollments: true).accept(true)
+    @course2.enroll_student(@student, allow_multiple_enrollments: true).accept(force: true)
     @course2.offer!
 
     @term_name = "First Term"

@@ -25,6 +25,7 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex, FlexItemProps} from '@instructure/ui-flex'
 import {
   IconEditLine,
+  IconNoSolid,
   IconPublishSolid,
   IconQuestionLine,
   IconWarningLine,
@@ -178,10 +179,13 @@ const ClosedIssuesText = ({
   isMobile: boolean
 }) => {
   const closedText = I18n.t('Closed (%{count})', {count: item.closedIssueCount})
+  const accessibleText = I18n.t('Closed remediation (%{count} issues set aside)', {
+    count: item.closedIssueCount,
+  })
   return (
     <ScanStateWithIcon
-      icon={<IconPublishSolid color="success" aria-hidden="true" />}
-      text={closedText}
+      icon={<IconNoSolid color="secondary" aria-hidden="true" />}
+      text={<AccessibleContent alt={accessibleText}>{closedText}</AccessibleContent>}
       isMobile={isMobile}
     />
   )
@@ -219,6 +223,8 @@ const UnknownIssuesText = ({isMobile}: {isMobile: boolean}) => (
   />
 )
 
+const ISSUE_LIMIT_REACHED_ERROR = 'issue_limit_reached'
+
 const ScanWithError = ({
   item,
   isMobile,
@@ -227,14 +233,28 @@ const ScanWithError = ({
   item: AccessibilityResourceScan
   isMobile: boolean
   onRescan?: (item: AccessibilityResourceScan) => void
-}) => (
-  <ScanStateWithExplanation
-    icon={<IconWarningLine color="error" size="x-small" aria-hidden="true" />}
-    content={<RescanAction item={item} isMobile={isMobile} onRescan={onRescan} />}
-    tooltipText={I18n.t('Failed scan')}
-    isMobile={isMobile}
-  />
-)
+}) => {
+  if (item.errorMessage === ISSUE_LIMIT_REACHED_ERROR) {
+    return (
+      <ScanStateWithExplanation
+        icon={<IconQuestionLine color="secondary" size="x-small" aria-hidden="true" />}
+        content={<Text>{I18n.t('Limit reached')}</Text>}
+        tooltipText={I18n.t(
+          'Max issue count reached on course. Remediate found issues and update report to find additional issues.',
+        )}
+        isMobile={isMobile}
+      />
+    )
+  }
+  return (
+    <ScanStateWithExplanation
+      icon={<IconWarningLine color="error" size="x-small" aria-hidden="true" />}
+      content={<RescanAction item={item} isMobile={isMobile} onRescan={onRescan} />}
+      tooltipText={I18n.t('Failed scan')}
+      isMobile={isMobile}
+    />
+  )
+}
 
 export const ScanStateCell: React.FC<ScanStateCellProps> = ({
   item,

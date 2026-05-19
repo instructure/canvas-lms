@@ -25,15 +25,19 @@ import {executeQuery} from '@canvas/graphql'
 import {defaultGetLtiAssetProcessorsResult} from '@canvas/lti-asset-processor/shared-with-sg/replicated/__fixtures__/default/ltiAssetProcessors'
 import {defaultGetLtiAssetReportsResult} from '@canvas/lti-asset-processor/shared-with-sg/replicated/__fixtures__/default/ltiAssetReports'
 import {LTI_ASSET_REPORTS_QUERY} from '@canvas/lti-asset-processor/shared-with-sg/replicated/queries/getLtiAssetReports'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 vi.mock('@canvas/graphql', () => ({
   executeQuery: vi.fn(() => 'foo'),
 }))
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 let queryClient: QueryClient
 

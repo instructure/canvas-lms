@@ -221,6 +221,65 @@ describe BrandConfigReconciler do
       end
     end
 
+    context "with cross-shard parent brand config" do
+      specs_require_sharding
+
+      before do
+        @cross_shard_config = @shard1.activate do
+          BrandConfig.create!(variables: { "ic-brand-primary" => "green" })
+        end
+      end
+
+      def cross_shard_parent_md5
+        "#{@shard1.id}~#{@cross_shard_config.md5}"
+      end
+
+      it "does not flag account as orphaned when parent config is on another shard" do
+        child_config = BrandConfig.for(
+          variables: { "ic-brand-global-nav-bgd" => "white" },
+          parent_md5: cross_shard_parent_md5
+        )
+        child_config.save!
+        @child_account.update!(brand_config_md5: child_config.md5)
+
+        result = BrandConfigReconciler.process_account(@parent_account, dry_run: true)
+
+        expect(result[:issues]).not_to include(a_hash_including(type: :orphaned_parent, account: @child_account))
+      end
+
+      it "does not flag account as stale when cross-shard parent matches expected" do
+        @parent_account.update!(brand_config_md5: nil)
+        # Reconciler loads fresh Account instances from DB, so instance stubs won't apply
+        allow_any_instance_of(Account).to receive(:first_parent_brand_config).and_return(@cross_shard_config)
+
+        child_config = BrandConfig.for(
+          variables: { "ic-brand-global-nav-bgd" => "white" },
+          parent_md5: cross_shard_parent_md5
+        )
+        child_config.save!
+        @child_account.update!(brand_config_md5: child_config.md5)
+
+        result = BrandConfigReconciler.process_account(@parent_account, dry_run: true)
+
+        expect(result[:issues]).not_to include(a_hash_including(type: :stale_parent, account: @child_account))
+      end
+
+      it "does not flag SharedBrandConfig as stale when cross-shard parent matches expected" do
+        sbc_config = BrandConfig.for(
+          variables: { "ic-brand-global-nav-bgd" => "navy" },
+          parent_md5: cross_shard_parent_md5
+        )
+        sbc_config.save!
+        @child_shared_config.update!(brand_config_md5: sbc_config.md5)
+        # Reconciler loads fresh Account instances from DB, so instance stubs won't apply
+        allow_any_instance_of(Account).to receive(:first_parent_brand_config).and_return(@cross_shard_config)
+
+        result = BrandConfigReconciler.process_account(@parent_account, dry_run: true)
+
+        expect(result[:issues]).not_to include(a_hash_including(type: :stale_shared_brand_config))
+      end
+    end
+
     context "idempotency" do
       it "produces same result when run multiple times with no issues" do
         result1 = BrandConfigReconciler.process_account(@parent_account)

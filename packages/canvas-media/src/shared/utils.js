@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const AUDIO_PLAYER_SIZE = {width: '320px', height: '14.25rem'}
+export const AUDIO_PLAYER_SIZE = {width: 320, height: 228}
 
 export const NON_PREVIEWABLE_TYPES = [
   'audio/x-ms-wma',
@@ -42,7 +42,7 @@ export function isAudio(type) {
 // the available space
 export function sizeMediaPlayer(player, type, container) {
   if (isAudio(type)) {
-    return AUDIO_PLAYER_SIZE
+    return {width: `${AUDIO_PLAYER_SIZE.width}px`, height: `${AUDIO_PLAYER_SIZE.height}px`}
   }
 
   const sz = {

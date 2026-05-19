@@ -34,6 +34,7 @@ module Types
     field :quiz_version, Integer, null: true
     field :score, Float, null: true
     field :started_at, DateTimeType, null: true
+    field :version_number, Integer, null: true
     field :workflow_state, String, null: false
   end
 end

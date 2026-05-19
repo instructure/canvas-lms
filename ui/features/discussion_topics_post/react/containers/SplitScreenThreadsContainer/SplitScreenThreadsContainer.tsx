@@ -21,7 +21,7 @@ import {
   SearchContext,
   DiscussionManagerUtilityContext,
 } from '../../utils/constants'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
@@ -442,7 +442,6 @@ const SplitScreenThreadContainer = props => {
   return (
     <Responsive
       match="media"
-      // @ts-expect-error TS2769 (typescriptify)
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {

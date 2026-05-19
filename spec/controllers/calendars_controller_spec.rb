@@ -359,4 +359,28 @@ describe CalendarEventsApiController do
       end
     end
   end
+
+  describe "#preload_peer_review_sub_assignments" do
+    subject(:controller_instance) { described_class.new }
+
+    let(:assignment) { Assignment.new }
+    let(:non_assignment) { SubAssignment.new }
+
+    it "preloads :peer_review_sub_assignment only on Assignment instances from a mixed collection" do
+      collection = [assignment, non_assignment]
+
+      expect(ActiveRecord::Associations).to receive(:preload).with([assignment], :peer_review_sub_assignment)
+      controller_instance.send(:preload_peer_review_sub_assignments, collection)
+    end
+
+    it "does not call preload when the collection contains no Assignment instances" do
+      expect(ActiveRecord::Associations).not_to receive(:preload)
+      controller_instance.send(:preload_peer_review_sub_assignments, [non_assignment])
+    end
+
+    it "does not call preload for an empty collection" do
+      expect(ActiveRecord::Associations).not_to receive(:preload)
+      controller_instance.send(:preload_peer_review_sub_assignments, [])
+    end
+  end
 end

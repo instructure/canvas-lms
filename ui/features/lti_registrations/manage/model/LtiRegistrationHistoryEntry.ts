@@ -54,6 +54,7 @@ const RegistrationAttributesMask = {
   vendor: true,
   workflow_state: true,
   description: true,
+  lock_deploying: true,
 } as const
 
 export const ZLtiRegistrationAttributes = ZLtiRegistration.pick(RegistrationAttributesMask)

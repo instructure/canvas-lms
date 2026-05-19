@@ -63,8 +63,6 @@ const getMockProps = () => ({
 describe('CommentRow', () => {
   beforeEach(() => {
     global.ENV = {current_user: {id: '1'}}
-    global.ENV.FEATURES = {}
-    global.ENV.FEATURES.consolidated_media_player = false
   })
 
   it('should render', () => {
@@ -72,18 +70,10 @@ describe('CommentRow', () => {
     render(<CommentRow {...props} />)
   })
 
-  it('should use studio player when consolidated_media_player is enabled', () => {
-    global.ENV.FEATURES.consolidated_media_player = true
+  it('should use studio player', () => {
     const props = getMockProps()
     const {queryByTestId} = render(<CommentRow {...props} />)
     expect(queryByTestId('canvas-studio-player')).toBeInTheDocument()
-  })
-
-  it('should use media player when consolidated_media_player is disabled', () => {
-    const props = getMockProps()
-    const {queryByTestId, container} = render(<CommentRow {...props} />)
-    expect(queryByTestId('canvas-studio-player')).not.toBeInTheDocument()
-    expect(container.querySelector('video')).toBeInTheDocument()
   })
 
   it('should decode HTML entities in author shortName', () => {

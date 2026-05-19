@@ -63,8 +63,6 @@ module Polling
   class PollsController < ApplicationController
     include ::Filters::Polling
 
-    before_action :require_user
-
     # @API List polls
     #
     # Returns the paginated list of polls for the current user.

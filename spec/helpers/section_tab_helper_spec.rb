@@ -113,11 +113,11 @@ describe SectionTabHelper do
 
         it "returns a non-empty array" do
           expect(available_section_tabs.to_a).to be_a Array
-          expect(available_section_tabs.to_a).to_not be_empty
+          expect(available_section_tabs.to_a).not_to be_empty
         end
 
         it "excludes tabs without label & href elements" do
-          expect(available_section_tabs.to_a).to_not include(bad_tab)
+          expect(available_section_tabs.to_a).not_to include(bad_tab)
         end
 
         context "and SmartSearch is enabled" do
@@ -145,7 +145,57 @@ describe SectionTabHelper do
               course.set_feature_flag!(:smart_search, "on")
               tabs_with_ss = available_section_tabs.to_a
               smart_search_tab = tabs_with_ss.find { |tab| tab[:id] == Course::TAB_SEARCH }
-              expect(smart_search_tab).to_not be_nil
+              expect(smart_search_tab).not_to be_nil
+            end
+          end
+        end
+
+        context "and new_quizzes_native_experience flag changes" do
+          before do
+            allow(course).to receive(:tabs_available).and_call_original
+            course.set_feature_flag!(:new_quizzes_native_experience, "off")
+          end
+
+          let(:available_section_tabs) do
+            SectionTabHelperSpec::AvailableSectionTabs.new(
+              course, current_user, domain_root_account, session
+            )
+          end
+
+          it "uncaches tabs when new_quizzes_native_experience FF is updated" do
+            enable_cache do
+              expect(course).to receive(:tabs_available).twice.and_call_original
+              available_section_tabs.to_a
+              course.remove_instance_variable(:@tabs_available) if course.instance_variable_defined?(:@tabs_available)
+
+              course.set_feature_flag!(:new_quizzes_native_experience, "on")
+              available_section_tabs.to_a
+            end
+          end
+        end
+
+        context "when context is an Account" do
+          let_once(:account) { Account.default }
+          let_once(:account_admin) { account_admin_user(account:) }
+
+          let(:available_section_tabs) do
+            SectionTabHelperSpec::AvailableSectionTabs.new(
+              account, account_admin, domain_root_account, session
+            )
+          end
+
+          before do
+            allow(account).to receive(:tabs_available).and_call_original
+          end
+
+          it "includes feature flag states in cache key for accounts" do
+            enable_cache do
+              expect(account).to receive(:tabs_available).twice.and_call_original
+              account.set_feature_flag!(:smart_search, "off")
+              available_section_tabs.to_a
+
+              account.set_feature_flag!(:smart_search, "on")
+              available_section_tabs.to_a
             end
           end
         end
@@ -174,7 +224,7 @@ describe SectionTabHelper do
               course.set_feature_flag!(:youtube_migration, "on")
               tabs_with_ym = available_section_tabs.to_a
               youtube_migration_tab = tabs_with_ym.find { |tab| tab[:id] == Course::TAB_YOUTUBE_MIGRATION }
-              expect(youtube_migration_tab).to_not be_nil
+              expect(youtube_migration_tab).not_to be_nil
             end
           end
         end
@@ -205,7 +255,7 @@ describe SectionTabHelper do
               course.account.enable_feature!(:a11y_checker)
               tabs_with_a11y = available_section_tabs.to_a
               a11y_tab = tabs_with_a11y.find { |tab| tab[:id] == Course::TAB_ACCESSIBILITY }
-              expect(a11y_tab).to_not be_nil
+              expect(a11y_tab).not_to be_nil
             end
           end
 
@@ -223,7 +273,7 @@ describe SectionTabHelper do
               course.set_feature_flag!(:a11y_checker_eap, "on")
               tabs_with_a11y = available_section_tabs.to_a
               a11y_tab = tabs_with_a11y.find { |tab| tab[:id] == Course::TAB_ACCESSIBILITY }
-              expect(a11y_tab).to_not be_nil
+              expect(a11y_tab).not_to be_nil
             end
           end
         end
@@ -235,7 +285,7 @@ describe SectionTabHelper do
           end
 
           it "does not include TAB_CONFERENCES if !WebConference.config" do
-            expect(available_section_tabs.to_a.pluck(:id)).to_not include(Course::TAB_CONFERENCES)
+            expect(available_section_tabs.to_a.pluck(:id)).not_to include(Course::TAB_CONFERENCES)
           end
         end
 
@@ -250,7 +300,7 @@ describe SectionTabHelper do
 
           it "does not include TAB_PEOPLE if template?" do
             template_course.update!(template: true)
-            expect(tabs_available.to_a.pluck(:id)).to_not include(Course::TAB_PEOPLE)
+            expect(tabs_available.to_a.pluck(:id)).not_to include(Course::TAB_PEOPLE)
           end
         end
 
@@ -261,7 +311,7 @@ describe SectionTabHelper do
           end
 
           it "does not include TAB_COLLABORATIONS if !Collaboration.any_collaborations_configured?" do
-            expect(available_section_tabs.to_a.pluck(:id)).to_not include(Course::TAB_COLLABORATIONS)
+            expect(available_section_tabs.to_a.pluck(:id)).not_to include(Course::TAB_COLLABORATIONS)
           end
 
           it "does not include TAB_COLLABORATIONS when new_collaborations feature flag has been enabled" do

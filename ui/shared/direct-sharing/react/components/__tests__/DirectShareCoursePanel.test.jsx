@@ -27,15 +27,19 @@ import useModuleCourseSearchApi, {
 } from '../../effects/useModuleCourseSearchApi'
 import DirectShareCoursePanel from '../DirectShareCoursePanel'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const server = setupServer()
 
 vi.mock('../../effects/useManagedCourseSearchApi')
 vi.mock('../../effects/useModuleCourseSearchApi')
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: vi.fn().mockReturnValue(vi.fn()),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
 
 describe('DirectShareCoursePanel', () => {
   let ariaLive

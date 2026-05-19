@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../spec_helper"
 require_relative "../views_helper"
 
 describe "shared/_flash_notices" do
@@ -36,7 +35,7 @@ describe "shared/_flash_notices" do
 
   it "just uses the icon if flagged to not use login text" do
     render partial: "shared/auth_type_icon", locals: local_options(with_login_text: nil)
-    expect(rendered).to_not match("Login with Facebook")
+    expect(rendered).not_to match("Login with Facebook")
   end
 
   it "renders a screenreader message if provided" do
@@ -46,7 +45,7 @@ describe "shared/_flash_notices" do
 
   it "omits screenreader span if no message provided" do
     render partial: "shared/auth_type_icon", locals: local_options(sr_message: nil)
-    expect(rendered).to_not match("<span class=\"screenreader-only\">")
+    expect(rendered).not_to match("<span class=\"screenreader-only\">")
   end
 
   it "uses the button icon based on auth type" do

@@ -57,7 +57,7 @@ module Lti
       }.freeze
     ].freeze
 
-    skip_before_action :load_user
+    skip_before_action :load_user, :require_user
     before_action :authorized_lti2_tool, :verify_service_configured
 
     rescue_from Lti::SubscriptionsValidator::InvalidContextType do

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import AttemptInformation from './AttemptInformation'
 import AssignmentToggleDetails from '../AssignmentToggleDetails'
@@ -27,7 +27,7 @@ import ContentTabs from './ContentTabs'
 import Header from './Header'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import MarkAsDoneButton from './MarkAsDoneButton'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import MissingPrereqs from './MissingPrereqs'
 import DateLocked from '../DateLocked'
 import React, {Suspense, lazy, useContext, useEffect, useState} from 'react'
@@ -222,7 +222,7 @@ function renderContentBaseOnAvailability(
     return (
       <>
         <Flex margin="medium 0 0 0" alignItems="start">
-          <div style={{flexGrow: 1}}>
+          <div style={{flexGrow: 1, maxWidth: '100%'}} data-testid="student-content-flex-container">
             {/* EVAL-3711 Remove ICE Feature Flag */}
             {!window.ENV.FEATURES?.instui_nav &&
               !assignment.env.peerReviewModeEnabled &&
@@ -241,7 +241,11 @@ function renderContentBaseOnAvailability(
                   submission={{
                     submissionId: submission._id,
                     submissionType: submission.submissionType,
-                    ifLastAttemptIsNumber: submission.attempt,
+                    attempt: submission.attempt,
+                    attachmentId: submission.attachments?.[0]?._id,
+                    attachmentIds: submission.attachments?.[0]?._id
+                      ? [submission.attachments[0]._id]
+                      : undefined,
                   }}
                 />
               )

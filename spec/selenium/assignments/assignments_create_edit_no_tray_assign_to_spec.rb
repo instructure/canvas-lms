@@ -15,8 +15,8 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative "../common"
-require_relative "../../spec_helper"
 require_relative "page_objects/assignments_index_page"
 require_relative "page_objects/assignment_create_edit_page"
 require_relative "page_objects/assignment_page"
@@ -258,7 +258,7 @@ describe "override assignees" do
   context "group assignments", :ignore_js_errors do
     before :once do
       course_with_teacher(active_all: true)
-      group_test_setup(3, 3, 1, true)
+      group_test_setup(3, 3, 1, differentiate_groups: true)
       @normal_assignment = Assignment.create!(context: @course, title: "Normal Assignment")
       @group_assignment = Assignment.create!(context: @course, title: "Group Assignment", group_category_id: @group_category[0].id)
       override = @group_assignment.assignment_overrides.build

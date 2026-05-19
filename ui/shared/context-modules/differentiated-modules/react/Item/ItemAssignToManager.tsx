@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ItemAssignToTray, {type ItemAssignToTrayProps} from './ItemAssignToTray'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 
 export default function ItemAssignToManager({

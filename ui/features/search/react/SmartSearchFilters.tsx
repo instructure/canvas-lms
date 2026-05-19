@@ -24,7 +24,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Alert} from '@instructure/ui-alerts'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {getLiveRegion} from '@instructure/platform-instui-bindings'
 
 const I18n = createI18nScope('SmartSearch')
 

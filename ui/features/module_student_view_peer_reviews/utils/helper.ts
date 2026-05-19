@@ -64,7 +64,8 @@ export function formatAssignment(
   studentViewPeerReviewsAssignment: StudentViewPeerReviewsAssignment
 } | null {
   if (
-    (assessmentRequests.length === 0 && !ENV.FEATURES.peer_review_allocation_and_grading) ||
+    (assessmentRequests.length === 0 &&
+      !(ENV.FEATURES.peer_review_allocation_and_grading && peerReviewSubAssignment)) ||
     ENV.course_id == null
   )
     return null
@@ -88,6 +89,7 @@ export function formatAssignment(
           peer_review_count: count,
           peer_review_points_possible: pointsPossible,
           peer_review_due_at: peerReviewDueAt,
+          peer_review_sub_assignment: peerReviewSubAssignment ?? null,
         },
         container,
       },
@@ -136,18 +138,28 @@ export function formatGraphqlModuleNodes(
 }
 
 export async function getAssignments(courseId: string): Promise<Array<GraphQLModuleItemsNode>> {
-  return createClient()
-    .query({
+  const client = createClient()
+  const allNodes: GraphQLModuleItemsNode[] = []
+  let cursor: string | null = null
+
+  do {
+    const response: GraphQLResponse = await client.query({
       query: ASSIGNMENT_QUERY,
-      variables: {courseId},
+      variables: {courseId, cursor},
     })
-    .then((response: GraphQLResponse) => {
-      const queryResponse = response && response.data && response.data.course
 
-      if (queryResponse) {
-        const moduleItemNodes = queryResponse?.modulesConnection?.nodes
+    const queryResponse = response?.data?.course
+    if (!queryResponse) {
+      break
+    }
 
-        if (moduleItemNodes != null) return moduleItemNodes
-      }
-    })
+    const connection = queryResponse.modulesConnection
+    if (connection?.nodes) {
+      allNodes.push(...connection.nodes)
+    }
+
+    cursor = connection?.pageInfo?.hasNextPage ? connection.pageInfo.endCursor : null
+  } while (cursor)
+
+  return allNodes
 }

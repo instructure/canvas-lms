@@ -26,9 +26,9 @@ import {
 } from '@canvas/outcomes/mocks/Outcomes'
 import {createCache} from '@canvas/apollo-v3'
 import {windowConfirm} from '@canvas/util/globalUtils'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 
-vi.mock('@canvas/query', () => ({
+vi.mock('@instructure/platform-query', () => ({
   useAllPages: vi.fn(),
 }))
 

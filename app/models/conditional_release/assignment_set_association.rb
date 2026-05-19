@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module ConditionalRelease
-  class AssignmentSetAssociation < ActiveRecord::Base
+  class AssignmentSetAssociation < ApplicationRecord
     include Deletion
 
     validates :assignment_id, presence: true

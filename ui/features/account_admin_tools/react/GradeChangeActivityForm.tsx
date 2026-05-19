@@ -20,6 +20,7 @@ import React, {useRef} from 'react'
 import {Controller, useForm, type SubmitHandler} from 'react-hook-form'
 import * as z from 'zod'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {Heading} from '@instructure/ui-heading'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {zodResolver} from '@hookform/resolvers/zod'
@@ -46,7 +47,7 @@ const defaultValues = {
   end_time: undefined,
 }
 
-const validationSchema = z
+const baseValidationSchema = z
   .object({
     grader_id: z.string().optional(),
     student_id: z.string().optional(),
@@ -55,14 +56,6 @@ const validationSchema = z
     start_time: z.string().optional(),
     end_time: z.string().optional(),
   })
-  .refine(
-    ({grader_id, student_id, course_id, assignment_id}) =>
-      grader_id || student_id || course_id || assignment_id,
-    () => ({
-      message: I18n.t('Please enter at least one field.'),
-      path: ['grader_id'],
-    }),
-  )
   .refine(
     ({start_time, end_time}) => {
       if (!start_time || !end_time) return true
@@ -77,7 +70,25 @@ const validationSchema = z
     }),
   )
 
-type FormValues = z.infer<typeof validationSchema>
+const validationSchemaForSub = baseValidationSchema.refine(
+  ({assignment_id, course_id}) => assignment_id || course_id,
+  () => ({
+    message: I18n.t('Please enter either course or assignment ID.'),
+    path: ['course_id'],
+  }),
+)
+
+const validationSchemaForRoot = baseValidationSchema.refine(
+  ({grader_id, student_id, course_id, assignment_id}) =>
+    grader_id || student_id || course_id || assignment_id,
+  () => ({
+    message: I18n.t('Please enter at least one field.'),
+    path: ['grader_id'],
+  }),
+)
+
+type FormValuesForRoot = z.infer<typeof validationSchemaForRoot>
+type FormValuesForSub = z.infer<typeof validationSchemaForSub>
 
 type User = {
   id: string
@@ -90,29 +101,47 @@ type Course = {
   course_code: string
 }
 
-export interface GradeChangeActivityFormProps {
-  accountId: string
-  onSubmit: (data: FormValues) => void
+type SearchInputs = {
+  course: JSX.Element
+  grader: JSX.Element
+  student: JSX.Element
+  assignment: JSX.Element
 }
 
-const GradeChangeActivityForm = ({accountId, onSubmit}: GradeChangeActivityFormProps) => {
+export interface GradeChangeActivityFormProps {
+  accountId: string
+  onSubmit: (data: FormValuesForRoot | FormValuesForSub) => void
+  searchAsSubaccount: boolean
+}
+
+const GradeChangeActivityForm = ({
+  accountId,
+  onSubmit,
+  searchAsSubaccount,
+}: GradeChangeActivityFormProps) => {
   const {
     control,
     formState: {errors},
     handleSubmit,
     setFocus,
-  } = useForm({defaultValues, resolver: zodResolver(validationSchema)})
+  } = useForm({
+    defaultValues,
+    resolver: zodResolver(searchAsSubaccount ? validationSchemaForSub : validationSchemaForRoot),
+  })
   const startDateInputRef = useRef<DateTimeInput>(null)
   const endDateInputRef = useRef<DateTimeInput>(null)
   const buttonText = I18n.t('Search Logs')
-  const searchCriteriaErrorMessage = getFormErrorMessage(errors, 'grader_id')
+  const searchCriteriaErrorMessage = getFormErrorMessage(
+    errors,
+    searchAsSubaccount ? 'course_id' : 'grader_id',
+  )
   const searchCriteriaHintMessages = [
     {text: I18n.t('Enter at least one.') as string, type: 'hint'} as const,
   ]
   const searchCriteriaMessages =
     searchCriteriaErrorMessage.length > 0 ? searchCriteriaErrorMessage : searchCriteriaHintMessages
 
-  const handleFormSubmit: SubmitHandler<FormValues> = async data => {
+  const handleFormSubmit: SubmitHandler<FormValuesForRoot | FormValuesForSub> = async data => {
     if (isDateTimeInputInvalid(startDateInputRef)) {
       setFocus('start_time')
       return
@@ -126,6 +155,160 @@ const GradeChangeActivityForm = ({accountId, onSubmit}: GradeChangeActivityFormP
     onSubmit(data)
   }
 
+  const buildSearchInputs = (): SearchInputs => {
+    return {
+      grader: (
+        <Controller
+          name="grader_id"
+          control={control}
+          rules={{deps: ['assignment_id', 'course_id', 'student_id']}}
+          render={({field: {ref, ...fieldWithoutRef}}) => (
+            <AutoCompleteSelect<User>
+              {...fieldWithoutRef}
+              maxLength={255}
+              inputRef={ref}
+              renderLabel={I18n.t('Grader')}
+              placeholder={I18n.t('Search by name or ID')}
+              assistiveText={I18n.t('Type to search')}
+              url={`/api/v1/accounts/${accountId}/users`}
+              renderOptionLabel={option => option.name}
+              renderBeforeInput={<IconUserSolid inline={false} />}
+              onInputChange={event => {
+                fieldWithoutRef.onChange(event)
+              }}
+              onRequestSelectOption={(_, {id}) => {
+                fieldWithoutRef.onChange(id)
+              }}
+              overrideSelectOptionProps={{
+                renderBeforeLabel: <IconUserSolid inline={false} />,
+              }}
+            />
+          )}
+        />
+      ),
+      student: (
+        <Controller
+          name="student_id"
+          control={control}
+          rules={{deps: ['assignment_id', 'course_id', 'grader_id']}}
+          render={({field: {ref, ...fieldWithoutRef}}) => (
+            <AutoCompleteSelect<User>
+              {...fieldWithoutRef}
+              maxLength={255}
+              inputRef={ref}
+              renderLabel={I18n.t('Student')}
+              placeholder={I18n.t('Search by name or ID')}
+              assistiveText={I18n.t('Type to search')}
+              url={`/api/v1/accounts/${accountId}/users`}
+              renderOptionLabel={option => option.name}
+              renderBeforeInput={<IconUserSolid inline={false} />}
+              messages={getFormErrorMessage(errors, 'student_id')}
+              onInputChange={event => {
+                fieldWithoutRef.onChange(event)
+              }}
+              onRequestSelectOption={(_, {id}) => {
+                fieldWithoutRef.onChange(id)
+              }}
+              overrideSelectOptionProps={{
+                renderBeforeLabel: <IconUserSolid inline={false} />,
+              }}
+            />
+          )}
+        />
+      ),
+      course: (
+        <Controller
+          name="course_id"
+          control={control}
+          rules={{deps: ['assignment_id', 'student_id', 'grader_id']}}
+          render={({field: {ref, ...fieldWithoutRef}}) => (
+            <AutoCompleteSelect<Course>
+              {...fieldWithoutRef}
+              maxLength={255}
+              inputRef={ref}
+              renderLabel={I18n.t('Course')}
+              placeholder={I18n.t('Search by name or ID')}
+              url={`/api/v1/accounts/${accountId}/courses`}
+              renderOptionLabel={option => `${option.id} - ${option.name} - ${option.course_code}`}
+              renderBeforeInput={<IconCoursesSolid inline={false} />}
+              fetchParams={{'state[]': 'all'}}
+              onInputChange={event => {
+                fieldWithoutRef.onChange(event)
+              }}
+              onRequestSelectOption={(_, {id}) => {
+                fieldWithoutRef.onChange(id)
+              }}
+              overrideSelectOptionProps={{
+                renderBeforeLabel: <IconCoursesSolid inline={false} />,
+              }}
+            />
+          )}
+        />
+      ),
+      assignment: (
+        <Controller
+          name="assignment_id"
+          control={control}
+          rules={{deps: ['course_id', 'student_id', 'grader_id']}}
+          render={({field}) => (
+            <TextInput
+              {...field}
+              renderLabel={I18n.t('Assignment ID')}
+              placeholder={I18n.t('Enter assignment ID')}
+              messages={getFormErrorMessage(errors, 'assignment_id')}
+            />
+          )}
+        />
+      ),
+    }
+  }
+  const searchCriteriaForRoot = () => {
+    const searchInputs = buildSearchInputs()
+    return (
+      <FieldGroup
+        title={I18n.t('Search Criteria')}
+        isRequired={true}
+        messages={searchCriteriaMessages}
+      >
+        <Grid>
+          <Grid.Row>
+            <Grid.Col>{searchInputs.grader}</Grid.Col>
+            <Grid.Col>{searchInputs.student}</Grid.Col>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Col>{searchInputs.course}</Grid.Col>
+            <Grid.Col>{searchInputs.assignment}</Grid.Col>
+          </Grid.Row>
+        </Grid>
+      </FieldGroup>
+    )
+  }
+  const searchCriteriaForSub = () => {
+    const searchInputs = buildSearchInputs()
+    return (
+      <FieldGroup
+        title={I18n.t('Search by Course or Assignment ID')}
+        isRequired={true}
+        messages={searchCriteriaMessages}
+      >
+        <Grid>
+          <Grid.Row>
+            <Grid.Col>{searchInputs.course}</Grid.Col>
+            <Grid.Col>{searchInputs.assignment}</Grid.Col>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Col>
+              <Heading variant="titleCardRegular">{I18n.t('Additional Filters')}</Heading>
+            </Grid.Col>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Col>{searchInputs.grader}</Grid.Col>
+            <Grid.Col>{searchInputs.student}</Grid.Col>
+          </Grid.Row>
+        </Grid>
+      </FieldGroup>
+    )
+  }
   return (
     <form
       aria-label={I18n.t('Grade Change Activity Form')}
@@ -133,124 +316,7 @@ const GradeChangeActivityForm = ({accountId, onSubmit}: GradeChangeActivityFormP
       onSubmit={handleSubmit(handleFormSubmit)}
     >
       <Flex direction="column" gap="large">
-        <FieldGroup
-          title={I18n.t('Search Criteria')}
-          isRequired={true}
-          messages={searchCriteriaMessages}
-        >
-          <Grid>
-            <Grid.Row>
-              <Grid.Col>
-                <Controller
-                  name="grader_id"
-                  control={control}
-                  rules={{deps: ['assignment_id', 'course_id', 'student_id']}}
-                  render={({field: {ref, ...fieldWithoutRef}}) => (
-                    <AutoCompleteSelect<User>
-                      {...fieldWithoutRef}
-                      maxLength={255}
-                      inputRef={ref}
-                      renderLabel={I18n.t('Grader')}
-                      placeholder={I18n.t('Search by name or ID')}
-                      assistiveText={I18n.t('Type to search')}
-                      url={`/api/v1/accounts/${accountId}/users`}
-                      renderOptionLabel={option => option.name}
-                      renderBeforeInput={<IconUserSolid inline={false} />}
-                      onInputChange={event => {
-                        fieldWithoutRef.onChange(event)
-                      }}
-                      onRequestSelectOption={(_, {id}) => {
-                        fieldWithoutRef.onChange(id)
-                      }}
-                      overrideSelectOptionProps={{
-                        renderBeforeLabel: <IconUserSolid inline={false} />,
-                      }}
-                    />
-                  )}
-                />
-              </Grid.Col>
-              <Grid.Col>
-                <Controller
-                  name="student_id"
-                  control={control}
-                  rules={{deps: ['assignment_id', 'course_id', 'grader_id']}}
-                  render={({field: {ref, ...fieldWithoutRef}}) => (
-                    <AutoCompleteSelect<User>
-                      {...fieldWithoutRef}
-                      maxLength={255}
-                      inputRef={ref}
-                      renderLabel={I18n.t('Student')}
-                      placeholder={I18n.t('Search by name or ID')}
-                      assistiveText={I18n.t('Type to search')}
-                      url={`/api/v1/accounts/${accountId}/users`}
-                      renderOptionLabel={option => option.name}
-                      renderBeforeInput={<IconUserSolid inline={false} />}
-                      messages={getFormErrorMessage(errors, 'student_id')}
-                      onInputChange={event => {
-                        fieldWithoutRef.onChange(event)
-                      }}
-                      onRequestSelectOption={(_, {id}) => {
-                        fieldWithoutRef.onChange(id)
-                      }}
-                      overrideSelectOptionProps={{
-                        renderBeforeLabel: <IconUserSolid inline={false} />,
-                      }}
-                    />
-                  )}
-                />
-              </Grid.Col>
-            </Grid.Row>
-            <Grid.Row>
-              <Grid.Col>
-                <Controller
-                  name="course_id"
-                  control={control}
-                  rules={{deps: ['assignment_id', 'student_id', 'grader_id']}}
-                  render={({field: {ref, ...fieldWithoutRef}}) => (
-                    <AutoCompleteSelect<Course>
-                      {...fieldWithoutRef}
-                      maxLength={255}
-                      inputRef={ref}
-                      renderLabel={I18n.t('Course')}
-                      placeholder={I18n.t('Search by name or ID')}
-                      url={`/api/v1/accounts/${accountId}/courses`}
-                      renderOptionLabel={option =>
-                        `${option.id} - ${option.name} - ${option.course_code}`
-                      }
-                      renderBeforeInput={<IconCoursesSolid inline={false} />}
-                      messages={getFormErrorMessage(errors, 'course_id')}
-                      fetchParams={{'state[]': 'all'}}
-                      onInputChange={event => {
-                        fieldWithoutRef.onChange(event)
-                      }}
-                      onRequestSelectOption={(_, {id}) => {
-                        fieldWithoutRef.onChange(id)
-                      }}
-                      overrideSelectOptionProps={{
-                        renderBeforeLabel: <IconCoursesSolid inline={false} />,
-                      }}
-                    />
-                  )}
-                />
-              </Grid.Col>
-              <Grid.Col>
-                <Controller
-                  name="assignment_id"
-                  control={control}
-                  rules={{deps: ['course_id', 'student_id', 'grader_id']}}
-                  render={({field}) => (
-                    <TextInput
-                      {...field}
-                      renderLabel={I18n.t('Assignment ID')}
-                      placeholder={I18n.t('Enter assignment ID')}
-                      messages={getFormErrorMessage(errors, 'assignment_id')}
-                    />
-                  )}
-                />
-              </Grid.Col>
-            </Grid.Row>
-          </Grid>
-        </FieldGroup>
+        {searchAsSubaccount ? searchCriteriaForSub() : searchCriteriaForRoot()}
         <FieldGroup
           title={I18n.t('Time Range')}
           messages={[{text: I18n.t('Optional.'), type: 'hint'}]}

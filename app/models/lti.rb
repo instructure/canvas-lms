@@ -24,4 +24,6 @@ module Lti
 
   V1P3 = "1.3"
   V1P1 = "1.1"
+
+  class LocalAppNotFound < StandardError; end
 end

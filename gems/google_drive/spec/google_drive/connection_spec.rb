@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe GoogleDrive::Connection do
   let(:connection) { GoogleDrive::Connection.new(token, secret, retries: 1) }
   let(:token) { "token" }

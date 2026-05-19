@@ -38,7 +38,7 @@ import {MigrationInfoAlert} from './MigrationInfoAlert'
 import {MigrationRow} from './MigrationRow'
 import {MigrationEmailNotification} from './MigrationEmailNotification'
 import {validateEmailForNewUser} from '@canvas/add-people/react/helpers'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('lti_registrations')
 

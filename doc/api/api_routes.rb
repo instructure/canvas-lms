@@ -43,7 +43,7 @@ if CanvasRails::Application.routes_reloader.paths.empty?
 else
   # we're probably running in spring, and Rails has already loaded them; make
   # sure they're up to date
-  CanvasRails::Application.routes_reloader.reload!
+  CanvasRails::Application.reload_routes!
 end
 
 # Extend YARD to generate our API documentation

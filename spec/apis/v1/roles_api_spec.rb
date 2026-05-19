@@ -218,7 +218,7 @@ describe "Roles API", type: :request do
       json = api_call_with_settings(base_role_type:, explicit: "1", enabled: "1")
       @account.reload
 
-      expect(@account.available_account_roles.map(&:name)).to_not include(@role_name)
+      expect(@account.available_account_roles.map(&:name)).not_to include(@role_name)
       expect(@account.roles.count).to eq 1
       new_role = @account.roles.first
       expect(new_role.name).to eq @role_name
@@ -304,7 +304,7 @@ describe "Roles API", type: :request do
 
       it "does not recycle a deleted role" do
         @role.destroy
-        expect(@account.roles.active.map(&:name)).to_not include @role_name
+        expect(@account.roles.active.map(&:name)).not_to include @role_name
 
         json = api_call(:post,
                         "/api/v1/accounts/#{@account.id}/roles",
@@ -315,7 +315,7 @@ describe "Roles API", type: :request do
                         { role: @role_name, base_role_type: "TeacherEnrollment" })
 
         new_role = Role.where(id: json["id"]).first
-        expect(@role.id).to_not eq new_role.id
+        expect(@role.id).not_to eq new_role.id
       end
     end
 
@@ -370,7 +370,7 @@ describe "Roles API", type: :request do
       api_call_with_settings(explicit: "1", enabled: "0")
       expect(@account.role_overrides.reload.size).to eq @initial_count + 1
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(override.enabled).to be_falsey
     end
 
@@ -378,7 +378,7 @@ describe "Roles API", type: :request do
       api_call_with_settings(base_role_type: "TeacherEnrollment", explicit: "1", enabled: "0")
       expect(@account.role_overrides.reload.size).to eq @initial_count + 1
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(override.enabled).to be_falsey
     end
 
@@ -386,14 +386,14 @@ describe "Roles API", type: :request do
       api_call_with_settings(locked: "1")
       expect(@account.role_overrides.reload.size).to eq @initial_count + 1
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(override.locked).to be_truthy
     end
 
     it "sets applies to descendents" do
       json = api_call_with_settings(enabled: "1", explicit: "1", applies_to_descendants: "0")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(json["permissions"][@permission]["applies_to_self"]).to be true
       expect(json["permissions"][@permission]["applies_to_descendants"]).to be false
       expect(override.applies_to_self).to be true
@@ -403,7 +403,7 @@ describe "Roles API", type: :request do
     it "sets applies to self" do
       json = api_call_with_settings(enabled: "1", explicit: "1", applies_to_self: "0")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(json["permissions"][@permission]["applies_to_self"]).to be false
       expect(json["permissions"][@permission]["applies_to_descendants"]).to be true
       expect(override.applies_to_self).to be false
@@ -423,7 +423,7 @@ describe "Roles API", type: :request do
       sub = @account.sub_accounts.create!
       json = api_call_with_settings(enabled: "1", explicit: "1", applies_to_descendants: "1", applies_to_self: "0")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(json["permissions"][@permission]["applies_to_self"]).to be false
       expect(json["permissions"][@permission]["applies_to_descendants"]).to be true
       expect(override.applies_to_self).to be false
@@ -445,7 +445,7 @@ describe "Roles API", type: :request do
       sub = @account.sub_accounts.create!
       json = api_call_with_settings(enabled: "1", explicit: "1", applies_to_descendants: "0", applies_to_self: "1")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(json["permissions"][@permission]["applies_to_self"]).to be true
       expect(json["permissions"][@permission]["applies_to_descendants"]).to be false
       expect(override.applies_to_self).to be true
@@ -465,7 +465,7 @@ describe "Roles API", type: :request do
     it "only sets the parts that are specified" do
       api_call_with_settings(explicit: "1", enabled: "0")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(override.enabled).to be false
       expect(override.locked).to be false
 
@@ -476,7 +476,7 @@ describe "Roles API", type: :request do
 
       api_call_with_settings(locked: "1")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(override.enabled).to be true
       expect(override.locked).to be true
     end
@@ -502,7 +502,7 @@ describe "Roles API", type: :request do
       expect(override).to be_nil
 
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
     end
 
     describe "json response" do

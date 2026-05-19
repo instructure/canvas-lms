@@ -27,7 +27,7 @@ import {
   ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
   COURSE_OUTCOME_PROFICIENCY_QUERY,
 } from '@canvas/outcomes/graphql/MasteryScale'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 import {executeQuery} from '@canvas/graphql'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 

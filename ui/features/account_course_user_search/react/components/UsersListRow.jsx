@@ -43,6 +43,7 @@ export default function UsersListRow({
   handleSubmitEditUserForm,
   roles,
   includeDeletedUsers,
+  temporaryEnrollmentStatus,
 }) {
   const [openModal, setOpenModal] = useState(false)
 
@@ -71,6 +72,7 @@ export default function UsersListRow({
             permissions,
             handleSubmitEditUserForm,
             roles,
+            temporaryEnrollmentStatus,
           })}
         {permissions.can_masquerade && (
           <Tooltip
@@ -176,6 +178,11 @@ UsersListRow.propTypes = {
     }),
   ).isRequired,
   includeDeletedUsers: bool,
+  temporaryEnrollmentStatus: shape({
+    is_provider: bool,
+    is_recipient: bool,
+    can_provide: bool,
+  }),
 }
 
 UsersListRow.displayName = 'Row'

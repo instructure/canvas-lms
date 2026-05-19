@@ -18,31 +18,118 @@
 
 import '@testing-library/jest-dom'
 import {cleanup} from '@testing-library/react'
-import {vi, afterEach} from 'vitest'
+import {vi, afterEach, beforeEach} from 'vitest'
 import $ from 'jquery'
+import axios from 'axios'
+
+// In CI there is no dev server. Axios XHR requests to Canvas API endpoints fail
+// immediately with ECONNREFUSED, causing optimistic Redux store updates to revert
+// before waitFor can check them. jsdom logs the ECONNREFUSED error via console.error
+// (at xhr-utils.js:63) BEFORE the XHR error event fires and axios processes it.
+// We intercept console.error to count pending ECONNREFUSED errors, then absorb the
+// matching ERR_NETWORK from axios. MSW's HttpResponse.error() never goes through the
+// jsdom TCP layer so it does NOT trigger console.error — those errors propagate normally.
+let pendingEconnrefusedCount = 0
+const _originalConsoleError = console.error.bind(console)
+console.error = (...args: unknown[]) => {
+  const first = args[0]
+  const msg = first instanceof Error ? first.message : String(first ?? '')
+  if (msg.includes('ECONNREFUSED')) {
+    pendingEconnrefusedCount++
+  }
+  _originalConsoleError(...args)
+}
+
+axios.interceptors.response.use(
+  response => response,
+  (error: {code?: string}) => {
+    if (error?.code === 'ERR_NETWORK' && pendingEconnrefusedCount > 0) {
+      pendingEconnrefusedCount--
+      return new Promise(() => {})
+    }
+    return Promise.reject(error)
+  },
+)
 
 // Track all timers created during tests so we can clean them up
 // This prevents memory leaks from InstUI transitions and other timer-based code
 const pendingTimeouts = new Set<ReturnType<typeof setTimeout>>()
 const pendingIntervals = new Set<ReturnType<typeof setInterval>>()
 
+// Track all MutationObservers so we can disconnect them in afterEach.
+// InstUI v11 ScreenReaderFocusRegion uses a MutationObserver that fires
+// asynchronously. If it fires after jsdom tears down the environment, it
+// throws "ReferenceError: Element is not defined" because the observer
+// callback checks `elem instanceof Element`. Disconnecting all observers
+// before the environment tears down prevents this.
+const activeMutationObservers = new Set<MutationObserver>()
+const OriginalMutationObserver = globalThis.MutationObserver
+class TrackedMutationObserver extends OriginalMutationObserver {
+  constructor(callback: MutationCallback) {
+    super(callback)
+    activeMutationObservers.add(this)
+  }
+
+  disconnect() {
+    activeMutationObservers.delete(this)
+    super.disconnect()
+  }
+}
+globalThis.MutationObserver = TrackedMutationObserver as unknown as typeof MutationObserver
+
 const originalSetTimeout = globalThis.setTimeout
 const originalSetInterval = globalThis.setInterval
 const originalClearTimeout = globalThis.clearTimeout
 const originalClearInterval = globalThis.clearInterval
+// setImmediate is a Node.js global used by React's scheduler. We wrap it
+// here so that scheduler callbacks that fire after jsdom environment
+// teardown are dropped instead of crashing with "ReferenceError: window is not defined".
+const originalSetImmediate = typeof setImmediate !== 'undefined' ? setImmediate : undefined
+const originalClearImmediate = typeof clearImmediate !== 'undefined' ? clearImmediate : undefined
+const pendingImmediates = new Set<NodeJS.Immediate>()
 
-// Wrap setTimeout to track pending timers
-globalThis.setTimeout = ((callback: (...args: unknown[]) => void, ms?: number, ...args: unknown[]) => {
+// Wrap setTimeout to track pending timers.
+// The document guard prevents InstUI BaseTransition callbacks from throwing
+// "ReferenceError: document is not defined" when a timer fires after the
+// jsdom environment has been torn down at the end of the test run.
+globalThis.setTimeout = ((
+  callback: (...args: unknown[]) => void,
+  ms?: number,
+  ...args: unknown[]
+) => {
   const id = originalSetTimeout(() => {
     pendingTimeouts.delete(id)
+
+    if (typeof (globalThis as any).document === 'undefined') return
     callback(...args)
   }, ms)
   pendingTimeouts.add(id)
   return id
 }) as typeof setTimeout
 
+// Wrap setImmediate to guard against React scheduler callbacks firing after
+// jsdom tears down the environment. React's scheduler (scheduler.development.js)
+// captures setImmediate at module-load time and uses it to schedule concurrent
+// work. If that work fires after jsdom removes window/document from scope,
+// react-dom throws "ReferenceError: window is not defined" in getActiveElementDeep.
+if (originalSetImmediate) {
+  globalThis.setImmediate = ((callback: (...args: unknown[]) => void, ...args: unknown[]) => {
+    const id: NodeJS.Immediate = originalSetImmediate(() => {
+      pendingImmediates.delete(id)
+      if (typeof document === 'undefined') return
+      callback(...args)
+    })
+    pendingImmediates.add(id)
+    return id
+  }) as typeof setImmediate
+}
+
 // Wrap setInterval to track pending intervals
-globalThis.setInterval = ((callback: (...args: unknown[]) => void, ms?: number, ...args: unknown[]) => {
+globalThis.setInterval = ((
+  callback: (...args: unknown[]) => void,
+  ms?: number,
+  ...args: unknown[]
+) => {
   const id = originalSetInterval(callback, ms, ...args)
   pendingIntervals.add(id)
   return id
@@ -64,6 +151,21 @@ globalThis.clearInterval = ((id?: ReturnType<typeof setInterval>) => {
   }
 }) as typeof clearInterval
 
+// Wrap clearImmediate to remove from tracking
+if (originalClearImmediate) {
+  globalThis.clearImmediate = (id?: NodeJS.Immediate) => {
+    if (id !== undefined) {
+      pendingImmediates.delete(id!)
+      originalClearImmediate(id)
+    }
+  }
+}
+
+// Reset ECONNREFUSED counter before each test to prevent test interference
+beforeEach(() => {
+  pendingEconnrefusedCount = 0
+})
+
 // Global cleanup after each test to prevent memory leaks and timer issues
 // This is especially important for InstUI components that use transitions with setTimeout
 afterEach(() => {
@@ -83,6 +185,22 @@ afterEach(() => {
     originalClearInterval(id)
   }
   pendingIntervals.clear()
+
+  // Clear pending setImmediate callbacks — React's scheduler uses setImmediate
+  // in Node/jsdom and any uncleared callbacks can fire after environment teardown
+  if (originalClearImmediate) {
+    for (const id of pendingImmediates) {
+      originalClearImmediate(id)
+    }
+    pendingImmediates.clear()
+  }
+
+  // Disconnect all MutationObservers to prevent InstUI ScreenReaderFocusRegion
+  // callbacks from firing after jsdom tears down the environment globals.
+  for (const observer of activeMutationObservers) {
+    observer.disconnect()
+  }
+  activeMutationObservers.clear()
 })
 
 // jQuery plugins (toJSON, dialog, droppable, etc.) are added via the jquery-with-plugins.ts wrapper
@@ -246,6 +364,7 @@ const ignoredErrors = [
   /Warning: ReactDOM.render is no longer supported in React 18/,
   /Warning: ReactDOMTestUtils is deprecated/,
   /Warning: %s: Support for defaultProps will be removed/,
+  /`ref` is not a prop\. Trying to access it will result in `undefined` being returned/,
 ]
 const ignoredWarnings = [
   /JQMIGRATE:/,
@@ -254,10 +373,9 @@ const ignoredWarnings = [
   /No more mocked responses for the query/,
   /Consumer uses the legacy contextTypes API/,
   /Warning: ReactDOM.render is no longer supported in React 18/,
+  /`ref` is not a prop\. Trying to access it will result in `undefined` being returned/,
 ]
-const ignoredLogs = [
-  /JQMIGRATE:/,
-]
+const ignoredLogs = [/JQMIGRATE:/]
 const originalError = console.error
 const originalWarn = console.warn
 const originalLog = console.log
@@ -356,10 +474,18 @@ if (!window.HTMLElement.prototype.scrollIntoView) {
 // Fullscreen API mock - needed for media player tests
 // jsdom doesn't implement the Fullscreen API
 if (!document.fullscreenEnabled) {
-  Object.defineProperty(document, 'fullscreenEnabled', {value: true, writable: true, configurable: true})
+  Object.defineProperty(document, 'fullscreenEnabled', {
+    value: true,
+    writable: true,
+    configurable: true,
+  })
 }
 if (!document.fullscreenElement) {
-  Object.defineProperty(document, 'fullscreenElement', {value: null, writable: true, configurable: true})
+  Object.defineProperty(document, 'fullscreenElement', {
+    value: null,
+    writable: true,
+    configurable: true,
+  })
 }
 if (!document.exitFullscreen) {
   document.exitFullscreen = vi.fn().mockResolvedValue(undefined)
@@ -369,7 +495,11 @@ if (!HTMLElement.prototype.requestFullscreen) {
 }
 // Safari-specific fullscreen API
 if (!(document as any).webkitFullscreenEnabled) {
-  Object.defineProperty(document, 'webkitFullscreenEnabled', {value: true, writable: true, configurable: true})
+  Object.defineProperty(document, 'webkitFullscreenEnabled', {
+    value: true,
+    writable: true,
+    configurable: true,
+  })
 }
 if (!(HTMLVideoElement.prototype as any).webkitEnterFullscreen) {
   ;(HTMLVideoElement.prototype as any).webkitEnterFullscreen = vi.fn()

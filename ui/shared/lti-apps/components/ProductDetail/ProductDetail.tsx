@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
 import {pickPreferredIntegration} from '@canvas/lti-apps/utils/pickPreferredIntegration'
@@ -41,8 +43,10 @@ import React, {useState, useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
 import {useAppendBreadcrumb} from '../../../breadcrumbs/useAppendBreadcrumb'
 import type {Product} from '../../models/Product'
+import type {LtiRegistration} from '../../models/LtiRegistration'
 import useProduct from '../../queries/useProduct'
 import useSimilarProducts from '../../queries/useSimilarProducts'
+import useInstallStatus from '../../queries/useInstallStatus'
 import ImageCarouselModal from '../common/Carousels/ImageCarouselModal'
 import ProductCarousel from '../common/Carousels/ProductCarousel'
 import Disclaimer from '../common/Disclaimer'
@@ -51,14 +55,29 @@ import {stripHtmlTags} from '../common/stripHtmlTags'
 import ExternalLinks from './ExternalLinks'
 import IntegrationDetailModal from './IntegrationDetailModal'
 import LtiConfigurationDetail from './LtiConfigurationDetail'
+import InstalledBadge from './InstalledBadge'
+import {Alert} from '@instructure/ui-alerts'
+import {UseQueryResult} from '@tanstack/react-query'
 
 const I18n = createI18nScope('lti_registrations')
 
 type ProductDetailProps = {
-  renderConfigureButton?: (buttonWidth: 'block' | 'inline-block', product: Product) => JSX.Element
+  renderConfigureButton?: (
+    buttonWidth: 'block' | 'inline-block',
+    product: Product,
+    installStatus?: LtiRegistration | null,
+    installStatusLoading?: boolean,
+  ) => JSX.Element
 }
 
-const ProductDetail = (props: ProductDetailProps) => {
+type ProductDetailDisplayProps = ProductDetailProps & {
+  product: Product
+  installStatus: UseQueryResult<LtiRegistration | null, Error>
+  otherProductsByCompany: Product[]
+}
+
+const ProductDetailDisplay = (props: ProductDetailDisplayProps) => {
+  const {product, installStatus, otherProductsByCompany, renderConfigureButton} = props
   const [isImageModalOpen, setImageModalOpen] = useState(false)
   const [imageModalScreenshots, setImageModalScreenshots] = useState<string[]>([])
   const [isIntDetailModalOpen, setIntDetailModalOpen] = useState(false)
@@ -67,50 +86,10 @@ const ProductDetail = (props: ProductDetailProps) => {
   const [isTruncated, setIsTruncated] = useState(false)
   const [showTrucatedDescription, setShowTruncatedDescription] = useState(true)
 
-  const location = useLocation()
-
-  const currentProductId = location.pathname.replace('/product_detail/', '')
   const {isDesktop, isMobile, isMaxMobile, isMaxTablet} = useBreakpoints()
-  const previousPathRegexp = window.location.pathname.replace(/\product_detail.*/, '')
-  const previousPath = previousPathRegexp.endsWith(`${instructorAppsRoute}/`)
-    ? `${previousPathRegexp.slice(0, -1)}#tab-apps`
-    : previousPathRegexp
+  const productDescription = stripHtmlTags(product.description)
 
-  const {product, isLoading, isError} = useProduct({
-    productId: currentProductId,
-  })
-  useAppendBreadcrumb(product?.name ?? '', previousPath, !!product?.name)
-  const productDescription = stripHtmlTags(product?.description ?? '')
-
-  useEffect(() => {
-    if (window.pendo && typeof window.pendo.track === 'function' && product?.id && product?.name) {
-      window.pendo.track('Product', {
-        productId: product.id,
-        productName: product.name,
-        source: 'canvas-apps',
-        placement: 'standard',
-      })
-    }
-  }, [product?.id, product?.name])
-
-  const {otherProductsByCompany} = useSimilarProducts({
-    params: {
-      filters: {
-        companies: [{id: product?.company.id.toString(), name: product?.company.name}],
-      },
-    },
-    product,
-  })
-
-  const ErrorPage = () => {
-    return <GenericErrorPage errorMessage={I18n.t('Error loading product details')} />
-  }
-
-  const excludeCurrentProduct = otherProductsByCompany?.tools.filter(
-    (otherProducts: Product) => otherProducts.global_product_id !== currentProductId,
-  )
-
-  const ltiConfiguration = product?.canvas_lti_configurations
+  const ltiConfiguration = product.canvas_lti_configurations
   const relevantIntegration = pickPreferredIntegration(ltiConfiguration ? ltiConfiguration : [])
 
   const imageModalClickHandler = (screenshots: string[]) => {
@@ -124,7 +103,7 @@ const ProductDetail = (props: ProductDetailProps) => {
   }
 
   const formattedUpdatedAt = () => {
-    const date = new Date(product?.updated_at as string)
+    const date = new Date(product.updated_at as string)
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -132,17 +111,21 @@ const ProductDetail = (props: ProductDetailProps) => {
     })
   }
 
-  const renderConfigureButton = () => {
+  const renderConfigureButtonSection = () => {
     const buttonMargins = !isDesktop ? '0 0 medium 0' : '0 0 xx-large 0'
     const tabletMargin = isMaxTablet ? '0 0 0 small' : '0'
     const buttonWidth = isMaxMobile ? 'block' : 'inline-block'
 
     return (
-      <Flex margin={buttonMargins}>
-        <Flex.Item shouldGrow={true} margin={tabletMargin}>
-          {props.renderConfigureButton
-            ? // @ts-expect-error
-              props.renderConfigureButton(buttonWidth, product)
+      <Flex margin={buttonMargins} direction="row" justifyItems="end">
+        <Flex.Item margin={tabletMargin}>
+          {renderConfigureButton
+            ? renderConfigureButton(
+                buttonWidth,
+                product,
+                installStatus.data,
+                installStatus.isLoading,
+              )
             : null}
         </Flex.Item>
       </Flex>
@@ -152,46 +135,65 @@ const ProductDetail = (props: ProductDetailProps) => {
   const renderHeader = () => {
     return (
       <div>
-        {!isDesktop && (
-          <Flex margin="medium 0 0 small">
-            <div style={{borderRadius: '8px'}}>
-              {/* @ts-expect-error */}
-              <img alt="" src={product.logo_url} width={80} height={80} style={{borderRadius: 8}} />
-            </div>
-          </Flex>
-        )}
-        <Flex margin={isDesktop ? 'small 0 0 0' : '0'}>
-          {isDesktop && (
-            <Flex.Item>
-              <div style={{borderRadius: '8px'}}>
-                <img
-                  alt=""
-                  // @ts-expect-error
-                  src={product.logo_url}
-                  width={80}
-                  height={80}
-                  style={{borderRadius: 8}}
-                />
-              </div>
-            </Flex.Item>
-          )}
-          <Flex.Item shouldGrow={true} shouldShrink={true} margin="small 0 0 mediumSmall">
-            {/* @ts-expect-error */}
-            <Heading level="h1">{product.name}</Heading>
-            <Flex.Item shouldGrow={true} shouldShrink={true}>
-              <div style={{marginBottom: '.5rem'}}>
-                <TruncateWithTooltip
-                  linesAllowed={2}
-                  horizontalOffset={isDesktop ? -150 : -10}
-                  backgroundColor="primary"
-                >
-                  {/* @ts-expect-error */}
-                  <Text>{product.tagline}</Text>
-                </TruncateWithTooltip>
-              </div>
-            </Flex.Item>
+        <Flex margin={isDesktop ? 'small 0 0 0' : '0'} alignItems="start" gap="small">
+          <Flex.Item shouldGrow={true} shouldShrink={true}>
+            <Flex direction={'column'}>
+              <Flex.Item margin="0 0 small 0">
+                {installStatus.data && (
+                  <Alert variant="info" hasShadow={false} transition="none">
+                    {I18n.t(
+                      'This app can only be installed once and is already active in your account.',
+                    )}
+                  </Alert>
+                )}
+              </Flex.Item>
+              <Flex direction="row">
+                {isDesktop && (
+                  <Flex.Item>
+                    <div style={{borderRadius: '8px'}}>
+                      <img
+                        alt=""
+                        src={product.logo_url}
+                        width={80}
+                        height={80}
+                        style={{borderRadius: 8}}
+                      />
+                    </div>
+                  </Flex.Item>
+                )}
+                {!isDesktop && (
+                  <Flex margin="medium 0 0 small">
+                    <div style={{borderRadius: '8px'}}>
+                      <img
+                        alt=""
+                        src={product.logo_url}
+                        width={80}
+                        height={80}
+                        style={{borderRadius: 8}}
+                      />
+                    </div>
+                  </Flex>
+                )}
+                <Flex.Item shouldGrow={true} shouldShrink={true} margin="small 0 0 mediumSmall">
+                  <Heading level="h1">{product.name}</Heading>
+                  <Flex.Item shouldGrow={true} shouldShrink={true}>
+                    <div style={{marginBottom: '.5rem'}}>
+                      <TruncateWithTooltip
+                        linesAllowed={2}
+                        horizontalOffset={isDesktop ? -150 : -10}
+                        backgroundColor="primary"
+                      >
+                        <Text>{product.tagline}</Text>
+                      </TruncateWithTooltip>
+                    </div>
+                  </Flex.Item>
+                </Flex.Item>
+              </Flex>
+            </Flex>
           </Flex.Item>
-          {isDesktop && renderConfigureButton()}
+          <Flex.Item shouldGrow={true} shouldShrink={false} margin="0 0 0 auto">
+            {isDesktop && renderConfigureButtonSection()}
+          </Flex.Item>
         </Flex>
       </div>
     )
@@ -202,7 +204,6 @@ const ProductDetail = (props: ProductDetailProps) => {
       <Flex margin={isDesktop ? '0 0 0 large' : '0 0 0 small'}>
         <Flex.Item margin={isDesktop ? '0 0 0 xx-large' : '0'}>
           <Text color="secondary">
-            {/* @ts-expect-error */}
             {I18n.t('by')} {product.company.name}
           </Text>{' '}
           |{' '}
@@ -215,7 +216,6 @@ const ProductDetail = (props: ProductDetailProps) => {
       <Flex direction="column">
         <Flex.Item margin="0 0 0 small">
           <Text color="secondary">
-            {/* @ts-expect-error */}
             {I18n.t('by')} {product.company.name}
           </Text>
         </Flex.Item>
@@ -229,7 +229,7 @@ const ProductDetail = (props: ProductDetailProps) => {
   }
 
   const renderTags = () => {
-    return product?.tags.map((t, i) => (
+    return product.tags.map((t, i) => (
       <Tag
         text={t.name}
         margin="x-small x-small 0 0"
@@ -239,12 +239,9 @@ const ProductDetail = (props: ProductDetailProps) => {
     ))
   }
 
-  // @ts-expect-error
-  const hasIntegrationResources = product?.integration_resources.resources?.length > 0
+  const hasIntegrationResources = product.integration_resources.resources?.length > 0
 
   const renderIntegrationResources = () => {
-    if (!product) return null
-
     const {comments, resources} = product.integration_resources
 
     const renderComments = comments ? (
@@ -291,156 +288,139 @@ const ProductDetail = (props: ProductDetailProps) => {
     )
   }
 
-  if (isError) {
-    return <ErrorPage />
-  }
-
   return (
     <div>
-      {isLoading ? (
-        <Flex justifyItems="center">
-          <Spinner
-            renderTitle={I18n.t('Loading Page')}
-            role="alert"
-            aria-busy="true"
-            data-testid="loading"
-          />
+      <>
+        {renderHeader()}
+        {renderBylineAndUpdatedAt()}
+        {installStatus && (
+          <Flex margin={isDesktop ? 'small 0 0 large' : 'small 0 0 small'}>
+            <Flex.Item margin={isDesktop ? '0 0 0 xx-large' : '0'}>
+              <InstalledBadge isInstalled={!!installStatus.data} />
+            </Flex.Item>
+          </Flex>
+        )}
+        <Flex
+          padding="small 0 0 small"
+          margin={isDesktop ? '0 medium medium medium' : '0 medium medium 0'}
+        >
+          <Flex.Item margin={isDesktop ? '0 0 0 xx-large' : '0'}>{renderTags()}</Flex.Item>
         </Flex>
-      ) : (
-        product && (
-          <>
-            {renderHeader()}
-            {renderBylineAndUpdatedAt()}
-            <Flex
-              padding="small 0 0 small"
-              margin={isDesktop ? '0 medium medium medium' : '0 medium medium 0'}
+        {!isDesktop && renderConfigureButtonSection()}
+        <View
+          as="div"
+          margin="small 0 small 0"
+          position="relative"
+          withFocusOutline={!showTrucatedDescription}
+        >
+          <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
+            <span style={{wordBreak: 'break-word'}}>{I18n.t('Overview')}</span>
+          </Heading>
+        </View>{' '}
+        <Flex gap="x-large">
+          {product.company.company_url && (
+            <Flex.Item margin="0 small medium small">
+              <Link
+                href={product.company.company_url}
+                isWithinText={false}
+                renderIcon={<IconExpandStartLine />}
+                target="_blank"
+              >
+                <Text weight="bold">{I18n.t('Website')}</Text>
+              </Link>
+            </Flex.Item>
+          )}
+          {product.support_url && (
+            <Flex.Item margin="0 0 medium 0">
+              <Link
+                href={product.support_url}
+                isWithinText={false}
+                renderIcon={<IconMessageLine />}
+                target="_blank"
+              >
+                <Text weight="bold">{I18n.t('Contact')}</Text>
+              </Link>
+            </Flex.Item>
+          )}
+        </Flex>
+        <Flex direction="column">
+          <Flex.Item width={'90%'} margin="0 small small 0">
+            <TruncateText
+              maxLines={showTrucatedDescription ? 4 : 50}
+              truncate="word"
+              ellipsis=" (...)"
+              onUpdate={() => setIsTruncated(true)}
             >
-              <Flex.Item margin={isDesktop ? '0 0 0 xx-large' : '0'}>{renderTags()}</Flex.Item>
-            </Flex>
-            {!isDesktop && renderConfigureButton()}
-            <View
-              as="div"
-              margin="small 0 small 0"
-              position="relative"
-              withFocusOutline={!showTrucatedDescription}
-            >
-              <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
-                <span style={{wordBreak: 'break-word'}}>{I18n.t('Overview')}</span>
-              </Heading>
-            </View>{' '}
-            <Flex gap="x-large">
-              {product.company.company_url && (
-                <Flex.Item margin="0 small medium small">
-                  <Link
-                    href={product.company.company_url}
-                    isWithinText={false}
-                    renderIcon={<IconExpandStartLine />}
-                    target="_blank"
-                  >
-                    <Text weight="bold">{I18n.t('Website')}</Text>
-                  </Link>
-                </Flex.Item>
-              )}
-              {product.support_url && (
-                <Flex.Item margin="0 0 medium 0">
-                  <Link
-                    href={product.support_url}
-                    isWithinText={false}
-                    renderIcon={<IconMessageLine />}
-                    target="_blank"
-                  >
-                    <Text weight="bold">{I18n.t('Contact')}</Text>
-                  </Link>
-                </Flex.Item>
-              )}
-            </Flex>
-            <Flex direction="column">
-              <Flex.Item width={'90%'} margin="0 small small 0">
-                <TruncateText
-                  maxLines={showTrucatedDescription ? 4 : 50}
-                  truncate="word"
-                  ellipsis=" (...)"
-                  onUpdate={() => setIsTruncated(true)}
-                >
-                  <Text>{productDescription}</Text>
-                </TruncateText>
-              </Flex.Item>
+              <Text>{productDescription}</Text>
+            </TruncateText>
+          </Flex.Item>
 
-              {isTruncated && (
-                <Link
-                  margin="0 medium medium 0"
-                  forceButtonRole={true}
-                  isWithinText={false}
-                  onClick={() => setShowTruncatedDescription(!showTrucatedDescription)}
-                  themeOverride={{
-                    focusOutlineColor: 'transparent',
-                    fontWeight: 600,
-                  }}
+          {isTruncated && (
+            <Link
+              margin="0 medium medium 0"
+              forceButtonRole={true}
+              isWithinText={false}
+              onClick={() => setShowTruncatedDescription(!showTrucatedDescription)}
+              themeOverride={{
+                focusOutlineColor: 'transparent',
+                fontWeight: 600,
+              }}
+            >
+              {showTrucatedDescription ? I18n.t('See more') : I18n.t('See less')}
+            </Link>
+          )}
+          {product.screenshots.length > 0 && (
+            <Flex.Item>
+              <IconButton
+                size="large"
+                themeOverride={{largeHeight: '5rem'}}
+                screenReaderLabel={I18n.t('View decorative image carousel')}
+                onClick={() => {
+                  imageModalClickHandler(product.screenshots)
+                }}
+              >
+                <Img display="block" loading="lazy" src={product.screenshots[0]}></Img>
+              </IconButton>
+              <div style={{position: 'relative', bottom: 30, zIndex: 10}}>
+                <ContextView
+                  width={80}
+                  padding="xxx-small"
+                  textAlign="end"
+                  placement="bottom"
+                  themeOverride={{arrowSize: '0'}}
                 >
-                  {showTrucatedDescription ? I18n.t('See more') : I18n.t('See less')}
-                </Link>
-              )}
-              {product.screenshots.length > 0 && (
-                <Flex.Item>
-                  <IconButton
-                    size="large"
-                    themeOverride={{largeHeight: '5rem'}}
-                    screenReaderLabel={I18n.t('View decorative image carousel')}
-                    onClick={() => {
-                      imageModalClickHandler(product?.screenshots)
-                    }}
-                  >
-                    <Img display="block" loading="lazy" src={product?.screenshots[0]}></Img>
-                  </IconButton>
-                  <div style={{position: 'relative', bottom: 30, zIndex: 10}}>
-                    <ContextView
-                      width={80}
-                      padding="xxx-small"
-                      textAlign="end"
-                      placement="bottom"
-                      themeOverride={{arrowSize: '0'}}
-                    >
-                      <Text size={product?.screenshots.length > 9 ? 'x-small' : 'small'}>
-                        <IconImageLine /> {product?.screenshots.length} images
-                      </Text>
-                    </ContextView>
-                  </div>
-                </Flex.Item>
-              )}
-            </Flex>
-            <ExternalLinks product={product} />
-            <LtiConfigurationDetail
-              badges={product.integration_badges}
-              integrationData={relevantIntegration}
-            />
-            <Flex margin="medium 0 0 0">
-              <Flex.Item margin="0 0 small 0">
-                <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
-                  <span style={{wordBreak: 'break-word'}}>
-                    {I18n.t('Implementation Resources')}
-                  </span>
-                </Heading>
-              </Flex.Item>
-            </Flex>
-            <Flex direction="column" margin="0 0 large 0">
-              {hasIntegrationResources
-                ? renderIntegrationResources()
-                : I18n.t(
-                    'The tool provider did not include implementation resources for this tool.',
-                  )}
-            </Flex>
-            {(excludeCurrentProduct?.length ?? 0) > 0 && (
-              <ProductCarousel
-                products={excludeCurrentProduct ?? []}
-                companyName={product.company.name}
-              />
-            )}
-            <div style={{marginTop: '35px'}}>
-              <Disclaimer />
-            </div>
-          </>
-        )
-      )}
+                  <Text size={product.screenshots.length > 9 ? 'x-small' : 'small'}>
+                    <IconImageLine /> {product.screenshots.length} images
+                  </Text>
+                </ContextView>
+              </div>
+            </Flex.Item>
+          )}
+        </Flex>
+        <ExternalLinks product={product} />
+        <LtiConfigurationDetail
+          badges={product.integration_badges}
+          integrationData={relevantIntegration}
+        />
+        <Flex margin="medium 0 0 0">
+          <Flex.Item margin="0 0 small 0">
+            <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
+              <span style={{wordBreak: 'break-word'}}>{I18n.t('Implementation Resources')}</span>
+            </Heading>
+          </Flex.Item>
+        </Flex>
+        <Flex direction="column" margin="0 0 large 0">
+          {hasIntegrationResources
+            ? renderIntegrationResources()
+            : I18n.t('The tool provider did not include implementation resources for this tool.')}
+        </Flex>
+        {otherProductsByCompany.length > 0 && (
+          <ProductCarousel products={otherProductsByCompany} companyName={product.company.name} />
+        )}
+        <div style={{marginTop: '35px'}}>
+          <Disclaimer />
+        </div>
+      </>
       <IntegrationDetailModal
         title={intDetailTitle}
         content={intDetailContent}
@@ -451,10 +431,95 @@ const ProductDetail = (props: ProductDetailProps) => {
         isModalOpen={isImageModalOpen}
         setModalOpen={setImageModalOpen}
         screenshots={imageModalScreenshots}
-        // @ts-expect-error
-        productName={product?.name}
+        productName={product.name}
       />
     </div>
+  )
+}
+
+const ProductDetail = (props: ProductDetailProps) => {
+  const location = useLocation()
+
+  const currentProductId = location.pathname.replace('/product_detail/', '')
+  const previousPathRegexp = window.location.pathname.replace(/\product_detail.*/, '')
+  const previousPath = previousPathRegexp.endsWith(`${instructorAppsRoute}/`)
+    ? `${previousPathRegexp.slice(0, -1)}#tab-apps`
+    : previousPathRegexp
+
+  const {product, isLoading, isError} = useProduct({
+    productId: currentProductId,
+  })
+  useAppendBreadcrumb(product?.name ?? '', previousPath, !!product?.name)
+
+  useEffect(() => {
+    if (window.pendo && typeof window.pendo.track === 'function' && product?.id && product?.name) {
+      window.pendo.track('Product', {
+        productId: product.id,
+        productName: product.name,
+        source: 'canvas-apps',
+        placement: 'standard',
+      })
+    }
+  }, [product?.id, product?.name])
+
+  const {otherProductsByCompany} = useSimilarProducts({
+    params: {
+      filters: {
+        companies: [{id: product?.company.id.toString(), name: product?.company.name}],
+      },
+    },
+    product,
+  })
+
+  const ltiConfiguration = product?.canvas_lti_configurations
+  const relevantIntegration = pickPreferredIntegration(ltiConfiguration ? ltiConfiguration : [])
+
+  const developerKeyId =
+    relevantIntegration?.integration_type === 'lti_13_global_inherited_key'
+      ? relevantIntegration.global_inherited_key
+      : undefined
+
+  const installStatus = useInstallStatus(developerKeyId)
+
+  const excludeCurrentProduct = otherProductsByCompany?.tools.filter(
+    (otherProducts: Product) => otherProducts.global_product_id !== currentProductId,
+  )
+
+  const ErrorPage = () => {
+    return (
+      <GenericErrorPage
+        imageUrl={errorShipUrl}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
+        errorMessage={I18n.t('Error loading product details')}
+      />
+    )
+  }
+
+  if (isError) {
+    return <ErrorPage />
+  }
+
+  if (isLoading || !product) {
+    return (
+      <Flex justifyItems="center">
+        <Spinner
+          renderTitle={I18n.t('Loading Page')}
+          role="alert"
+          aria-busy="true"
+          data-testid="loading"
+        />
+      </Flex>
+    )
+  }
+
+  return (
+    <ProductDetailDisplay
+      product={product}
+      installStatus={installStatus}
+      otherProductsByCompany={excludeCurrentProduct ?? []}
+      renderConfigureButton={props.renderConfigureButton}
+    />
   )
 }
 

@@ -35,7 +35,11 @@ import {getK5ThemeVars} from '@canvas/k5/react/k5-theme'
 import {DEFAULT_COURSE_COLOR} from '@canvas/k5/react/utils'
 import {scoreToGrade} from '@instructure/grading-utils'
 
-const k5ThemeVariables = getK5ThemeVars()
+const k5ThemeVariables = getK5ThemeVars(
+  Boolean(ENV.use_high_contrast),
+  Boolean(ENV.USE_CLASSIC_FONT),
+  Boolean(ENV.use_dyslexic_font),
+)
 
 const I18n = createI18nScope('grades_summary')
 

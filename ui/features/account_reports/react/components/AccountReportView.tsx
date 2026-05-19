@@ -23,7 +23,7 @@ import {Heading} from '@instructure/ui-heading'
 import ReportsTable from './ReportsTable'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {AccountReportInfo} from '@canvas/account_reports/types'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('account_reports')
 

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ModerationGrader < ActiveRecord::Base
+class ModerationGrader < ApplicationRecord
   belongs_to :user
   belongs_to :assignment, inverse_of: :moderation_graders, class_name: "AbstractAssignment"
 

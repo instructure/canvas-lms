@@ -23,7 +23,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {array, func, string, shape} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
-import EmptyDesert from '@canvas/images/react/EmptyDesert'
+import {EmptyDesert} from '@instructure/platform-images'
 
 const I18n = createI18nScope('account_course_user_search')
 

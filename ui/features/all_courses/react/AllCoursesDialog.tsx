@@ -17,15 +17,13 @@
  */
 
 import {Modal} from '@instructure/ui-modal'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {useEffect, useState} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {CloseButton} from '@instructure/ui-buttons'
-
-const I18n = createI18nScope('catalog')
 
 const DEFAULT_IFRAME_HEIGHT = '300px'
 const ADDITIONAL_PADDING = 30
@@ -37,6 +35,7 @@ interface Props {
 }
 
 export default function AllCoursesDialog(props: Props) {
+  const {t} = useTranslation('catalog')
   const {embeddedLink, onClose, isOpen} = props
   const [modalHeight, setModalHeight] = useState(DEFAULT_IFRAME_HEIGHT)
   const [loadingFrame, setLoadingFrame] = useState(true)
@@ -71,7 +70,7 @@ export default function AllCoursesDialog(props: Props) {
     setLoadingFrame(false)
   }
 
-  const enrollLabel = I18n.t('Enroll in a Course')
+  const enrollLabel = t('Enroll in a Course')
   return (
     <Modal
       data-testid="all-courses-dialog"
@@ -89,16 +88,13 @@ export default function AllCoursesDialog(props: Props) {
               onClose()
               setLoadingFrame(true)
             }}
-            screenReaderLabel={I18n.t('Close enrollment dialog')}
+            screenReaderLabel={t('Close enrollment dialog')}
           />
         </Flex>
       </Modal.Header>
       {loadingFrame ? (
         <View textAlign="center" margin="medium">
-          <Spinner
-            data-testid="all-courses-loading"
-            renderTitle={I18n.t('Loading enrollment form')}
-          />
+          <Spinner data-testid="all-courses-loading" renderTitle={t('Loading enrollment form')} />
         </View>
       ) : null}
       <iframe
@@ -106,7 +102,7 @@ export default function AllCoursesDialog(props: Props) {
         data-testid="all-courses-iframe"
         style={style}
         src={embeddedLink}
-        title={I18n.t('Course Catalog')}
+        title={t('Course Catalog')}
         onLoad={stopLoading}
       />
     </Modal>

@@ -25,11 +25,9 @@
 import React, {useState} from 'react'
 import {Select} from '@instructure/ui-select'
 import {View} from '@instructure/ui-view'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 
 import type {SelectProps} from '@instructure/ui-select'
-
-const I18n = createI18nScope('groupNavigationSelector')
 
 type GroupOption = {
   id: string
@@ -49,6 +47,7 @@ const getOptionById = (options: GroupOption[], queryId: string): GroupOption => 
 }
 
 export default function GroupNavigationSelector(props: Props) {
+  const {t} = useTranslation('groupNavigationSelector')
   const defaultOption = getOptionById(props.options, window.location.pathname.split('/')[2])
   const [isShowingOptions, setIsShowingOptions] = useState<boolean>(false)
   const [selectedOptionId, setSelectedOptionId] = useState<string>(defaultOption.id)
@@ -98,8 +97,8 @@ export default function GroupNavigationSelector(props: Props) {
     <View as="div" padding="0 0 medium 0">
       <Select
         data-testid="group-selector"
-        renderLabel={I18n.t('Select Group')}
-        assistiveText={I18n.t('Use arrow keys to navigate options.')}
+        renderLabel={t('Select Group')}
+        assistiveText={t('Use arrow keys to navigate options.')}
         inputValue={inputValue}
         isShowingOptions={isShowingOptions}
         onBlur={handleBlur}

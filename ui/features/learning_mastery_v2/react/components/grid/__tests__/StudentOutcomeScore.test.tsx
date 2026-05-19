@@ -19,19 +19,8 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {StudentOutcomeScore, StudentOutcomeScoreProps} from '../StudentOutcomeScore'
-import {svgUrl} from '@canvas/outcomes/react/utils/icons'
 import {Outcome, Rating} from '@canvas/outcomes/react/types/rollup'
-import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
-
-vi.mock('@canvas/outcomes/react/utils/icons', () => ({
-  svgUrl: vi.fn(() => 'http://test.com'),
-}))
-
-vi.mock('@canvas/svg-wrapper', () => ({
-  default: ({ariaLabel, ariaHidden}: {ariaLabel?: string; ariaHidden?: boolean}) => (
-    <svg aria-label={ariaLabel} aria-hidden={ariaHidden} data-testid="mock-svg" />
-  ),
-}))
+import {ScoreDisplayFormat} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 describe('StudentOutcomeScore', () => {
   interface TestProps {
@@ -84,19 +73,22 @@ describe('StudentOutcomeScore', () => {
     }
   })
 
-  it('calls svgUrl with the right arguments', () => {
+  it('renders an icon for the computed mastery level', () => {
     render(<StudentOutcomeScore {...defaultProps()} />)
-    expect(svgUrl).toHaveBeenCalledWith(3, 5)
+    expect(screen.getByRole('img')).toBeInTheDocument()
   })
 
-  it('renders ScreenReaderContent with the rating description', async () => {
-    render(<StudentOutcomeScore {...defaultProps()} />)
-    expect(await screen.findByLabelText('great!')).toBeInTheDocument()
-  })
-
-  it('renders ScreenReaderContent with "Unassessed" if there is no score', async () => {
+  it('renders the unassessed icon if there is no score', async () => {
     render(<StudentOutcomeScore {...defaultProps({score: undefined})} />)
     expect(await screen.findByLabelText('Unassessed')).toBeInTheDocument()
+  })
+
+  describe('action button', () => {
+    it('renders an icon in the action button when onAction is provided', () => {
+      render(<StudentOutcomeScore {...defaultProps()} onAction={jest.fn()} focus={true} />)
+      const actionButton = screen.getByTestId('score-cell-action-button')
+      expect(actionButton.querySelector('svg')).toBeInTheDocument()
+    })
   })
 
   describe('scoreDisplayFormat', () => {

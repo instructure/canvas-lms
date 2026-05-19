@@ -24,7 +24,7 @@ import type {Announcement} from '../types'
 import {ANNOUNCEMENTS_PAGINATED_KEY} from '../constants'
 import {useWidgetDashboard} from './useWidgetDashboardContext'
 import {widgetDashboardPersister} from '../utils/persister'
-import {useBroadcastQuery} from '@canvas/query/broadcast'
+import {useBroadcastQuery} from '@instructure/platform-query/broadcast'
 
 interface UseAnnouncementsOptions {
   limit?: number

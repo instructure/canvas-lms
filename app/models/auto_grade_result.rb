@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AutoGradeResult < ActiveRecord::Base
+class AutoGradeResult < ApplicationRecord
   belongs_to :submission, optional: false
 
   validates :attempt, presence: true, numericality: { greater_than: 0 }

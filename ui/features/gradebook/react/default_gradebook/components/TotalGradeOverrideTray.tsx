@@ -35,7 +35,7 @@ import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 import useStore from '../stores'
 import {gradeOverrideCustomStatus} from '../FinalGradeOverrides/FinalGradeOverride.utils'
 import {useFinalGradeOverrideCustomStatus} from '../hooks/useFinalGradeOverrideCustomStatus'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {ApiCallStatus} from '@canvas/do-fetch-api-effect/apiRequest'
 
 const I18n = createI18nScope('gradebook')

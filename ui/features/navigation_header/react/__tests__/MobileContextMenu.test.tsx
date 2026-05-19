@@ -55,6 +55,12 @@ const tabsFromApi = [
     label: 'DIG',
     type: 'external',
   },
+  {
+    id: 'nav_menu_link_42',
+    html_url: 'https://example.com',
+    label: 'Custom Link',
+    type: 'external',
+  },
 ]
 const spinner = 'Spinner'
 const contextType = 'Course'
@@ -122,5 +128,33 @@ describe('MobileContextMenu', () => {
     expect(getByText('DIG')).toBeVisible()
     expect(iconOff).toHaveLength(3)
     expect(iconOff[2]).toBeVisible()
+  })
+
+  describe('nav_menu_link tabs', () => {
+    it('shows external link icon for nav_menu_link tabs', async () => {
+      const {container, getAllByRole, getByText} = render(<MobileContextMenu {...props} />)
+      await waitFor(() => getAllByRole('link'))
+      const link = getByText('Custom Link').closest('a')
+      const icon = link?.querySelector("svg[name='IconExternalLink']")
+      expect(icon).toBeInTheDocument()
+    })
+
+    it('opens in new tab for nav_menu_link tabs', async () => {
+      const {getAllByRole, getByText} = render(<MobileContextMenu {...props} />)
+      await waitFor(() => getAllByRole('link'))
+      const link = getByText('Custom Link').closest('a')
+      expect(link).toHaveAttribute('target', '_blank')
+    })
+
+    it('shows LTI icon (not external link icon) for non-nav_menu_link external tabs', async () => {
+      const {container, getAllByRole, getByText} = render(<MobileContextMenu {...props} />)
+      await waitFor(() => getAllByRole('link'))
+      // DIG is an external tool tab (not nav_menu_link), should use IconLti
+      const digLink = getByText('DIG').closest('a')
+      const externalIcon = digLink?.querySelector("svg[name='IconExternalLink']")
+      const ltiIcon = digLink?.querySelector("svg[name='IconLti']")
+      expect(externalIcon).not.toBeInTheDocument()
+      expect(ltiIcon).toBeInTheDocument()
+    })
   })
 })

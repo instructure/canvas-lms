@@ -72,15 +72,19 @@
     @include fontSize(11px);
   }
   .unread-count {
-    display: block;
+    @include fontSize(11px);
+    min-width: 20px;
+    line-height: 20px;
+    border-radius: 10px;
     background: var(--ic-brand-primary);
-    border-radius: 15px;
-    width: 10px;
-    height: 10px;
+    color: $ic-color-light;
+    display: inline-block;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 0 6px;
     position: absolute;
     #{direction(left)}: 3px;
-    top: 22px;
-    padding: 0;
+    top: 12px;
   }
   .accessibly-hidden {
     position: absolute;

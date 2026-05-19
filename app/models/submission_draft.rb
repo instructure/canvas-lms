@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class SubmissionDraft < ActiveRecord::Base
+class SubmissionDraft < ApplicationRecord
   belongs_to :submission, inverse_of: :submission_drafts
   belongs_to :media_object, primary_key: :media_id
   has_many :submission_draft_attachments, inverse_of: :submission_draft, dependent: :destroy

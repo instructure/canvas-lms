@@ -19,20 +19,33 @@
 
 require "apis/api_spec_helper"
 
+# -- this needs to be a real class
+class Doodad < ActiveRecord::Base
+  def self.versioned_fields
+    %i[ringding_id woozel_id]
+  end
+end
+
+class Woozel < ActiveRecord::Base
+  simply_versioned explicit: true, versioned_associations: [:doodads]
+  has_many :doodads
+end
+
 describe "simply_versioned" do
   before :all do
-    class Woozel < ActiveRecord::Base # rubocop:disable Lint/ConstantDefinitionInBlock,RSpec/LeakyConstantDeclaration -- this needs to be a real class
-      simply_versioned explicit: true
-    end
-
     Woozel.connection.create_table :woozels, force: true do |t|
       t.string :name
+    end
+
+    Doodad.connection.create_table :doodads, force: true do |t|
+      t.integer :woozel_id
+      t.integer :ringding_id
     end
   end
 
   after :all do
     Woozel.connection.drop_table :woozels
-    Object.send(:remove_const, :Woozel) # rubocop:disable RSpec/RemoveConst
+    Doodad.connection.drop_table :doodads
     GC.start
   end
 
@@ -199,6 +212,40 @@ describe "simply_versioned" do
         expect(@woozel.versions.previous_version(1)).to be_nil
         expect(@woozel.versions.previous_version(2).model.name).to eq "test"
       end
+    end
+  end
+
+  describe "capture_associations_for_version" do
+    it "does not crash when there are no associated records" do
+      woozel = Woozel.new(name: "Eeyore")
+      expect { woozel.capture_associations_for_version(:doodads) }.not_to raise_error
+    end
+
+    it "captures doodad associations" do
+      woozel = Woozel.create!(name: "test")
+      woozel.doodads.create!(ringding_id: 1)
+
+      captured = woozel.capture_associations_for_version(:doodads)
+      expect(captured).to eq([{ "ringding_id" => 1, "woozel_id" => woozel.id }])
+    end
+  end
+
+  describe "restore_associations_from_version" do
+    it "restores doodad associations from version" do
+      woozel = Woozel.create!(name: "test")
+      doodad = woozel.doodads.create!(ringding_id: 1)
+      woozel.with_versioning(explicit: true, &:save!)
+
+      doodad.destroy
+      woozel.doodads.create!(ringding_id: 2)
+      woozel.reload.with_versioning(explicit: true, &:save!)
+      expect(woozel.doodads.count).to eq 1
+
+      version = woozel.reload.versions.find_by(number: 2)
+      woozel.restore_associations_from_version(version, :doodads)
+      expect(woozel.reload.doodads.count).to eq 1
+      new_doodad = woozel.doodads.take
+      expect(new_doodad.ringding_id).to eq(doodad.ringding_id)
     end
   end
 

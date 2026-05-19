@@ -27,7 +27,7 @@ module Canvadocs
       user = opts.delete(:user)
       enable_annotations = opts.delete(:enable_annotations)
       read_only = opts.delete(:read_only) || false
-      opts.reverse_merge! canvadoc_permissions_for_user(user, enable_annotations, read_only)
+      opts.reverse_merge! canvadoc_permissions_for_user(user, enable_annotations, read_only:)
       opts[:url] = attachment.public_url(expires_in: 7.days)
       opts[:locale] = I18n.locale || I18n.default_locale
       opts[:send_usage_metrics] = user.account.feature_enabled?(:send_usage_metrics) if user
@@ -35,6 +35,7 @@ module Canvadocs
 
       Canvas.timeout_protection("canvadocs", raise_on_timeout: true) do
         session = canvadocs_api.session(document_id, StringifyIds.recursively_stringify_ids(opts))
+        process_session_token(session["id"])
         canvadocs_api.view(session["id"])
       end
     end
@@ -44,7 +45,20 @@ module Canvadocs
     end
     private :canvadocs_api
 
-    def canvadoc_permissions_for_user(user, enable_annotations, read_only = false)
+    def process_session_token(token)
+      claims = JSON::JWT.decode(token, :skip_verification)
+
+      return unless claims["w"]
+      return if attachment.word_count
+
+      attachment.update(word_count: claims["w"])
+    rescue => e
+      # We don't want to block the session flow even if we can not process the token
+      Rails.logger.error("Failed to process token: #{token} Exception: #{e}")
+    end
+    private :process_session_token
+
+    def canvadoc_permissions_for_user(user, enable_annotations, read_only: false)
       return {} unless enable_annotations && canvadocs_can_annotate?(user)
 
       opts = canvadocs_default_options_for_user(user, read_only)

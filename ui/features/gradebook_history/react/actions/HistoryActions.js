@@ -71,10 +71,10 @@ function formatHistoryItems(data) {
       gradeBefore: item.grade_before || '',
       gradeCurrent: item.grade_current || '',
       id: item.id,
-      pointsPossibleAfter: item.points_possible_after ? item.points_possible_after.toString() : '–',
-      pointsPossibleBefore: item.points_possible_before
-        ? item.points_possible_before.toString()
-        : '–',
+      pointsPossibleAfter:
+        item.points_possible_after != null ? item.points_possible_after.toString() : '–',
+      pointsPossibleBefore:
+        item.points_possible_before != null ? item.points_possible_before.toString() : '–',
       pointsPossibleCurrent: pointsPossibleCurrent(assignments, item),
       student: users[item.links.student] ? users[item.links.student].name : '',
     }

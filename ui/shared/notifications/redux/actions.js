@@ -17,7 +17,7 @@
  */
 
 import {createActions, handleActions} from 'redux-actions'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 /**
  * Exports action action creators for notification actions:

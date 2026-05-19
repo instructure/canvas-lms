@@ -19,7 +19,6 @@
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
-import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {LtiToolIframeProps} from '../../ltiTool'
 
@@ -56,7 +55,6 @@ export const LtiToolIframe = ({submission, assignment}: LtiToolIframeProps) => {
       )}
       {showTool && (
         <ToolLaunchIframe
-          allow={iframeAllowances()}
           src={launchURL}
           style={style}
           data-testid="lti-external-tool"

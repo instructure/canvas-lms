@@ -23,7 +23,7 @@ import {map} from 'es-toolkit/compat'
 
 import CopyToClipboard from '@canvas/copy-to-clipboard'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {render} from '@canvas/react'
 
 const I18n = createI18nScope('UploadMediaTrackForm')
 
@@ -68,7 +68,7 @@ export default class UploadMediaTrackForm {
         zIndex,
       })
 
-    ReactDOM.render(
+    render(
       <CopyToClipboard interaction="readonly" name="video_url" value={video_url} />,
       document.getElementById('media-track-video-url-container'),
     )

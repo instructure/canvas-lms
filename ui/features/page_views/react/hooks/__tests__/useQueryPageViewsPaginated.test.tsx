@@ -60,7 +60,7 @@ function createMockPageViews(userId: string, pageNumber: number, count: number):
 }
 
 beforeEach(() => {
-  vi.clearAllMocks()
+  vi.resetAllMocks()
 })
 
 describe('useQueryPageViewsPaginated', () => {
@@ -545,6 +545,30 @@ describe('useQueryPageViewsPaginated', () => {
 
     // Should have made exactly 2 API calls
     expect(vi.mocked(doFetchApi).mock.calls).toHaveLength(2)
+  })
+
+  it('should not show next page when result count is less than pageSize', async () => {
+    // Regression: fewer results than pageSize must not produce a phantom page 2 link
+    const partialViews = createMockPageViews('134', 1, 5)
+
+    vi.mocked(doFetchApi).mockResolvedValueOnce({
+      json: partialViews,
+      link: undefined,
+      response: {} as Response,
+      text: JSON.stringify(partialViews),
+    })
+
+    const {result} = renderHook(() => useQueryPageViewsPaginated({userId: '134', pageSize: 10}), {
+      wrapper: createWrapper(),
+    })
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+    })
+
+    expect(result.current.views).toHaveLength(5)
+    expect(result.current.totalPages).toBe(1)
+    expect(result.current.hasReachedEnd).toBe(true)
   })
 
   it('should throw error when try to paginate further after reaching end', async () => {

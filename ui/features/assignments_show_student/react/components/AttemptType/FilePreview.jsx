@@ -19,7 +19,7 @@
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {getOriginalityData} from '@canvas/grading/originalityReportHelper'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import {colors, spacing} from '@instructure/canvas-theme'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -44,7 +44,8 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
   const showDocumentProcessorsColumn = useShouldShowLtiAssetReportsForStudent({
     submissionId: submission._id,
     submissionType: submission.submissionType,
-    ifLastAttemptIsNumber: submission.attempt,
+    attempt: submission.attempt,
+    attachmentIds: submission.attachments?.map(f => f._id) ?? [],
   })
 
   useEffect(() => {
@@ -151,6 +152,7 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
                   <LtiAssetReportsForStudentSubmission
                     submissionId={submission._id}
                     submissionType={submission.submissionType}
+                    attempt={submission.attempt}
                     attachmentId={file._id}
                   />
                 </Table.Cell>

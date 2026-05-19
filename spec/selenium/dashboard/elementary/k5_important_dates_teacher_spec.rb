@@ -139,7 +139,7 @@ describe "teacher k5 dashboard important dates", :ignore_js_errors do
     end
 
     it "has no important dates when C4E is turned off" do
-      toggle_k5_setting(@account, false)
+      toggle_k5_setting(@account, enable: false)
 
       get "/calendar"
 
@@ -147,7 +147,7 @@ describe "teacher k5 dashboard important dates", :ignore_js_errors do
       click_calendar_subject(@subject_course.name)
 
       expect(important_dates_block).not_to be_displayed
-      toggle_k5_setting(@account, true)
+      toggle_k5_setting(@account)
     end
 
     it "maintains important dates checked option on more options page" do

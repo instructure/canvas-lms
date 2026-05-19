@@ -240,7 +240,7 @@ describe EportfolioEntriesController do
       eportfolio_entry(@category)
       @student = @user
       course = Course.create!
-      course.enroll_student(@student).accept(true)
+      course.enroll_student(@student).accept(force: true)
       teacher = teacher_in_course(course:, active_all: true).user
       @assignment = course.assignments.create!
       @submission = @assignment.submissions.find_by(user: @student)

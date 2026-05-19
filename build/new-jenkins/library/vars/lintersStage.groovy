@@ -40,19 +40,6 @@ private def runLinterCommand(String stageName, Closure scriptBlock) {
   }
 }
 
-def provisionDocker() {
-  // Pull the linters image from registry and tag it locally
-  credentials.withStarlordCredentials {
-    sh """
-      set -ex
-
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $LINTERS_RUNNER_IMAGE
-      docker tag $LINTERS_RUNNER_IMAGE local/linters-runner
-      echo "Linters runner image pulled and tagged locally."
-    """
-  }
-}
-
 def runLintersInline() {
   def hasBundleFiles = env.HAS_BUNDLE_FILES == 'true'
   def hasYarnFiles = env.HAS_YARN_FILES == 'true'

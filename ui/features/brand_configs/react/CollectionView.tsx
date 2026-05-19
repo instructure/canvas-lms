@@ -257,11 +257,10 @@ export default function CollectionView(props: CollectionViewProps) {
     )
   }
 
-  function onNewTheme(_e: React.SyntheticEvent, value: string[] | string) {
-    let md5 = value
+  function onNewTheme(_e: React.SyntheticEvent, value: (string | number)[] | string | number) {
     // massage the callback value from InstUI Menu component (see INSTUI-2429)
-    if (md5 instanceof Array) md5 = md5[0]
-    if (md5 === '0') md5 = ''
+    const raw = value instanceof Array ? value[0] : value
+    const md5 = typeof raw === 'number' ? '' : raw
     startEditing({md5ToActivate: md5})
   }
 

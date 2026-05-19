@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Checkpoints::AdhocOverrideCommonService < ApplicationService
-  require_relative "discussion_checkpoint_error"
   include Checkpoints::DateOverrider
 
   def initialize(checkpoint:, override:)

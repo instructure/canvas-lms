@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class MasterCourses::ChildContentTag < ActiveRecord::Base
+class MasterCourses::ChildContentTag < ApplicationRecord
   # can never have too many content tags
 
   # stores change data on the associated course

@@ -20,12 +20,12 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import axios from '@canvas/axios'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import PublishButtonView from '@canvas/publish-button-view'
 import SpeedgraderLinkView from './backbone/views/SpeedgraderLinkView'
-import vddTooltip from '@canvas/due-dates/jquery/vddTooltip'
+import vddTooltip from '@canvas/due-dates/react/vddTooltip'
 import MarkAsDone from '@canvas/util/jquery/markAsDone'
 import CyoeStats from '@canvas/conditional-release-stats/react/index'
 import '@canvas/jquery/jquery.instructure_forms'
@@ -49,7 +49,7 @@ import {
   mapRubricAssociationUnderscoredKeysToCamelCase,
 } from '@canvas/rubrics/react/utils'
 import {PeerReviewWidget} from '@canvas/assignments/react/PeerReviewWidget'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
@@ -69,10 +69,11 @@ function createOrUpdateRoot(elementId: string, component: React.ReactElement) {
 
   let root = roots.get(elementId)
   if (!root) {
-    root = createRoot(container)
+    root = render(component, container)
     roots.set(elementId, root)
+  } else {
+    rerender(root, component)
   }
-  root.render(component)
 }
 
 function unmountRoot(elementId: string) {
@@ -209,6 +210,7 @@ const promiseToGetModuleSequenceFooter = import('@canvas/module-sequence-footer'
 $(() => {
   const $el = $('#assignment_publish_button')
   if ($el.length > 0) {
+    // @ts-expect-error TS7 migration
     const model = new Assignment({
       id: $el.attr('data-id'),
       unpublishable: !$el.hasClass('disabled'),
@@ -218,15 +220,14 @@ $(() => {
 
     // @ts-expect-error
     new SpeedgraderLinkView({model, el: '#assignment-speedgrader-link'}).render()
+    // @ts-expect-error TS7 migration
     const pbv = new PublishButtonView({model, el: $el})
     pbv.render()
 
-    // @ts-expect-error
     pbv.on('publish', () => {
       $('#moderated_grading_button').show()
       $('#speed-grader-link-container').removeClass('hidden')
     })
-    // @ts-expect-error
     pbv.on('unpublish', () => {
       $('#moderated_grading_button').hide()
       $('#speed-grader-link-container').addClass('hidden')

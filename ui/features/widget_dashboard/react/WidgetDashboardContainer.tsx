@@ -37,17 +37,18 @@ import {useResponsiveContext} from './hooks/useResponsiveContext'
 import {useWidgetDashboardEdit} from './hooks/useWidgetDashboardEdit'
 import {useWidgetLayout} from './hooks/useWidgetLayout'
 import {toggleDashboardView} from '@canvas/dashboard-toggle/utils/dashboardToggle'
+import DarkModeToggle from './components/DarkModeToggle'
+import {useWidgetTheme} from './theme/WidgetThemeContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
 const WidgetDashboardContainer: React.FC = () => {
-  const {observedUsersList, canAddObservee, currentUser, currentUserRoles, dashboardFeatures} =
-    useWidgetDashboard()
+  const {observedUsersList, canAddObservee, currentUser, currentUserRoles} = useWidgetDashboard()
+  const {isDark} = useWidgetTheme()
   const {isMobile} = useResponsiveContext()
   const {isEditMode, isDirty, isSaving, saveError, enterEditMode, exitEditMode, clearError} =
     useWidgetDashboardEdit()
   const {config, resetConfig, saveLayout} = useWidgetLayout()
-  const isCustomizationEnabled = dashboardFeatures.widget_dashboard_customization
   const [switchingDashboard, setSwitchingDashboard] = useState(false)
   const customizeButtonRef = useRef<Element | null>(null)
   const wasEditModeRef = useRef(isEditMode)
@@ -93,7 +94,7 @@ const WidgetDashboardContainer: React.FC = () => {
   }
 
   return (
-    <View as="div">
+    <View as="div" background={isDark ? undefined : 'primary'}>
       <DashboardNotifications />
       {saveError && (
         <Alert
@@ -105,12 +106,19 @@ const WidgetDashboardContainer: React.FC = () => {
           {I18n.t('Failed to save widget layout: %{error}', {error: saveError})}
         </Alert>
       )}
-      <Flex margin="0 0 medium" alignItems="center">
-        <Flex.Item shouldGrow>
-          <Flex gap="small" direction={isMobile ? 'column' : 'row'} alignItems="center">
+      <Flex direction="column" gap="small" margin="0 0 medium">
+        <Flex.Item>
+          <Flex gap="small" direction={isMobile ? 'column' : 'row'} alignItems="center" wrap="wrap">
             <Flex.Item shouldGrow>
-              <Heading level="h1" margin="0" data-testid="dashboard-heading">
-                {I18n.t('Dashboard')}
+              <Heading
+                level="h1"
+                margin="0"
+                data-testid="dashboard-heading"
+                color={isDark ? 'primary-inverse' : undefined}
+              >
+                {ENV.current_user?.display_name
+                  ? I18n.t('Hello, %{name}!', {name: ENV.current_user.display_name})
+                  : I18n.t('Dashboard')}
               </Heading>
             </Flex.Item>
             {ENV.widget_dashboard_overridable === true && (
@@ -124,51 +132,48 @@ const WidgetDashboardContainer: React.FC = () => {
                 </Button>
               </Flex.Item>
             )}
-            {isCustomizationEnabled && (
-              <>
-                {isEditMode ? (
-                  <>
-                    <Flex.Item>
-                      <Button
-                        onClick={handleCancel}
-                        margin="0 small 0 0"
-                        data-testid="cancel-customize-button"
-                      >
-                        {I18n.t('Cancel')}
-                      </Button>
-                    </Flex.Item>
-                    <Flex.Item>
-                      <Button
-                        color="primary"
-                        onClick={handleSave}
-                        interaction={isSaving ? 'disabled' : 'enabled'}
-                        data-testid="save-customize-button"
-                      >
-                        {isSaving ? I18n.t('Saving...') : I18n.t('Save changes')}
-                      </Button>
-                    </Flex.Item>
-                  </>
-                ) : (
-                  <Flex.Item>
-                    <Button
-                      elementRef={el => {
-                        customizeButtonRef.current = el
-                      }}
-                      onClick={enterEditMode}
-                      renderIcon={<IconConfigureLine />}
-                      withBackground={false}
-                      color="primary"
-                      data-testid="customize-dashboard-button"
-                    >
-                      {I18n.t('Customize dashboard')}
-                    </Button>
-                  </Flex.Item>
-                )}
-              </>
+            {ENV.DASHBOARD_FEATURES?.widget_dashboard_dark_mode && (
+              <Flex.Item>
+                <DarkModeToggle />
+              </Flex.Item>
             )}
-            <Flex.Item>
-              <FeedbackQuestionTile />
-            </Flex.Item>
+            {isEditMode ? (
+              <>
+                <Flex.Item>
+                  <Button onClick={handleCancel} data-testid="cancel-customize-button">
+                    {I18n.t('Cancel')}
+                  </Button>
+                </Flex.Item>
+                <Flex.Item>
+                  <Button
+                    color="primary"
+                    onClick={handleSave}
+                    interaction={isSaving ? 'disabled' : 'enabled'}
+                    data-testid="save-customize-button"
+                  >
+                    {isSaving ? I18n.t('Saving...') : I18n.t('Save changes')}
+                  </Button>
+                </Flex.Item>
+              </>
+            ) : (
+              <Flex.Item>
+                <Button
+                  elementRef={el => {
+                    customizeButtonRef.current = el
+                  }}
+                  onClick={enterEditMode}
+                  renderIcon={<IconConfigureLine />}
+                  data-testid="customize-dashboard-button"
+                >
+                  {I18n.t('Customize dashboard')}
+                </Button>
+              </Flex.Item>
+            )}
+            {ENV.add_oak_mount_point && (
+              <Flex.Item>
+                <div id="oak-mount-point"></div>
+              </Flex.Item>
+            )}
           </Flex>
         </Flex.Item>
         {observedUsersList.length > 0 && currentUser && (
@@ -188,6 +193,9 @@ const WidgetDashboardContainer: React.FC = () => {
             </View>
           </Flex.Item>
         )}
+        <Flex.Item>
+          <FeedbackQuestionTile />
+        </Flex.Item>
       </Flex>
       <DashboardTabs />
     </View>

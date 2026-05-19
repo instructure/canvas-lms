@@ -688,7 +688,7 @@ describe GroupCategory do
 
     it "catches errors and fail the current progress" do
       expect_any_instantiation_of(@category).to receive(:distribute_members_among_groups_by_section).and_raise("oh noes")
-      @category.assign_unassigned_members_in_background(true)
+      @category.assign_unassigned_members_in_background(by_section: true)
       run_jobs
 
       progress = @category.progresses.last
@@ -712,7 +712,7 @@ describe GroupCategory do
       group = @category.groups.create(name: "Group", context: @course)
       @category.update_attribute(:auto_leader, "first")
 
-      @category.assign_unassigned_members(true)
+      @category.assign_unassigned_members(by_section: true)
       expect(group.reload.users).to eq [@student]
       expect(group.leader).to eq @student
     end

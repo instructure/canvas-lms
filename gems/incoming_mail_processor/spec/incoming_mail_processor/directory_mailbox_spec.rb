@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe IncomingMailProcessor::DirectoryMailbox do
   it_behaves_like "Mailbox"
 
@@ -35,7 +33,7 @@ describe IncomingMailProcessor::DirectoryMailbox do
 
   it "connects if folder exists" do
     expect(@mailbox).to receive(:folder_exists?).with(default_config[:folder]).and_return(true)
-    expect { @mailbox.connect }.to_not raise_error
+    expect { @mailbox.connect }.not_to raise_error
   end
 
   it "raises on connect if folder does not exist" do

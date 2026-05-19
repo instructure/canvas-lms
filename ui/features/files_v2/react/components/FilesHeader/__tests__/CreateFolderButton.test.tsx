@@ -20,7 +20,7 @@ import React from 'react'
 import CreateFolderButton from '../CreateFolderButton'
 import {render, screen, waitFor} from '@testing-library/react'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import userEvent from '@testing-library/user-event'
 import {FileManagementProvider} from '../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
@@ -28,13 +28,17 @@ import {RowsProvider} from '../../../contexts/RowsContext'
 import {mockRowsContext} from '../../FileFolderTable/__tests__/testUtils'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess} from '@instructure/platform-alerts'
 
 const server = setupServer()
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: vi.fn(() => () => {}),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashSuccess: vi.fn(() => () => {}),
+  }
+})
 
 const renderComponent = () => {
   return render(

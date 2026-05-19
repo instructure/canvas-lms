@@ -50,6 +50,8 @@ const RCE = forwardRef<RCEWrapper, RCEPropTypes>(function RCE(props, rceRef) {
     editorOptions, // tinymce config
     height,
     highContrastCSS,
+    useHighContrast,
+    fontFamily,
     instRecordDisabled,
     language,
     liveRegion,
@@ -93,6 +95,8 @@ const RCE = forwardRef<RCEWrapper, RCEPropTypes>(function RCE(props, rceRef) {
       canvasOrigin,
       defaultContent,
       highContrastCSS,
+      useHighContrast,
+      fontFamily,
       instRecordDisabled,
       language: normalizeLocale(language),
       liveRegion,
@@ -180,6 +184,17 @@ export interface RCEPropTypes {
    * array of URLs to high-contrast css
    */
   highContrastCSS?: string[]
+
+  /**
+   * whether high contrast mode is enabled
+   */
+  useHighContrast?: boolean
+
+  /**
+   * CSS font-family string for the RCE chrome (toolbar, menus).
+   * Built by the host to include Lato Extended, dyslexic font, K5 font, etc.
+   */
+  fontFamily?: string
 
   /**
    * if true, do not load the plugin that provides the media toolbar and menu items

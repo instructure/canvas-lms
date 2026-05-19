@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {func, shape, string, object} from 'prop-types'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {NumberInput} from '@instructure/ui-number-input'
 
 export default function DimensionInput(props) {
@@ -40,7 +39,7 @@ export default function DimensionInput(props) {
   return (
     <NumberInput
       allowStringValue={true}
-      renderLabel={<ScreenReaderContent>{label}</ScreenReaderContent>}
+      renderLabel={label}
       onChange={handleChange}
       onDecrement={handleDecrement}
       onIncrement={handleIncrement}
@@ -48,7 +47,7 @@ export default function DimensionInput(props) {
       showArrows={false}
       value={inputValue}
       messages={messages}
-      inputRef={(ref) => {
+      inputRef={ref => {
         if (dimensionsRef) {
           dimensionsRef.current = ref
         }

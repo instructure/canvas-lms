@@ -273,6 +273,7 @@ body:not(.responsive_student_grades_page) {
 
 #grades_summary {
   a.toggle_comments_link,
+  a.toggle_score_details_link,
   a.toggle_rubric_assessments_link {
     background-color: $ic-color-medium-light;
     padding: 4px 6px;

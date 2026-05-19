@@ -90,8 +90,6 @@
 class PlannerOverridesController < ApplicationController
   include Api::V1::PlannerOverride
 
-  before_action :require_user
-
   # @API List planner overrides
   #
   # Retrieve a planner override for the current user
@@ -108,7 +106,7 @@ class PlannerOverridesController < ApplicationController
   #
   # @returns PlannerOverride
   def show
-    planner_override = PlannerOverride.find(params[:id])
+    planner_override = PlannerOverride.for_user(@current_user).find(params[:id])
     render json: planner_override_json(planner_override, @current_user, session)
   end
 
@@ -124,7 +122,7 @@ class PlannerOverridesController < ApplicationController
   #
   # @returns PlannerOverride
   def update
-    planner_override = PlannerOverride.find(params[:id])
+    planner_override = PlannerOverride.for_user(@current_user).find(params[:id])
     planner_override.marked_complete = value_to_boolean(params[:marked_complete])
     planner_override.dismissed = value_to_boolean(params[:dismissed])
     sync_module_requirement_done(planner_override.plannable, @current_user, value_to_boolean(params[:marked_complete]))
@@ -141,7 +139,7 @@ class PlannerOverridesController < ApplicationController
   #
   # Create a planner override for the current user
   #
-  # @argument plannable_type [Required, String, "announcement"|"assignment"|"discussion_topic"|"quiz"|"wiki_page"|"planner_note"|"calendar_event"|"assessment_request"|"sub_assignment"]
+  # @argument plannable_type [Required, String, "announcement"|"assignment"|"discussion_topic"|"quiz"|"wiki_page"|"planner_note"|"calendar_event"|"assessment_request"|"sub_assignment"|"peer_review_sub_assignment"]
   #   Type of the item that you are overriding in the planner
   #
   # @argument plannable_id [Required, Integer]
@@ -162,7 +160,7 @@ class PlannerOverridesController < ApplicationController
                                            marked_complete: value_to_boolean(params[:marked_complete]),
                                            user: @current_user,
                                            dismissed: value_to_boolean(params[:dismissed]))
-    planner_override.plannable_type = plannable.type if plannable.is_a?(SubAssignment)
+    planner_override.plannable_type = plannable.type if plannable.is_a?(SubAssignment) || plannable.is_a?(PeerReviewSubAssignment)
     sync_module_requirement_done(plannable, @current_user, value_to_boolean(params[:marked_complete]))
 
     begin
@@ -189,7 +187,7 @@ class PlannerOverridesController < ApplicationController
   #
   # @returns PlannerOverride
   def destroy
-    planner_override = PlannerOverride.find(params[:id])
+    planner_override = PlannerOverride.for_user(@current_user).find(params[:id])
 
     if planner_override.destroy
       Rails.cache.delete(planner_meta_cache_key)

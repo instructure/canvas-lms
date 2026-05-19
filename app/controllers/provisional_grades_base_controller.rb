@@ -22,7 +22,6 @@ class ProvisionalGradesBaseController < ApplicationController
   include GradebookSettingsHelpers
   include Api::V1::Submission
 
-  before_action :require_user
   before_action :load_assignment
 
   def status

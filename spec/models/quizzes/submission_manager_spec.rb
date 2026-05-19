@@ -32,7 +32,7 @@ describe Quizzes::SubmissionManager do
         @quiz.quiz_submissions.create!(temporary_user_code: "asdf")
         stub_user = instance_double(User, to_s: "asdf")
 
-        s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(stub_user, false)
+        s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(stub_user, temporary: false)
 
         expect(s.temporary_user_code).to eq "asdf"
       end
@@ -41,7 +41,7 @@ describe Quizzes::SubmissionManager do
         @quiz.quiz_submissions.create!(temporary_user_code: "asdf")
         stub_user = instance_double(User, to_s: "asdf")
 
-        s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(stub_user, true)
+        s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(stub_user, temporary: true)
 
         expect(s.temporary_user_code).to eq "asdf"
       end
@@ -51,7 +51,7 @@ describe Quizzes::SubmissionManager do
       it "uses a temporary user code to query the db" do
         @quiz.quiz_submissions.create!(temporary_user_code: "user_#{test_user.id}")
 
-        s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user, true)
+        s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user, temporary: true)
 
         expect(s.temporary_user_code).to eq "user_#{test_user.id}"
       end
@@ -64,7 +64,7 @@ describe Quizzes::SubmissionManager do
         s = nil
         expect do
           s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user)
-        end.to_not change { Quizzes::QuizSubmission.count }
+        end.not_to change { Quizzes::QuizSubmission.count }
 
         expect(s.user).to eq test_user
         expect(s).to eq submission
@@ -79,7 +79,7 @@ describe Quizzes::SubmissionManager do
         s = nil
         expect do
           s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user)
-        end.to_not change { Quizzes::QuizSubmission.count }
+        end.not_to change { Quizzes::QuizSubmission.count }
         expect(s).to eq submission
         expect(s.workflow_state).to eq "graded"
       end
@@ -89,7 +89,7 @@ describe Quizzes::SubmissionManager do
       it "creates new submission and set the workflow state" do
         s = nil
         expect do
-          s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user, false, "preview")
+          s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user, temporary: false, state: "preview")
         end.to change { Quizzes::QuizSubmission.count }.by(1)
         expect(s.workflow_state).to eq "preview"
       end

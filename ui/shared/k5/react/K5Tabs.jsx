@@ -25,7 +25,11 @@ import {View} from '@instructure/ui-view'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {getK5ThemeVars} from './k5-theme'
 
-const k5ThemeVariables = getK5ThemeVars()
+const k5ThemeVariables = getK5ThemeVars(
+  Boolean(ENV.use_high_contrast),
+  Boolean(ENV.USE_CLASSIC_FONT),
+  Boolean(ENV.use_dyslexic_font),
+)
 
 const I18n = createI18nScope('k5_tabs')
 

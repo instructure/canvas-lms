@@ -17,7 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require_relative "../helpers/k5_common"
+
 describe NewQuizzesController do
+  include K5Common
+
   let(:course) { course_model }
   let(:teacher) { teacher_in_course(course:, active_all: true).user }
   let(:student) { student_in_course(course:, active_all: true).user }
@@ -136,6 +140,66 @@ describe NewQuizzesController do
           expect(response).to render_template("assignments/native_new_quizzes")
         end
       end
+
+      context "with content_only param" do
+        it "still sets up content tag context" do
+          get :launch, params: {
+            course_id: course.id,
+            assignment_id: assignment.id,
+            content_only: true
+          }
+          expect(response).to render_template("assignments/native_new_quizzes")
+          expect(assigns[:js_env][:NEW_QUIZZES]).to be_present
+        end
+      end
+
+      context "with sessionless_launch" do
+        it "skips content tag context setup" do
+          get :launch, params: {
+            course_id: course.id,
+            assignment_id: assignment.id,
+            sessionless_launch: true
+          }
+          expect(response).to render_template("assignments/native_new_quizzes")
+          expect(assigns[:module_tag]).to be_nil
+          expect(assigns[:tag]).to be_nil
+          expect(assigns[:resource_url]).to be_nil
+        end
+      end
+
+      context "when assignment is in a module but no module_item_id is provided" do
+        let(:context_module) { course.context_modules.create!(name: "Test Module") }
+
+        before do
+          context_module.add_item(type: "assignment", id: assignment.id)
+        end
+
+        it "auto-resolves the first module tag for the assignment" do
+          get :launch, params: {
+            course_id: course.id,
+            assignment_id: assignment.id
+          }
+          expect(assigns[:module_tag]).to be_present
+          expect(assigns[:module_tag].content).to eq(assignment)
+        end
+      end
+    end
+
+    context "when sessionless_launch param is present" do
+      before do
+        user_session(teacher)
+      end
+
+      it "renders the native new quizzes view" do
+        get :launch, params: { course_id: course.id, assignment_id: assignment.id, sessionless_launch: true }
+        expect(response).to render_template("assignments/native_new_quizzes")
+      end
+
+      it "does not alter the basename" do
+        get :launch, params: { course_id: course.id, assignment_id: assignment.id, sessionless_launch: true }
+        expect(assigns[:js_env][:NEW_QUIZZES][:basename])
+          .to eq("/courses/#{course.id}/assignments/#{assignment.id}")
+      end
     end
 
     context "when user is a student" do
@@ -147,6 +211,101 @@ describe NewQuizzesController do
       it "renders the native new quizzes view for authorized students" do
         get :launch, params: { course_id: course.id, assignment_id: assignment.id }
         expect(response).to render_template("assignments/native_new_quizzes")
+      end
+
+      context "when assignment is locked" do
+        before do
+          allow(controller).to receive(:taking_action?).and_return(true)
+        end
+
+        it "returns unauthorized when before unlock_at" do
+          assignment.update!(due_at: 36.hours.from_now, unlock_at: 1.day.from_now, lock_at: 2.days.from_now)
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          assert_unauthorized
+        end
+
+        it "returns unauthorized when after lock_at" do
+          assignment.update!(due_at: 36.hours.ago, unlock_at: 2.days.ago, lock_at: 1.day.ago)
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          assert_unauthorized
+        end
+
+        it "renders when within the lock window" do
+          assignment.update!(due_at: Time.zone.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now)
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(response).to render_template("assignments/native_new_quizzes")
+        end
+
+        it "does not block non-taking actions" do
+          allow(controller).to receive(:taking_action?).and_call_original
+          assignment.update!(due_at: 36.hours.from_now, unlock_at: 1.day.from_now, lock_at: 2.days.from_now)
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(response).to render_template("assignments/native_new_quizzes")
+        end
+      end
+
+      context "when assignment has student-specific overrides" do
+        it "respects the override dates" do
+          assignment.update!(due_at: 36.hours.from_now, unlock_at: 1.day.from_now, lock_at: 2.days.from_now)
+          override = assignment.assignment_overrides.create!(set_type: "ADHOC")
+          override.assignment_override_students.create!(user: student)
+          override.override_unlock_at(1.day.ago)
+          override.override_lock_at(1.day.from_now)
+          override.save!
+
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(response).to render_template("assignments/native_new_quizzes")
+        end
+      end
+    end
+
+    context "when user is a teacher" do
+      before do
+        course.offer!
+        user_session(teacher)
+      end
+
+      it "renders even when assignment is locked" do
+        assignment.update!(due_at: 36.hours.from_now, unlock_at: 1.day.from_now, lock_at: 2.days.from_now)
+        get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+        expect(response).to render_template("assignments/native_new_quizzes")
+      end
+    end
+
+    context "in a K5 (Canvas for Elementary) course" do
+      before do
+        toggle_k5_setting(course.account)
+        course.offer!
+      end
+
+      context "when user is a student" do
+        before { user_session(student) }
+
+        it "hides the course sidebar (@show_left_side is false)" do
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(assigns(:show_left_side)).to be false
+        end
+      end
+
+      context "when user is a teacher" do
+        before { user_session(teacher) }
+
+        it "keeps the course sidebar visible (@show_left_side is true)" do
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(assigns(:show_left_side)).to be true
+        end
+      end
+
+      context "when account is not K5" do
+        before do
+          toggle_k5_setting(course.account, enable: false)
+          user_session(student)
+        end
+
+        it "does not set @show_left_side" do
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(assigns(:show_left_side)).to be_nil
+        end
       end
     end
   end
@@ -195,7 +354,7 @@ describe NewQuizzesController do
 
       context "when no quiz_lti tool is found" do
         before do
-          allow(Lti::ToolFinder).to receive(:from_context).and_return(nil)
+          tool.destroy
         end
 
         it "returns unauthorized" do
@@ -204,16 +363,16 @@ describe NewQuizzesController do
         end
       end
 
-      context "when tool is not quiz_lti" do
+      context "when only a non-quiz_lti tool with course_navigation exists" do
         before do
-          regular_tool = course.context_external_tools.create!(
+          tool.destroy
+          course.context_external_tools.create!(
             name: "Regular Tool",
             url: "http://example.com/launch",
             consumer_key: "key",
             shared_secret: "secret",
             course_navigation: { enabled: true }
           )
-          allow(Lti::ToolFinder).to receive(:from_context).and_return(regular_tool)
         end
 
         it "returns unauthorized" do

@@ -50,7 +50,7 @@ describe Submissions::PreviewsController do
         before do
           user_session(@teacher)
           submission = @quiz.assignment.submissions.where(user_id: @student).first
-          submission.quiz_submission.with_versioning(true) do
+          submission.quiz_submission.with_versioning do
             submission.quiz_submission.update_attribute(:finished_at, 1.hour.ago)
           end
         end

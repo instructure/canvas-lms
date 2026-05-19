@@ -308,10 +308,9 @@ describe UsersController, type: :request do
   end
 
   it "add file attachment location to returned message when file_association_access feature flag is enabled" do
-    @context = @course
-    attachment = attachment_model(context: @course, content_type: "application/pdf")
+    attachment = attachment_model(context: @student, content_type: "application/pdf")
     attachment.root_account.enable_feature!(:file_association_access)
-    discussion_topic_model(message: "<img src='/users/#{@user.id}/files/#{attachment.id}' />", user: @user)
+    discussion_topic_model(context: @course, message: "<img src='/users/#{@student.id}/files/#{attachment.id}' />", user: @student)
 
     json = api_call(:get,
                     "/api/v1/users/activity_stream.json",
@@ -367,7 +366,7 @@ describe UsersController, type: :request do
   end
 
   it "translates user content in discussion topic without verifiers" do
-    should_translate_user_content(@course, false) do |user_content|
+    should_translate_user_content(@course, include_verifiers: false) do |user_content|
       @context = @course
       discussion_topic_model(message: user_content, user: @user)
       json = api_call(:get,
@@ -390,7 +389,7 @@ describe UsersController, type: :request do
   end
 
   it "translates user content in discussion entry without verifiers" do
-    should_translate_user_content(@course, false) do |user_content|
+    should_translate_user_content(@course, include_verifiers: false) do |user_content|
       @context = @course
       discussion_topic_model
       @topic.reply_from(user: @user, html: user_content)
@@ -445,7 +444,7 @@ describe UsersController, type: :request do
   end
 
   it "translates user content in announcement messages without verifiers" do
-    should_translate_user_content(@course, false) do |user_content|
+    should_translate_user_content(@course, include_verifiers: false) do |user_content|
       @context = @course
       announcement_model(message: user_content, user: @user)
       json = api_call(:get,
@@ -468,7 +467,7 @@ describe UsersController, type: :request do
   end
 
   it "translates user content in announcement discussion entries without verifiers" do
-    should_translate_user_content(@course, false) do |user_content|
+    should_translate_user_content(@course, include_verifiers: false) do |user_content|
       @context = @course
       announcement_model
       @a.reply_from(user: @user, html: user_content)
@@ -734,7 +733,7 @@ describe UsersController, type: :request do
       },
 
       "user" => {
-        "name" => "User", "sortable_name" => "User", "id" => @sub.user_id, "short_name" => "User", "created_at" => @user.created_at.iso8601
+        "name" => "User", "sortable_name" => "User", "id" => @sub.user_id, "short_name" => "User", "created_at" => @user.created_at.as_json
       },
 
       "context_type" => "Course",
@@ -880,7 +879,7 @@ describe UsersController, type: :request do
       },
 
       "user" => {
-        "name" => "User", "sortable_name" => "User", "id" => @sub.user_id, "short_name" => "User", "created_at" => @user.created_at.iso8601
+        "name" => "User", "sortable_name" => "User", "id" => @sub.user_id, "short_name" => "User", "created_at" => @user.created_at.as_json
       },
       "context_type" => "Course",
       "course_id" => @course.id,

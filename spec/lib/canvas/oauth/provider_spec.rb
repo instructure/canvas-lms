@@ -170,6 +170,43 @@ module Canvas::OAuth
       end
     end
 
+    describe "#can_issue_token?" do
+      let_once(:developer_key) { DeveloperKey.create!(name: "test_key") }
+      let_once(:trusted_key) { DeveloperKey.create!(name: "trusted_key").tap { |k| k.update!(trusted: true) } }
+      let_once(:regular_user) { user_model }
+
+      it "returns true for trusted developer keys regardless of user permissions" do
+        provider = Provider.new(trusted_key.id, "https://example.com")
+        expect(provider.can_issue_token?(regular_user, regular_user)).to be true
+      end
+
+      it "returns true for non-site-admin users with untrusted keys" do
+        provider = Provider.new(developer_key.id, "https://example.com")
+        expect(provider.can_issue_token?(regular_user, regular_user)).to be true
+      end
+
+      context "when user is a site admin" do
+        let_once(:site_admin) { site_admin_user }
+
+        it "returns false when user lacks site_admin_self_token_create permission" do
+          account_with_role_changes(account: Account.site_admin, role_changes: { site_admin_self_token_create: false })
+          provider = Provider.new(developer_key.id, "https://example.com")
+          expect(provider.can_issue_token?(site_admin, site_admin)).to be false
+        end
+
+        it "returns true when user has site_admin_self_token_create permission" do
+          provider = Provider.new(developer_key.id, "https://example.com")
+          expect(provider.can_issue_token?(site_admin, site_admin)).to be true
+        end
+
+        it "returns true for trusted keys even without the permission" do
+          account_with_role_changes(account: Account.site_admin, role_changes: { site_admin_self_token_create: false })
+          provider = Provider.new(trusted_key.id, "https://example.com")
+          expect(provider.can_issue_token?(site_admin, site_admin)).to be true
+        end
+      end
+    end
+
     describe "#app_name" do
       let(:key_attrs) { { name: "some app", user_name: "some user", email: "some email" } }
       let(:key) { instance_double(DeveloperKey, **key_attrs) }

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 RSpec.describe LatePolicySerializer do
   subject(:json) do
     LatePolicySerializer.new(late_policy, controller: instance_double(ActionController::Base)).as_json

@@ -23,43 +23,11 @@
 class AiConversationsController < ApplicationController
   include Api::V1::AiExperience
 
-  protect_from_forgery except: %i[create post_message], with: :exception
-
   before_action :require_context
   before_action :check_ai_experiences_feature_flag
   before_action :require_access_right
   before_action :load_experience
-  before_action :load_conversation, only: %i[post_message destroy show evaluation]
-
-  # Display the page for teachers to view all student AI conversations
-  # Returns HTML for teachers, JSON for students (their active conversation)
-  #
-  # @returns HTML page or JSON
-  def index
-    # Teacher view - show all student conversations
-    permissions = %i[manage_assignments_add manage_assignments_edit manage_assignments_delete]
-    unless @context.grants_any_right?(@current_user, *permissions)
-      return render_unauthorized_action
-    end
-
-    set_active_tab "ai_experiences"
-    add_crumb t("#crumbs.ai_experiences", "AI Experiences"), course_ai_experiences_path(@context)
-    add_crumb @experience.title, course_ai_experience_path(@context, @experience)
-    add_crumb t("#crumbs.ai_conversations", "AI Conversations")
-
-    @page_title = t("#page_title.ai_conversations", "%{title} - AI Conversations", title: @experience.title)
-    js_bundle :ai_experiences_ai_conversations
-
-    can_manage = @context.grants_any_right?(@current_user, *permissions)
-
-    js_env(
-      AI_EXPERIENCE: ai_experience_json(@experience, @current_user, session, can_manage:),
-      COURSE_ID: @context.id,
-      ai_experiences_evaluation_enabled: @context.feature_enabled?(:ai_experiences_evaluation)
-    )
-
-    render html: view_context.content_tag(:div, nil, id: "ai_experiences_ai_conversations"), layout: true
-  end
+  before_action :load_conversation, only: %i[post_message destroy show evaluation create_feedback delete_feedback]
 
   # @API Show conversation
   #
@@ -73,17 +41,11 @@ class AiConversationsController < ApplicationController
       return render_unauthorized_action
     end
 
-    client = LLMConversationClient.new(
-      current_user: @conversation.user,
-      root_account_uuid: @context.root_account.uuid,
-      conversation_context_id: @experience.llm_conversation_context_id,
-      facts: @experience.facts,
-      learning_objectives: @experience.learning_objective,
-      scenario: @experience.pedagogical_guidance,
-      conversation_id: @conversation.llm_conversation_id
+    messages_and_progress = AiExperiences::ConversationMessagesService.new(account: @context.account).fetch_with_progress(
+      conversation_id: @conversation.llm_conversation_id,
+      requesting_user: @current_user
     )
 
-    messages_and_progress = client.messages_with_conversation_progress
     render json: {
       id: @conversation.id,
       user_id: @conversation.user_id.to_s,
@@ -110,18 +72,10 @@ class AiConversationsController < ApplicationController
                                        .first
 
     if existing_conversation
-      client = LLMConversationClient.new(
-        current_user: @current_user,
-        root_account_uuid: @context.root_account.uuid,
-        conversation_context_id: @experience.llm_conversation_context_id,
-        # Fallback to inline variables if no context exists (for older records)
-        facts: @experience.facts,
-        learning_objectives: @experience.learning_objective,
-        scenario: @experience.pedagogical_guidance,
-        conversation_id: existing_conversation.llm_conversation_id
+      messages_and_progress = AiExperiences::ConversationMessagesService.new(account: @context.account).fetch_with_progress(
+        conversation_id: existing_conversation.llm_conversation_id,
+        requesting_user: @current_user
       )
-
-      messages_and_progress = client.messages_with_conversation_progress
       render json: { id: existing_conversation.id, messages: messages_and_progress[:messages], progress: messages_and_progress[:progress] }
     else
       render json: {}
@@ -145,17 +99,14 @@ class AiConversationsController < ApplicationController
     # If active conversation exists, complete it before creating a new one
     existing_conversation&.complete!
 
-    client = LLMConversationClient.new(
+    result = AiExperiences::ConversationStartService.new(account: @context.account).start(
       current_user: @current_user,
       root_account_uuid: @context.root_account.uuid,
       conversation_context_id: @experience.llm_conversation_context_id,
-      # Fallback to inline variables if no context exists (for older records)
       facts: @experience.facts,
       learning_objectives: @experience.learning_objective,
       scenario: @experience.pedagogical_guidance
     )
-
-    result = client.starting_messages
 
     # Save the conversation record
     conversation_record = nil
@@ -189,25 +140,10 @@ class AiConversationsController < ApplicationController
       return render json: { error: "message is required" }, status: :bad_request
     end
 
-    client = LLMConversationClient.new(
-      current_user: @current_user,
-      root_account_uuid: @context.root_account.uuid,
-      conversation_context_id: @experience.llm_conversation_context_id,
-      # Fallback to inline variables if no context exists (for older records)
-      facts: @experience.facts,
-      learning_objectives: @experience.learning_objective,
-      scenario: @experience.pedagogical_guidance,
-      conversation_id: @conversation.llm_conversation_id
-    )
-
-    # Get current messages first
-    messages_data = client.messages
-    current_messages = messages_data[:messages]
-
-    # Send the new message
-    result = client.continue_conversation(
-      messages: current_messages,
-      new_user_message: params[:message]
+    result = AiExperiences::ConversationContinueService.new(account: @context.account).continue(
+      conversation_id: @conversation.llm_conversation_id,
+      new_user_message: params[:message],
+      requesting_user: @current_user
     )
 
     # Return only the Canvas conversation ID, messages, and progress
@@ -238,22 +174,52 @@ class AiConversationsController < ApplicationController
       return render_unauthorized_action
     end
 
-    client = LLMConversationClient.new(
-      current_user: @conversation.user,
-      root_account_uuid: @context.root_account.uuid,
-      conversation_context_id: @experience.llm_conversation_context_id,
-      facts: @experience.facts,
-      learning_objectives: @experience.learning_objective,
-      scenario: @experience.pedagogical_guidance,
+    evaluation_data = AiExperiences::ConversationEvaluationService.new(account: @context.account).evaluate(
       conversation_id: @conversation.llm_conversation_id
     )
-
-    evaluation_data = client.evaluation
 
     render json: {
       id: @conversation.id,
       evaluation: evaluation_data
     }
+  rescue LlmConversation::Errors::ConversationError => e
+    render json: { error: e.message }, status: :service_unavailable
+  end
+
+  # @API Create feedback on a conversation message
+  #
+  # Submit a like or dislike vote on an AI-generated message.
+  #
+  # @argument vote [Required, String] "liked" or "disliked"
+  # @argument message_id [Required, String] llm-conversation message UUID
+  # @argument feedback_message [Optional, String] optional text for dislike
+  #
+  # @returns {Object} Hash with feedback record
+  def create_feedback
+    feedback = AiExperiences::ConversationMessageFeedbackService.new(account: @context.account).create(
+      conversation_id: @conversation.llm_conversation_id,
+      message_id: params[:message_id],
+      user_id: @current_user.uuid,
+      vote: params[:vote],
+      feedback_message: params[:feedback_message]
+    )
+    render json: { feedback: }
+  rescue LlmConversation::Errors::ConversationError => e
+    render json: { error: e.message }, status: :service_unavailable
+  end
+
+  # @API Delete feedback on a conversation message
+  #
+  # Remove a previously submitted vote (toggling off like/dislike).
+  #
+  # @returns {Object} Success response
+  def delete_feedback
+    AiExperiences::ConversationMessageFeedbackService.new(account: @context.account).delete(
+      conversation_id: @conversation.llm_conversation_id,
+      message_id: params[:message_id],
+      feedback_id: params[:feedback_id]
+    )
+    render json: { success: true }
   rescue LlmConversation::Errors::ConversationError => e
     render json: { error: e.message }, status: :service_unavailable
   end

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AccessToken < ActiveRecord::Base
+class AccessToken < ApplicationRecord
   include Workflow
 
   extend RootAccountResolver
@@ -88,10 +88,10 @@ class AccessToken < ActiveRecord::Base
       # This block is only for checking if the user can manage their own tokens
       next false unless user.id == user_id
 
+      next false unless self.class.can_manage_own_access_tokens?(user)
+
       # if the session wasn't set up correctly, just ignore the additional restrictions
       next true unless (root_account = session&.dig(:root_account))
-      # additional restrictions gated by feature flags
-      next true unless root_account.feature_enabled?(:admin_manage_access_tokens)
 
       # if personal access tokens are limited, then you can't create tokens for yourself
       # (from this block; if you're an admin, you'll still be able to from the block below)
@@ -111,6 +111,8 @@ class AccessToken < ActiveRecord::Base
     can :read and can :delete
 
     given do |user|
+      next false if user.id == user_id && !self.class.can_manage_own_access_tokens?(user)
+
       self.user.check_accounts_right?(user, :create_access_tokens)
     end
     can :create and can :update
@@ -220,7 +222,17 @@ class AccessToken < ActiveRecord::Base
 
   def set_permanent_expiration
     expires_in = developer_key.tokens_expire_in
-    self.permanent_expires_at = Time.now.utc + expires_in if expires_in
+    # failsafe 1 week
+    if Account.site_admin.feature_enabled?(:site_admin_access_token_expiration) &&
+       Account.site_admin.grants_right?(user, :read) &&
+       (site_admin_expires_in = DynamicSettings.find(tree: :private)["site_admin_access_token_expires_in", failsafe: 604_800]&.seconds || 1.week)
+      expires_in = [expires_in, site_admin_expires_in].compact.min
+    end
+    if expires_in
+      expires_at = Time.now.utc + expires_in
+      expires_at = [permanent_expires_at, expires_at].compact.min if new_record?
+      self.permanent_expires_at = expires_at
+    end
   end
 
   def usable?(token_key = :crypted_token)
@@ -279,7 +291,7 @@ class AccessToken < ActiveRecord::Base
       # not only use optimistic locking, but also don't update if someone else
       # is already in the process of updating it
       updated = AccessToken.where(id: AccessToken.where(id: self, last_used_at: prior_last_used_at)
-                                                 .lock("FOR UPDATE SKIP LOCKED"))
+                                      .lock("FOR UPDATE SKIP LOCKED"))
                            .update_all(last_used_at: at, updated_at: at)
       changes_applied if updated == 1
     end
@@ -307,7 +319,7 @@ class AccessToken < ActiveRecord::Base
     @full_token = nil
   end
 
-  def generate_token(overwrite = false)
+  def generate_token(overwrite: false)
     if overwrite || !crypted_token
       self.token = CanvasSlug.generate(nil, TOKEN_SIZE)
 
@@ -331,7 +343,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def regenerate_access_token
-    generate_token(true)
+    generate_token(overwrite: true)
     save
   end
 
@@ -363,6 +375,7 @@ class AccessToken < ActiveRecord::Base
       path = path.gsub(%r{:[^/)]+}, "[^/]+") # handle dynamic segments /courses/:course_id -> /courses/[^/]+
       path = path.gsub(%r{\*[^/)]+}, ".+") # handle glob segments /files/*path -> /files/.+
       path = path.gsub("(", "(?:").gsub(")", "|)") # handle optional segments /files(/[^/]+) -> /files(?:/[^/]+|)
+      path = path.gsub("/download", "/(?:download|preview)(?:\\.:type)?") # files have preview and download endpoints that do pretty much the same job
       path = "#{path}(?:\\.[^/]+|)" # handle format segments /files(.:format) -> /files(?:\.[^/]+|)
       Regexp.new("^#{path}$")
     end
@@ -403,6 +416,21 @@ class AccessToken < ActiveRecord::Base
     developer_key_id == DeveloperKey.default.id || developer_key&.name == DeveloperKey::DEFAULT_KEY_NAME
   end
 
+  def self.send_expiration_reminders
+    return unless Account.site_admin.feature_enabled?(:access_key_expiration_email)
+
+    notification = BroadcastPolicy.notification_finder.by_name("Access Token Expiring Soon")
+    return unless notification
+
+    window_start = 7.days.from_now.beginning_of_day
+    window_end   = 7.days.from_now.end_of_day
+
+    active.user_generated
+          .where(permanent_expires_at: window_start..window_end)
+          .preload(:developer_key, user: { pseudonym: :account })
+          .find_each { |token| notification.create_message(token, [token.user]) }
+  end
+
   # if user is not provided, all user tokens in the account will be invalidated
   # if skip_admins is true, tokens for users with active admin roles in the account will not be invalidated
   def self.invalidate_mobile_tokens!(account, user: nil, skip_admins: true)
@@ -439,6 +467,17 @@ class AccessToken < ActiveRecord::Base
       # the developer key's shard, avoiding the background job overhead while
       # still remaining contention-safe at the DB level.
       DeveloperKey.increment_counter(:access_token_count, developer_key.id)
+    end
+  end
+
+  class << self
+    def can_manage_own_access_tokens?(user)
+      if Account.site_admin.grants_right?(user, :read) &&
+         !Account.site_admin.grants_right?(user, :site_admin_self_token_create)
+        return false
+      end
+
+      true
     end
   end
 end

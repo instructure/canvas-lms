@@ -20,19 +20,19 @@ import React from 'react'
 import {useQuery} from '@apollo/client'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {TEACHER_QUERY} from '@canvas/assignments/graphql/teacher/Queries'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import TeacherSavedView from './TeacherSavedView'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-
-const I18n = createI18nScope('assignments_2')
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 interface TeacherQueryProps {
   assignmentLid: string
 }
 
 const TeacherQuery: React.FC<TeacherQueryProps> = ({assignmentLid}) => {
+  const {t} = useTranslation('assignments_2')
   const {loading, error, data} = useQuery(TEACHER_QUERY, {
     variables: {assignmentLid},
   })
@@ -42,8 +42,10 @@ const TeacherQuery: React.FC<TeacherQueryProps> = ({assignmentLid}) => {
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
-        errorSubject={I18n.t('Assignments 2 Teacher initial query error')}
-        errorCategory={I18n.t('Assignments 2 Teacher Error Page')}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
+        errorSubject={t('Assignments 2 Teacher initial query error')}
+        errorCategory={t('Assignments 2 Teacher Error Page')}
         errorMessage={error.message}
       />
     )
@@ -52,7 +54,7 @@ const TeacherQuery: React.FC<TeacherQueryProps> = ({assignmentLid}) => {
   if (loading) {
     return (
       <View as="div" textAlign="center" padding="large 0">
-        <Spinner size="large" renderTitle={I18n.t('Loading')} />
+        <Spinner size="large" renderTitle={t('Loading')} />
       </View>
     )
   }

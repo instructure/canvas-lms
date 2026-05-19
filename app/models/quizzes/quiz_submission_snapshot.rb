@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Quizzes::QuizSubmissionSnapshot < ActiveRecord::Base
+class Quizzes::QuizSubmissionSnapshot < ApplicationRecord
   belongs_to :quiz_submission, class_name: "Quizzes::QuizSubmission"
   serialize :data
 end

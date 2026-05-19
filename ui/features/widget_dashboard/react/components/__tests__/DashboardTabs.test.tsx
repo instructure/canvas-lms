@@ -23,7 +23,11 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import {graphql, http, HttpResponse} from 'msw'
 import DashboardTabs from '../DashboardTabs'
-import {clearWidgetDashboardCache, defaultGraphQLHandlers} from '../../__tests__/testHelpers'
+import {
+  clearWidgetDashboardCache,
+  defaultGraphQLHandlers,
+  PlatformTestWrapper,
+} from '../../__tests__/testHelpers'
 import {WidgetDashboardProvider} from '../../hooks/useWidgetDashboardContext'
 import {WidgetDashboardEditProvider} from '../../hooks/useWidgetDashboardEdit'
 import {WidgetLayoutProvider} from '../../hooks/useWidgetLayout'
@@ -166,15 +170,17 @@ const setup = (props?: Props, envOverrides = {}, preferencesOverrides = {}) => {
   }
 
   const renderResult = render(
-    <QueryClientProvider client={queryClient}>
-      <WidgetDashboardProvider preferences={preferences}>
-        <WidgetDashboardEditProvider>
-          <WidgetLayoutProvider>
-            <DashboardTabs {...buildDefaultProps(props)} />
-          </WidgetLayoutProvider>
-        </WidgetDashboardEditProvider>
-      </WidgetDashboardProvider>
-    </QueryClientProvider>,
+    <PlatformTestWrapper>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider preferences={preferences}>
+          <WidgetDashboardEditProvider>
+            <WidgetLayoutProvider>
+              <DashboardTabs {...buildDefaultProps(props)} />
+            </WidgetLayoutProvider>
+          </WidgetDashboardEditProvider>
+        </WidgetDashboardProvider>
+      </QueryClientProvider>
+    </PlatformTestWrapper>,
   )
 
   return {

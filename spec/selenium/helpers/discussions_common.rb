@@ -20,20 +20,6 @@
 require_relative "../common"
 
 module DiscussionsCommon
-  def go_to_topic
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-  end
-
-  def create_and_go_to_topic(title = "new topic", discussion_type = "side_comment", is_locked = false)
-    @topic = @course.discussion_topics.create!(title:, discussion_type:, user: @teacher)
-    if is_locked
-      @topic.lock
-      @topic.reload
-    end
-    go_to_topic
-    @topic
-  end
-
   def create_discussion(discussion_name, discussion_type, user = @teacher)
     @course.discussion_topics.create!(title: discussion_name, discussion_type:, message: "Discussion topic message", user:)
   end

@@ -17,7 +17,8 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -28,7 +29,7 @@ import {View} from '@instructure/ui-view'
 import IndentSelector from './AddItemModalComponents/IndentSelector'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {submiEditItem, prepareItemData} from '../handlers/editItemHandlers'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {ModuleItemMasterCourseRestrictionType} from '../utils/types'
 import {MODULE_ITEMS, MODULE_ITEMS_ALL} from '../utils/constants'
 
@@ -159,6 +160,8 @@ const EditItemModal = (props: EditItemModalProps) => {
         handleSubmit()
       }}
       data-testid="edit-item-modal"
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
     >
       <View as="div" padding="small small small medium">
         <Grid>

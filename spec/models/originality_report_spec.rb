@@ -316,7 +316,7 @@ describe OriginalityReport do
         # because if the user doesn't exist anymore, it was a test student
         # that got destroyed.
         OriginalityReport.copy_to_group_submissions!(report_id: -1, user_id: -1)
-      end.to_not raise_error
+      end.not_to raise_error
     end
 
     it "does not explode if the report is gone but a newer one exists" do
@@ -329,7 +329,7 @@ describe OriginalityReport do
           attachment_id: originality_report.attachment_id,
           updated_at: originality_report.updated_at - 1.hour
         )
-      end.to_not raise_error
+      end.not_to raise_error
     end
 
     it "explodes if the report is gone but no newer one exists" do
@@ -493,7 +493,7 @@ describe OriginalityReport do
 
     context "when the submission is not a group submission" do
       it "doesn't enqueue if submission is not a group submission" do
-        expect(described_class).to_not receive(:delay_if_production)
+        expect(described_class).not_to receive(:delay_if_production)
         subject.copy_to_group_submissions_later!
       end
     end

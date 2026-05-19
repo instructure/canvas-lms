@@ -20,7 +20,7 @@
 
 describe FoldersController do
   def io
-    fixture_file_upload("docs/doc.doc", "application/msword", true)
+    fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
   end
 
   def root_folder
@@ -135,6 +135,23 @@ describe FoldersController do
       delete_folder do
         @folder.sub_folders.create!(name: "folder2", context: @course)
       end
+    end
+  end
+
+  context "unauthenticated user in public course" do
+    before do
+      course_factory(is_public: true, active_all: true)
+      @root = Folder.root_folders(@course).first
+    end
+
+    it "allows access to the folder index" do
+      get "index", params: { course_id: @course.id }
+      expect(response).to have_http_status :ok
+    end
+
+    it "allows access to the folder show" do
+      get "show", params: { course_id: @course.id, id: @root.id }, format: "json"
+      expect(response).to have_http_status :ok
     end
   end
 end

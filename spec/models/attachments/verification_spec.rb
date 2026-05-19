@@ -86,7 +86,6 @@ describe Attachments::Verification do
     it "verifies a legacy verifier for read and download" do
       expect(v.valid_verifier_for_permission?(attachment.uuid, :read, root_account)).to be(true)
       expect(v.valid_verifier_for_permission?(attachment.uuid, :download, root_account)).to be(true)
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("attachments.legacy_verifier_success").twice
     end
 
     it "accepts the uuid of another copy of the file" do
@@ -95,7 +94,6 @@ describe Attachments::Verification do
       v2 = Attachments::Verification.new(clone)
       expect(v2.valid_verifier_for_permission?(attachment.uuid, :read, root_account)).to be true
       expect(v2.valid_verifier_for_permission?(attachment.uuid, :download, root_account)).to be true
-      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("attachments.related_verifier_success").twice
       expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("feature_flag_check", any_args).at_least(:once)
     end
 
@@ -180,6 +178,169 @@ describe Attachments::Verification do
       mock_session = { eportfolio_ids: [eportfolio.id], permissions_key: SecureRandom.uuid }
       expect(v2.valid_verifier_for_permission?(token, :read, root_account, mock_session)).to be(true)
       expect(v2.valid_verifier_for_permission?(token, :download, root_account, mock_session)).to be(true)
+    end
+  end
+
+  describe "#monitor_cross_domain_access" do
+    let(:referer) { "https://other.canvas.example/files/1" }
+    let(:request_host) { "this.canvas.example" }
+    let(:request_url) { "https://this.canvas.example/files/2" }
+    let(:request) do
+      instance_double(
+        ActionDispatch::Request,
+        referer:,
+        host: request_host,
+        url: request_url
+      )
+    end
+    let(:files_domain) { false }
+    let(:referrer_is_canvas_domain) { false }
+    let(:referrer_account) { referrer_is_canvas_domain ? instance_double(Account, id: 2) : nil }
+    let(:request_account) { instance_double(Account, id: 1) }
+
+    before do
+      allow(InstStatsd::Statsd).to receive(:event)
+    end
+
+    context "when the feature flag is disabled" do
+      let(:referrer_is_canvas_domain) { true }
+
+      before do
+        Account.site_admin.disable_feature!(:log_cross_domain_file_access)
+        allow(LoadAccount).to receive(:from_host).with("other.canvas.example").and_return(referrer_account)
+        allow(LoadAccount).to receive(:from_host).with("this.canvas.example").and_return(request_account)
+        v.monitor_cross_domain_access(request, files_domain)
+      end
+
+      it "does not emit a stats event" do
+        expect(InstStatsd::Statsd).not_to have_received(:event)
+      end
+    end
+
+    context "when the feature flag is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:log_cross_domain_file_access)
+        allow(LoadAccount).to receive(:from_host).with("other.canvas.example").and_return(referrer_account)
+        allow(LoadAccount).to receive(:from_host).with("this.canvas.example").and_return(request_account)
+        v.monitor_cross_domain_access(request, files_domain)
+      end
+
+      context "when the request is nil" do
+        let(:request) { nil }
+
+        it "does not emit a stats event" do
+          expect(InstStatsd::Statsd).not_to have_received(:event)
+        end
+      end
+
+      context "when the referer is blank" do
+        let(:referer) { "" }
+
+        it "does not emit a stats event" do
+          expect(InstStatsd::Statsd).not_to have_received(:event)
+        end
+      end
+
+      context "when files_domain is true" do
+        let(:files_domain) { true }
+        let(:referrer_is_canvas_domain) { true }
+
+        it "does not emit a stats event" do
+          expect(InstStatsd::Statsd).not_to have_received(:event)
+        end
+      end
+
+      context "when the referrer host matches the request host" do
+        let(:referer) { "https://this.canvas.example/somewhere" }
+
+        it "does not emit a stats event" do
+          expect(InstStatsd::Statsd).not_to have_received(:event)
+        end
+      end
+
+      context "when the referrer is not a known Canvas domain" do
+        it "does not emit a stats event" do
+          expect(InstStatsd::Statsd).not_to have_received(:event)
+        end
+      end
+
+      context "when the referrer is another Canvas domain with the same account" do
+        let(:referrer_is_canvas_domain) { true }
+        let(:referrer_account) { instance_double(Account, id: 1) }
+
+        it "does not emit a stats event" do
+          expect(InstStatsd::Statsd).not_to have_received(:event)
+        end
+      end
+
+      context "when the referrer is another Canvas domain with a different account" do
+        let(:referrer_is_canvas_domain) { true }
+
+        it "emits a cross_domain_file_access event" do
+          expect(InstStatsd::Statsd).to have_received(:event).with(
+            "File accessed from different Canvas domain",
+            "Referrer: https://other.canvas.example/files/1, Request URL: https://this.canvas.example/files/2",
+            type: "cross_domain_file_access",
+            alert_type: :warning
+          )
+        end
+      end
+
+      context "when the referer URI is invalid" do
+        let(:referer) { "http://[bad" }
+
+        it "does not emit a stats event" do
+          expect(InstStatsd::Statsd).not_to have_received(:event)
+        end
+      end
+    end
+  end
+
+  describe "#monitor_uuid_verifier_usage" do
+    let(:referer) { "https://other.canvas.example/files/1" }
+    let(:request_url) { "https://this.canvas.example/files/2" }
+    let(:request) do
+      instance_double(ActionDispatch::Request, referer:, url: request_url)
+    end
+
+    before do
+      allow(InstStatsd::Statsd).to receive(:event)
+    end
+
+    context "when the feature flag is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:log_uuid_verifier_usage)
+        v.monitor_uuid_verifier_usage(request)
+      end
+
+      it "does not emit a stats event" do
+        expect(InstStatsd::Statsd).not_to have_received(:event)
+      end
+    end
+
+    context "when the feature flag is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:log_uuid_verifier_usage)
+      end
+
+      it "emits a uuid_verifier_usage event" do
+        v.monitor_uuid_verifier_usage(request)
+        expect(InstStatsd::Statsd).to have_received(:event).with(
+          "File accessed with UUID verifier",
+          "Referrer: https://other.canvas.example/files/1, Request URL: https://this.canvas.example/files/2",
+          type: "uuid_verifier_usage",
+          alert_type: :info
+        )
+      end
+
+      context "when the referer URI is invalid" do
+        let(:referer) { "http://[bad" }
+
+        it "does not emit a stats event" do
+          v.monitor_uuid_verifier_usage(request)
+          expect(InstStatsd::Statsd).not_to have_received(:event)
+        end
+      end
     end
   end
 end

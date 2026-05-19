@@ -143,7 +143,6 @@ class OutcomeGroupsApiController < ApplicationController
   include Api::V1::Progress
   include Outcomes::OutcomeFriendlyDescriptionResolver
 
-  before_action :require_user
   before_action :get_context
   before_action :require_context, only: [:link_index]
 

@@ -18,13 +18,24 @@
 import $ from 'jquery'
 import React from 'react'
 import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import AssignmentInformation from '../index'
 import type {AssignmentInformationComponentProps} from '../index'
+import type {SubmissionConnection} from '../../../../types'
 import {assignmentInfoDefaultProps, defaultAssignment} from './fixtures'
+
+const mockShow = vi.fn()
+vi.mock('@canvas/assignment-posting-policy-tray', () => ({
+  default: React.forwardRef((_props: object, ref: React.Ref<{show: () => void}>) => {
+    React.useImperativeHandle(ref, () => ({show: mockShow}))
+    return <div data-testid="assignment-posting-policy-tray" />
+  }),
+}))
 
 describe('Assignment Information Tests', () => {
   beforeEach(() => {
     $.subscribe = vi.fn()
+    mockShow.mockClear()
   })
   const renderAssignmentInformation = (props: AssignmentInformationComponentProps) => {
     return render(<AssignmentInformation {...props} />)
@@ -145,6 +156,62 @@ describe('Assignment Information Tests', () => {
     expect(getByTestId('curve-grades-button')).toBeEnabled()
   })
 
+  describe('assignment score details table', () => {
+    const makeSubmission = (overrides: {
+      id: string
+      score: number | null
+      userId: string
+    }): SubmissionConnection => ({
+      assignmentId: '1',
+      redoRequest: false,
+      submittedAt: null,
+      state: 'graded',
+      ...overrides,
+    })
+
+    it('shows "No graded submissions" for High and Low Score when all submissions are ungraded', () => {
+      const props = {
+        ...assignmentInfoDefaultProps,
+        submissions: [
+          makeSubmission({id: '1', score: null, userId: '1'}),
+          makeSubmission({id: '2', score: null, userId: '2'}),
+        ],
+      }
+      const {getByTestId} = renderAssignmentInformation(props)
+      expect(getByTestId('assignment-max')).toHaveTextContent('No graded submissions')
+      expect(getByTestId('assignment-min')).toHaveTextContent('No graded submissions')
+    })
+
+    it('excludes null scores and uses only numeric scores for High, Low, and Average', () => {
+      const props = {
+        ...assignmentInfoDefaultProps,
+        submissions: [
+          makeSubmission({id: '1', score: 8, userId: '1'}),
+          makeSubmission({id: '2', score: null, userId: '2'}),
+          makeSubmission({id: '3', score: 5, userId: '3'}),
+        ],
+      }
+      const {getByTestId} = renderAssignmentInformation(props)
+      expect(getByTestId('assignment-max')).toHaveTextContent('8')
+      expect(getByTestId('assignment-min')).toHaveTextContent('5')
+      expect(getByTestId('assignment-average')).toHaveTextContent('6.5')
+    })
+
+    it('includes a score of 0 in High and Low Score calculations', () => {
+      const props = {
+        ...assignmentInfoDefaultProps,
+        submissions: [
+          makeSubmission({id: '1', score: 10, userId: '1'}),
+          makeSubmission({id: '2', score: 0, userId: '2'}),
+          makeSubmission({id: '3', score: null, userId: '3'}),
+        ],
+      }
+      const {getByTestId} = renderAssignmentInformation(props)
+      expect(getByTestId('assignment-max')).toHaveTextContent('10')
+      expect(getByTestId('assignment-min')).toHaveTextContent('0')
+    })
+  })
+
   describe('assignment in closed grading period', () => {
     let props: AssignmentInformationComponentProps
     beforeEach(() => {
@@ -191,6 +258,67 @@ describe('Assignment Information Tests', () => {
       const curveButton = getByTestId('curve-grades-button')
       expect(defaultButton).toBeEnabled()
       expect(curveButton).toBeEnabled()
+    })
+  })
+
+  describe('Grade Post Policy button', () => {
+    it('renders when an assignment is selected', () => {
+      const {getByTestId} = renderAssignmentInformation(assignmentInfoDefaultProps)
+      expect(getByTestId('grade-post-policy-button')).toBeInTheDocument()
+    })
+
+    it('does not render when no assignment is selected', () => {
+      const {queryByTestId} = renderAssignmentInformation({
+        ...assignmentInfoDefaultProps,
+        assignment: undefined,
+      })
+      expect(queryByTestId('grade-post-policy-button')).toBeNull()
+    })
+
+    it('opens the posting policy tray when clicked', async () => {
+      const {getByTestId} = renderAssignmentInformation(assignmentInfoDefaultProps)
+      await userEvent.click(getByTestId('grade-post-policy-button'))
+      expect(getByTestId('assignment-posting-policy-tray')).toBeInTheDocument()
+    })
+
+    it('reflects updated postManually state on subsequent tray opens', async () => {
+      const {getByTestId} = renderAssignmentInformation(assignmentInfoDefaultProps)
+      await userEvent.click(getByTestId('grade-post-policy-button'))
+      expect(mockShow).toHaveBeenCalledWith(
+        expect.objectContaining({assignment: expect.objectContaining({postManually: false})}),
+      )
+
+      mockShow.mock.calls[0][0].onAssignmentPostPolicyUpdated({
+        assignmentId: '1',
+        postManually: true,
+      })
+
+      await userEvent.click(getByTestId('grade-post-policy-button'))
+      expect(mockShow).toHaveBeenLastCalledWith(
+        expect.objectContaining({assignment: expect.objectContaining({postManually: true})}),
+      )
+    })
+
+    it('resets postManually when a different assignment is selected', async () => {
+      const {getByTestId, rerender} = renderAssignmentInformation(assignmentInfoDefaultProps)
+      await userEvent.click(getByTestId('grade-post-policy-button'))
+
+      mockShow.mock.calls[0][0].onAssignmentPostPolicyUpdated({
+        assignmentId: '1',
+        postManually: true,
+      })
+
+      rerender(
+        <AssignmentInformation
+          {...assignmentInfoDefaultProps}
+          assignment={{...defaultAssignment, id: '2', postManually: false}}
+        />,
+      )
+
+      await userEvent.click(getByTestId('grade-post-policy-button'))
+      expect(mockShow).toHaveBeenLastCalledWith(
+        expect.objectContaining({assignment: expect.objectContaining({postManually: false})}),
+      )
     })
   })
 })

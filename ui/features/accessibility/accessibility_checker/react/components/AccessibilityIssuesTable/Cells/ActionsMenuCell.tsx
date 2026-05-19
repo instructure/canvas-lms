@@ -25,12 +25,13 @@ import {Menu} from '@instructure/ui-menu'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {AccessibilityResourceScan, ScanWorkflowState} from '../../../../../shared/react/types'
 import {useAccessibilityScansFetchUtils} from '../../../../../shared/react/hooks/useAccessibilityScansFetchUtils'
 import {useAccessibilityScansStore} from '../../../../../shared/react/stores/AccessibilityScansStore'
 import {CloseRemediationModal, shouldShowCloseRemediationModal} from './CloseRemediationModal'
+import {useA11yTracking} from '../../../../../shared/react/hooks/useA11yTracking'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -43,6 +44,7 @@ export const ActionsMenuCell = ({scan}: ActionsMenuCellProps) => {
   const {doFetchAccessibilityScanData, doFetchAccessibilityIssuesSummary} =
     useAccessibilityScansFetchUtils()
   const isCloseIssuesEnabled = useAccessibilityScansStore(state => state.isCloseIssuesEnabled)
+  const {trackA11yEvent} = useA11yTracking()
 
   const isClosed = Boolean(scan.closedAt?.trim())
   const hasIssues = scan.issueCount > 0
@@ -63,6 +65,10 @@ export const ActionsMenuCell = ({scan}: ActionsMenuCellProps) => {
     },
     onSuccess: (_data, {close}) => {
       if (close) {
+        trackA11yEvent('ResourceClosed', {
+          resourceId: scan.id,
+          courseId: scan.courseId,
+        })
         if (!shouldShowCloseRemediationModal()) {
           showFlashAlert({
             message: I18n.t('Remediation closed successfully'),

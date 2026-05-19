@@ -44,7 +44,7 @@ describe('ItemAssignToTray - Blueprint Locking Info', () => {
   })
 
   afterEach(() => {
-    window.location = originalLocation
+    Object.defineProperty(window, 'location', {value: originalLocation, writable: true})
     server.resetHandlers()
     cleanup()
   })

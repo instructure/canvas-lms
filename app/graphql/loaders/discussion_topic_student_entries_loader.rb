@@ -31,8 +31,7 @@ class Loaders::DiscussionTopicStudentEntriesLoader < GraphQL::Batch::Loader
     student_ids = @course.all_real_student_enrollments.select(:user_id)
 
     # Group topics by whether they are group discussions or regular discussions
-    regular_topics = discussion_topics.reject(&:for_group_discussion?)
-    group_topics = discussion_topics.select(&:for_group_discussion?)
+    group_topics, regular_topics = discussion_topics.partition(&:for_group_discussion?)
 
     # Hash to store results: topic_id => has_student_entries (boolean)
     results = {}

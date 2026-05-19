@@ -84,6 +84,8 @@ export const mockRegistration = (
   internal_service: false,
   ims_registration_id: ZLtiImsRegistrationId.parse('1'),
   manual_configuration_id: null,
+  lock_deploying: false,
+  template_registration_id: null,
   ...reg,
 })
 

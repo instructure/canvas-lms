@@ -28,7 +28,7 @@ import {Flex} from '@instructure/ui-flex'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import './AccessTokenDetails.css'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import type {Token} from './types'
 

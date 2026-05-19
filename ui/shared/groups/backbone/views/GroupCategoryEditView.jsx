@@ -17,9 +17,8 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import numberHelper from '@canvas/i18n/numberHelper'
-import {createRoot} from 'react-dom/client'
 import {extend} from '@canvas/backbone/utils'
 import {extend as lodashExtend} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -78,22 +77,21 @@ GroupCategoryEditView.prototype.renderGroupLimitInput = function () {
     const setShouldShowEmptyNameError = shouldShow => {
       this.shouldShowEmptyNameError = shouldShow
     }
-    const root = this.groupSetNameInputRoot ?? createRoot(groupSetNameInputContainer)
-    root.render(
+    legacyRender(
       <GroupSetNameInput
         id={this.model.id}
         initialValue={groupSetNameInputContainer.dataset.value}
         getShouldShowEmptyNameError={getShouldShowEmptyNameError}
         setShouldShowEmptyNameError={setShouldShowEmptyNameError}
       />,
+      groupSetNameInputContainer,
     )
   }
   const groupLimitContainer = document.getElementById(
     `group_limit_input_container_${this.model.id}`,
   )
   if (groupLimitContainer) {
-    const root = this.groupLimitInputRoot ?? createRoot(groupLimitContainer)
-    root.render(<GroupLimitInput initialValue={groupLimitContainer.dataset.value} />)
+    legacyRender(<GroupLimitInput initialValue={groupLimitContainer.dataset.value} />, groupLimitContainer)
   }
 }
 
@@ -149,13 +147,12 @@ GroupCategoryEditView.prototype.toggleAutoGroupLeader = function () {
 GroupCategoryEditView.prototype.showSelfSignupEndDatePicker = function () {
   const container = document.getElementById(`category_${this.model.id}_self_signup_end_at_picker`)
   if (container) {
-    const root = createRoot(container)
     const initialEndDate = this.model.get('self_signup_end_at')
     this.model.set('initial_self_signup_end_at', initialEndDate)
     const updateEndDate = end => {
       this.model.set('self_signup_end_at', end)
     }
-    root.render(<SelfSignupEndDate initialEndDate={initialEndDate} onDateChange={updateEndDate} />)
+    legacyRender(<SelfSignupEndDate initialEndDate={initialEndDate} onDateChange={updateEndDate} />, container)
   }
 }
 

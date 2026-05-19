@@ -101,8 +101,6 @@
 class CommMessagesApiController < ApplicationController
   include Api::V1::CommMessage
 
-  before_action :require_user
-
   # @API List of CommMessages for a user
   #
   # Retrieve a paginated list of messages sent to a user.

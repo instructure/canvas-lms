@@ -30,6 +30,7 @@ type AssessmentFooterProps = {
   isStandAloneContainer: boolean
   onDismiss: () => void
   onSubmit?: () => void
+  onSubmitButtonRef?: (el: HTMLButtonElement | null) => void
 }
 export const AssessmentFooter = ({
   isPreviewMode,
@@ -37,6 +38,7 @@ export const AssessmentFooter = ({
   isStandAloneContainer,
   onDismiss,
   onSubmit,
+  onSubmitButtonRef,
 }: AssessmentFooterProps) => {
   return (
     <View as="div" data-testid="rubric-assessment-footer" overflowX="hidden" overflowY="hidden">
@@ -61,6 +63,9 @@ export const AssessmentFooter = ({
           <Flex.Item>
             <Button
               color="primary"
+              elementRef={(el: Element | null) =>
+                onSubmitButtonRef?.(el as HTMLButtonElement | null)
+              }
               onClick={() => onSubmit()}
               data-testid="save-rubric-assessment-button"
             >

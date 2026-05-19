@@ -19,7 +19,7 @@
 import React from 'react'
 import {Button, type ButtonProps} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 
 const I18n = createI18nScope('LogoutButton')
 

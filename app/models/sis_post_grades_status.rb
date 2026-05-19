@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class SisPostGradesStatus < ActiveRecord::Base
+class SisPostGradesStatus < ApplicationRecord
   ALLOWED_STATUSES = %w[success warning failed].freeze
   belongs_to :course
   belongs_to :course_section

@@ -38,6 +38,6 @@ describe Lti::PlatformStorage do
     subject { Lti::PlatformStorage::FORWARDING_TARGET }
 
     it { is_expected.to be_a String }
-    it { is_expected.to_not be_empty }
+    it { is_expected.not_to be_empty }
   end
 end

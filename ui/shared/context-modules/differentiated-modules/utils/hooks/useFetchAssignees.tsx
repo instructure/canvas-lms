@@ -20,7 +20,7 @@ import {useEffect, useState, useRef, useMemo} from 'react'
 
 import {useGetAssigneeOptions} from './useGetAssigneeOptions'
 import {getCourseSettings, CourseSettings} from './queryFn'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {uniqBy} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {type AssigneeOption} from '../../react/Item/types'

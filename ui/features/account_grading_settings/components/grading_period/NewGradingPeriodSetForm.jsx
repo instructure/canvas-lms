@@ -23,7 +23,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import setsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import EnrollmentTermInput from './EnrollmentTermInput'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('NewGradingPeriodSetForm')
 

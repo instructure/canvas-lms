@@ -16,23 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {
+  ScoreDisplayFormat,
+  OutcomeArrangement,
+  NameDisplayFormat,
+  SecondaryInfoDisplay,
+  DisplayFilter,
+} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
+
 export const MAX_GRID_WIDTH: number = 1440
-export const COLUMN_WIDTH: number = 160
 export const STUDENT_COLUMN_WIDTH: number = 220
 export const STUDENT_COLUMN_RIGHT_PADDING: number = 15
 export const COLUMN_PADDING: number = 2
-export const CELL_HEIGHT: number = 48
 
 export const BAR_CHART_HEIGHT: number = 64
 
 export const DEFAULT_PAGE_NUMBER: number = 1
 export const DEFAULT_STUDENTS_PER_PAGE: number = 15
 export const STUDENTS_PER_PAGE_OPTIONS: number[] = [15, 30, 50, 100]
-
-export enum SortOrder {
-  ASC = 'asc',
-  DESC = 'desc',
-}
 
 export enum SortBy {
   Name = 'student_name',
@@ -42,37 +43,6 @@ export enum SortBy {
   LoginId = 'student_login_id',
   Outcome = 'outcome',
   ContributingScore = 'contributing_score',
-}
-
-export enum SecondaryInfoDisplay {
-  NONE = 'none',
-  SIS_ID = 'sis_id',
-  INTEGRATION_ID = 'integration_id',
-  LOGIN_ID = 'login_id',
-}
-
-export enum DisplayFilter {
-  SHOW_UNPUBLISHED_ASSIGNMENTS = 'show_unpublished_assignments',
-  SHOW_STUDENTS_WITH_NO_RESULTS = 'show_students_with_no_results',
-  SHOW_OUTCOMES_WITH_NO_RESULTS = 'show_outcomes_with_no_results',
-  SHOW_STUDENT_AVATARS = 'show_student_avatars',
-}
-
-export enum NameDisplayFormat {
-  FIRST_LAST = 'first_last',
-  LAST_FIRST = 'last_first',
-}
-
-export enum ScoreDisplayFormat {
-  ICON_ONLY = 'icon_only',
-  ICON_AND_POINTS = 'icon_and_points',
-  ICON_AND_LABEL = 'icon_and_label',
-}
-
-export enum OutcomeArrangement {
-  ALPHABETICAL = 'alphabetical',
-  CUSTOM = 'custom',
-  UPLOAD_ORDER = 'upload_order',
 }
 
 export interface GradebookSettings {

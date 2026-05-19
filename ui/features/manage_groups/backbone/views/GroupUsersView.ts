@@ -28,8 +28,10 @@ import 'jqueryui/droppable'
 
 const I18n = createI18nScope('GroupUsersView')
 
+// @ts-expect-error TS7 migration
 export default class GroupUsersView extends PaginatedCollectionView {
   static initClass() {
+    // @ts-expect-error TS7 migration
     this.prototype.defaults = {
       ...PaginatedCollectionView.prototype.defaults,
       itemView: GroupUserView,
@@ -55,6 +57,7 @@ export default class GroupUsersView extends PaginatedCollectionView {
       },
     }
 
+    // @ts-expect-error TS7 migration
     this.prototype.template = template
   }
 
@@ -205,7 +208,6 @@ export default class GroupUsersView extends PaginatedCollectionView {
 
   // @ts-expect-error - Legacy Backbone typing
   renderItem(model) {
-    // @ts-expect-error - Backbone View property
     super.renderItem(...arguments)
     // @ts-expect-error - Backbone View property
     if (!(this.model != null ? this.model.isLocked() : undefined)) return this._initDrag(model.view)

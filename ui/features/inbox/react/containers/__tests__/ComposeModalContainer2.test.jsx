@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {ApolloProvider} from '@apollo/client'
 import ComposeModalManager from '../ComposeModalContainer/ComposeModalManager'
 import {fireEvent, render, waitFor} from '@testing-library/react'
@@ -30,7 +30,6 @@ import * as utils from '../../../util/utils'
 import * as uploadFileModule from '@canvas/upload-file'
 import {graphql} from 'msw'
 
- 
 if (typeof vi !== 'undefined') vi.mock('@canvas/upload-file')
 vi.mock('@canvas/upload-file')
 

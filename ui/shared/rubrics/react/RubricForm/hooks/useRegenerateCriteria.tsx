@@ -20,7 +20,7 @@ import {useState, useCallback} from 'react'
 import {monitorProgress, type CanvasProgress} from '@canvas/progress/ProgressHelpers'
 import {useMutation} from '@tanstack/react-query'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {calcPointsPossible} from '../utils'
 import {mapRubricUnderscoredKeysToCamelCase} from '../../utils'
 import type {RubricCriterion} from '../../types/rubric'
@@ -51,14 +51,7 @@ export const useRegenerateCriteria = ({
       setRegeneratedCriteriaProgress(progress)
       if (progress.workflow_state === 'completed') {
         const transformed = mapRubricUnderscoredKeysToCamelCase(progress.results)
-        const newCriteria = transformed.criteria ?? []
-
-        // For regeneration, we replace the existing criteria with the new ones
-        // The API should return the full set of criteria, not just the new ones
-        const updatedCriteria = newCriteria.map(criterion => ({
-          ...criterion,
-          isGenerated: true,
-        }))
+        const updatedCriteria = transformed.criteria ?? []
 
         setRubricFormField('criteria', updatedCriteria)
         setRubricFormField('pointsPossible', calcPointsPossible(updatedCriteria))

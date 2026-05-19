@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Auditors; end
+module Auditors
+  class Record < EventStream::Record
+    def initialize(*args)
+      super
 
-class Auditors::Record < EventStream::Record
-  def initialize(*args)
-    super
-
-    self.request_id ||= RequestContext::Generator.request_id unless event_type == "corrupted"
+      self.request_id ||= RequestContext::Generator.request_id unless event_type == "corrupted"
+    end
   end
 end

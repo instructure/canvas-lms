@@ -21,7 +21,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {createContext, ReactNode} from 'react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {AsyncQueuer} from '@tanstack/react-pacer'
-import {queryClient as baseQueryClient} from '@canvas/query'
+import {queryClient as baseQueryClient} from '@instructure/platform-query'
 
 const SUBACCOUNTS_PER_PAGE = 100
 

@@ -102,6 +102,7 @@ export function getInitialGridDisplaySettings(
       editedCommentId: null,
     },
     showUnpublishedAssignments: settings.show_unpublished_assignments === 'true',
+    showSuppressedAssignments: settings.show_suppressed_assignments === 'true',
     showSeparateFirstLastNames: settings.show_separate_first_last_names === 'true',
     viewUngradedAsZero: settings.view_ungraded_as_zero === 'true',
     viewHiddenGradesIndicator: settings.view_hidden_grades_indicator === 'true',

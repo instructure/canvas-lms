@@ -24,7 +24,7 @@ class SearchController < ApplicationController
   include SearchHelper
   include Api::V1::Conversation
 
-  before_action :require_user, except: [:all_courses]
+  skip_before_action :require_user, only: [:all_courses]
   before_action :get_context, except: :recipients
 
   def rubrics

@@ -29,9 +29,10 @@ export default class UnassignedUsersView extends GroupUsersView {
     // @ts-expect-error - Backbone View property
     this.optionProperty('category')
 
+    // @ts-expect-error TS7 migration
     this.prototype.defaults = {
+      // @ts-expect-error TS7 migration
       ...GroupUsersView.prototype.defaults,
-      // @ts-expect-error - Legacy Backbone typing
       autoFetch: true, // load until below the viewport, don't wait for the user to scroll
       itemViewOptions: {
         canAssignToGroup: true,
@@ -39,7 +40,9 @@ export default class UnassignedUsersView extends GroupUsersView {
       },
     }
 
+    // @ts-expect-error TS7 migration
     this.prototype.els = {
+      // @ts-expect-error TS7 migration
       ...GroupUsersView.prototype.els,
       '.no-results-wrapper': '$noResultsWrapper',
       '.no-results': '$noResults',
@@ -87,6 +90,7 @@ export default class UnassignedUsersView extends GroupUsersView {
   }
 
   afterRender() {
+    // @ts-expect-error TS7 migration
     super.afterRender(...arguments)
     // @ts-expect-error - Backbone View property
     this.collection.load('first')
@@ -133,6 +137,7 @@ export default class UnassignedUsersView extends GroupUsersView {
       // @ts-expect-error - Backbone View property
       this.assignToGroupMenu.remove()
     }
+    // @ts-expect-error TS7 migration
     return super.remove(...arguments)
   }
 

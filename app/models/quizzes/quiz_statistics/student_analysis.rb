@@ -51,8 +51,8 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   #   :submission_correct_count_average=>1,
   #   :questions=>
   #     [output of stats_for_question for every question in submission_data]
-  def generate(legacy = true, options = {})
-    submissions = submissions_for_statistics(options)
+  def generate(legacy: true, section_ids: nil)
+    submissions = submissions_for_statistics(section_ids:)
     # questions: questions from quiz#quiz_data
     # {1022=>
     # {"id"=>1022,
@@ -160,7 +160,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       end
       next unless obj[:answers] && obj[:question_type] != "text_only_question"
 
-      stat = stats_for_question(obj, responses_for_question[obj[:id]], legacy)
+      stat = stats_for_question(obj, responses_for_question[obj[:id]], legacy:)
       stat[:answers].each { |a| a.delete(:user_names) } if stat[:answers] && anonymous?
       stats[:questions] << ["question", stat]
     end
@@ -323,13 +323,13 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
 
   private
 
-  def submissions_for_statistics(param_options = {})
+  def submissions_for_statistics(section_ids: nil)
     GuardRail.activate(:secondary) do
       scope = quiz.quiz_submissions.for_students(quiz)
       logged_out = quiz.quiz_submissions.logged_out
 
-      if param_options[:section_ids].present?
-        user_ids = Enrollment.active.where(course_section_id: param_options[:section_ids]).pluck(:user_id)
+      if section_ids.present?
+        user_ids = Enrollment.active.where(course_section_id: section_ids).pluck(:user_id)
         scope = scope.where(user_id: user_ids)
         logged_out = logged_out.where(user_id: user_ids)
       end
@@ -386,7 +386,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   #   "unexpected_response_values"=>[],
   #   "user_ids"=>[1,2,3],
   #   "multiple_responses"=>false}],
-  def stats_for_question(question, responses, legacy = true)
+  def stats_for_question(question, responses, legacy: true)
     if !legacy && CQS.can_analyze?(question)
       output = {}
 

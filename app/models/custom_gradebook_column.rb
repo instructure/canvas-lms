@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CustomGradebookColumn < ActiveRecord::Base
+class CustomGradebookColumn < ApplicationRecord
   include Workflow
 
   acts_as_list scope: :course_id

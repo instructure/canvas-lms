@@ -18,12 +18,10 @@
 
 import {useShouldShowLtiAssetReportsForStudent} from '@canvas/lti-asset-processor/react/hooks/useLtiAssetProcessorsAndReportsForStudent'
 import {LtiAssetReportsForStudentSubmission} from '@canvas/lti-asset-processor/react/LtiAssetReportsForStudentSubmission'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {z} from 'zod'
-
-const I18n = createI18nScope('submissions')
 
 // Props passed in via data- attributes on the div this component is rendered into
 export const ZTextEntryAssetReportStatusLinkProps = z.object({
@@ -34,12 +32,13 @@ export const ZTextEntryAssetReportStatusLinkProps = z.object({
 export default function TextEntryAssetReportStatusLink(
   props: z.infer<typeof ZTextEntryAssetReportStatusLinkProps>,
 ) {
+  const {t} = useTranslation('submissions')
   const shouldShow = useShouldShowLtiAssetReportsForStudent(props)
   if (!shouldShow) return null
 
   return (
     <Flex gap="x-small" alignItems="end">
-      <Text weight="bold">{I18n.t('Document Processors:')}</Text>
+      <Text weight="bold">{t('Document Processors:')}</Text>
       <LtiAssetReportsForStudentSubmission {...props} />
     </Flex>
   )

@@ -18,7 +18,7 @@
 
 import {chunk} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import type {RequestDispatch} from '@canvas/network'
 import type {Student, UserSubmissionGroup} from '../../../../../api.d'
 import GRADEBOOK_GRAPHQL_CONFIG from './graphql/config'

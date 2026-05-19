@@ -17,8 +17,8 @@
  */
 
 import {useMemo} from 'react'
-import {useAllPages} from '@canvas/query'
-import {Student} from '../MessageStudentsWhoDialog'
+import {useAllPages} from '@instructure/platform-query'
+import type {Student} from '../types'
 import {executeQuery} from '@canvas/graphql'
 import {
   OBSERVER_ENROLLMENTS_QUERY,

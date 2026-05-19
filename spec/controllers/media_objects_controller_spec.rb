@@ -81,6 +81,7 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to eq(
         {
           "auto_caption_status" => nil,
+          "viewer_restrictions" => {},
           "can_add_captions" => false,
           "created_at" => media_object.created_at.as_json,
           "media_id" => deleted_media_id,
@@ -296,6 +297,7 @@ describe MediaObjectsController do
         [
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo2.created_at.as_json,
             "media_id" => "test2",
@@ -314,6 +316,7 @@ describe MediaObjectsController do
           },
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo3.created_at.as_json,
             "media_id" => "test3",
@@ -332,6 +335,7 @@ describe MediaObjectsController do
           },
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo1.created_at.as_json,
             "media_id" => "test",
@@ -375,6 +379,7 @@ describe MediaObjectsController do
         [
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo.created_at.as_json,
             "media_id" => "test",
@@ -398,6 +403,7 @@ describe MediaObjectsController do
         [
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo.created_at.as_json,
             "media_id" => "test",
@@ -436,6 +442,7 @@ describe MediaObjectsController do
         [
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo1.created_at.as_json,
             "media_id" => "test",
@@ -445,6 +452,7 @@ describe MediaObjectsController do
           },
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo2.created_at.as_json,
             "media_id" => "another_test",
@@ -486,6 +494,7 @@ describe MediaObjectsController do
         [
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo3.created_at.as_json,
             "media_id" => "test3",
@@ -504,6 +513,7 @@ describe MediaObjectsController do
           },
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo2.created_at.as_json,
             "media_id" => "test2",
@@ -528,6 +538,7 @@ describe MediaObjectsController do
         [
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo1.created_at.as_json,
             "media_id" => "test",
@@ -579,6 +590,7 @@ describe MediaObjectsController do
         [
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "media_id" => "in_course_with_att",
             "media_type" => nil,
             "created_at" => mo1.created_at.as_json,
@@ -588,6 +600,7 @@ describe MediaObjectsController do
           },
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "media_id" => "in_course_with_deleted_att",
             "media_type" => nil,
             "created_at" => mo2.created_at.as_json,
@@ -632,6 +645,7 @@ describe MediaObjectsController do
         [
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo3.created_at.as_json,
             "media_id" => "test3",
@@ -650,6 +664,7 @@ describe MediaObjectsController do
           },
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo2.created_at.as_json,
             "media_id" => "test2",
@@ -677,6 +692,7 @@ describe MediaObjectsController do
         [
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo1.created_at.as_json,
             "media_id" => "test",
@@ -723,6 +739,7 @@ describe MediaObjectsController do
         [
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo2.created_at.as_json,
             "media_id" => "not_in_course",
@@ -753,6 +770,7 @@ describe MediaObjectsController do
         [
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "media_id" => "in_group",
             "media_type" => nil,
             "created_at" => mo1.created_at.as_json,
@@ -863,6 +881,7 @@ describe MediaObjectsController do
         [
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo2.created_at.as_json,
             "media_id" => "test2",
@@ -881,6 +900,7 @@ describe MediaObjectsController do
           },
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo1.created_at.as_json,
             "media_id" => "test",
@@ -915,6 +935,7 @@ describe MediaObjectsController do
         [
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo1.created_at.as_json,
             "media_id" => "test",
@@ -942,6 +963,7 @@ describe MediaObjectsController do
         [
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "can_add_captions" => true,
             "created_at" => mo1.created_at.as_json,
             "media_id" => "test",
@@ -970,6 +992,7 @@ describe MediaObjectsController do
         [
           {
             "auto_caption_status" => nil,
+            "viewer_restrictions" => {},
             "media_id" => "in_group",
             "media_type" => nil,
             "created_at" => mo1.created_at.as_json,
@@ -1016,6 +1039,48 @@ describe MediaObjectsController do
       assert_status(200)
       json = response.parsed_body
       expect(json["title"]).to eq("new title")
+    end
+
+    it "saves viewer_restrictions when provided" do
+      course_with_teacher_logged_in
+      mo = MediaObject.create!(user_id: @user, media_id: "the-video")
+      put "update_media_object",
+          params: {
+            media_object_id: "the-video",
+            user_entered_title: "title",
+            viewer_restrictions: { "show_rolling_transcript" => true }
+          },
+          as: :json
+      assert_status(200)
+      expect(mo.reload.viewer_restrictions).to eq({ "show_rolling_transcript" => true })
+      expect(response.parsed_body["viewer_restrictions"]).to eq({ "show_rolling_transcript" => true })
+    end
+
+    it "preserves viewer_restrictions when not included in update" do
+      course_with_teacher_logged_in
+      mo = MediaObject.create!(
+        user_id: @user,
+        media_id: "the-video",
+        viewer_restrictions: { "show_rolling_transcript" => true }
+      )
+      put "update_media_object",
+          params: { media_object_id: "the-video", user_entered_title: "new title" }
+      assert_status(200)
+      expect(mo.reload.viewer_restrictions).to eq({ "show_rolling_transcript" => true })
+    end
+
+    it "ignores unknown viewer_restrictions keys" do
+      course_with_teacher_logged_in
+      mo = MediaObject.create!(user_id: @user, media_id: "the-video")
+      put "update_media_object",
+          params: {
+            media_object_id: "the-video",
+            user_entered_title: "title",
+            viewer_restrictions: { "unknown_key" => true }
+          },
+          as: :json
+      assert_status(200)
+      expect(mo.reload.viewer_restrictions).to eq({})
     end
 
     context "adheres to attachment permissions" do
@@ -1289,7 +1354,10 @@ describe MediaObjectsController do
 
   describe "GET '/media_attachments/:id/immersive_view" do
     before do
-      @media_object = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
+      Account.default.enable_feature!(:rce_asr_captioning_improvements)
+      @media_object = @course.media_objects.create! media_id: "0_deadbeef",
+                                                    user_entered_title: "blah.flv",
+                                                    viewer_restrictions: { "show_rolling_transcript" => true }
       allow_any_instance_of(MediaObject).to receive(:media_sources).and_return(
         [{ url: "whatever man", bitrate: 12_345 }]
       )
@@ -1309,6 +1377,24 @@ describe MediaObjectsController do
 
       get "immersive_view", params: { attachment_id: attachment.id }
       expect(assigns[:body_classes]).to include("immersive-media-view", "content-only")
+    end
+
+    it "returns 404 when rce_asr_captioning_improvements is disabled" do
+      Account.default.disable_feature!(:rce_asr_captioning_improvements)
+      user_session(@student)
+      attachment = @media_object.attachment
+
+      get "immersive_view", params: { attachment_id: attachment.id }
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "returns 404 when show_rolling_transcript is false" do
+      @media_object.update!(viewer_restrictions: { "show_rolling_transcript" => false })
+      user_session(@student)
+      attachment = @media_object.attachment
+
+      get "immersive_view", params: { attachment_id: attachment.id }
+      expect(response).to have_http_status(:not_found)
     end
   end
 
@@ -1397,6 +1483,42 @@ describe MediaObjectsController do
       post :create_media_object, params: { context_code: "user_#{@user.id}", id: "new_object", type: "audio", title: "title" }
       @media_object = @user.reload.media_objects.last
       expect(response.parsed_body["media_object"]["uuid"]).to eq @media_object.attachment.uuid
+    end
+
+    it "sets default viewer_restrictions when none provided" do
+      post :create_media_object,
+           params: { context_code: "user_#{@user.id}", id: "new_object", type: "audio", title: "title" }
+      @media_object = @user.reload.media_objects.last
+      expect(@media_object.viewer_restrictions).to eq({ "show_rolling_transcript" => false })
+    end
+
+    it "uses provided viewer_restrictions when given" do
+      post :create_media_object,
+           params: {
+             context_code: "user_#{@user.id}",
+             id: "new_object",
+             type: "audio",
+             title: "title",
+             viewer_restrictions: { "show_rolling_transcript" => true }
+           },
+           as: :json
+      @media_object = @user.reload.media_objects.last
+      expect(@media_object.viewer_restrictions).to eq({ "show_rolling_transcript" => true })
+    end
+
+    it "ignores unknown viewer_restrictions keys" do
+      post :create_media_object,
+           params: {
+             context_code: "user_#{@user.id}",
+             id: "new_object",
+             type: "audio",
+             title: "title",
+             viewer_restrictions: { "unknown_key" => true }
+           },
+           as: :json
+      assert_status(200)
+      @media_object = @user.reload.media_objects.last
+      expect(@media_object.viewer_restrictions).to eq({ "show_rolling_transcript" => false })
     end
   end
 

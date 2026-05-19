@@ -118,7 +118,7 @@ describe "Global Grades" do
     ((score1 + score2 + score3) / (@assignment1.points_possible + @assignment2.points_possible +
       @assignment3.points_possible)) * 100
   end
-  let(:grade_old_gp) { ((score4 / @assignment4.points_possible) * 100) }
+  let(:grade_old_gp) { (score4 / @assignment4.points_possible) * 100 }
   let(:grade_total_gp) do
     ((score1 + score2 + score3 + score4) / (@assignment1.points_possible + @assignment2.points_possible +
       @assignment3.points_possible + @assignment4.points_possible)) * 100

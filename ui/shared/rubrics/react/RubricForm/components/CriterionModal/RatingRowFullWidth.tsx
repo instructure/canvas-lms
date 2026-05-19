@@ -66,7 +66,7 @@ export const RatingRowFullWidth = ({
                   {criterionUseRange && (
                     <Flex.Item width="4.5rem" textAlign="end" margin="0 0 x-small 0">
                       <View as="span" margin="0 small 0 0" data-testid="range-start">
-                        {rangeStart ? I18n.t('%{rangeStart} to ', {rangeStart}) : `--`}
+                        {rangeStart != null ? I18n.t('>%{rangeStart} to ', {rangeStart}) : `--`}
                       </View>
                     </Flex.Item>
                   )}
@@ -106,9 +106,18 @@ export const RatingRowFullWidth = ({
                       cursor="pointer"
                       margin="xx-small 0 0 0"
                     >
-                      <div className="drag-handle" {...provided.dragHandleProps}>
-                        <IconDragHandleLine />
-                      </div>
+                      <View
+                        as="div"
+                        role="button"
+                        aria-label={I18n.t('Reorder %{ratingName} Rating', {
+                          ratingName: rating.description,
+                        })}
+                        className="drag-handle"
+                        data-testid="rubric-criterion-rating-row-drag-handle"
+                        {...provided.dragHandleProps}
+                      >
+                        <IconDragHandleLine aria-hidden="true" />
+                      </View>
                     </View>
                   </Flex.Item>
                   <Flex.Item align="start">

@@ -492,6 +492,7 @@ describe RequestThrottle do
       expect(RequestThrottle::LeakyBucket).to receive(:new).with("user:1", client_overrides).and_return(bucket)
       expect(bucket).to receive(:get_up_front_cost_for_path).with(base_req["PATH_INFO"]).and_return(1)
       expect(bucket).to receive(:reserve_capacity).and_yield.and_return(1)
+      expect(bucket).to receive(:full?).and_return(false)
       expect(bucket).to receive(:remaining).and_return(1)
       # the cost is still returned anyway
       expected = response

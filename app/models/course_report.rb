@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CourseReport < ActiveRecord::Base
+class CourseReport < ApplicationRecord
   include Workflow
   include CaptureJobIds
 

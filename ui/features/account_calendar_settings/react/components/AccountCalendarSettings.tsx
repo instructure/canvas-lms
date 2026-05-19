@@ -25,7 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {AccountList} from './AccountList'

@@ -56,7 +56,7 @@ module ModelCache
 
       # ensure the target class is ModelCache-aware, and set up the :id lookup
       target_klass = reflections[method.to_s].klass
-      raise "`#{target_klass}` needs to `include ModelCache` before you can make `#{self}##{method}` cacheable" unless target_klass.included_modules.include?(ModelCache)
+      raise "`#{target_klass}` needs to `include ModelCache` before you can make `#{self}##{method}` cacheable" unless target_klass.include?(ModelCache)
 
       unless ModelCache.keys[target_klass.name].include?(options[:key_lookup])
         ModelCache.keys[target_klass.name] << options[:key_lookup]

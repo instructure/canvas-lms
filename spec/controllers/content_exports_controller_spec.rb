@@ -132,7 +132,6 @@ describe ContentExportsController do
       toggle_k5_setting(@course.account)
       get :index, params: { course_id: @course.id }
       expect(assigns(:css_bundles).flatten).to include(:k5_theme)
-      expect(assigns(:js_bundles).flatten).to include(:k5_theme)
     end
 
     it "redirects to login if no user is logged in" do

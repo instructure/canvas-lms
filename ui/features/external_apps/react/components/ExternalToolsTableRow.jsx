@@ -31,7 +31,7 @@ import ConfigureExternalToolButton from './ConfigureExternalToolButton'
 import ReregisterExternalToolButton from './ReregisterExternalToolButton'
 import store from '../lib/ExternalAppsStore'
 import classMunger from '../lib/classMunger'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import ExternalToolMigrationInfo from './ExternalToolMigrationInfo'
 

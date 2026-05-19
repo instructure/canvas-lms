@@ -19,7 +19,7 @@
 #
 require "English"
 
-class ContentExport < ActiveRecord::Base
+class ContentExport < ApplicationRecord
   include Workflow
 
   belongs_to :context, polymorphic: [:course, :group, { context_user: "User" }]
@@ -478,7 +478,11 @@ class ContentExport < ActiveRecord::Base
   end
 
   def is_external_object?(obj)
-    obj.is_a?(ContextExternalTool) && obj.context_type == "Account"
+    (
+      obj.is_a?(ContextExternalTool) && obj.context_type == "Account"
+    ) || (
+      obj.is_a?(NavMenuLink) && obj.course_id.nil?
+    )
   end
 
   # Method Summary

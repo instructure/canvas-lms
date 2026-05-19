@@ -226,7 +226,7 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
                   resize="both"
                   messages={showMissingRedirectUrisMessage ? validationMessage : []}
                 />
-                {!isLtiKey && ENV.FEATURES.api_rate_limits && (
+                {!isLtiKey && (
                   <UtidSelector
                     redirectUris={developerKey.redirect_uris}
                     accountId={this.props.contextId}

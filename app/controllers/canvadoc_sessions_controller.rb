@@ -23,6 +23,8 @@ class CanvadocSessionsController < ApplicationController
   include CoursesHelper
   include HmacHelper
 
+  skip_before_action :require_user, only: :show
+
   def token_auth_allowed?
     params[:action] == "show"
   end

@@ -23,7 +23,7 @@ import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import SpacePandaUrl from '@canvas/images/SpacePanda.svg'
+import SpacePandaUrl from '@instructure/platform-images/assets/SpacePanda.svg'
 
 const I18n = createI18nScope('course_paces_no_results')
 

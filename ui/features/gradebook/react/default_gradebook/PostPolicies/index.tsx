@@ -20,7 +20,7 @@
 
 import * as tz from '@instructure/moment-utils'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import {getAssignmentColumnId, postPolicyChangeable} from '../Gradebook.utils'
 import AsyncComponents from '../AsyncComponents'
 import type Gradebook from '../Gradebook'
@@ -63,7 +63,7 @@ export default class PostPolicies {
       'post-assignment-grades-tray',
     ].forEach(id => {
       const node = document.getElementById(id)
-      if (node) ReactDOM.unmountComponentAtNode(node)
+      if (node) legacyUnmountComponentAtNode(node)
     })
   }
 
@@ -105,7 +105,7 @@ export default class PostPolicies {
     const bindAssignmentPolicyTray = ref => {
       tray = ref
     }
-    ReactDOM.render(
+    legacyRender(
       <AssignmentPostingPolicyTray ref={bindAssignmentPolicyTray} />,
       $assignmentPolicyContainer,
     )
@@ -140,7 +140,7 @@ export default class PostPolicies {
     const bindHideTray = ref => {
       tray = ref
     }
-    ReactDOM.render(<HideAssignmentGradesTray ref={bindHideTray} />, $hideContainer)
+    legacyRender(<HideAssignmentGradesTray ref={bindHideTray} />, $hideContainer)
 
     tray.show({
       assignment: {
@@ -172,7 +172,7 @@ export default class PostPolicies {
     const bindPostTray = ref => {
       tray = ref
     }
-    ReactDOM.render(<PostAssignmentGradesTray ref={bindPostTray} />, $postContainer)
+    legacyRender(<PostAssignmentGradesTray ref={bindPostTray} />, $postContainer)
 
     tray.show({
       assignment: {

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import {UsageRightsContainer} from '../UsageRightsContainer'
@@ -26,10 +26,18 @@ import {UsageRightsContainer} from '../UsageRightsContainer'
 vi.mock('../../../components/DiscussionOptions/UsageRights', () => ({
   UsageRights: vi.fn(({initialUsageRights, errorState, creativeCommonsOptions}) =>
     React.createElement('div', {'data-testid': 'usage-rights-mock'}, [
-      React.createElement('div', {'data-testid': 'cc-options-length', key: '1'}, creativeCommonsOptions.length),
+      React.createElement(
+        'div',
+        {'data-testid': 'cc-options-length', key: '1'},
+        creativeCommonsOptions.length,
+      ),
       React.createElement('div', {'data-testid': 'error-state', key: '2'}, errorState.toString()),
-      React.createElement('div', {'data-testid': 'initial-rights', key: '3'}, JSON.stringify(initialUsageRights)),
-    ])
+      React.createElement(
+        'div',
+        {'data-testid': 'initial-rights', key: '3'},
+        JSON.stringify(initialUsageRights),
+      ),
+    ]),
   ),
 }))
 

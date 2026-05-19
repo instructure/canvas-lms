@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import axios from '@canvas/axios'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {Button} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'

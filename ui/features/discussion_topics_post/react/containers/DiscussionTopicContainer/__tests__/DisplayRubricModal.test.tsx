@@ -20,10 +20,10 @@ import {render, fireEvent} from '@testing-library/react'
 import {DisplayRubricModal} from '../DisplayRubricModal'
 import type {AssignmentRubric} from '@canvas/rubrics/react/RubricAssignment/queries'
 import type {RubricAssociation} from '@canvas/rubrics/react/types/rubric'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import * as RubricFormQueries from '@canvas/rubrics/react/RubricForm/queries/RubricFormQueries'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer as destroyFlashAlertContainer} from '@instructure/platform-alerts'
 
 vi.mock('@canvas/rubrics/react/RubricForm/queries/RubricFormQueries', async importOriginal => {
   const actual =
@@ -61,6 +61,7 @@ const MOCK_RUBRIC: AssignmentRubric = {
   buttonDisplay: 'numeric',
   ratingOrder: 'descending',
   freeFormCriterionComments: false,
+  public: false,
   criteria: [
     {
       id: '1',
@@ -77,7 +78,6 @@ const MOCK_RUBRIC: AssignmentRubric = {
       ],
     },
   ],
-  can_update: true,
 }
 
 const MOCK_RUBRIC_ASSOCIATION: RubricAssociation = {
@@ -219,12 +219,12 @@ describe('DisplayRubricModal', () => {
       expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
     })
 
-    it('displays edit button when rubric is provided and user can manage rubrics', () => {
+    it('displays edit button when rubric is provided and user can update rubric association', () => {
       const {getByTestId} = render(
         <DisplayRubricModal
           {...defaultProps}
           rubric={MOCK_RUBRIC}
-          rubricAssociation={MOCK_RUBRIC_ASSOCIATION}
+          rubricAssociation={{...MOCK_RUBRIC_ASSOCIATION, canUpdate: true}}
           canManageRubrics={true}
         />,
       )
@@ -232,12 +232,12 @@ describe('DisplayRubricModal', () => {
       expect(getByTestId('edit-assignment-rubric-button')).toBeInTheDocument()
     })
 
-    it('displays remove button when rubric is provided and user can manage rubrics', () => {
+    it('displays remove button when rubric is provided and user can delete rubric association', () => {
       const {getByTestId} = render(
         <DisplayRubricModal
           {...defaultProps}
           rubric={MOCK_RUBRIC}
-          rubricAssociation={MOCK_RUBRIC_ASSOCIATION}
+          rubricAssociation={{...MOCK_RUBRIC_ASSOCIATION, canDelete: true}}
           canManageRubrics={true}
         />,
       )
@@ -245,19 +245,35 @@ describe('DisplayRubricModal', () => {
       expect(getByTestId('remove-assignment-rubric-button')).toBeInTheDocument()
     })
 
-    it('does not display edit and remove buttons when user cannot manage rubrics', () => {
+    it('does not display edit button when user cannot update rubric association', () => {
       const {queryByTestId, getByTestId} = render(
         <DisplayRubricModal
           {...defaultProps}
           rubric={MOCK_RUBRIC}
-          rubricAssociation={MOCK_RUBRIC_ASSOCIATION}
+          rubricAssociation={{...MOCK_RUBRIC_ASSOCIATION, canUpdate: false, canDelete: true}}
           canManageRubrics={false}
         />,
       )
 
       expect(queryByTestId('edit-assignment-rubric-button')).not.toBeInTheDocument()
+      // Preview and remove buttons should still be available
+      expect(queryByTestId('remove-assignment-rubric-button')).toBeInTheDocument()
+      expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
+    })
+
+    it('does not display remove button when user cannot delete rubric association', () => {
+      const {queryByTestId, getByTestId} = render(
+        <DisplayRubricModal
+          {...defaultProps}
+          rubric={MOCK_RUBRIC}
+          rubricAssociation={{...MOCK_RUBRIC_ASSOCIATION, canDelete: false, canUpdate: true}}
+          canManageRubrics={false}
+        />,
+      )
+
+      expect(queryByTestId('edit-assignment-rubric-button')).toBeInTheDocument()
       expect(queryByTestId('remove-assignment-rubric-button')).not.toBeInTheDocument()
-      // Preview button should still be available
+      // Preview and edit buttons should still be available
       expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
     })
   })

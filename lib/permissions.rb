@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../app/services/canvas_career/label_overrides"
-
 module Permissions
   # canvas-lms proper, plugins, etc. call Permissions.register to add
   # permissions to the system. all registrations must happen during app init;
@@ -91,6 +89,20 @@ module Permissions
     end
 
     @permissions
+  end
+
+  def self.non_masquerading_permissions
+    return [] unless @permissions.frozen?
+
+    @non_masquerading_permissions ||= Set.new(@permissions.keys.select { |perm| @permissions.dig(perm, :not_for_masquerading) })
+  end
+
+  def self.not_for_masquerading?(permission)
+    if permission.is_a?(Array)
+      non_masquerading_permissions.intersect?(permission)
+    else
+      non_masquerading_permissions.include?(permission)
+    end
   end
 
   def self.permission_groups(context = nil)

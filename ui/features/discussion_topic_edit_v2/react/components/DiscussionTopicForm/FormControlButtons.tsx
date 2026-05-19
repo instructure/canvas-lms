@@ -20,7 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 
 import {assignLocation} from '@canvas/util/globalUtils'
-import type {Breakpoints} from '@canvas/with-breakpoints'
+import type {Breakpoints} from '@instructure/platform-with-breakpoints'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'

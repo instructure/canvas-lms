@@ -455,5 +455,87 @@ describe CoursesHelper do
     it "returns url for the assignment itself when event is Assignment" do
       expect(recent_event_url(@assignment)).to eq "/courses/#{@course.id}/assignments/#{@assignment.id}"
     end
+
+    it "returns url for the parent assignment when event is PeerReviewSubAssignment" do
+      @course.account.enable_feature!(:peer_review_allocation_and_grading)
+      peer_review = peer_review_model(course: @course)
+      expect(recent_event_url(peer_review)).to eq "/courses/#{@course.id}/assignments/#{peer_review.parent_assignment_id}"
+    end
+  end
+
+  describe "#icon_data for PeerReviewSubAssignment" do
+    include CoursesHelper
+    include ApplicationHelper
+
+    before(:once) do
+      course_with_teacher(active_all: true)
+      @course.account.enable_feature!(:peer_review_allocation_and_grading)
+      @student_one = User.create!(valid_user_attributes)
+      @student_two = User.create!(valid_user_attributes)
+      [@student_one, @student_two].each do |student|
+        e = @course.enroll_student(student)
+        e.invite
+        e.accept
+      end
+      @peer_review = peer_review_model(course: @course)
+      @peer_review.reload
+    end
+
+    before do
+      user_session(@user)
+    end
+
+    def check_peer_review_icon_data(msg, aria_label, icon, options = {})
+      base_options = {
+        context: @course,
+        contexts: [@course],
+        current_user: @teacher,
+        recent_event: @peer_review,
+        submission: nil
+      }.merge(options)
+      icon_explanation, icon_aria_label, icon_class = icon_data(base_options)
+      expect(icon_explanation).to eql msg
+      expect(icon_aria_label).to eql aria_label
+      expect(icon_class).to eql icon
+    end
+
+    context "as a student" do
+      it "returns not submitted when no peer review submission exists" do
+        expect(self).to receive(:t).with("#courses.recent_event.not_submitted", "not submitted").and_return("not submitted")
+        check_peer_review_icon_data("not submitted", "Peer Review", "icon-peer-review", current_user: @student_one)
+      end
+
+      it "returns submission readable_state when peer review submission exists" do
+        submission = @peer_review.submit_homework(@student_one, { submission_type: "online_text_entry", body: "my review" })
+        check_peer_review_icon_data(submission.readable_state,
+                                    "Peer Review",
+                                    "icon-peer-review",
+                                    current_user: @student_one,
+                                    submission:,
+                                    show_assignment_type_icon: true)
+      end
+    end
+
+    context "as an instructor" do
+      it "returns no submissions when none exist" do
+        expect(self).to receive(:t).with("#courses.recent_event.no_submissions", "no submissions").and_return("no submissions")
+        check_peer_review_icon_data("no submissions", "Peer Review", "icon-peer-review")
+      end
+
+      it "returns needs grading when ungraded submissions exist" do
+        expect(self).to receive(:t).with("#courses.recent_event.needs_grading", "needs grading").and_return("needs grading")
+        @peer_review.submit_homework(@student_one, { submission_type: "online_text_entry", body: "my review" })
+        check_peer_review_icon_data("needs grading", "Peer Review", "icon-peer-review")
+      end
+
+      it "returns all graded when all submitted and graded" do
+        expect(self).to receive(:t).with("#courses.recent_event.all_graded", "all graded").and_return("all graded")
+        [@student_one, @student_two].each do |student|
+          @peer_review.submit_homework(student, { submission_type: "online_text_entry", body: "review" })
+          @peer_review.grade_student(student, grade: 5, grader: @teacher)
+        end
+        check_peer_review_icon_data("all graded", "Peer Review", "icon-peer-review")
+      end
+    end
   end
 end

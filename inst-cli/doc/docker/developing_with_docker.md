@@ -96,8 +96,9 @@ inst canvas rebuild --no-debug
 Once Canvas is running you may debug like so:
 
 1. Add a `debugger` statement or VSCode breakpoint to your Ruby code.
-2. Open the VSCode "Run and Debug" tool panel and select "Attach with rdbg (tcp 12345)" from the VSCode dropdown.
-3. Trip the debugger statement by navigating to the webpage, running the test, or whatever.
+2. Open the VSCode "Run and Debug" tool panel and select "Attach with rdbg to web server (tcp 12345)" or "Attach with rdbg to jobs server (tcp 12356)" from the VSCode dropdown
+depending on what you want to debug.
+3. Trip the debugger statement by navigating to the webpage, triggering the delayed job, running the test, or whatever.
 
 Alternatively, if you don't want to use VSCode you can remotely attach to the `web` or `jobs` debuggee server like so:
 

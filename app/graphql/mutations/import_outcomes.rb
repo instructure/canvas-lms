@@ -180,9 +180,9 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
                                         .active
                                         .where(
                                           source_outcome_group_id: LearningOutcomeGroup
-                                            .active
-                                            .where(context: source_context)
-                                            .where.not(id: group_ids)
+                                                                   .active
+                                                                   .where(context: source_context)
+                                                                   .where.not(id: group_ids)
                                         )
                                         .pluck(:source_outcome_group_id)
 

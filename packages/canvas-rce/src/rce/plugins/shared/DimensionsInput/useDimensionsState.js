@@ -41,7 +41,7 @@ function inputValueFor(initialNumber) {
   return Number.isFinite(initialNumber) ? `${initialNumber}` : ''
 }
 
-export default function useDimensionsState(initialDimensions, constraints) {
+export default function useDimensionsState(initialDimensions, constraints, options = {}) {
   const {
     appliedHeight,
     appliedWidth,
@@ -76,8 +76,8 @@ export default function useDimensionsState(initialDimensions, constraints) {
 
   const dimensionMinimums = {height: minHeight, width: minWidth, percentage: minPercentage}
   const dimensionScaleFns = {
-    height: scaleForHeight,
-    width: scaleForWidth,
+    height: options.scaleFns?.height ?? scaleForHeight,
+    width: options.scaleFns?.width ?? scaleForWidth,
   }
 
   function updateDimensions(attributes) {

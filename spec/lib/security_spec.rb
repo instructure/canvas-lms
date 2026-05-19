@@ -46,8 +46,8 @@ describe "security" do
       encrypted_data2 = CanvasSecurity.url_key_encrypt_data(data2)
       expect(data1).to eq 'abcde12345!@#$%^&*()~`/\\|+=-_🙂Ю'
       expect(data2).to eq "https://www.google.com/maps"
-      expect(encrypted_data1).to_not eq data1
-      expect(encrypted_data2).to_not eq data2
+      expect(encrypted_data1).not_to eq data1
+      expect(encrypted_data2).not_to eq data2
       expect(encrypted_data1).to match(/[\w-]+~[\w-]+~[\w-]+/)
       expect(encrypted_data2).to match(/[\w-]+~[\w-]+~[\w-]+/)
       expect(CanvasSecurity.url_key_decrypt_data(encrypted_data1)).to eq data1

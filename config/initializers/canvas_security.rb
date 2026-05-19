@@ -20,7 +20,7 @@ require "canvas_security"
 
 Rails.configuration.to_prepare do
   CanvasSecurity.settings_store = Setting
-  CanvasSecurity.validate_encryption_key(ENV["UPDATE_ENCRYPTION_KEY_HASH"])
+  CanvasSecurity.validate_encryption_key(overwrite: ENV["UPDATE_ENCRYPTION_KEY_HASH"])
   CanvasSecurity.region = Canvas.region
   CanvasSecurity.environment = Canvas.environment
 

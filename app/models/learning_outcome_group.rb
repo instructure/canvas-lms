@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class LearningOutcomeGroup < ActiveRecord::Base
+class LearningOutcomeGroup < ApplicationRecord
   include Workflow
   include MasterCourses::Restrictor
   extend RootAccountResolver
@@ -324,7 +324,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     end
   end
 
-  def self.global_root_outcome_group(force = true)
+  def self.global_root_outcome_group(force: true)
     find_or_create_root(nil, force)
   end
 

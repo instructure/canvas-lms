@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 describe EnrollmentState do
   describe "#enrollments_needing_calculation" do
     it "finds enrollments that need calculation" do
@@ -289,6 +287,7 @@ describe EnrollmentState do
     def restrict_view(account, type)
       account.settings[type] = { value: true, locked: false }
       account.save!
+      run_jobs # ensure cache invalidations happen
     end
 
     it "invalidates access for future students when account future access settings are changed" do

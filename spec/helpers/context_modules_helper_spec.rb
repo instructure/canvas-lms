@@ -517,7 +517,7 @@ describe ContextModulesHelper do
         it { is_expected.to be_falsey }
 
         it "should not call the module_items_visible_to" do
-          expect(context).to_not receive(:module_items_visible_to).with(current_user)
+          expect(context).not_to receive(:module_items_visible_to).with(current_user)
 
           subject
         end
@@ -537,7 +537,7 @@ describe ContextModulesHelper do
     it "yields when module performance improvement is enabled" do
       allow(helper).to receive(:module_performance_improvement_is_enabled?).with(context, user).and_return(true)
 
-      expect(helper).to_not receive(:cache).with(cache_key, {}).and_yield
+      expect(helper).not_to receive(:cache).with(cache_key, {}).and_yield
       expect { |b| helper.cache_if_no_module_perf_enabled(cache_key, context, user, &b) }.to yield_control
     end
 

@@ -102,6 +102,7 @@ module SpeedGrader
 
       res["context"]["concluded"] = assignment.context.concluded?
       res["anonymize_students"] = anonymize_students?
+      res["anonymous_participants"] = assignment.anonymous_participants?
       res["anonymize_graders"] = !assignment.can_view_other_grader_identities?(current_user)
       res["post_manually"] = assignment.post_manually?
 
@@ -164,7 +165,6 @@ module SpeedGrader
         { versions: :versionable },
         :quiz_submission,
         :user,
-        :attachment_associations,
         :assignment,
         { originality_reports: :lti_link }
       ]
@@ -411,7 +411,6 @@ module SpeedGrader
                                 upload_status: AttachmentUploadStatus.upload_status(a)
                               }
                             )
-                            a.set_word_count if a.word_count.nil? && a.word_count_supported?
                             attachment_json[:attachment][:word_count] = a.word_count
                           end
                       end

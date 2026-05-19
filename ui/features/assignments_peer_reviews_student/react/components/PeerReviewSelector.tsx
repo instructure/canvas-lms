@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconCompleteLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {AssessmentRequest} from '@canvas/assignments/react/AssignmentsPeerReviewsStudentTypes'
@@ -168,7 +167,7 @@ export const PeerReviewSelector = ({
 
   return (
     <SimpleSelect
-      renderLabel={<ScreenReaderContent>{I18n.t('Select peer to review')}</ScreenReaderContent>}
+      renderLabel={I18n.t('Select Peer to Review')}
       value={
         hasOptions
           ? String(selectedIndex >= 0 && selectedIndex < totalOptionsCount ? selectedIndex : 0)

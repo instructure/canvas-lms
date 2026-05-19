@@ -57,6 +57,7 @@ const FilePreviewIframe = ({item}: {item: File}) => {
       id="file-preview-iframe"
       key={item.id}
       sandbox={sandboxSettings(item)}
+      allowFullScreen
       src={item.preview_url}
       style={{
         ...(item.mime_class === 'html' ? {backgroundColor: '#F2F4F4'} : {}),

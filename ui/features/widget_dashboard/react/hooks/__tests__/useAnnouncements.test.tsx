@@ -21,9 +21,10 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import React from 'react'
 import {waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
-import {graphql, HttpResponse} from 'msw'
+import {graphql, http, HttpResponse} from 'msw'
 import {usePaginatedAnnouncements} from '../useAnnouncements'
 import {clearWidgetDashboardCache} from '../../__tests__/testHelpers'
+import {WidgetDashboardProvider} from '../useWidgetDashboardContext'
 
 const mockGqlResponse = {
   data: {
@@ -411,5 +412,43 @@ describe('usePaginatedAnnouncements', () => {
     expect(result.current.error).toBeNull()
 
     cleanup()
+  })
+
+  it('passes observedUserId in GraphQL query when in observer context', async () => {
+    let capturedVariables: any = null
+
+    server.use(
+      http.post('/api/graphql', async ({request}) => {
+        const body = (await request.json()) as {query: string; variables: any}
+        if (body.query.includes('GetUserAnnouncements')) {
+          capturedVariables = body.variables
+          return HttpResponse.json(mockGqlResponse)
+        }
+      }),
+    )
+
+    const originalEnv = window.ENV
+    window.ENV = {...originalEnv, current_user_id: '123'} as any
+
+    const queryClient = new QueryClient({
+      defaultOptions: {queries: {retry: false, gcTime: 0}},
+    })
+
+    const {result} = renderHook(() => usePaginatedAnnouncements({limit: 10}), {
+      wrapper: ({children}: {children: React.ReactNode}) => (
+        <QueryClientProvider client={queryClient}>
+          <WidgetDashboardProvider observedUserId="observee42">{children}</WidgetDashboardProvider>
+        </QueryClientProvider>
+      ),
+    })
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+    })
+
+    expect(capturedVariables?.observedUserId).toBe('observee42')
+
+    window.ENV = originalEnv
+    queryClient.clear()
   })
 })

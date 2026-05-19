@@ -54,6 +54,13 @@ describe AiExperienceContextFile do
     end
   end
 
+  describe "llm_conversation_service_document_id" do
+    it "defaults to nil" do
+      context_file = AiExperienceContextFile.create!(ai_experience:, attachment:)
+      expect(context_file.llm_conversation_service_document_id).to be_nil
+    end
+  end
+
   describe "acts_as_list" do
     it "maintains position ordering scoped to ai_experience" do
       attachment1 = attachment_model(context: course, size: 1.megabyte)

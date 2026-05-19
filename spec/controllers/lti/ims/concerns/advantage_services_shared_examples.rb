@@ -105,7 +105,23 @@ shared_examples_for "advantage services" do |skip_mime_type_checks_on_error: fal
     context "with unbound developer key" do
       let(:before_send_request) do
         lambda do
+          root_account.disable_feature! :lti_deactivate_registrations
           developer_key.developer_key_account_bindings.first.update! workflow_state: "off"
+        end
+      end
+
+      it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
+
+      it "returns 401 unauthorized and complains about missing developer key" do
+        expect(response).to have_http_status :unauthorized
+        expect(json).to be_lti_advantage_error_response_body("unauthorized", "Invalid Developer Key")
+      end
+    end
+
+    context "with inactive registration" do
+      let(:before_send_request) do
+        lambda do
+          developer_key.lti_registration.deactivate
         end
       end
 

@@ -83,7 +83,6 @@ function createPanel(overrideProps: Partial<ComputerPanelProps>, ref?: React.Ref
       userLocale="en"
       liveRegion={() => document.getElementById(LIVE_REGION_ID)}
       updateSubtitles={() => false}
-      useStudioPlayer={false}
       {...overrideProps}
     />
   )

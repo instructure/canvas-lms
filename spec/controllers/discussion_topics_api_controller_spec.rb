@@ -98,7 +98,7 @@ describe DiscussionTopicsApiController do
                      attachment: default_uploaded_data },
            format: "json"
 
-      expect(response).to_not be_successful
+      expect(response).not_to be_successful
       expect(response.body).to include("User storage quota exceeded")
     end
 
@@ -504,11 +504,7 @@ describe DiscussionTopicsApiController do
       before do
         @course.account.root_account.enable_feature!(:discussion_summary_with_cedar)
 
-        mock_response = Struct.new(:response, :input_tokens, :output_tokens, keyword_init: true).new(
-          response: "cedar summary",
-          input_tokens: 100,
-          output_tokens: 200
-        )
+        mock_response = double(response: "cedar summary")
         stub_const("CedarClient", Class.new do
           define_singleton_method(:prompt) do |*|
             mock_response
@@ -535,6 +531,7 @@ describe DiscussionTopicsApiController do
 
       it "passes correct parameters to Cedar" do
         calls = []
+        mock_response = double(response: "cedar summary")
         stub_const("CedarClient", Class.new do
           define_singleton_method(:prompt) do |args|
             calls << args
@@ -542,11 +539,7 @@ describe DiscussionTopicsApiController do
             raise "Expected feature_slug to eq 'discussion-summary'" unless args[:feature_slug] == "discussion-summary"
             raise "Expected prompt to be present" unless args[:prompt].present?
 
-            Struct.new(:response, :input_tokens, :output_tokens, keyword_init: true).new(
-              response: "cedar summary",
-              input_tokens: 100,
-              output_tokens: 200
-            )
+            mock_response
           end
         end)
 
@@ -666,6 +659,47 @@ describe DiscussionTopicsApiController do
       expect(response).to be_successful
       expect(response.parsed_body["liked"]).to be_truthy
       expect(response.parsed_body["disliked"]).to be_falsey
+    end
+
+    context "add_comment action" do
+      before do
+        allow_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+      end
+
+      it "adds a comment to a disliked summary" do
+        post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @refined_summary.id, _action: "dislike" }, format: "json"
+        expect(response).to be_successful
+
+        post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @refined_summary.id, _action: "add_comment", comment: "The summary is inaccurate" }, format: "json"
+
+        expect(response).to be_successful
+        expect(response.parsed_body["comment"]).to eq("The summary is inaccurate")
+        expect(response.parsed_body["disliked"]).to be_truthy
+      end
+
+      it "returns an error when comment is blank" do
+        post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @refined_summary.id, _action: "add_comment" }, format: "json"
+
+        expect(response).to be_bad_request
+        expect(response.parsed_body["error"]).to be_present
+      end
+
+      it "returns an error when feedback is not disliked" do
+        post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @refined_summary.id, _action: "seen" }, format: "json"
+
+        post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @refined_summary.id, _action: "add_comment", comment: "some feedback" }, format: "json"
+
+        expect(response).to be_bad_request
+        expect(response.parsed_body["error"]).to be_present
+      end
+
+      it "returns an error when comment exceeds 1024 characters" do
+        post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @refined_summary.id, _action: "dislike" }, format: "json"
+
+        post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @refined_summary.id, _action: "add_comment", comment: "a" * 1025 }, format: "json"
+
+        expect(response).to be_bad_request
+      end
     end
   end
 

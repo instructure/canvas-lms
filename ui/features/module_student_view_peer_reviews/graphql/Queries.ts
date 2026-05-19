@@ -19,9 +19,9 @@
 import {gql} from '@apollo/client'
 
 const ASSIGNMENT_QUERY = gql`
-  query GetCourseModulesForPeerReviews($courseId: ID!) {
+  query GetCourseModulesForPeerReviews($courseId: ID!, $cursor: String) {
     course(id: $courseId) {
-      modulesConnection {
+      modulesConnection(first: 100, after: $cursor) {
         nodes {
           id: _id
           moduleItems {
@@ -55,6 +55,10 @@ const ASSIGNMENT_QUERY = gql`
               }
             }
           }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
         }
       }
     }

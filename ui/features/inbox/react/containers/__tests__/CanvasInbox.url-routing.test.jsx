@@ -18,7 +18,7 @@
 
 import {render, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {ApolloProvider} from '@apollo/client'
 
 import {mswClient} from '../../../../../shared/msw/mswClient'

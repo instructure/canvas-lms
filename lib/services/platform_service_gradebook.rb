@@ -44,6 +44,10 @@ module Services
     class << self
       private
 
+      Canvas::Reloader.on_reload do
+        @config = nil
+      end
+
       def config
         @config ||= begin
           yaml_content = DynamicSettings.find(tree: :private)["platform_service_gradebook.yml", failsafe: nil] || "{}"

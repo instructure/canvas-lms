@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../../spec_helper"
-
 describe Accessibility::Concerns::AccessibilityCheckable do
   # Create a test class that includes the concern
   let(:test_class) do

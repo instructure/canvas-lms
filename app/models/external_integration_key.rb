@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ExternalIntegrationKey < ActiveRecord::Base
+class ExternalIntegrationKey < ApplicationRecord
   belongs_to :context, polymorphic: [:account]
 
   validates :context_id, presence: { unless: -> { new_record? && context&.new_record? } }

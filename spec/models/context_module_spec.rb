@@ -108,6 +108,33 @@ describe ContextModule do
         expect(@page2.reload).to be_published
       end
     end
+
+    context "with wiki page user tracking" do
+      before :once do
+        @user1 = user_model
+        @user2 = user_model
+        @page = @course.wiki_pages.create!(title: "tracked page", user: @user1, workflow_state: "unpublished")
+        @page_tag = @module.add_item(id: @page.id, type: "page")
+      end
+
+      it "sets the wiki page user from the explicit user argument" do
+        @module.publish_items!(user: @user2)
+        expect(@page.reload.user).to eq @user2
+      end
+
+      it "sets the wiki page user from the progress object" do
+        progress = Progress.create!(context: @course, tag: "test", user: @user2)
+        @module.publish_items!(progress:)
+        expect(@page.reload.user).to eq @user2
+      end
+
+      it "prefers the explicit user over the progress user" do
+        user3 = user_model
+        progress = Progress.create!(context: @course, tag: "test", user: @user2)
+        @module.publish_items!(progress:, user: user3)
+        expect(@page.reload.user).to eq user3
+      end
+    end
   end
 
   describe "unpublish_items!" do
@@ -182,6 +209,27 @@ describe ContextModule do
         @module.unpublish_items!
         expect(@context_visibility_tag.reload.published?).to be true
         expect(@context_visibility_file.reload.locked?).to be false
+      end
+    end
+
+    context "with wiki page user tracking" do
+      before :once do
+        @user1 = user_model
+        @user2 = user_model
+        @page = @course.wiki_pages.create!(title: "tracked page", user: @user1)
+        @page_tag = @module.add_item(id: @page.id, type: "page")
+        @page_tag.publish
+      end
+
+      it "sets the wiki page user from the explicit user argument" do
+        @module.unpublish_items!(user: @user2)
+        expect(@page.reload.user).to eq @user2
+      end
+
+      it "sets the wiki page user from the progress object" do
+        progress = Progress.create!(context: @course, tag: "test", user: @user2)
+        @module.unpublish_items!(progress:)
+        expect(@page.reload.user).to eq @user2
       end
     end
   end
@@ -602,7 +650,7 @@ describe ContextModule do
                 custom_params: custom, lti_resource_link_lookup_uuid: lookup_uuid
               )
             )
-            expect(tag.associated_asset.id).to_not eq(existing_resource_link.id)
+            expect(tag.associated_asset.id).not_to eq(existing_resource_link.id)
             expect(tag.associated_asset.lookup_uuid).to eq(lookup_uuid)
             expect(tag.associated_asset.custom).to eq("foo" => "bar")
           end
@@ -998,6 +1046,58 @@ describe ContextModule do
         result.reload
         expect(result.completed_at).to eq(original_completed_at)
         expect(result.evaluated_at).to eq(original_evaluated_at)
+      end
+    end
+  end
+
+  describe "evaluate_all_progressions" do
+    it "does not re-evaluate progressions for date-concluded enrollments" do
+      student_in_course(active_all: true)
+      mod = @course.context_modules.create!(name: "Module")
+      assignment = @course.assignments.create!(
+        title: "Score This",
+        grading_type: "points",
+        points_possible: 10,
+        submission_types: "online_text_entry"
+      )
+      tag = mod.add_item(id: assignment.id, type: "assignment")
+      mod.completion_requirements = [{ id: tag.id, type: "min_score", min_score: 5 }]
+      mod.workflow_state = "active"
+      mod.save!
+
+      # Set manual posting so grade stays unposted
+      assignment.ensure_post_policy(post_manually: true)
+
+      # Student submits and gets a passing score, but grade is NOT posted yet
+      assignment.submit_homework(@student, body: "my answer")
+      submission = assignment.grade_student(@student, grade: "10", grader: @teacher).first
+      expect(submission.posted_at).to be_nil
+      # Grade is unposted - module progression should NOT be completed
+      progression = mod.evaluate_for(@student)
+      expect(progression.workflow_state).not_to eq("completed")
+      expect(progression.completed_at).to be_nil
+
+      # Conclude enrollment by date
+      @enrollment.start_at = 2.months.ago
+      @enrollment.end_at = 1.month.ago
+      @enrollment.save!
+      @enrollment.enrollment_state.recalculate_state
+      @enrollment.enrollment_state.save!
+      expect(@enrollment.enrollment_state.state).to eq("completed")
+
+      # Now post the grade (simulating instructor posting after course end)
+      submission.update!(posted_at: Time.zone.now)
+
+      # Mark progression as outdated (what recalculate_module_progressions does)
+      mod.context_module_progressions.where(current: true).update_all(current: false)
+
+      Timecop.freeze(2.days.from_now) do
+        mod.evaluate_all_progressions
+
+        # Progression should NOT have been re-evaluated for concluded enrollment
+        progression.reload
+        expect(progression.completed_at).to be_nil
+        expect(progression.workflow_state).not_to eq("completed")
       end
     end
   end

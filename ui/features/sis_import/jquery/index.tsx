@@ -24,10 +24,10 @@ import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, formErrors */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf, disableIf */
 import 'jqueryui/progressbar'
 
-import ReactDOM from 'react-dom/client'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import SisImportForm from '../react/SisImportForm'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import type {SisImport} from 'api'
 
 const I18n = createI18nScope('sis_import')
@@ -54,6 +54,9 @@ interface SisBatch extends SisImport {
       differentiation_tag_sets: number
       differentiation_tags: number
       differentiation_tag_memberships: number
+      institutional_tag_categories: number
+      institutional_tags: number
+      institutional_tag_associations: number
       user_observers: number
       change_sis_ids: number
     }
@@ -70,11 +73,11 @@ $(document).ready(function (_event) {
   const mountNode = document.getElementById('attachment_mount')
   if (!mountNode) return
 
-  const root = ReactDOM.createRoot(mountNode)
-  root.render(
+  legacyRender(
     <QueryClientProvider client={queryClient}>
       <SisImportForm onSuccess={onSuccess} />
     </QueryClientProvider>,
+    mountNode,
   )
   let state: 'nothing' | 'updating' | 'checking' = 'nothing'
 
@@ -237,6 +240,45 @@ $(document).ready(function (_event) {
         ),
       ) +
       '</li>'
+    if (ENV.INSTITUTIONAL_TAGS_ENABLED) {
+      output +=
+        '<li>' +
+        htmlEscape(
+          I18n.t(
+            'import_counts.institutional_tag_categories',
+            'Institutional Tag Categories: %{institutional_tag_categories_count}',
+            {
+              institutional_tag_categories_count: batch.data.counts.institutional_tag_categories,
+            },
+          ),
+        ) +
+        '</li>'
+      output +=
+        '<li>' +
+        htmlEscape(
+          I18n.t(
+            'import_counts.institutional_tags',
+            'Institutional Tags: %{institutional_tags_count}',
+            {
+              institutional_tags_count: batch.data.counts.institutional_tags,
+            },
+          ),
+        ) +
+        '</li>'
+      output +=
+        '<li>' +
+        htmlEscape(
+          I18n.t(
+            'import_counts.institutional_tag_associations',
+            'Institutional Tag Associations: %{institutional_tag_associations_count}',
+            {
+              institutional_tag_associations_count:
+                batch.data.counts.institutional_tag_associations,
+            },
+          ),
+        ) +
+        '</li>'
+    }
     output +=
       '<li>' +
       htmlEscape(
@@ -275,7 +317,8 @@ $(document).ready(function (_event) {
     const tick = function (): void {
       if (state === 'nothing') {
         fakeTickCount++
-        const progress = (($('.copy_progress').progressbar('option', 'value') as number) || 0) + 0.25
+        const progress =
+          (($('.copy_progress').progressbar('option', 'value') as number) || 0) + 0.25
         if (fakeTickCount < 10) {
           $('.copy_progress').progressbar('option', 'value', progress)
         }
@@ -354,7 +397,9 @@ $(document).ready(function (_event) {
               )
               message += createMessageHtml(sis_batch)
               message += createCountsHtml(sis_batch)
-              $('.sis_messages').show().html(raw(message) as unknown as string)
+              $('.sis_messages')
+                .show()
+                .html(raw(message) as unknown as string)
             }
           } else {
             if (progress === lastProgress) {
@@ -376,7 +421,7 @@ $(document).ready(function (_event) {
   }
 
   function onSuccess(data: OnSuccessData): void {
-    root.render(null)
+    legacyUnmountComponentAtNode(mountNode)
     if (data && data.id) {
       startPoll()
     } else {

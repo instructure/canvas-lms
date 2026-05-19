@@ -18,7 +18,7 @@
 
 import type {Action} from 'redux'
 import type {ThunkAction} from 'redux-thunk'
-import {showFlashAlert, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashSuccess} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {captureException} from '@sentry/browser'
 

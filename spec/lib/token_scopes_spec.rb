@@ -80,15 +80,22 @@ describe TokenScopes do
         ]
       end
 
-      it "formats the scopes with url:http_verb|api_path" do
+      it "formats the scopes with url:http_verb|api_path and url:http|file_access_path" do
         generated_scopes.each do |scope|
-          expect(%r{^url:(?:GET|OPTIONS|POST|PUT|PATCH|DELETE)\|/api/.+} =~ scope).not_to be_nil
+          regex = %r{^url:(?:GET|OPTIONS|POST|PUT|PATCH|DELETE)\|/(api/.+|.+/download|.+/preview)$}
+          expect(regex =~ scope).not_to be_nil
         end
       end
 
       it "does not include the optional format part of the route path" do
         generated_scopes.each do |scope|
           expect(scope.include?("(.:format)")).to be false
+        end
+      end
+
+      it "does not include the optional type part of the route path" do
+        generated_scopes.each do |scope|
+          expect(scope.include?("(.:type)")).to be false
         end
       end
     end

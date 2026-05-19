@@ -24,6 +24,7 @@ import {Button} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useResponsiveContext} from '../../hooks/useResponsiveContext'
+import {useWidgetTheme} from '../../theme/WidgetThemeContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
@@ -43,6 +44,7 @@ const WidgetCard: React.FC<WidgetCardProps> = ({
   disabled = false,
 }) => {
   const {isMobile} = useResponsiveContext()
+  const {colors} = useWidgetTheme()
 
   return (
     <View
@@ -58,7 +60,7 @@ const WidgetCard: React.FC<WidgetCardProps> = ({
       role="group"
       aria-label={displayName}
       themeOverride={{
-        backgroundSecondary: '#F9FAFA',
+        backgroundSecondary: colors.cardSecondary,
       }}
     >
       <Flex direction="column" height="100%">
@@ -85,7 +87,7 @@ const WidgetCard: React.FC<WidgetCardProps> = ({
             as="div"
             borderWidth="small 0 0 0"
             padding="small 0 0 0"
-            themeOverride={{borderColorPrimary: '#E8EAEC'}}
+            themeOverride={{borderColorPrimary: colors.border}}
           >
             <Button
               size="small"

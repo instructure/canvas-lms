@@ -19,7 +19,7 @@
  */
 
 import $ from 'jquery'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {ApolloClient, gql} from '@apollo/client'
 import {MockedProvider} from '@apollo/client/testing'
 import {createCache} from '@canvas/apollo-v3'
@@ -264,7 +264,7 @@ describe('CommentsTrayBody', () => {
         <CommentsTrayBody {...props} />
       </MockedProvider>,
     )
-    expect(await waitFor(() => getByLabelText('Comment input box'))).toBeInTheDocument()
+    expect(await waitFor(() => getByLabelText('Comment'))).toBeInTheDocument()
   })
 
   it('does not render CommentTextArea when the student cannot make changes to the submission', async () => {
@@ -278,7 +278,7 @@ describe('CommentsTrayBody', () => {
         </MockedProvider>
       </StudentViewContext.Provider>,
     )
-    expect(await waitFor(() => queryByLabelText('Comment input box'))).not.toBeInTheDocument()
+    expect(await waitFor(() => queryByLabelText('Comment'))).not.toBeInTheDocument()
   })
 
   it('does not render CommentTextArea when an observer is viewing the submission', async () => {
@@ -292,7 +292,7 @@ describe('CommentsTrayBody', () => {
         </MockedProvider>
       </StudentViewContext.Provider>,
     )
-    expect(await waitFor(() => queryByLabelText('Comment input box'))).not.toBeInTheDocument()
+    expect(await waitFor(() => queryByLabelText('Comment'))).not.toBeInTheDocument()
   })
 
   it('notifies user when comment successfully sent', async () => {

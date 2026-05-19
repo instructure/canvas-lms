@@ -22,7 +22,6 @@ import Backbone from '@canvas/backbone'
 // @ts-expect-error
 extend(SpeedgraderLinkView, Backbone.View)
 
-// @ts-expect-error
 function SpeedgraderLinkView(this: any) {
   this.toggleSpeedgraderLink = this.toggleSpeedgraderLink.bind(this)
   // @ts-expect-error

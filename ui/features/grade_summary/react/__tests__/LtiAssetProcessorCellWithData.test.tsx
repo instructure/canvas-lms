@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {
   LtiAssetProcessorCellWithData,

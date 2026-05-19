@@ -99,7 +99,7 @@ describe Quizzes::QuizExtension do
       @course.enroll_student(@user)
 
       manager = Quizzes::SubmissionManager.new(@quiz)
-      @qs = manager.find_or_create_submission(@user, nil, "settings_only")
+      @qs = manager.find_or_create_submission(@user, state: "settings_only")
     end
 
     it "extends a submission's extra attempts" do

@@ -41,7 +41,6 @@ import {
 import formatMessage from '../format-message'
 import ResizeHandle from './ResizeHandle'
 import {FS_ENABLED} from '../util/fullscreenHelpers'
-import {AIWandSVG} from './plugins/shared/ai_tools'
 
 export const WYSIWYG_VIEW = 'WYSIWYG'
 export const PRETTY_HTML_EDITOR_VIEW = 'PRETTY'
@@ -67,7 +66,6 @@ StatusBar.propTypes = {
   onWordcountModalOpen: func.isRequired,
   disabledPlugins: arrayOf(string),
   features: arrayOf(string), // StatusBarFeature[]
-  onAI: func,
 }
 
 StatusBar.defaultProps = {
@@ -263,35 +261,13 @@ export default function StatusBar(props) {
 
   function renderIconButtons() {
     if (isHtmlView()) return null
-    const ai_tools = isFeature('ai_tools')
     const kb_shortcuts = isFeature('keyboard_shortcuts')
     const a11y_checker = isFeature('a11y_checker')
-    if (!(ai_tools || kb_shortcuts || a11y_checker)) return null
+    if (!(kb_shortcuts || a11y_checker)) return null
 
     const kbshortcut = formatMessage('View keyboard shortcuts')
     return (
       <View display="inline-block" padding="0 x-small">
-        {ai_tools && props.onAI && (
-          <IconButton
-            data-btn-id="rce-ai-btn"
-            color="secondary"
-            aria-haspopup="dialog"
-            title={formatMessage('AI Tools')}
-            tabIndex={tabIndexForBtn('rce-ai-btn')}
-            onClick={event => {
-              event.target.focus() // FF doesn't focus buttons on click
-              props.onAI()
-            }}
-            onFocus={() => setFocusedBtnId('rce-ai-btn')}
-            screenReaderLabel={formatMessage('AI Tools')}
-            withBackground={false}
-            withBorder={false}
-          >
-            <span style={{color: 'dodgerBlue'}}>
-              <SVGIcon src={AIWandSVG} size="x-small" />
-            </span>
-          </IconButton>
-        )}
         {kb_shortcuts && (
           <IconButton
             data-btn-id="rce-kbshortcut-btn"

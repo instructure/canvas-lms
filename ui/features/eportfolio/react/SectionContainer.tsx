@@ -35,7 +35,7 @@ interface Props {
   isOwner: boolean
   sectionId: number
   sectionListNode: HTMLElement
-  submissionListNode: HTMLElement
+  submissionListNode: HTMLElement | null
 }
 
 const fetchSections = async (portfolio_id: number): Promise<ePortfolioSection[]> => {

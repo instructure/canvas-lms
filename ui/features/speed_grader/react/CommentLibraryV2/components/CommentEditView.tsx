@@ -24,7 +24,7 @@ import {View} from '@instructure/ui-view'
 import {useEffect, useRef, useState} from 'react'
 import {SpeedGraderLegacy_UpdateCommentBankItem} from '../graphql/mutations'
 import {useMutation} from '@apollo/client'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SpeedGraderLegacy_UpdateCommentBankItemMutation} from '@canvas/graphql/codegen/graphql'
 

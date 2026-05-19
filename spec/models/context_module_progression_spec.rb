@@ -265,18 +265,18 @@ describe ContextModuleProgression do
     it "raises a stale object error during save" do
       progression = stale_progression
       expect { progression.update_attribute(:updated_at, 10.seconds.from_now) }.to raise_error(ActiveRecord::StaleObjectError)
-      expect { progression.reload.update_attribute(:updated_at, 10.seconds.from_now) }.to_not raise_error
+      expect { progression.reload.update_attribute(:updated_at, 10.seconds.from_now) }.not_to raise_error
     end
 
     it "raises a stale object error during evaluate" do
       progression = stale_progression
       expect { progression.evaluate }.to raise_error(ActiveRecord::StaleObjectError)
-      expect { progression.reload.evaluate }.to_not raise_error
+      expect { progression.reload.evaluate }.not_to raise_error
     end
 
     it "does not raise a stale object error during evaluate!" do
       progression = stale_progression
-      expect { progression.evaluate! }.to_not raise_error
+      expect { progression.evaluate! }.not_to raise_error
     end
 
     it "does not raise a stale object error during catastrophic evaluate!" do
@@ -284,7 +284,7 @@ describe ContextModuleProgression do
       allow(progression).to receive(:save).at_least(:once).and_raise(ActiveRecord::StaleObjectError.new(progression, "Save"))
 
       new_progression = nil
-      expect { new_progression = progression.evaluate! }.to_not raise_error
+      expect { new_progression = progression.evaluate! }.not_to raise_error
       expect(new_progression.workflow_state).to eq "locked"
     end
   end

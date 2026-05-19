@@ -18,12 +18,21 @@ if [ ! -z "${SSH_USERNAME-}" ]; then
   # translations should take precedence.
   "$(yarn bin)/sync-translations" --ignore-jira --config ./package-translations/sync-config-crowd.json
   "$(yarn bin)/sync-translations" --ignore-jira --config ./package-translations/sync-config.json
+
+  # Sync canvas-lms UI translations (i18next format, separate S3 project)
+  "$(yarn bin)/sync-translations" --ignore-jira --config ./package-translations/sync-config-canvas-lms.json
 fi
 
 # Remove empty/missing strings from catalogs.
 for file in packages/translations/lib/*.json; do
   if [[ "$file" == 'packages/translations/lib/en.json' ]]; then continue; fi
   jq --indent 4 'with_entries(select(.value.message != ""))' "$file" > tmp.json && mv tmp.json "$file"
+done
+
+# Remove empty strings from canvas-lms i18next catalogs (flat key:value format).
+for file in packages/translations/lib/canvas-lms/*.json; do
+  if [[ "$file" == *'/en.json' ]]; then continue; fi
+  jq --indent 4 'walk(if type == "object" then with_entries(select(.value != "")) else . end)' "$file" > tmp.json && mv tmp.json "$file"
 done
 
 # If there are no changes to commit, bail out

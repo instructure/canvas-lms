@@ -109,6 +109,21 @@ describe Assignment do
     expect(@assignment.errors[:grading_type]).not_to be_nil
   end
 
+  it "versions attachment associations with the assignment" do
+    attachment_model(context: @course)
+    assignment = @course.assignments.create!(description: "file linke: <a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>file</a>", updating_user: @teacher)
+    assignment.update(description: "meh")
+
+    expect(YAML.load(assignment.versions.find_by(number: 1).yaml)["attachment_associations"][0]).to include({
+                                                                                                              attachment_id: @attachment.id,
+                                                                                                              context_id: assignment.id,
+                                                                                                              context_type: "Assignment",
+                                                                                                              root_account_id: @course.root_account_id,
+                                                                                                              user_id: @teacher.id,
+                                                                                                              context_concern: nil
+                                                                                                            })
+  end
+
   describe "#question_count" do
     let(:assignment) { Assignment.new }
 
@@ -284,7 +299,7 @@ describe Assignment do
         assignment.update!(due_at: 1.day.from_now)
         expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
         assignment.update!(due_at: nil)
-        expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
+        expect(ScheduledSmartAlert.all).not_to include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
       end
 
       it "deletes the ScheduledSmartAlert if the due date is changed to the past" do
@@ -292,7 +307,7 @@ describe Assignment do
         assignment.update!(due_at: 1.day.from_now)
         expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
         assignment.update!(due_at: 1.day.ago)
-        expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
+        expect(ScheduledSmartAlert.all).not_to include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
       end
 
       it "deletes associated ScheduledSmartAlerts when the Assignment is deleted" do
@@ -302,8 +317,8 @@ describe Assignment do
         expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
         expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
         assignment.destroy
-        expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
-        expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
+        expect(ScheduledSmartAlert.all).not_to include(an_object_having_attributes(context_type: "Assignment", context_id: assignment.id))
+        expect(ScheduledSmartAlert.all).not_to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
       end
     end
 
@@ -1884,6 +1899,141 @@ describe Assignment do
       expect(new_assignment.peer_review_across_sections).to be false
     end
 
+    context "with a peer review sub assignment" do
+      let(:assignment) do
+        a = assignment_model(
+          course: @course,
+          title: "Assignment with Peer Review",
+          points_possible: 10,
+          peer_review_count: 2,
+          peer_reviews: true,
+          submission_types: "online_text_entry"
+        )
+        peer_review_model(parent_assignment: a)
+        a.reload
+      end
+
+      let(:peer_review_sub) { assignment.peer_review_sub_assignment }
+      let(:new_assignment) do
+        duped = assignment.duplicate
+        duped.save!
+        duped.reload
+      end
+
+      it "creates exactly one new PeerReviewSubAssignment" do
+        peer_review_sub # force evaluation so the original peer review sub assignment exists before counting
+        expect { assignment.duplicate }.to change(PeerReviewSubAssignment, :count).by(1)
+      end
+
+      it "duplicates the peer review sub assignment" do
+        expect(new_assignment.peer_review_sub_assignment).to be_present
+      end
+
+      it "links the duplicated peer review sub assignment to the new assignment, not the original" do
+        expect(new_assignment.peer_review_sub_assignment.parent_assignment_id).to eq(new_assignment.id)
+        expect(new_assignment.peer_review_sub_assignment.parent_assignment_id).not_to eq(assignment.id)
+      end
+
+      it "preserves peer_review_count on the duplicated assignment" do
+        expect(new_assignment.peer_review_count).to eq(assignment.peer_review_count)
+      end
+
+      it "preserves points_possible on the duplicated peer review sub assignment" do
+        expect(new_assignment.peer_review_sub_assignment.points_possible).to eq(peer_review_sub.points_possible)
+      end
+
+      it "preserves grading_type on the duplicated peer review sub assignment" do
+        expect(new_assignment.peer_review_sub_assignment.grading_type).to eq(peer_review_sub.grading_type)
+      end
+
+      it "preserves dates on the duplicated peer review sub assignment" do
+        new_peer_review_sub = new_assignment.peer_review_sub_assignment
+        expect(new_peer_review_sub.due_at).to be_within(1.second).of(peer_review_sub.due_at)
+        expect(new_peer_review_sub.unlock_at).to be_within(1.second).of(peer_review_sub.unlock_at)
+        expect(new_peer_review_sub.lock_at).to be_within(1.second).of(peer_review_sub.lock_at)
+      end
+
+      it "generates the peer review sub assignment title from the new assignment's title" do
+        new_peer_review_sub = new_assignment.peer_review_sub_assignment
+        expect(new_peer_review_sub.title).to include(new_assignment.title)
+        expect(new_peer_review_sub.title).not_to eq(peer_review_sub.title)
+      end
+
+      it "does not copy assessment_requests to the duplicated peer review sub assignment" do
+        expect(new_assignment.peer_review_sub_assignment.assessment_requests).to be_empty
+      end
+
+      it "sets duplicate_of on the duplicated peer review sub assignment" do
+        expect(new_assignment.peer_review_sub_assignment.duplicate_of).to eq(peer_review_sub)
+      end
+
+      it "resets peer_reviews_assigned to false on the new assignment" do
+        expect(new_assignment.peer_reviews_assigned).to be false
+      end
+
+      it "does not duplicate the peer review sub assignment when the feature flag is disabled" do
+        assignment # force evaluation while flag is enabled by peer_review_model factory
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        duplicated = assignment.reload.duplicate
+        duplicated.save!
+        duplicated.reload
+        expect(duplicated.peer_review_sub_assignment).to be_nil
+      end
+
+      it "resets peer_review_count to 0 when the feature flag is disabled" do
+        assignment # force evaluation while flag is enabled by peer_review_model factory
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        duplicated = assignment.reload.duplicate
+        duplicated.save!
+        duplicated.reload
+        expect(duplicated.peer_review_count).to eq(0)
+      end
+
+      it "raises if peer review sub assignment creation fails" do
+        allow(PeerReview::PeerReviewCreatorService).to receive(:call).and_raise(ActiveRecord::RecordInvalid)
+        expect { assignment.duplicate }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
+      it "does not persist the duplicated assignment if the peer review sub assignment creation fails" do
+        peer_review_sub # force evaluation so the original assignment exists before counting
+        allow(PeerReview::PeerReviewCreatorService).to receive(:call).and_raise(ActiveRecord::RecordInvalid)
+        expect do
+          assignment.duplicate
+        rescue ActiveRecord::RecordInvalid
+          nil
+        end.not_to change(Assignment, :count)
+      end
+
+      it "does not persist the duplicated assignment if result.save! fails inside the transaction" do
+        assignment # force evaluation so the original assignment exists before counting
+        allow(assignment).to receive(:clone).and_wrap_original do |original|
+          result = original.call
+          allow(result).to receive(:save!).and_raise(ActiveRecord::RecordInvalid)
+          result
+        end
+        expect do
+          assignment.duplicate
+        rescue ActiveRecord::RecordInvalid
+          nil
+        end.not_to change(Assignment, :count)
+      end
+    end
+
+    context "without a peer review sub assignment" do
+      it "resets peer_review_count to 0" do
+        assignment = assignment_model(
+          course: @course,
+          title: "no peer reviews",
+          points_possible: 10,
+          peer_reviews: true,
+          peer_review_count: 3
+        )
+        new_assignment = assignment.duplicate
+        new_assignment.save!
+        expect(new_assignment.peer_review_count).to eq(0)
+      end
+    end
+
     context "with an assignment that can't be duplicated" do
       let(:assignment) { @course.assignments.create!(assignment_valid_attributes) }
 
@@ -2648,10 +2798,10 @@ describe Assignment do
         group_two = @course.groups.create!(name: "Group A", group_category:)
         group_three = @course.groups.create!(name: "Group C", group_category:)
 
-        add_user_to_group(student_one, group_one, true)
-        add_user_to_group(student_two, group_two, true)
-        add_user_to_group(student_three, group_three, true)
-        add_user_to_group(@initial_student, group_three, true)
+        add_user_to_group(student_one, group_one, is_leader: true)
+        add_user_to_group(student_two, group_two, is_leader: true)
+        add_user_to_group(student_three, group_three, is_leader: true)
+        add_user_to_group(@initial_student, group_three, is_leader: true)
 
         assignment = @course.assignments.create!(
           assignment_valid_attributes.merge(
@@ -2720,8 +2870,8 @@ describe Assignment do
         group_one = @course.groups.create!(name: "Group B", group_category:)
         group_two = @course.groups.create!(name: "Group A", group_category:)
 
-        add_user_to_group(student_one, group_one, true)
-        add_user_to_group(student_two, group_two, true)
+        add_user_to_group(student_one, group_one, is_leader: true)
+        add_user_to_group(student_two, group_two, is_leader: true)
 
         assignment = @course.assignments.create!(
           assignment_valid_attributes.merge(
@@ -2844,10 +2994,10 @@ describe Assignment do
       group_two = @course.groups.create!(name: "Group A", group_category:)
       group_three = @course.groups.create!(name: "Group C", group_category:)
 
-      add_user_to_group(student_one, group_one, true)
-      add_user_to_group(student_two, group_two, true)
-      add_user_to_group(student_three, group_three, true)
-      add_user_to_group(@initial_student, group_three, true)
+      add_user_to_group(student_one, group_one, is_leader: true)
+      add_user_to_group(student_two, group_two, is_leader: true)
+      add_user_to_group(student_three, group_three, is_leader: true)
+      add_user_to_group(@initial_student, group_three, is_leader: true)
 
       assignment = @course.assignments.create!(
         assignment_valid_attributes.merge(
@@ -2974,7 +3124,7 @@ describe Assignment do
       @assignment.update!(due_at: 2.days.from_now, lock_at: 3.days.from_now)
       @assignment.reload
       decoded = Canvas::Security.decode_jwt(@assignment.secure_params)
-      expect(decoded).to_not include(:description)
+      expect(decoded).not_to include(:description)
     end
 
     it "does not contain the description when the assignment is locked" do
@@ -3108,7 +3258,7 @@ describe Assignment do
       @assignment.grade_student(@student, grade: 10, grader: @teacher)
       @submission = @assignment.grade_student(@student, grade: nil, grader: @teacher).first
 
-      expect(@submission.workflow_state).to_not eq("unsubmitted")
+      expect(@submission.workflow_state).not_to eq("unsubmitted")
     end
   end
 
@@ -4061,20 +4211,20 @@ describe Assignment do
 
     it "delegates to NeedsGradingCountQuery" do
       query = instance_double(Assignments::NeedsGradingCountQuery)
-      expect(query).to receive(:manual_count)
-      expect(Assignments::NeedsGradingCountQuery).to receive(:new).with(@assignment).and_return(query)
+      expect(query).to receive(:manual_count).and_return({ @assignment.global_id => 1 })
+      expect(Assignments::NeedsGradingCountQuery).to receive(:new).with([@assignment]).and_return(query)
       @assignment.needs_grading_count
     end
 
     it "updates when section (and its enrollments) are moved" do
       @assignment.update_attribute(:updated_at, 1.minute.ago)
       expect(@assignment.needs_grading_count).to be(1)
-      expect(Assignments::NeedsGradingCountQuery.new(@assignment, nil).manual_count).to be(1)
+      expect(Assignments::NeedsGradingCountQuery.new([@assignment], nil).manual_count[@assignment.global_id]).to be(1)
       course2 = @course.account.courses.create!
       e = @course.enrollments.where(user_id: @user.id).first.course_section
       e.move_to_course(course2)
       @assignment.reload
-      expect(Assignments::NeedsGradingCountQuery.new(@assignment, nil).manual_count).to be(0)
+      expect(Assignments::NeedsGradingCountQuery.new([@assignment], nil).manual_count[@assignment.global_id]).to be(0)
       expect(@assignment.needs_grading_count).to be(0)
     end
 
@@ -4212,6 +4362,24 @@ describe Assignment do
       expect(@submission.user_id).to eql(@user.id)
     end
 
+    it "normalizes letter grade casing with zero points possible" do
+      @assignment.grading_type = "letter_grade"
+      @assignment.points_possible = 0.0
+      @assignment.save!
+
+      grade = @assignment.score_to_grade(0, "b+")
+      expect(grade).to eql("B+")
+    end
+
+    it "preserves invalid letter grades with zero points possible when not in scheme" do
+      @assignment.grading_type = "letter_grade"
+      @assignment.points_possible = 0.0
+      @assignment.save!
+
+      grade = @assignment.score_to_grade(0, "Z")
+      expect(grade).to eql("Z")
+    end
+
     it "properly calculates letter grades" do
       @assignment.grading_type = "letter_grade"
       @assignment.points_possible = 10
@@ -4321,13 +4489,13 @@ describe Assignment do
       expect(@submission.user_id).to eql(@user.id)
     end
 
-    context "when force_letter_grade(the third argument of score_to_grade) is true" do
+    context "when force_letter_grade is true" do
       it "returns letter grading standard grade for points" do
         @assignment.grading_type = "points"
         @assignment.points_possible = 10
         @assignment.save!
         submission = @assignment.grade_student(@user, grade: "9", grader: @teacher).first
-        expect(@assignment.score_to_grade(submission.score, submission.grade, true)).to eq "A-"
+        expect(@assignment.score_to_grade(submission.score, submission.grade, force_letter_grade: true)).to eq "A-"
       end
 
       it "returns 'complete' for 0/0" do
@@ -4335,7 +4503,7 @@ describe Assignment do
         @assignment.points_possible = 0
         @assignment.save!
         submission = @assignment.grade_student(@user, grade: "0", grader: @teacher).first
-        expect(@assignment.score_to_grade(submission.score, submission.grade, true)).to eq "complete"
+        expect(@assignment.score_to_grade(submission.score, submission.grade, force_letter_grade: true)).to eq "complete"
       end
 
       it "returns given grade for -1/0" do
@@ -4343,7 +4511,7 @@ describe Assignment do
         @assignment.points_possible = 0
         @assignment.save!
         submission = @assignment.grade_student(@user, grade: -1, grader: @teacher).first
-        expect(@assignment.score_to_grade(submission.score, submission.grade, true)).to eq "-1"
+        expect(@assignment.score_to_grade(submission.score, submission.grade, force_letter_grade: true)).to eq "-1"
       end
 
       it "returns highest grading scheme grade when 1/0" do
@@ -4351,7 +4519,7 @@ describe Assignment do
         @assignment.points_possible = 0
         @assignment.save!
         submission = @assignment.grade_student(@user, grade: 1, grader: @teacher).first
-        expect(@assignment.score_to_grade(submission.score, submission.grade, true)).to eq "A"
+        expect(@assignment.score_to_grade(submission.score, submission.grade, force_letter_grade: true)).to eq "A"
       end
     end
 
@@ -6892,12 +7060,12 @@ describe Assignment do
       expect(course.assignments.not_excluded_from_accessibility_scan).not_to include(classic_quiz_assignment)
     end
 
-    it "excludes external tool assignments" do
+    it "includes external tool assignments" do
       external_tool_assignment = course.assignments.create!(
         title: "External Tool Assignment",
         submission_types: "external_tool"
       )
-      expect(course.assignments.not_excluded_from_accessibility_scan).not_to include(external_tool_assignment)
+      expect(course.assignments.not_excluded_from_accessibility_scan).to include(external_tool_assignment)
     end
 
     it "excludes New Quizzes (quiz_lti) assignments" do
@@ -6932,6 +7100,73 @@ describe Assignment do
 
     it "includes parent assignments" do
       expect(AbstractAssignment.assignment_or_peer_review).to include(@parent_assignment)
+    end
+  end
+
+  describe ".assignment_scope_for_context" do
+    context "when peer_review_allocation_and_grading is enabled" do
+      before :once do
+        @course = course_factory(active_all: true)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @older_assignment = @course.assignments.create!(title: "Older Assignment")
+        @older_assignment.update_column(:created_at, 2.days.ago)
+        @parent_assignment = @course.assignments.create!(
+          title: "Parent Assignment",
+          peer_reviews: true,
+          peer_review_count: 2
+        )
+        @parent_assignment.update_column(:created_at, 1.day.ago)
+        @newer_assignment = @course.assignments.create!(title: "Newer Assignment")
+        @peer_review_assignment = peer_review_model(parent_assignment: @parent_assignment)
+      end
+
+      it "includes regular assignments" do
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).to include(@older_assignment)
+      end
+
+      it "includes assignments with peer reviews" do
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).to include(@parent_assignment)
+      end
+
+      it "includes peer review sub assignments" do
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).to include(@peer_review_assignment)
+      end
+
+      it "does not include assignments from other courses" do
+        other_course = Course.create!
+        other_course.enable_feature!(:peer_review_allocation_and_grading)
+        other_assignment = other_course.assignments.create!(title: "Other")
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).not_to include(other_assignment)
+      end
+    end
+
+    context "when peer_review_allocation_and_grading is disabled" do
+      before :once do
+        @course = course_factory(active_all: true)
+        @older_assignment = @course.assignments.create!(title: "Older Assignment")
+        @older_assignment.update_column(:created_at, 2.days.ago)
+        @parent_assignment = @course.assignments.create!(
+          title: "Parent Assignment",
+          peer_reviews: true,
+          automatic_peer_reviews: false
+        )
+        @parent_assignment.update_column(:created_at, 1.day.ago)
+        @newer_assignment = @course.assignments.create!(title: "Newer Assignment")
+      end
+
+      it "includes regular assignments" do
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).to include(@older_assignment)
+      end
+
+      it "does not include peer review sub-assignments" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        peer_review = @parent_assignment.create_peer_review_sub_assignment!(
+          peer_reviews: true,
+          peer_review_count: 2
+        )
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        expect(AbstractAssignment.assignment_scope_for_context(@course)).not_to include(peer_review)
+      end
     end
   end
 
@@ -7115,6 +7350,14 @@ describe Assignment do
     it "excludes students with completed enrollments" do
       @student1.student_enrollments.first.complete!
       expect(@assignment.participants.include?(@student1)).to be_falsey
+    end
+
+    it "excludes students whose only relevant enrollment is concluded" do
+      student = create_users(1, return_type: :record).first
+      student_in_section(@section2, user: student)
+      student_in_section(@section1, user: student, allow_multiple_enrollments: true)
+      @course.enrollments.find_by(user: student, course_section: @section1).complete!
+      expect(@assignment.participants).not_to include(student)
     end
 
     it "excludes students with completed enrollments by date" do
@@ -9030,6 +9273,85 @@ describe Assignment do
       assignment.restore
       expect(comment_bank_item.reload.workflow_state).to eq "active"
     end
+
+    context "with peer review sub assignment" do
+      let(:peer_review_assignment) do
+        @course.assignments.create!(
+          title: "Peer Review Assignment",
+          peer_reviews: true,
+          peer_review_count: 1
+        )
+      end
+      let(:peer_review_sub) do
+        PeerReviewSubAssignment.create!(
+          parent_assignment: peer_review_assignment,
+          submission_types: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE
+        )
+      end
+
+      before do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        [peer_review_assignment, peer_review_sub]
+        peer_review_assignment.destroy
+      end
+
+      it "restores the peer review sub assignment when feature flag is enabled" do
+        expect(peer_review_sub.reload.workflow_state).to eq "deleted"
+
+        peer_review_assignment.reload.restore
+        expect(peer_review_sub.reload.workflow_state).not_to eq "deleted"
+      end
+
+      it "triggers peer review attributes sync after restoring" do
+        expect(PeerReview::PeerReviewUpdaterService).to receive(:call)
+          .with(parent_assignment: peer_review_assignment)
+          .at_least(:once)
+        peer_review_assignment.reload.restore
+      end
+
+      it "restores only the assignment when feature flag is disabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+
+        peer_review_assignment.reload.restore
+        expect(peer_review_sub.reload.workflow_state).to eq "deleted"
+      end
+
+      it "does not sync sub assignment when FF is disabled at restore then re-enabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        peer_review_assignment.reload.restore
+
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        expect(PeerReview::PeerReviewUpdaterService).not_to receive(:call)
+        expect(peer_review_sub.reload.workflow_state).to eq "deleted"
+      end
+
+      it "restores only the assignment when no peer review sub assignment exists (legacy)" do
+        legacy_assignment = @course.assignments.create!(
+          title: "Legacy Peer Review",
+          peer_reviews: true
+        )
+        legacy_assignment.destroy
+
+        expect { legacy_assignment.restore }.not_to raise_error
+        expect(legacy_assignment.reload.workflow_state).not_to eq "deleted"
+      end
+
+      it "restores the most recently created sub assignment when multiple deleted ones exist" do
+        # peer_review_sub is the older deleted sub (already deleted by the before block).
+        # Simulate a newer sub created after a second enable/disable cycle,
+        # also deleted. The restore should pick the most recent one (highest id).
+        newer_sub = PeerReviewSubAssignment.create!(
+          parent_assignment: peer_review_assignment,
+          submission_types: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE
+        )
+        newer_sub.update_columns(workflow_state: "deleted")
+
+        peer_review_assignment.reload.restore
+
+        expect(peer_review_sub.reload.workflow_state).to eq "deleted"
+        expect(newer_sub.reload.workflow_state).not_to eq "deleted"
+      end
+    end
   end
 
   describe "#readable_submission_type" do
@@ -9206,6 +9528,96 @@ describe Assignment do
         it "returns an Array" do
           expect(@assignment.add_submission_comment(@u2).class).to eq Array
         end
+      end
+    end
+
+    context "when completing a comment-based peer review" do
+      let_once(:course) { course_model }
+      let_once(:assessor) { user_model.tap { |u| course.enroll_student(u, enrollment_state: "active") } }
+      let_once(:reviewee) { user_model.tap { |u| course.enroll_student(u, enrollment_state: "active") } }
+
+      before :once do
+        peer_review_model(course:, peer_review_count: 1)
+        @parent_assignment.update!(rubric: nil)
+        @reviewee_submission = submission_model(assignment: @parent_assignment, user: reviewee)
+        @assessor_submission = submission_model(assignment: @parent_assignment, user: assessor)
+        @assessment_request = AssessmentRequest.create!(
+          user: reviewee,
+          asset: @reviewee_submission,
+          assessor_asset: @assessor_submission,
+          assessor:,
+          workflow_state: "assigned",
+          peer_review_sub_assignment: @peer_review_sub_assignment
+        )
+      end
+
+      it "calls SubmissionCreatorService when assessment_request has a peer_review_sub_assignment" do
+        service_double = instance_double(PeerReview::SubmissionCreatorService)
+        expect(PeerReview::SubmissionCreatorService).to receive(:new)
+          .with(parent_assignment: @parent_assignment, assessor:)
+          .and_return(service_double)
+        expect(service_double).to receive(:call)
+
+        @parent_assignment.add_submission_comment(
+          reviewee,
+          comment: "Good work!",
+          author: assessor,
+          assessment_request: @assessment_request
+        )
+      end
+
+      it "does not call SubmissionCreatorService when assessment_request has no peer_review_sub_assignment" do
+        @assessment_request.update!(peer_review_sub_assignment: nil)
+
+        expect(PeerReview::SubmissionCreatorService).not_to receive(:new)
+
+        @parent_assignment.add_submission_comment(
+          reviewee,
+          comment: "Good work!",
+          author: assessor,
+          assessment_request: @assessment_request
+        )
+      end
+    end
+
+    # When a rubric association is present, SubmissionCreatorService is triggered
+    # via RubricAssessment#update_assessment_requests, not via add_submission_comment
+    context "when assessment_request has an active rubric association" do
+      let_once(:course) { course_model }
+      let_once(:assessor) { user_model.tap { |u| course.enroll_student(u, enrollment_state: "active") } }
+      let_once(:reviewee) { user_model.tap { |u| course.enroll_student(u, enrollment_state: "active") } }
+
+      before :once do
+        peer_review_model(course:, peer_review_count: 1)
+        rubric = rubric_model(context: course)
+        rubric_association = RubricAssociation.create!(
+          rubric:,
+          association_object: @parent_assignment,
+          context: course,
+          purpose: "grading"
+        )
+        @reviewee_submission = submission_model(assignment: @parent_assignment, user: reviewee)
+        @assessor_submission = submission_model(assignment: @parent_assignment, user: assessor)
+        @assessment_request = AssessmentRequest.create!(
+          user: reviewee,
+          asset: @reviewee_submission,
+          assessor_asset: @assessor_submission,
+          assessor:,
+          workflow_state: "assigned",
+          peer_review_sub_assignment: @peer_review_sub_assignment,
+          rubric_association:
+        )
+      end
+
+      it "does not call SubmissionCreatorService" do
+        expect(PeerReview::SubmissionCreatorService).not_to receive(:new)
+
+        @parent_assignment.add_submission_comment(
+          reviewee,
+          comment: "Good work!",
+          author: assessor,
+          assessment_request: @assessment_request
+        )
       end
     end
   end
@@ -9511,7 +9923,6 @@ describe Assignment do
     before do
       allow(@course).to receive(:feature_enabled?) { false }
       allow(@course).to receive(:feature_enabled?).with(:assignments_2_student) { true }
-      Account.site_admin.disable_feature!(:external_tools_for_a2)
     end
 
     let(:assignment) do
@@ -9527,7 +9938,6 @@ describe Assignment do
 
     %w[
       discussion_topic
-      external_tool
       online_quiz
       wiki_page
     ].each do |type|
@@ -9556,9 +9966,7 @@ describe Assignment do
       end
     end
 
-    it "returns true if when LTI external tool feature flag is enabled" do
-      Account.site_admin.enable_feature!(:external_tools_for_a2)
-
+    it "returns true for LTI external tool assignments" do
       assignment.build_wiki_page
       assignment.build_discussion_topic
       assignment.build_quiz
@@ -9863,7 +10271,13 @@ describe Assignment do
     before :once do
       @course.enable_feature!(:peer_review_allocation_and_grading)
       @assignment = @course.assignments.create!(
-        name: "peer review assignment",
+        name: "Assignment with Graded Peer Reviews",
+        peer_reviews: true,
+        peer_review_count: 2
+      )
+      peer_review_model(parent_assignment: @assignment)
+      @assignment_with_legacy_reviews = @course.assignments.create!(
+        name: "Assignment with Legacy Peer Reviews",
         peer_reviews: true,
         peer_review_count: 2
       )
@@ -9905,45 +10319,111 @@ describe Assignment do
       end
     end
 
-    it "allows changes to peer review count before peer reviews are submitted" do
-      @assignment.peer_review_count = 3
-      expect(@assignment).to be_valid
+    describe "changes to peer review count for assignments with graded peer reviews" do
+      it "allows changes before peer reviews are submitted" do
+        @assignment.peer_review_count = 3
+        expect(@assignment).to be_valid
+      end
+
+      it "does not allow changes after peer reviews are submitted" do
+        submission1 = @assignment.find_or_create_submission(@student1)
+        submission2 = @assignment.find_or_create_submission(@student2)
+        AssessmentRequest.create!(
+          user: @student1,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: @student2,
+          workflow_state: "completed"
+        )
+
+        @assignment.peer_review_count = 3
+        expect(@assignment).not_to be_valid
+        expect(@assignment.errors[:peer_review_count]).to include(
+          "Students have already submitted peer reviews, so reviews required and points cannot be changed."
+        )
+      end
+
+      it "allows validation to pass when peer_review_count is not changed" do
+        submission1 = @assignment.find_or_create_submission(@student1)
+        submission2 = @assignment.find_or_create_submission(@student2)
+        AssessmentRequest.create!(
+          user: @student1,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: @student2,
+          workflow_state: "completed"
+        )
+
+        @assignment.name = "updated name"
+        expect(@assignment).to be_valid
+      end
+
+      context "when the feature flag is disabled" do
+        before { @course.disable_feature!(:peer_review_allocation_and_grading) }
+
+        it "does not allow changes after peer reviews are submitted" do
+          submission1 = @assignment.find_or_create_submission(@student1)
+          submission2 = @assignment.find_or_create_submission(@student2)
+          AssessmentRequest.create!(
+            user: @student1,
+            asset: submission1,
+            assessor_asset: submission2,
+            assessor: @student2,
+            workflow_state: "completed"
+          )
+
+          @assignment.peer_review_count = 3
+          expect(@assignment).not_to be_valid
+          expect(@assignment.errors[:peer_review_count]).to include(
+            "Students have already submitted peer reviews, so reviews required and points cannot be changed."
+          )
+        end
+
+        it "allows changes before peer reviews are submitted" do
+          @assignment.peer_review_count = 3
+          expect(@assignment).to be_valid
+        end
+      end
     end
 
-    it "does not allow changes to peer review count after peer reviews are submitted" do
-      submission1 = @assignment.find_or_create_submission(@student1)
-      submission2 = @assignment.find_or_create_submission(@student2)
-      AssessmentRequest.create!(
-        user: @student1,
-        asset: submission1,
-        assessor_asset: submission2,
-        assessor: @student2,
-        workflow_state: "completed"
-      )
+    describe "changes to peer review count for assignments with legacy peer reviews" do
+      it "allows changes before peer reviews are submitted" do
+        @assignment_with_legacy_reviews.peer_review_count = 3
+        expect(@assignment_with_legacy_reviews).to be_valid
+      end
 
-      @assignment.peer_review_count = 3
-      expect(@assignment).not_to be_valid
-      expect(@assignment.errors[:peer_review_count]).to include(
-        "Students have already submitted peer reviews, so reviews required and points cannot be changed."
-      )
+      it "allows changes after peer reviews are submitted" do
+        submission1 = @assignment_with_legacy_reviews.find_or_create_submission(@student1)
+        submission2 = @assignment_with_legacy_reviews.find_or_create_submission(@student2)
+        AssessmentRequest.create!(
+          user: @student1,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: @student2,
+          workflow_state: "completed"
+        )
+
+        @assignment_with_legacy_reviews.peer_review_count = 3
+        expect(@assignment_with_legacy_reviews).to be_valid
+      end
+
+      it "allows validation to pass when peer_review_count is not changed" do
+        submission1 = @assignment_with_legacy_reviews.find_or_create_submission(@student1)
+        submission2 = @assignment_with_legacy_reviews.find_or_create_submission(@student2)
+        AssessmentRequest.create!(
+          user: @student1,
+          asset: submission1,
+          assessor_asset: submission2,
+          assessor: @student2,
+          workflow_state: "completed"
+        )
+
+        @assignment_with_legacy_reviews.name = "updated name"
+        expect(@assignment_with_legacy_reviews).to be_valid
+      end
     end
 
-    it "allows validation to pass when peer_review_count is not changed" do
-      submission1 = @assignment.find_or_create_submission(@student1)
-      submission2 = @assignment.find_or_create_submission(@student2)
-      AssessmentRequest.create!(
-        user: @student1,
-        asset: submission1,
-        assessor_asset: submission2,
-        assessor: @student2,
-        workflow_state: "completed"
-      )
-
-      @assignment.name = "updated name"
-      expect(@assignment).to be_valid
-    end
-
-    it "allows updating various assignment properties when peer review submissions exist" do
+    it "allows updating various properties except for peer review count for assignments with graded peer reviews after peer reviews are submitted" do
       submission1 = @assignment.find_or_create_submission(@student1)
       submission2 = @assignment.find_or_create_submission(@student2)
       AssessmentRequest.create!(
@@ -9978,22 +10458,6 @@ describe Assignment do
       expect(@assignment.errors[:peer_review_count]).to include(
         "Students have already submitted peer reviews, so reviews required and points cannot be changed."
       )
-    end
-
-    it "does not validate peer review count when feature flag is disabled" do
-      @course.disable_feature!(:peer_review_allocation_and_grading)
-      submission1 = @assignment.find_or_create_submission(@student1)
-      submission2 = @assignment.find_or_create_submission(@student2)
-      AssessmentRequest.create!(
-        user: @student1,
-        asset: submission1,
-        assessor_asset: submission2,
-        assessor: @student2,
-        workflow_state: "completed"
-      )
-
-      @assignment.peer_review_count = 3
-      expect(@assignment).to be_valid
     end
 
     describe ".assignment_ids_with_peer_review_submissions" do
@@ -10070,20 +10534,23 @@ describe Assignment do
     end
 
     context "when disabling peer reviews" do
-      it "allows disabling when no peer review submissions exist" do
+      it "allows disabling for assignments with graded peer reviews when no PR submissions exist and FF is enabled" do
         assignment = @course.assignments.create!(
-          name: "peer review assignment",
+          name: "Assignment with graded peer reviews",
           peer_reviews: true
         )
+        peer_review_model(parent_assignment: assignment)
+
         assignment.peer_reviews = false
         expect(assignment).to be_valid
       end
 
-      it "prevents disabling when peer review submissions exist" do
+      it "prevents disabling for assignments with graded peer reviews when PR submissions exist and FF is enabled" do
         assignment = @course.assignments.create!(
-          name: "peer review assignment",
+          name: "Assignment with graded peer reviews and submissions",
           peer_reviews: true
         )
+        peer_review_model(parent_assignment: assignment)
         create_completed_assessment_request(assignment, reviewer: @student2, reviewee: @student1)
 
         expect(assignment.peer_review_submissions?).to be true
@@ -10091,11 +10558,39 @@ describe Assignment do
         assignment.peer_reviews = false
         expect(assignment).not_to be_valid
         expect(assignment.errors[:peer_reviews]).to include(
-          "cannot be disabled when students have already submitted reviews"
+          "cannot be disabled for assignments with graded peer reviews when students have already submitted reviews"
         )
       end
 
-      it "allows disabling when feature flag is disabled" do
+      it "prevents disabling for assignments with graded peer reviews when FF is disabled" do
+        assignment = @course.assignments.create!(
+          name: "peer review assignment",
+          peer_reviews: true
+        )
+        peer_review_model(parent_assignment: assignment)
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+
+        assignment.peer_reviews = false
+        expect(assignment).not_to be_valid
+        expect(assignment.errors[:peer_reviews]).to include(
+          "cannot be disabled for assignments with graded peer reviews in legacy mode"
+        )
+      end
+
+      it "allows disabling for assignments with legacy peer reviews when PR submissions exist when FF is enabled" do
+        assignment = @course.assignments.create!(
+          name: "Assignment with legacy peer reviews",
+          peer_reviews: true
+        )
+        create_completed_assessment_request(assignment, reviewer: @student2, reviewee: @student1)
+
+        expect(assignment.peer_review_submissions?).to be true
+
+        assignment.peer_reviews = false
+        expect(assignment).to be_valid
+      end
+
+      it "allows disabling for assignments with legacy peer reviews when PR submissions exist when FF is disabled" do
         @course.disable_feature!(:peer_review_allocation_and_grading)
         assignment = @course.assignments.create!(
           name: "peer review assignment",
@@ -10128,6 +10623,53 @@ describe Assignment do
 
         assignment.peer_reviews = true
         expect(assignment).to be_valid
+      end
+    end
+
+    context "compatibility with legacy and graded peer review modes" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @assignment_with_graded_peer_reviews = @course.assignments.create!(
+          name: "assignment with graded peer reviews",
+          peer_reviews: true
+        )
+        peer_review_model(parent_assignment: @assignment_with_graded_peer_reviews)
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        @assignment_with_legacy_peer_reviews = @course.assignments.create!(
+          name: "assignment with legacy peer reviews",
+          peer_reviews: true
+        )
+      end
+
+      context "when in legacy mode" do
+        it "prevents disabling peer reviews for assignments with graded peer reviews" do
+          @assignment_with_graded_peer_reviews.peer_reviews = false
+          expect(@assignment_with_graded_peer_reviews).not_to be_valid
+          expect(@assignment_with_graded_peer_reviews.errors[:peer_reviews]).to include(
+            "cannot be disabled for assignments with graded peer reviews in legacy mode"
+          )
+        end
+
+        it "allows disabling peer reviews for assignments with legacy peer reviews" do
+          @assignment_with_legacy_peer_reviews.peer_reviews = false
+          expect(@assignment_with_legacy_peer_reviews).to be_valid
+        end
+      end
+
+      context "when in graded mode" do
+        before :once do
+          @course.enable_feature!(:peer_review_allocation_and_grading)
+        end
+
+        it "allows disabling peer reviews for assignments with graded peer reviews" do
+          @assignment_with_graded_peer_reviews.peer_reviews = false
+          expect(@assignment_with_graded_peer_reviews).to be_valid
+        end
+
+        it "allows disabling peer reviews for assignments with legacy peer reviews" do
+          @assignment_with_legacy_peer_reviews.peer_reviews = false
+          expect(@assignment_with_legacy_peer_reviews).to be_valid
+        end
       end
     end
   end
@@ -11094,13 +11636,13 @@ describe Assignment do
           it "does not call refresh_course_content_participation_counts when not changing to a trigger workflow_state" do
             assignment.workflow_state = "duplicating"
             assignment.save!
-            expect(assignment).to_not receive(:refresh_course_content_participation_counts)
+            expect(assignment).not_to receive(:refresh_course_content_participation_counts)
           end
 
           it "does not call refresh_course_content_participation_counts when changing something other than workflow_state" do
             assignment.title = "New Title"
             assignment.save!
-            expect(assignment).to_not receive(:refresh_course_content_participation_counts)
+            expect(assignment).not_to receive(:refresh_course_content_participation_counts)
           end
         end
 
@@ -11129,13 +11671,13 @@ describe Assignment do
           it "does not call refresh_course_content_participation_counts when not changing to something other than not_graded" do
             assignment.submission_types = "on_paper"
             assignment.save!
-            expect(assignment).to_not receive(:refresh_course_content_participation_counts)
+            expect(assignment).not_to receive(:refresh_course_content_participation_counts)
           end
 
           it "does not call refresh_course_content_participation_counts when changing something other than submission_types" do
             assignment.title = "New Title"
             assignment.save!
-            expect(assignment).to_not receive(:refresh_course_content_participation_counts)
+            expect(assignment).not_to receive(:refresh_course_content_participation_counts)
           end
         end
       end
@@ -11656,7 +12198,7 @@ describe Assignment do
       @assignment.omit_from_final_grade = true
       @assignment.points_possible = 10
 
-      expect(@assignment).to_not be_valid
+      expect(@assignment).not_to be_valid
     end
 
     it "disallows hide_in_gradebook to be set to true if omit_from_final_grade is false" do
@@ -11664,14 +12206,14 @@ describe Assignment do
       @assignment.omit_from_final_grade = false
       @assignment.points_possible = 0
 
-      expect(@assignment).to_not be_valid
+      expect(@assignment).not_to be_valid
     end
 
     it "disallows hide_in_gradebook to be set to anything other than a boolean" do
       @assignment.hide_in_gradebook = 2
-      expect(@assignment).to_not be_valid
+      expect(@assignment).not_to be_valid
       @assignment.hide_in_gradebook = nil
-      expect(@assignment).to_not be_valid
+      expect(@assignment).not_to be_valid
     end
   end
 
@@ -11687,12 +12229,12 @@ describe Assignment do
 
     it "disallows 0" do
       @assignment.allowed_attempts = 0
-      expect(@assignment).to_not be_valid
+      expect(@assignment).not_to be_valid
     end
 
     it "disallows values less than -1" do
       @assignment.allowed_attempts = -2
-      expect(@assignment).to_not be_valid
+      expect(@assignment).not_to be_valid
     end
 
     it "allows values greater than 0" do
@@ -13002,6 +13544,27 @@ describe Assignment do
       expect(@second_checkpoint.reload.grading_type).to eq "pass_fail"
     end
 
+    describe "#ensure_post_policy" do
+      it "syncs post_manually to all sub_assignments when set to true" do
+        @parent.ensure_post_policy(post_manually: true)
+        expect(@first_checkpoint.post_policy.reload.post_manually).to be true
+        expect(@second_checkpoint.post_policy.reload.post_manually).to be true
+      end
+
+      it "syncs post_manually to all sub_assignments when set to false" do
+        @parent.ensure_post_policy(post_manually: true)
+        @parent.ensure_post_policy(post_manually: false)
+        expect(@first_checkpoint.post_policy.reload.post_manually).to be false
+        expect(@second_checkpoint.post_policy.reload.post_manually).to be false
+      end
+
+      it "does not sync to sub_assignments when the assignment has none" do
+        assignment = @course.assignments.create!
+        expect { assignment.ensure_post_policy(post_manually: true) }.not_to raise_error
+        expect(assignment.post_policy.post_manually).to be true
+      end
+    end
+
     it "will update the sub_assignment lock_at and unlock_at when parent updates" do
       expect(@first_checkpoint.reload.unlock_at).to be_nil
       expect(@second_checkpoint.reload.unlock_at).to be_nil
@@ -14137,6 +14700,128 @@ describe Assignment do
         @peer_review_sub.destroy
         expect(@assignment.reload.peer_review_overrides_for_dates).to be_nil
       end
+    end
+  end
+
+  describe ".not_ignored_by" do
+    let(:course) { course_model }
+    let(:teacher) { user_model }
+    let!(:assignment1) { assignment_model(course:) }
+    let!(:assignment2) { assignment_model(course:, title: "Assignment 2") }
+
+    it "includes assignments that are not ignored" do
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "viewing")
+      expect(result).to include(assignment1, assignment2)
+    end
+
+    it "excludes assignments that are ignored with correct asset_type" do
+      Ignore.create!(
+        user: teacher,
+        asset: assignment1,
+        purpose: "viewing"
+      )
+
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "viewing")
+      expect(result).to include(assignment2)
+      expect(result).not_to include(assignment1)
+    end
+
+    it "respects different purposes" do
+      Ignore.create!(
+        user: teacher,
+        asset: assignment1,
+        purpose: "grading"
+      )
+
+      # Ignored for "grading" but not for "viewing"
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "viewing")
+      expect(result).to include(assignment1, assignment2)
+
+      # Check for "grading" purpose
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "grading")
+      expect(result).to include(assignment2)
+      expect(result).not_to include(assignment1)
+    end
+
+    it "respects different users" do
+      other_teacher = user_model
+      Ignore.create!(
+        user: teacher,
+        asset: assignment1,
+        purpose: "viewing"
+      )
+
+      # teacher has ignored assignment1
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "viewing")
+      expect(result).not_to include(assignment1)
+
+      # other_teacher has not ignored it
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(other_teacher, "viewing")
+      expect(result).to include(assignment1)
+    end
+
+    it "uses correct asset_type for Assignment class" do
+      # Create ignore with "Assignment" asset_type (the actual class name)
+      ignore = Ignore.create!(
+        user: teacher,
+        asset: assignment1,
+        purpose: "viewing"
+      )
+
+      expect(ignore.asset_type).to eq("Assignment")
+
+      result = Assignment.where(id: [assignment1.id, assignment2.id]).not_ignored_by(teacher, "viewing")
+      expect(result).not_to include(assignment1)
+    end
+  end
+
+  describe "#can_manage_rubrics?" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @assignment = @course.assignments.create!
+    end
+
+    it "returns true for a teacher with manage_assignments_edit" do
+      expect(@assignment.can_manage_rubrics?(@teacher, nil)).to be true
+    end
+
+    it "returns true when user has manage_assignments_edit but not manage_rubrics" do
+      custom_role = custom_teacher_role("NoRubricsTeacher", account: @course.account)
+      @course.account.role_overrides.create!(role: custom_role, permission: :manage_rubrics, enabled: false)
+      @course.account.role_overrides.create!(role: custom_role, permission: :manage_assignments_edit, enabled: true)
+      custom_teacher = course_with_user("TeacherEnrollment", active_all: true, course: @course, role: custom_role).user
+      expect(@assignment.can_manage_rubrics?(custom_teacher, nil)).to be true
+    end
+
+    it "returns false for a student" do
+      student = course_with_student(active_all: true, course: @course).user
+      expect(@assignment.can_manage_rubrics?(student, nil)).to be false
+    end
+  end
+
+  describe ".find_assignment_or_peer_review" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      assignment_model(course: @course)
+    end
+
+    it "returns the assignment for a regular assignment id" do
+      expect(AbstractAssignment.find_assignment_or_peer_review(@assignment.id)).to eq @assignment
+    end
+
+    it "returns the peer review sub assignment when the feature flag is enabled" do
+      peer_review_sub_assignment = peer_review_model(parent_assignment: @assignment)
+      expect(AbstractAssignment.find_assignment_or_peer_review(peer_review_sub_assignment.id)).to eq peer_review_sub_assignment
+    end
+
+    it "raises ActiveRecord::RecordNotFound for a peer review sub assignment when the feature flag is disabled" do
+      peer_review_sub_assignment = peer_review_model(parent_assignment: @assignment)
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+      expect { AbstractAssignment.find_assignment_or_peer_review(peer_review_sub_assignment.id) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "raises ActiveRecord::RecordNotFound for an unknown id" do
+      expect { AbstractAssignment.find_assignment_or_peer_review(0) }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 end

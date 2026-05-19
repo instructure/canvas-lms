@@ -20,7 +20,7 @@ import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {RubricForm, type RubricFormComponentProp} from '../index'
-import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer as destroyFlashAlertContainer} from '@instructure/platform-alerts'
 import fakeEnv from '@canvas/test-utils/fakeENV'
 
 vi.mock('../queries/RubricFormQueries', async () => ({

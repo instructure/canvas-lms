@@ -24,6 +24,8 @@ import {isValidDomainName} from '../../common/lib/validators/isValidDomainName'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {ZPublicJwk} from '../model/internal_lti_configuration/PublicJwk'
 
+import {queryClient} from '@instructure/platform-query'
+
 const I18n = createI18nScope('lti_registrations')
 
 type IconUriField =
@@ -66,14 +68,21 @@ export const validateUrl = <K extends string>(field: K, url: string | undefined)
 /**
  * Validates the entire Lti1p3RegistrationOverlayState object and returns an
  * array of errors, if any are found.
+ *
+ * The validateLaunchSettings flag allows for the validation of the launch settings to be toggled on or off,
+ * which is useful for inherited registrations, which may have invalid launch settings that are not relevant
+ * to the registration overlay form (since admins can't edit those anyway).
+ *
  * @param state
  * @returns
  */
-export const validateLti1p3RegistrationOverlayState = (
-  state: Lti1p3RegistrationOverlayState,
-): Lti1p3RegistrationOverlayStateError[] => {
+export const validateLti1p3RegistrationOverlayState = (options: {
+  state: Lti1p3RegistrationOverlayState
+  validateLaunchSettings: boolean
+}): Lti1p3RegistrationOverlayStateError[] => {
+  const {state, validateLaunchSettings: shouldValidateLaunchSettings} = options
   return [
-    ...validateLaunchSettings(state.launchSettings),
+    ...(shouldValidateLaunchSettings ? validateLaunchSettings(state.launchSettings) : []),
     ...validateOverrideUris(state.override_uris),
     ...validateIconUris(state.icons),
   ]

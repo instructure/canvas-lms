@@ -25,9 +25,9 @@
 # - Item banks: /courses/:course_id/banks/*
 class NewQuizzesController < ApplicationController
   include NewQuizzesHelper
+  include K5Mode
 
   before_action :require_context
-  before_action :require_user
   before_action :require_new_quizzes_native_experience
 
   def launch
@@ -41,24 +41,49 @@ class NewQuizzesController < ApplicationController
 
     # Check authorization based on the action being performed
     return unless authorized_action(@assignment, @current_user, :read)
+    return if assignment_locked_for_student?
 
-    render_native_experience(
-      build_launch_data(assignment: @assignment, tag: @tag)
+    signed_launch_data = Services::NewQuizzes::Routes::LaunchHelper.default_launch_data(
+      tool: @tool,
+      assignment: @assignment,
+      context: @context,
+      user: @current_user,
+      controller: self,
+      request:,
+      basename:,
+      content_tag: @module_tag || @tag,
+      launch_url: @resource_url,
+      current_pseudonym: @current_pseudonym,
+      domain_root_account: @domain_root_account
     )
+
+    return render_unauthorized_action unless signed_launch_data
+
+    render_native_experience(signed_launch_data)
   end
 
   # Handles item banks routes:
   # - /courses/:course_id/banks/*
   # - /accounts/:account_id/banks/*
   def banks
-    @tool = find_context_quiz_lti_tool
+    placement = navigation_placement
+    @tool = find_context_quiz_lti_tool(placement)
     return render_unauthorized_action unless @tool&.quiz_lti?
     return unless authorized_action(@context, @current_user, :read)
 
-    placement = "#{@context.class.url_context_class.to_s.downcase}_navigation"
-    render_native_experience(
-      build_launch_data(placement:)
+    signed_launch_data = Services::NewQuizzes::Routes::LaunchHelper.item_bank_launch_data(
+      tool: @tool,
+      context: @context,
+      user: @current_user,
+      controller: self,
+      request:,
+      basename:,
+      placement:,
+      current_pseudonym: @current_pseudonym,
+      domain_root_account: @domain_root_account
     )
+
+    render_native_experience(signed_launch_data)
   end
 
   private
@@ -70,15 +95,18 @@ class NewQuizzesController < ApplicationController
   end
 
   def setup_content_tag_context
+    return if params[:sessionless_launch]
+
     @tag = @assignment.external_tool_tag
     return unless @tag
+
+    @resource_url = @tag.url
 
     @module_tag = if params[:module_item_id]
                     @context.context_module_tags.not_deleted.find(params[:module_item_id])
                   else
                     @assignment.context_module_tags.first
                   end
-    @resource_url = @tag.url
   end
 
   def find_assignment_quiz_lti_tool
@@ -92,52 +120,38 @@ class NewQuizzesController < ApplicationController
     Lti::ToolFinder.from_assignment(@assignment)
   end
 
-  def find_context_quiz_lti_tool
-    scope = ContextExternalTool.where(tool_id: ContextExternalTool::QUIZ_LTI)
-    Lti::ToolFinder.from_context(@context, scope:)
+  def find_context_quiz_lti_tool(placement)
+    Lti::ContextToolFinder.all_tools_for(@context, type: placement.to_sym).quiz_lti.order(:id).first
+  end
+
+  def navigation_placement
+    "#{@context.class.url_context_class.to_s.downcase}_navigation"
+  end
+
+  def assignment_locked_for_student?
+    return false unless @context.grants_right?(@current_user, :participate_as_student)
+    return false unless taking_action?
+    return false if @context.grants_right?(@current_user, :manage_assignments)
+
+    assignment_with_overrides = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
+    return false unless assignment_with_overrides.locked_for?(@current_user)
+
+    render_unauthorized_action
+    true
+  end
+
+  def taking_action?
+    request.path.include?("/taking")
   end
 
   def render_native_experience(signed_launch_data)
-    add_new_quizzes_bundle
-
-    signed_launch_data[:basename] = calculate_basename
-    js_env(NEW_QUIZZES: signed_launch_data)
-
-    add_body_class("native-new-quizzes full-width")
+    launch_url = Services::NewQuizzes.launch_url(tool_url: @tool&.url)
+    setup_new_quizzes_env(signed_launch_data, launch_url:)
 
     render "assignments/native_new_quizzes", layout: "application"
   end
 
-  def build_launch_data(assignment: nil, tag: nil, placement: nil)
-    variable_expander = build_variable_expander(assignment:)
-
-    launch_opts = {
-      context: @context,
-      assignment:,
-      tool: @tool,
-      tag:,
-      current_user: @current_user,
-      controller: self,
-      request:,
-      variable_expander:,
-    }
-    launch_opts[:placement] = placement if placement
-
-    ::NewQuizzes::LaunchDataBuilder.new(**launch_opts).build_with_signature
-  end
-
-  def build_variable_expander(assignment: nil)
-    Lti::VariableExpander.new(@domain_root_account, @context, self, {
-      current_user: @current_user,
-      current_pseudonym: @current_pseudonym,
-      tool: @tool,
-      assignment:,
-      content_tag: assignment ? (@module_tag || @tag) : nil,
-      launch_url: assignment ? @resource_url : nil
-    }.compact)
-  end
-
-  def calculate_basename
+  def basename
     return "/courses/#{@context.id}/assignments/#{@assignment.id}" if @assignment
 
     case @context

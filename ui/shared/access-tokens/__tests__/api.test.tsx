@@ -28,9 +28,13 @@ import {renderHook} from '@testing-library/react-hooks'
 
 const mockShowFlashAlert = vi.fn()
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: mockShowFlashAlert,
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: mockShowFlashAlert,
+  }
+})
 
 const mockTokens: Token[] = [
   {

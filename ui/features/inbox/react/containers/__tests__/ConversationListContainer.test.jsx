@@ -25,7 +25,7 @@ import React from 'react'
 import {render, fireEvent, waitFor, screen} from '@testing-library/react'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
 import {responsiveQuerySizes} from '../../../util/utils'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 
 vi.mock('../../../util/utils', async () => {
   const actual = await vi.importActual('../../../util/utils')

@@ -17,7 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {getLiveRegion} from '@instructure/platform-instui-bindings'
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'

@@ -41,7 +41,7 @@ describe "courses/_recent_feedback" do
 
     render partial: "courses/recent_feedback", contexts: [@course], object: @submission, locals: { is_hidden: false }
 
-    expect(response.body).to_not include(@course.name)
+    expect(response.body).not_to include(@course.name)
   end
 
   it "shows the comment" do

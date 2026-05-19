@@ -38,7 +38,7 @@ describe "quizzes section hierarchy" do
     @new_section.save!
 
     # create a quiz and assign it to the section with due dae after course end date
-    @quiz = quiz_with_multiple_type_questions(false)
+    @quiz = quiz_with_multiple_type_questions
     @quiz.reload
     @override = @quiz.assignment_overrides.build
     @override.set = @new_section

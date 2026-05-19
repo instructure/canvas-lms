@@ -22,6 +22,14 @@ import type {Lti1p3RegistrationWizardStep} from '../Lti1p3RegistrationWizardStat
 import {toUndefined} from '../../../common/lib/toUndefined'
 import {getDefaultPlacementTextFromConfig} from './helpers'
 import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
+import {useDomainDuplicates} from '../../api/domainDuplicates'
+import {getAccountId} from '../../../common/lib/getAccountId'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Flex} from '@instructure/ui-flex'
+import {Spinner} from '@instructure/ui-spinner'
+import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
+
+const I18n = createI18nScope('lti_registration.wizard')
 
 export type ReviewScreenWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
@@ -43,6 +51,32 @@ export const ReviewScreenWrapper = ({
   const scopes = state.permissions.scopes ?? []
   const privacyLevel =
     state.data_sharing.privacy_level ?? internalConfig.privacy_level ?? 'anonymous'
+
+  // Check for duplicate domains and wait for the query to complete
+  // Show a spinner while checking to ensure users see any duplicate warnings
+  const accountId = getAccountId()
+  const domain = state.launchSettings.domain ?? toUndefined(internalConfig.domain)
+  const domainDuplicatesQuery = useDomainDuplicates(accountId, domain)
+
+  // Show loading spinner while checking for duplicates
+  if (domainDuplicatesQuery.isLoading) {
+    return (
+      <RegistrationModalBody>
+        <Flex justifyItems="center" alignItems="center" height="100%">
+          <Spinner
+            size="large"
+            renderTitle={I18n.t('Checking for duplicate domains...')}
+            data-testid="duplicate-domain-spinner"
+          />
+        </Flex>
+      </RegistrationModalBody>
+    )
+  }
+
+  // After loading completes, use the results if successful, otherwise pass empty array
+  const domainDuplicates = domainDuplicatesQuery.isSuccess
+    ? domainDuplicatesQuery.data.json.duplicates
+    : []
 
   const labels = Object.fromEntries(
     placements.map(placement => [
@@ -105,6 +139,8 @@ export const ReviewScreenWrapper = ({
         defaultIconUrl={internalConfig.launch_settings?.icon_url}
         nickname={name}
         includeIconUrls={includeIconUrls}
+        domainDuplicates={domainDuplicates}
+        accountId={accountId}
         onEditLaunchSettings={() => transitionTo('LaunchSettings')}
         onEditPlacements={() => transitionTo('Placements')}
         onEditNaming={() => transitionTo('Naming')}

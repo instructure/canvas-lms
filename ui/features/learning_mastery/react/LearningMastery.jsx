@@ -18,12 +18,12 @@
 
 import $ from 'jquery'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render as canvasRender, rerender} from '@canvas/react'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 import OutcomeGradebookView from '../backbone/views/OutcomeGradebookView'
 import GradebookMenu from '@canvas/gradebook-menu'
-import Paginator from '@canvas/instui-bindings/react/Paginator'
+import {Paginator} from '@instructure/platform-instui-bindings'
 
 function normalizeSections(options) {
   const sections = options.sections || []
@@ -75,9 +75,16 @@ export default class LearningMastery {
     const container = document.getElementById('outcome-gradebook-paginator')
 
     if (!this.paginatorRoot) {
-      this.paginatorRoot = createRoot(container)
+      this.paginatorRoot = canvasRender(
+        <Paginator page={page} pageCount={pageCount} loadPage={loadPage} />,
+        container,
+      )
+    } else {
+      rerender(
+        this.paginatorRoot,
+        <Paginator page={page} pageCount={pageCount} loadPage={loadPage} />,
+      )
     }
-    this.paginatorRoot.render(<Paginator page={page} pageCount={pageCount} loadPage={loadPage} />)
   }
 
   saveSettings() {
@@ -121,9 +128,10 @@ export default class LearningMastery {
     }
 
     if (!this.gradebookMenuRoot) {
-      this.gradebookMenuRoot = createRoot(container)
+      this.gradebookMenuRoot = canvasRender(<GradebookMenu {...props} />, container)
+    } else {
+      rerender(this.gradebookMenuRoot, <GradebookMenu {...props} />)
     }
-    this.gradebookMenuRoot.render(<GradebookMenu {...props} />)
   }
 
   _setCurrentSectionId(sectionId) {

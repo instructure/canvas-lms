@@ -23,7 +23,7 @@ import {getCurrentUserId, executeGraphQLQuery, createUserQueryConfig} from '../u
 import {COURSE_STATISTICS_KEY, QUERY_CONFIG} from '../constants'
 import {useWidgetDashboard} from './useWidgetDashboardContext'
 import {widgetDashboardPersister} from '../utils/persister'
-import {useBroadcastQuery} from '@canvas/query/broadcast'
+import {useBroadcastQuery} from '@instructure/platform-query/broadcast'
 
 interface SubmissionStatistics {
   submissionsDueCount: number

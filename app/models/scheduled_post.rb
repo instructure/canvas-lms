@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class ScheduledPost < ActiveRecord::Base
+class ScheduledPost < ApplicationRecord
   belongs_to :assignment, inverse_of: :scheduled_post, class_name: "AbstractAssignment"
   belongs_to :post_policy, inverse_of: :scheduled_post
 

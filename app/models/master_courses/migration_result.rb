@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class MasterCourses::MigrationResult < ActiveRecord::Base
+class MasterCourses::MigrationResult < ApplicationRecord
   belongs_to :master_migration, class_name: "MasterCourses::MasterMigration"
   belongs_to :content_migration
   belongs_to :child_subscription, class_name: "MasterCourses::ChildSubscription"

@@ -25,9 +25,8 @@ import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 import AssessmentGradeInput from './AssessmentGradeInput'
 import {Flex} from '@instructure/ui-flex'
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext, showFlashWarning} from '@instructure/platform-alerts'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
-import {showFlashWarning} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('SpeedGraderCheckpoints')
 

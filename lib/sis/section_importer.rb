@@ -48,6 +48,12 @@ module SIS
         end
       end
 
+      if importer.deleted_section_ids.any?
+        DiscussionTopicSectionVisibility
+          .where(course_section_id: importer.deleted_section_ids.to_a)
+          .update_all(workflow_state: "deleted")
+      end
+
       importer.success_count
     end
 

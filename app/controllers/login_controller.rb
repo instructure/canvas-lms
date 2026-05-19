@@ -25,7 +25,7 @@ class LoginController < ApplicationController
   before_action :run_login_hooks, only: :new
   before_action :fix_ms_office_redirects, only: :new
   skip_before_action :require_reacceptance_of_terms
-  before_action :require_user, only: :session_token
+  skip_before_action :require_user, only: %i[clear_file_session logout_landing new]
 
   def new
     if @current_user &&
@@ -117,10 +117,17 @@ class LoginController < ApplicationController
     host = return_to.host
     return render_unauthorized_action unless host.casecmp?(request.host)
 
+    consent_from_mobile = if params[:mobile_consent].present?
+                            params[:mobile_consent] == "true"
+                          else
+                            nil
+                          end
+
     login_pseudonym = @real_current_pseudonym || @current_pseudonym
     token = SessionToken.new(login_pseudonym.global_id,
                              current_user_id: @real_current_user ? @current_user.global_id : nil,
-                             used_remember_me_token: true).to_s
+                             used_remember_me_token: true,
+                             consent_from_mobile:).to_s
     return_to.query&.concat("&")
     return_to.query = "" unless return_to.query
     return_to.query.concat("session_token=#{token}")
@@ -142,13 +149,11 @@ class LoginController < ApplicationController
   private
 
   def redirect_to_discovery_url
-    if Account.site_admin.feature_enabled?(:new_login_ui_identity_discovery_page) &&
+    if @domain_root_account.discovery_page_allowed? &&
        @domain_root_account.discovery_page_active? &&
        !params[:authentication_provider]
-      # TODO: redirect to external Identity Service discovery URL (SPA hosted by Identity Service)
-      # identity_service_discovery_url = @domain_root_account.identity_service_discovery_url(request)
-      # redirect_to identity_service_discovery_url
-      # increment_statsd(:discovery_page_redirect)
+      redirect_to @domain_root_account.discovery_page_url
+      increment_statsd(:discovery_page_redirect)
     elsif @domain_root_account.auth_discovery_url(request) && !params[:authentication_provider]
       auth_discovery_url = @domain_root_account.auth_discovery_url(request)
       if flash[:delegated_message]

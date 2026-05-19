@@ -19,7 +19,7 @@
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {IconUploadLine} from '@instructure/ui-icons'
 import CreateFolderButton from './CreateFolderButton'

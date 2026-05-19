@@ -154,4 +154,10 @@
       <% end %>
     </tbody>
   </table>
+  <% if @context.account.feature_enabled?(:intelligent_insights_modernisation) %>
+    <div class="course-criteria">
+      <h3><%= t('headings.course_criteria', 'Course Criteria') %></h3>
+      <div id="criteria-mount"></div>
+    </div>
+  <% end %>
 </div>

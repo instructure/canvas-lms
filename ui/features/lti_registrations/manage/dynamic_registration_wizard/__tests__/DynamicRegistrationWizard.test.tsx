@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {fireEvent, render, screen, waitFor} from '@testing-library/react'
+import {fireEvent, render as baseRender, screen, waitFor} from '@testing-library/react'
 import {ZAccountId} from '../../model/AccountId'
 import {
   DynamicRegistrationWizard,
@@ -23,7 +23,6 @@ import {
 } from '../DynamicRegistrationWizard'
 import {success} from '../../../common/lib/apiResult/ApiResult'
 import userEvent from '@testing-library/user-event'
-import type {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 import {
   mockRegistration,
@@ -31,10 +30,50 @@ import {
   mockToolConfiguration,
 } from './helpers'
 import {ZUnifiedToolId} from '../../model/UnifiedToolId'
+import React from 'react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import fakeENV from '@canvas/test-utils/fakeENV'
+
+const server = setupServer(
+  http.get('/api/v1/accounts/:accountId/lti_registrations/check_domain_duplicates', () => {
+    return HttpResponse.json({duplicates: []})
+  }),
+)
+
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        staleTime: 0,
+        gcTime: 0,
+      },
+    },
+  })
+  return ({children}: {children: React.ReactNode}) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  )
+}
+
+const render = (ui: React.ReactElement) => baseRender(ui, {wrapper: createWrapper()})
 
 const mockAlert = vi.fn() as any
 
 describe('DynamicRegistrationWizard', () => {
+  beforeAll(() => server.listen({onUnhandledRequest: 'error'}))
+  afterAll(() => server.close())
+
+  beforeEach(() => {
+    fakeENV.setup({ACCOUNT_ID: '123'})
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+    fakeENV.teardown()
+  })
+
   const defaultProps = {
     dynamicRegistrationUrl: 'https://example.com',
     accountId: ZAccountId.parse('123'),

@@ -1,0 +1,31 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "rspec-rdbg",
+      "type": "shell",
+      "command": "docker compose exec -T web bin/rdbg -c --nonstop --open --host 0.0.0.0 --port 12354 -- bundle exec rspec ${relativeFile}:${lineNumber}",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": {
+        "owner": "rspec-rdbg",
+        "source": "rspec-rdbg",
+        "pattern": {
+          "regexp": "^(ZZZ_NEVER_MATCHES_ZZZ)$",
+          "file": 1,
+          "line": 1,
+          "message": 1
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^",
+          "endsPattern": "Debugger can attach"
+        }
+      }
+    }
+  ]
+}

@@ -17,8 +17,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 # rubocop:disable Security/MarshalLoad
 describe "Time Marshal override" do
   it "preserves the old marshalling for post-1900 dates" do

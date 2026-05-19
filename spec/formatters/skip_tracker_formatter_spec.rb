@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
 require_relative "skip_tracker_formatter"
 require "json"
 require "tempfile"
@@ -366,6 +365,41 @@ RSpec.describe RSpec::SkipTrackerFormatter do
         expect(result[:pending].pluck(:description)).to include("Existing test", "New test")
 
         ENV.delete("RSPEC_SKIP_TRACKER_OUTPUT")
+      end
+    end
+
+    context "close behavior" do
+      it "does not close the inner IO when output is an OutputWrapper" do
+        inner = StringIO.new
+        wrapper = RSpec::Core::OutputWrapper.new(inner)
+        f = described_class.new(wrapper)
+        f.dump_summary(create_summary_notification)
+        f.close(nil)
+        expect(inner).not_to be_closed
+      end
+
+      it "closes the File handle after writing" do
+        temp = Tempfile.new(["close_test", ".json"])
+        ENV["RSPEC_SKIP_TRACKER_OUTPUT"] = temp.path
+        f = described_class.new(StringIO.new)
+        f.dump_summary(create_summary_notification)
+        f.close(nil)
+        expect(f.output).to be_closed
+      ensure
+        ENV.delete("RSPEC_SKIP_TRACKER_OUTPUT")
+        temp.unlink
+      end
+
+      it "can be called twice without raising IOError" do
+        temp = Tempfile.new(["idempotent_test", ".json"])
+        ENV["RSPEC_SKIP_TRACKER_OUTPUT"] = temp.path
+        f = described_class.new(StringIO.new)
+        f.dump_summary(create_summary_notification)
+        f.close(nil)
+        expect { f.close(nil) }.not_to raise_error
+      ensure
+        ENV.delete("RSPEC_SKIP_TRACKER_OUTPUT")
+        temp.unlink
       end
     end
 

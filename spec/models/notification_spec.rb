@@ -53,4 +53,50 @@ describe Notification do
       expect(notification.related_user_setting(nil, Account.default)).to be_nil
     end
   end
+
+  describe "#create_message" do
+    let(:root_account) { Account.default }
+    let(:message_creator) { double(create_message: []) }
+
+    before do
+      @notification = Notification.find_or_create_by!(name: "Create Message Test") do |n|
+        n.subject = "test"
+        n.category = "TestImmediately"
+      end
+      Notification.reset_cache!
+      assignment_model
+      user_model(workflow_state: "registered")
+    end
+
+    def suppress_with(value)
+      root_account.settings[:suppress_notifications] = value
+      root_account.save!
+    end
+
+    it "suppresses all notifications when suppress_notifications is true" do
+      suppress_with(true)
+      expect(NotificationMessageCreator).not_to receive(:new)
+      @notification.create_message(@assignment, [@user])
+    end
+
+    it "suppresses matching category when suppress_notifications is an array" do
+      @notification.update!(category: "Grading")
+      suppress_with(%w[grading])
+      expect(NotificationMessageCreator).not_to receive(:new)
+      @notification.create_message(@assignment, [@user])
+    end
+
+    it "does not suppress non-matching category when suppress_notifications is an array" do
+      @notification.update!(category: "Announcement")
+      suppress_with(%w[grading])
+      expect(NotificationMessageCreator).to receive(:new).and_return(message_creator)
+      @notification.create_message(@assignment, [@user])
+    end
+
+    it "sends notifications when suppress_notifications is false" do
+      suppress_with(false)
+      expect(NotificationMessageCreator).to receive(:new).and_return(message_creator)
+      @notification.create_message(@assignment, [@user])
+    end
+  end
 end

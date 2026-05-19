@@ -19,7 +19,7 @@
 import React from 'react'
 import {cleanup, render as testingLibraryRender} from '@testing-library/react'
 import CoursesTray from '../CoursesTray'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 

@@ -19,31 +19,45 @@
 import React from 'react'
 import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {assignLocation} from '@canvas/util/globalUtils'
+import {MemoryRouter, useNavigate} from 'react-router-dom'
 import SignInPrompt from '../SignInPrompt'
 
-vi.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: vi.fn(),
-}))
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
+  return {...actual, useNavigate: vi.fn()}
+})
+
+const mockNavigate = vi.fn()
 
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
 })
 
+beforeEach(() => {
+  vi.mocked(useNavigate).mockReturnValue(mockNavigate)
+})
+
 describe('<SignInPrompt />', () => {
   it('renders prompt text and login link', () => {
-    render(<SignInPrompt />)
+    render(
+      <MemoryRouter>
+        <SignInPrompt />
+      </MemoryRouter>,
+    )
     expect(screen.getByText('Already have an account?')).toBeInTheDocument()
     const link = screen.getByTestId('log-in-link')
     expect(link).toBeInTheDocument()
-    expect(link).toHaveAttribute('href', '/login')
+    expect(link).toHaveAttribute('href', '/login/canvas')
   })
 
-  it('calls assignLocation on click', async () => {
-    render(<SignInPrompt />)
-    const link = screen.getByTestId('log-in-link')
-    await userEvent.click(link)
-    expect(assignLocation).toHaveBeenCalledWith('/login')
+  it('navigates to /login/canvas on click', async () => {
+    render(
+      <MemoryRouter>
+        <SignInPrompt />
+      </MemoryRouter>,
+    )
+    await userEvent.click(screen.getByTestId('log-in-link'))
+    expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
   })
 })

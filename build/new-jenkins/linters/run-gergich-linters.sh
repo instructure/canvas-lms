@@ -49,7 +49,7 @@ if [[ ! "${PRIVATE_PLUGINS[*]}" =~ "$GERRIT_PROJECT" ]]; then
   ruby script/tatl_tael
 fi
 
-if ! git diff HEAD~1 --exit-code -GENV -- 'packages/canvas-rce/**/*.js' 'packages/canvas-rce/**/*.jsx' 'packages/canvas-rce/**/*.ts' 'packages/canvas-rce/**/*.tsx'; then
+if git diff HEAD~1 -- 'packages/canvas-rce/**/*.js' 'packages/canvas-rce/**/*.jsx' 'packages/canvas-rce/**/*.ts' 'packages/canvas-rce/**/*.tsx' | grep -q '^+.*ENV'; then
   message="It looks like you added a reference to a Canvas ENV key inside the RCE. Instead, you should pass this value via a prop the RCEWrapper.\\n"
   gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
 fi
@@ -72,6 +72,25 @@ ruby script/rlint --no-fail-on-offense
 ruby script/lint_commit_message
 
 bin/rails css:styleguide doc:api
+
+# Regression check for GROW-236: ensure file download routes don't leak into
+# other controllers' API docs (e.g., accounts#index should have exactly 1 scope).
+accounts_html="public/doc/api/accounts.html"
+if [ -f "$accounts_html" ]; then
+  accounts_index_scopes=$(ruby -e "
+    require 'nokogiri'
+    doc = Nokogiri::HTML(File.read('$accounts_html'))
+    h2 = doc.at_css('h2[name=\"method.accounts.index\"]')
+    puts h2 ? h2.parent.css('h3').length : 'missing'
+  " 2>/dev/null || echo "missing")
+  if [ "$accounts_index_scopes" = "missing" ]; then
+    echo "ERROR: accounts#index section not found in API docs" >&2
+    exit 1
+  elif [ "$accounts_index_scopes" != "1" ]; then
+    echo "ERROR: accounts#index has $accounts_index_scopes scopes in API docs, expected 1. File download routes may be leaking into other controllers." >&2
+    exit 1
+  fi
+fi
 
 gergich status
 echo "LINTER OK!"

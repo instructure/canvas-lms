@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import {extend} from 'es-toolkit/compat'
 import config from './config'
 import initialize from './config/initializers/initializer'
@@ -67,7 +67,7 @@ export const mount = function (node: HTMLElement | null, options?: ConfigOptions
 
   return initialize().then(function () {
     if (container) {
-      ReactDOM.render(<Layout {...controller.getState()} />, container)
+      legacyRender(<Layout {...controller.getState()} />, container)
     }
     return controller.start(update)
   })
@@ -79,7 +79,7 @@ export const isMounted = function (): boolean {
 
 export const update = function (props: any): void {
   if (container) {
-    ReactDOM.render(<Layout {...props} />, container)
+    legacyRender(<Layout {...props} />, container)
   }
 }
 
@@ -91,7 +91,7 @@ export const unmount = function (): void {
   if (isMounted()) {
     controller.stop()
     if (container) {
-      ReactDOM.unmountComponentAtNode(container)
+      legacyUnmountComponentAtNode(container)
     }
     container = null
   }

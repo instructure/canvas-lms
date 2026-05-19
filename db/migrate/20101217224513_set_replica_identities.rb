@@ -24,10 +24,12 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     return if connection.index_exists?(:content_tags, replica_identity: true)
 
     set_replica_identity :access_tokens
+    set_replica_identity :accessibility_course_statistics
     set_replica_identity :accessibility_issues
     set_replica_identity :accessibility_resource_scans
     set_replica_identity :account_users
     set_replica_identity :accounts
+    set_replica_identity :ai_conversations
     set_replica_identity :ai_experiences
     set_replica_identity :allocation_rules
     set_replica_identity :asset_user_accesses

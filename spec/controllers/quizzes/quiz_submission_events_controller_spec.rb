@@ -36,7 +36,7 @@ describe Quizzes::QuizSubmissionEventsController do
       course_with_teacher(active_all: true)
       student_in_course(active_all: true)
       quiz_model(course: @course)
-      @quiz_submission = @quiz.generate_submission(@student, false)
+      @quiz_submission = @quiz.generate_submission(@student)
     end
 
     it "requires authorization" do

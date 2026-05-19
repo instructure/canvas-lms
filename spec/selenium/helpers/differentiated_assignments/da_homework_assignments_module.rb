@@ -78,7 +78,7 @@ module DifferentiatedAssignments
           DifferentiatedAssignments::Assignment.new(assignee)
         end
 
-        def assign_assignment_overrides(short = false)
+        def assign_assignment_overrides(short: false)
           if short
             short_list.each(&:assign_overrides)
           else

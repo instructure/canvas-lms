@@ -26,8 +26,8 @@ import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Table} from '@instructure/ui-table'
-import EmptyDesert from '@canvas/images/react/EmptyDesert'
-import celebratePandaUrl from '@canvas/images/CelebratePanda.svg'
+import {EmptyDesert} from '@instructure/platform-images'
+import celebratePandaUrl from '@instructure/platform-images/assets/CelebratePanda.svg'
 import {
   QueryClient,
   type QueryFunctionContext,
@@ -37,9 +37,10 @@ import {
 } from '@tanstack/react-query'
 import {YoutubeEmbed, YoutubeScanResource, YoutubeScanResultReport} from '../../../api'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import GenericErrorPage from '@canvas/generic-error-page/react'
-import ErrorShip from '@canvas/images/ErrorShip.svg'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
+import ErrorShip from '@instructure/platform-images/assets/ErrorShip.svg'
+import {showFlashError} from '@instructure/platform-alerts'
 import {Link} from '@instructure/ui-link'
 import {
   IconAssignmentLine,
@@ -51,7 +52,7 @@ import {
 } from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
 import {type CanvasProgress} from '@canvas/progress/ProgressHelpers'
-import Paginator from '@canvas/instui-bindings/react/Paginator'
+import {Paginator} from '@instructure/platform-instui-bindings'
 import {Pill} from '@instructure/ui-pill'
 
 export interface AppProps {
@@ -143,6 +144,8 @@ const LastScanFailedResultView: React.FC<{
     <Wrapper handleCourseScan={handleCourseScan} scanButtonDisabled={isRequestLoading}>
       <GenericErrorPage
         imageUrl={ErrorShip}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject={I18n.t('Last YouTube content scan failed.')}
         errorCategory={I18n.t('YouTube Migration Error Page.')}
         errorMessage={I18n.t('Try to scan again.')}
@@ -972,6 +975,8 @@ export const App: React.FC<AppProps> = ({courseId}) => {
     return (
       <GenericErrorPage
         imageUrl={ErrorShip}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject={I18n.t('Scan loading error')}
         errorCategory={I18n.t('YouTube Migration Error Page.')}
         errorMessage={I18n.t('Try to reload the page.')}

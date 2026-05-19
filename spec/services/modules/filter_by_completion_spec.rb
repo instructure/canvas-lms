@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 describe Modules::FilterByCompletion do
   before :once do
     @course = course_factory(active_all: true)

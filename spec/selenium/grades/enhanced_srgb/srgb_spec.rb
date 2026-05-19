@@ -151,7 +151,7 @@ describe "Screenreader Gradebook" do
     @submission = @assign1.submit_homework(@students[0], body: "student submission")
     EnhancedSRGB.visit(@course.id)
     EnhancedSRGB.select_assignment(@assign1)
-    wait_for_new_page_load(EnhancedSRGB.assignment_link.click)
+    wait_for_new_page_load { EnhancedSRGB.assignment_link.click }
 
     expect(driver.current_url).to include("/courses/#{@course.id}/assignments/#{@assign1.id}")
   end

@@ -21,7 +21,6 @@
 class LmgbUserDetailsController < ApplicationController
   include Outcomes::Enrollments
 
-  before_action :require_user
   before_action :require_context
   before_action :require_outcome_context
 

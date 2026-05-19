@@ -30,6 +30,7 @@ class CanvasSchema < GraphQL::Schema
   connections.add(DynamoQuery, DynamoConnection)
   connections.add(AddressBook::MessageableUser::Collection, CollectionConnection)
   connections.add(BookmarkedCollection::Proxy, CollectionConnection)
+  connections.add(InstructorQuery, InstructorConnection)
 
   def self.execute(...)
     max_depth GraphQLTuning.max_depth
@@ -63,7 +64,7 @@ class CanvasSchema < GraphQL::Schema
     when AccountNotification then Types::AccountNotificationType
     when Course then Types::CourseType
     when AllocationRule then Types::AllocationRuleType
-    when Assignment then Types::AssignmentType
+    when Assignment, SubAssignment then Types::AssignmentType
     when PeerReviewSubAssignment then Types::PeerReviewSubAssignmentType
     when AssignmentGroup then Types::AssignmentGroupType
     when CommentBankItem then Types::CommentBankItemType
@@ -110,6 +111,9 @@ class CanvasSchema < GraphQL::Schema
         Types::ModuleItemType
       end
     when ContextExternalTool then Types::ExternalToolType
+    when InstitutionalTag            then Types::InstitutionalTagType
+    when InstitutionalTagAssociation then Types::InstitutionalTagAssociationType
+    when InstitutionalTagCategory    then Types::InstitutionalTagCategoryType
     when Setting then Types::InternalSettingType
     when AssessmentRequest then Types::AssessmentRequestType
     when UsageRights then Types::UsageRightsType

@@ -36,6 +36,8 @@ interface ProblemAreaAndIssueDescriptionSectionProps {
   selectedIssue: AccessibilityIssue
   onOpenPage: () => void
   onEditPage: () => void
+  onStaleConflict: () => void
+  onRescan: () => void
 }
 
 /**
@@ -77,6 +79,8 @@ export const ProblemAreaAndIssueDescriptionSection = ({
   selectedIssue,
   onOpenPage,
   onEditPage,
+  onStaleConflict,
+  onRescan,
 }: ProblemAreaAndIssueDescriptionSectionProps) => {
   return (
     <Grid
@@ -97,7 +101,13 @@ export const ProblemAreaAndIssueDescriptionSection = ({
       </GridArea>
 
       <GridArea area="content">
-        <ProblemArea previewRef={previewRef} item={selectedScan} issue={selectedIssue} />
+        <ProblemArea
+          previewRef={previewRef}
+          item={selectedScan}
+          issue={selectedIssue}
+          onStaleConflict={onStaleConflict}
+          onRescan={onRescan}
+        />
       </GridArea>
 
       <GridArea area="desc-heading" additionalStyles={{marginTop: '0.5rem'}}>

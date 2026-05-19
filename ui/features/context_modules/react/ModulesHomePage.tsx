@@ -18,9 +18,7 @@
 
 import React from 'react'
 import {IconModuleSolid} from '@instructure/ui-icons'
-import {useScope as createI18nScope} from '@canvas/i18n'
-
-const I18n = createI18nScope('modules_home_page')
+import {useTranslation} from '@canvas/i18next'
 
 export interface ModulesHomePageProps {
   onCreateButtonClick?: () => void
@@ -29,13 +27,14 @@ export interface ModulesHomePageProps {
 export default function ModulesHomePage({
   onCreateButtonClick = () => {},
 }: ModulesHomePageProps): React.JSX.Element {
+  const {t} = useTranslation('modules_home_page')
   return (
     <ul className="ic-EmptyStateList">
       <li className="ic-EmptyStateList__Item">
         <div className="ic-EmptyStateList__BillboardWrapper">
           <button type="button" className="ic-EmptyStateButton" onClick={onCreateButtonClick}>
             <IconModuleSolid className="ic-EmptyStateButton__SVG" />
-            <span className="ic-EmptyStateButton__Text">{I18n.t('Create a new Module')}</span>
+            <span className="ic-EmptyStateButton__Text">{t('Create a new Module')}</span>
           </button>
         </div>
       </li>

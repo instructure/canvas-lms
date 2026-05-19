@@ -82,11 +82,15 @@ module Lti
       #
       # @return [ContextExternalTool] The first tool that matches the given scope
       def from_context(context, scope:)
+        scope = Lti::ToolFinderUtils.filter_by_unavailable_context_controls(scope, context)
         scope.find_by(context: Lti::ToolFinderUtils.contexts_to_search(context))
       end
 
       # Returns the ContextExternalTool for this id, given that it is
       # available in the given context.
+      #
+      # TODO: availability is not yet implemented (we'd need the context passed
+      # in here) -- fix, or migrate usages of this method to use from_id
       #
       # Use instead of Rails' find_by to respect admin tool availability decisions.
       #
@@ -103,6 +107,9 @@ module Lti
       # available in the given context.
       #
       # Use instead of Rails' find to respect admin tool availability decisions.
+      #
+      # TODO: availability is not yet implemented (we'd need the context passed
+      # in here) -- fix, or migrate usages of this method to use from_id,
       #
       # @param id [Integer] The id of the ContextExternalTool
       # @param scope [ActiveRecord::Relation] Optionally, a ContextExternalTool query to narrow the search
@@ -325,10 +332,7 @@ module Lti
             order_clauses << sort_by_sql_string("#{ContextExternalTool.quoted_table_name}.id = #{preferred_tool_id}")
           end
 
-          # prefer tools from the original developer key when requested,
-          # and over other order clauses like context
-          prefer_original_client_id = context.root_account.feature_enabled?(:lti_find_external_tool_prefer_original_client_id)
-          if prefer_original_client_id && (original_client_id = Shard.integral_id_for(original_client_id))
+          if (original_client_id = Shard.integral_id_for(original_client_id))
             order_clauses.prepend(sort_by_sql_string("developer_key_id = #{original_client_id}"))
           end
 
@@ -388,7 +392,7 @@ module Lti
         # If exactly match doesn't work, try to match by ignoring extra query parameters
         match ||= find_tool_match(
           sorted_external_tools,
-          ->(t) { t.matches_url?(url, false) },
+          ->(t) { t.matches_url?(url, match_queries_exactly: false) },
           ->(t) { t.url.present? }
         )
 
@@ -409,7 +413,7 @@ module Lti
 
           match ||= find_tool_match(
             sorted_external_tools,
-            ->(t) { t.matches_url?(url, false, use_environment_overrides: true) },
+            ->(t) { t.matches_url?(url, match_queries_exactly: false, use_environment_overrides: true) },
             ->(t) { t.url.present? }
           )
 

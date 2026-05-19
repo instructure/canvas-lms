@@ -67,7 +67,7 @@ describe Quizzes::QuizSubmissionZipper do
 
     before :once do
       @student = course_with_student
-      @quiz = course_quiz(true)
+      @quiz = course_quiz(active: true)
     end
 
     before do
@@ -117,7 +117,7 @@ describe Quizzes::QuizSubmissionZipper do
       local_storage!
       course_with_student active_all: true
       student = @student
-      quiz = course_quiz(true)
+      quiz = course_quiz(active: true)
       question = quiz.quiz_questions.create! question_data: {
         name: "q1",
         points_possible: 1,

@@ -21,6 +21,7 @@ export type AccessibilityScanWorkflowState = 'completed' | 'failed' | 'queued' |
 export interface AccessibilityScanResult {
   id: number
   workflow_state: AccessibilityScanWorkflowState
+  created_at: string | null
 }
 
 export interface CourseScanProps {
@@ -29,7 +30,13 @@ export interface CourseScanProps {
   scanDisabled: boolean
 }
 
-export interface ScanViewProps {
+interface ButtonLabel {
+  buttonLabel: string
+}
+
+export interface ScanInProgressViewProps extends ButtonLabel {}
+
+export interface ScanViewProps extends ButtonLabel {
   handleCourseScan?: () => void
   isRequestLoading?: boolean
 }

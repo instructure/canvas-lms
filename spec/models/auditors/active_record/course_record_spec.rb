@@ -38,7 +38,7 @@ describe Auditors::ActiveRecord::CourseRecord do
 
     it "is creatable from an event_stream record of the correct type" do
       ar_rec = Auditors::ActiveRecord::CourseRecord.create_from_event_stream!(es_record)
-      expect(ar_rec.id).to_not be_nil
+      expect(ar_rec.id).not_to be_nil
       expect(ar_rec.uuid).to eq(es_record.id)
       expect(ar_rec.course_id).to eq(course_record.id)
       expect(ar_rec.user_id).to eq(user_record.id)
@@ -46,7 +46,7 @@ describe Auditors::ActiveRecord::CourseRecord do
       expect(ar_rec.event_type).to eq("unconcluded")
       expect(ar_rec.event_data).to eq({ "data-key" => "data-val" })
       expect(ar_rec.sis_batch_id).to be_nil
-      expect(ar_rec.created_at).to_not be_nil
+      expect(ar_rec.created_at).not_to be_nil
     end
 
     it "is updatable from ES record" do

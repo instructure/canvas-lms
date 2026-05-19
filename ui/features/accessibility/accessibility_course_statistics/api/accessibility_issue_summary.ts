@@ -21,15 +21,22 @@ import type {AccessibilityIssueSummary} from '../types/accessibility_issue_summa
 
 interface FetchAccessibilityIssueSummaryParams {
   accountId: string
+  enrollmentTermId?: string
 }
 
 export const fetchAccessibilityIssueSummary = async (
   params: FetchAccessibilityIssueSummaryParams,
 ): Promise<AccessibilityIssueSummary> => {
-  const {accountId} = params
+  const {accountId, enrollmentTermId} = params
+
+  const queryParams: Record<string, string> = {}
+  if (enrollmentTermId) {
+    queryParams.enrollment_term_id = enrollmentTermId
+  }
 
   const response = await doFetchApi<AccessibilityIssueSummary>({
     path: `/api/v1/accounts/${accountId}/accessibility_issue_summary`,
+    params: queryParams,
   })
 
   return response.json || {active: 0, resolved: 0}

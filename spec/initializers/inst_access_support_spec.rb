@@ -52,7 +52,7 @@ describe InstAccessSupport do
     it "configures signing and encryption keys using base64 values" do
       expect do
         InstAccessSupport.configure_inst_access!
-      end.to_not raise_error
+      end.not_to raise_error
 
       expect(InstAccess.config.signing_key.to_s).to eq signing_keypair.to_s
       expect(InstAccess.config.encryption_key.to_s).to eq encryption_keypair.public_key.to_s

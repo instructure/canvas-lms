@@ -112,14 +112,14 @@ describe "Importing assignments" do
             let(:migration) { course.content_migrations.create!(date_shift_options_settings) }
 
             it "should not set the skip_schedule_peer_reviews before save" do
-              expect(item).to_not receive(:skip_schedule_peer_reviews=)
+              expect(item).not_to receive(:skip_schedule_peer_reviews=)
               subject
             end
           end
 
           context "when migration not contains date_shift_options" do
             it "should not set the skip_schedule_peer_reviews before save" do
-              expect(item).to_not receive(:skip_schedule_peer_reviews=)
+              expect(item).not_to receive(:skip_schedule_peer_reviews=)
               subject
             end
           end
@@ -128,7 +128,7 @@ describe "Importing assignments" do
 
       context "when FF pre_date_shift_for_assignment_importing disabled" do
         it "should not use the try_to_save_with_date_shift method" do
-          expect(Importers::AssignmentImporter).to_not receive(:try_to_save_with_date_shift)
+          expect(Importers::AssignmentImporter).not_to receive(:try_to_save_with_date_shift)
           subject
         end
 
@@ -282,7 +282,7 @@ describe "Importing assignments" do
           Importers::AssignmentImporter.import_from_migration(base_assignment_hash, course, migration)
           assignment = course.assignments.find_by(migration_id: base_assignment_hash["migration_id"])
           expect(assignment.lti_asset_processors.count).to eq 0
-          expect(migration.warnings).to_not be_empty
+          expect(migration.warnings).not_to be_empty
         end
       end
 
@@ -318,7 +318,7 @@ describe "Importing assignments" do
           Importers::AssignmentImporter.import_from_migration(base_assignment_hash, course, migration)
           assignment = course.assignments.find_by(migration_id: base_assignment_hash["migration_id"])
           expect(assignment.lti_asset_processors.count).to eq 0
-          expect(migration.warnings).to_not be_empty
+          expect(migration.warnings).not_to be_empty
         end
       end
 
@@ -343,7 +343,7 @@ describe "Importing assignments" do
           Importers::AssignmentImporter.import_from_migration(base_assignment_hash, course, migration)
           assignment = course.assignments.find_by(migration_id: base_assignment_hash["migration_id"])
           expect(assignment.lti_asset_processors.count).to eq 0
-          expect(migration.warnings).to_not be_empty
+          expect(migration.warnings).not_to be_empty
         end
       end
 
@@ -1172,7 +1172,7 @@ describe "Importing assignments" do
               expect do
                 Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
                 Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
-              end.to_not change { Assignment.count }
+              end.not_to change { Assignment.count }
               expect(assignment.line_items.pluck(:label, :coupled, :score_maximum).sort_by(&:first))
                 .to eq(expected_created_line_items_fields)
             end
@@ -1502,7 +1502,7 @@ describe "Importing assignments" do
       course_model
       migration = @course.content_migrations.create!
       @course.assignments.create!(title: "test", due_at: Time.zone.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now, peer_reviews_due_at: 2.days.from_now, migration_id:)
-      expect(migration).to_not receive(:add_warning).with("We were unable to find a tool profile match for vendor_code: \"abc\" product_code: \"qrx\".")
+      expect(migration).not_to receive(:add_warning).with("We were unable to find a tool profile match for vendor_code: \"abc\" product_code: \"qrx\".")
       Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
     end
   end
@@ -2058,6 +2058,148 @@ describe "Importing assignments" do
         expect(subject.sub_assignments.first.due_at).not_to be_nil
         expect(subject.sub_assignments.second.due_at).not_to be_nil
       end
+
+      context "when restoring deleted checkpoints" do
+        it "restores deleted checkpoints when has_sub_assignments is true" do
+          # First, do a normal import
+          assignment = subject
+          expect(assignment.sub_assignments.count).to eq(2)
+
+          # Then manually delete the checkpoints (simulating corruption)
+          SubAssignment.where(parent_assignment_id: assignment.id).update_all(workflow_state: "deleted")
+          expect(assignment.sub_assignments.active.count).to eq(0)
+
+          # Call fix_checkpoint_consistency directly
+          Importers::AssignmentImporter.send(:fix_checkpoint_consistency, assignment, migration)
+
+          # Checkpoints should be restored to match parent's workflow_state
+          assignment.reload
+          expect(assignment.has_sub_assignments).to be(true)
+          expect(assignment.sub_assignments.count).to eq(2)
+          expect(assignment.sub_assignments.pluck(:workflow_state)).to all(eq(assignment.workflow_state))
+        end
+
+        it "restores partially deleted checkpoints" do
+          assignment = subject
+          expect(assignment.sub_assignments.count).to eq(2)
+
+          # Delete only one checkpoint
+          assignment.sub_assignments.first.update_column(:workflow_state, "deleted")
+          expect(assignment.sub_assignments.active.count).to eq(1)
+
+          # Call fix
+          Importers::AssignmentImporter.send(:fix_checkpoint_consistency, assignment, migration)
+
+          # Both should match parent's workflow_state
+          assignment.reload
+          expect(assignment.sub_assignments.count).to eq(2)
+          expect(assignment.sub_assignments.pluck(:workflow_state)).to all(eq(assignment.workflow_state))
+        end
+
+        it "does not restore stale deleted checkpoints when current ones are already active" do
+          # Simulate a previous toggle cycle leaving stale deleted records:
+          # 4 sub_assignments total — 2 active (current), 2 deleted (stale).
+          # Build stale ones while current ones are still active so that
+          # sync_parent_has_sub_flag sees active records and leaves
+          # has_sub_assignments=true. Then delete stale ones via
+          # update_columns to bypass callbacks.
+          assignment = subject
+          active_pair = assignment.sub_assignments.to_a
+
+          stale_topic = assignment.sub_assignments.build(
+            sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+            title: "stale reply_to_topic",
+            context: assignment.context
+          )
+          stale_topic.save!
+          stale_topic.update_columns(workflow_state: "deleted", updated_at: 1.day.ago)
+
+          stale_entry = assignment.sub_assignments.build(
+            sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY,
+            title: "stale reply_to_entry",
+            context: assignment.context
+          )
+          stale_entry.save!
+          stale_entry.update_columns(workflow_state: "deleted", updated_at: 1.day.ago)
+
+          Importers::AssignmentImporter.send(:fix_checkpoint_consistency, assignment, migration)
+
+          assignment.reload
+          expect(assignment.sub_assignments.active.count).to eq(2)
+          expect(assignment.sub_assignments.active.map(&:id)).to match_array(active_pair.map(&:id))
+          expect(SubAssignment.find(stale_topic.id).workflow_state).to eq("deleted")
+          expect(SubAssignment.find(stale_entry.id).workflow_state).to eq("deleted")
+        end
+
+        it "restores only the most recently updated deleted checkpoint per tag" do
+          # Simulate 2 toggle cycles leaving 3 deleted topic checkpoints and
+          # 2 deleted entry checkpoints. Only the most recently updated one
+          # per tag should be restored.
+          # Build new records while originals are still active so that
+          # sync_parent_has_sub_flag keeps has_sub_assignments=true, then
+          # delete all via update_columns to bypass callbacks.
+          assignment = subject
+
+          old_topic = SubAssignment.find_by(
+            parent_assignment_id: assignment.id,
+            sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC
+          )
+          old_entry = SubAssignment.find_by(
+            parent_assignment_id: assignment.id,
+            sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY
+          )
+
+          # Create a newer topic checkpoint while originals are still active
+          new_topic = assignment.sub_assignments.build(
+            sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+            title: "newer topic checkpoint",
+            context: assignment.context
+          )
+          new_topic.save!
+
+          # Now delete all via update_columns (bypasses callbacks/flag sync)
+          old_topic.update_columns(workflow_state: "deleted", updated_at: 3.days.ago)
+          new_topic.update_columns(workflow_state: "deleted", updated_at: 1.day.ago)
+          old_entry.update_columns(workflow_state: "deleted", updated_at: 2.days.ago)
+
+          Importers::AssignmentImporter.send(:fix_checkpoint_consistency, assignment, migration)
+
+          assignment.reload
+          active = assignment.sub_assignments.active
+          expect(active.count).to eq(2)
+
+          # newer topic checkpoint should be restored, not the old one
+          active_topic = active.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+          expect(active_topic.id).to eq(new_topic.id)
+          expect(SubAssignment.find(old_topic.id).workflow_state).to eq("deleted")
+
+          # only entry present, so it gets restored regardless
+          expect(active.where(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY).count).to eq(1)
+        end
+
+        it "logs restoration of deleted checkpoints" do
+          assignment = subject
+          SubAssignment.where(parent_assignment_id: assignment.id).update_all(workflow_state: "deleted")
+
+          expect(Rails.logger).to receive(:info).with(
+            a_string_matching(/Import Consistency Fix.*restored 2 checkpoint\(s\) to \w+ state/)
+          )
+
+          Importers::AssignmentImporter.send(:fix_checkpoint_consistency, assignment, migration)
+        end
+
+        it "does not restore when has_sub_assignments is false" do
+          assignment = subject
+          assignment.update_column(:has_sub_assignments, false)
+          SubAssignment.where(parent_assignment_id: assignment.id).update_all(workflow_state: "deleted")
+
+          # Should not restore
+          Importers::AssignmentImporter.send(:fix_checkpoint_consistency, assignment, migration)
+
+          assignment.reload
+          expect(assignment.sub_assignments.active.count).to eq(0)
+        end
+      end
     end
 
     context "when the discussion_checkpoints feature flag is off" do
@@ -2249,7 +2391,7 @@ describe "Importing assignments" do
 
       Importers::AssignmentImporter.associate_assignment_group(assignment_hash, course, assignment)
 
-      expect(assignment.assignment_group.id).to_not eq(assignment_group.id)
+      expect(assignment.assignment_group.id).not_to eq(assignment_group.id)
       expect(assignment.assignment_group.name).to eq("Imported Assignments")
     end
 
@@ -2259,7 +2401,7 @@ describe "Importing assignments" do
 
       Importers::AssignmentImporter.associate_assignment_group(assignment_hash, course, assignment)
 
-      expect(assignment.assignment_group.id).to_not eq(assignment_group.id)
+      expect(assignment.assignment_group.id).not_to eq(assignment_group.id)
       expect(assignment.assignment_group.name).to eq("Imported Assignments")
     end
   end

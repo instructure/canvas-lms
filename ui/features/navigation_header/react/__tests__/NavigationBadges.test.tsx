@@ -19,7 +19,7 @@
 import React from 'react'
 import {render as testingLibraryRender, screen, act} from '@testing-library/react'
 import NavigationBadges from '../NavigationBadges'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {setupServer} from 'msw/node'
@@ -82,7 +82,10 @@ describe('GlobalNavigation', () => {
     })
 
     it('does not fetch the shares unread count when the user does not have permission', async () => {
-      fakeENV.setup({CAN_VIEW_CONTENT_SHARES: false})
+      fakeENV.setup({
+        CAN_VIEW_CONTENT_SHARES: false,
+        SETTINGS: {release_notes_badge_disabled: false},
+      })
       let shareRequestMade = false
       server.use(
         http.get('/api/v1/users/self/content_shares/unread_count', () => {
@@ -104,7 +107,7 @@ describe('GlobalNavigation', () => {
     })
 
     it('does not fetch the shares unread count when the user is not logged in', async () => {
-      fakeENV.setup({current_user_id: null})
+      fakeENV.setup({current_user_id: null, SETTINGS: {release_notes_badge_disabled: false}})
       let shareRequestMade = false
       server.use(
         http.get('/api/v1/users/self/content_shares/unread_count', () => {
@@ -148,7 +151,10 @@ describe('GlobalNavigation', () => {
     })
 
     it('does not fetch inbox count when user has opted out of notifications', async () => {
-      fakeENV.setup({current_user_disabled_inbox: true})
+      fakeENV.setup({
+        current_user_disabled_inbox: true,
+        SETTINGS: {release_notes_badge_disabled: false},
+      })
       let inboxRequestMade = false
       server.use(
         http.get('/api/v1/conversations/unread_count', () => {

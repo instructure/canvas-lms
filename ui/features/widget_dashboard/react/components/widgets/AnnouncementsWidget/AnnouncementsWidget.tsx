@@ -23,7 +23,7 @@ import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {List} from '@instructure/ui-list'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import TemplateWidget from '../TemplateWidget/TemplateWidget'
+import {TemplateWidget} from '@instructure/platform-widget-dashboard'
 import AnnouncementItem from './AnnouncementItem'
 import type {BaseWidgetProps, Announcement} from '../../../types'
 import {useAnnouncementsPaginated} from '../../../hooks/useAnnouncements'
@@ -38,7 +38,7 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({
   isEditMode = false,
   dragHandleProps,
 }) => {
-  const {sharedCourseData} = useWidgetDashboard()
+  const {sharedCourseData, observedUserId} = useWidgetDashboard()
 
   const [filter, setFilter] = useWidgetConfig<FilterOption>(widget.id, 'filter', 'unread')
 
@@ -133,7 +133,11 @@ const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({
               key={`${announcement.id}-${announcement.isRead ? 'read' : 'unread'}`}
               margin="0"
             >
-              <AnnouncementItem announcementItem={announcement} filter={filter} />
+              <AnnouncementItem
+                announcementItem={announcement}
+                filter={filter}
+                readOnly={!!observedUserId}
+              />
             </List.Item>
           ))}
         </List>

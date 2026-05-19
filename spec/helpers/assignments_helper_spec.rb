@@ -269,10 +269,18 @@ describe AssignmentsHelper do
       expect(show_peer_review_widget?).to be_falsey
     end
 
+    it "returns false when assignment has no peer review sub-assignment" do
+      @can_grade = true
+      allow(@context).to receive(:horizon_course?).and_return(false)
+      allow(@context).to receive(:feature_enabled?).with(:peer_review_allocation_and_grading).and_return(true)
+      expect(show_peer_review_widget?).to be_falsey
+    end
+
     it "returns true when all conditions are met" do
       @can_grade = true
       allow(@context).to receive(:horizon_course?).and_return(false)
       allow(@context).to receive(:feature_enabled?).with(:peer_review_allocation_and_grading).and_return(true)
+      @assignment.create_peer_review_sub_assignment!(peer_reviews: true, peer_review_count: 2)
       expect(show_peer_review_widget?).to be_truthy
     end
   end
@@ -323,13 +331,20 @@ describe AssignmentsHelper do
       expect(show_legacy_peer_reviews_link?).to be_falsey
     end
 
-    it "returns false when peer_review_allocation_and_grading feature is enabled" do
+    it "returns false when FF is enabled and assignment has a peer review sub-assignment" do
       @can_grade = true
       allow(@assignment.context).to receive(:feature_enabled?).with(:peer_review_allocation_and_grading).and_return(true)
+      @assignment.create_peer_review_sub_assignment!(peer_reviews: true, peer_review_count: 2)
       expect(show_legacy_peer_reviews_link?).to be_falsey
     end
 
-    it "returns true when all conditions are met" do
+    it "returns true when FF is enabled but assignment has no sub-assignment (legacy)" do
+      @can_grade = true
+      allow(@assignment.context).to receive(:feature_enabled?).with(:peer_review_allocation_and_grading).and_return(true)
+      expect(show_legacy_peer_reviews_link?).to be_truthy
+    end
+
+    it "returns true when FF is disabled" do
       @can_grade = true
       allow(@assignment.context).to receive(:feature_enabled?).with(:peer_review_allocation_and_grading).and_return(false)
       expect(show_legacy_peer_reviews_link?).to be_truthy

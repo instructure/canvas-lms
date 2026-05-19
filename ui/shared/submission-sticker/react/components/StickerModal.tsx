@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {Button, CondensedButton} from '@instructure/ui-buttons'
 import {IconCheckSolid, IconTrashLine} from '@instructure/ui-icons'
 import {Alert} from '@instructure/ui-alerts'

@@ -62,6 +62,11 @@ module Types
       ActiveSupport::NumberHelper.number_to_human_size(object.size)
     end
 
+    field :size_bytes, Integer, null: true
+    def size_bytes
+      object.size
+    end
+
     field :thumbnail_url, Types::UrlType, null: true
     def thumbnail_url
       return if object.locked_for?(current_user, check_policies: true)
@@ -83,7 +88,7 @@ module Types
 
     field :url, Types::UrlType, null: true, extras: [:parent]
     def url(parent:)
-      return if object.locked_for?(current_user, check_policies: true)
+      return if attachment_access_blocked?(parent)
 
       # Check if this file belongs to a peer review submission
       if parent.is_a?(Submission)
@@ -135,7 +140,7 @@ module Types
         return unless submission_id ||= parent&.id
       end
 
-      return if object.locked_for?(current_user, check_policies: true)
+      return if attachment_access_blocked?(parent)
 
       Loaders::IDLoader.for(Submission).load(submission_id).then do |submission|
         next unless submission.grants_right?(current_user, session, :read)
@@ -159,13 +164,26 @@ module Types
 
     private
 
+    # locked_for? checks only attachment-level locks. Mirror
+    # AttachmentHelper#access_allowed: a Submission :read grant overrides
+    # the lock. (AttachmentHelper#access_allowed can't be called here —
+    # it needs controller state.)
+    def attachment_access_blocked?(parent)
+      if Account.site_admin.feature_enabled?(:peer_reviewer_locked_file_access) &&
+         parent.is_a?(Submission) && parent.grants_right?(current_user, session, :read)
+        return false
+      end
+
+      object.locked_for?(current_user, check_policies: true)
+    end
+
     def build_standard_file_url
       opts = {
         download: "1",
         download_frd: "1",
         host: context[:request].host_with_port,
         protocol: context[:request].protocol,
-        location: (context[:asset_location] if context[:domain_root_account]&.feature_enabled?(:file_association_access))
+        location: (context[:asset_location] if context[:domain_root_account]&.feature_enabled?(:file_association_access_conversation) || context[:domain_root_account]&.feature_enabled?(:file_association_access))
       }
 
       unless context[:domain_root_account]&.feature_enabled?(:disable_adding_uuid_verifier_in_api)

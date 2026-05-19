@@ -293,6 +293,74 @@ describe('TodoItem', () => {
       expect(button).toBeInTheDocument()
       expect(screen.getByText('Mark Lab Report: Cell Structure as complete')).toBeInTheDocument()
     })
+
+    it('shows as incomplete when planner override has marked_complete false, even if submitted', () => {
+      const item = {
+        ...mockPlannerItems[0],
+        submissions: {
+          submitted: true,
+          excused: false,
+          graded: false,
+          late: false,
+          missing: false,
+          needs_grading: false,
+          has_feedback: false,
+          redo_request: false,
+        },
+        planner_override: {
+          id: 1,
+          plannable_type: 'assignment',
+          plannable_id: '1',
+          user_id: 1,
+          workflow_state: 'active',
+          marked_complete: false,
+          dismissed: false,
+          deleted_at: null,
+          created_at: '2025-01-01T00:00:00Z',
+          updated_at: '2025-01-01T00:00:00Z',
+        },
+      }
+      renderWithProvider(<TodoItem item={item} />)
+
+      expect(screen.getByText('Mark Lab Report: Cell Structure as complete')).toBeInTheDocument()
+      const link = screen.getByTestId(`todo-link-${item.plannable_id}`)
+      const titleText = link.querySelector('span')
+      expect(titleText).not.toHaveAttribute('color', 'secondary')
+    })
+
+    it('shows as complete when planner override has marked_complete true, even without submission', () => {
+      const item = {
+        ...mockPlannerItems[0],
+        submissions: {
+          submitted: false,
+          excused: false,
+          graded: false,
+          late: false,
+          missing: false,
+          needs_grading: false,
+          has_feedback: false,
+          redo_request: false,
+        },
+        planner_override: {
+          id: 1,
+          plannable_type: 'assignment',
+          plannable_id: '1',
+          user_id: 1,
+          workflow_state: 'active',
+          marked_complete: true,
+          dismissed: false,
+          deleted_at: null,
+          created_at: '2025-01-01T00:00:00Z',
+          updated_at: '2025-01-01T00:00:00Z',
+        },
+      }
+      renderWithProvider(<TodoItem item={item} />)
+
+      expect(screen.getByText('Mark Lab Report: Cell Structure as incomplete')).toBeInTheDocument()
+      const link = screen.getByTestId(`todo-link-${item.plannable_id}`)
+      const titleText = link.querySelector('span')
+      expect(titleText).toHaveAttribute('color', 'secondary')
+    })
   })
 
   describe('announcement display', () => {

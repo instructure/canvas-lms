@@ -248,8 +248,8 @@ module CC::Importer::Standard
       {
         product_code: meta_doc.at_css("tool_setting tool_proxy").attribute("product_code").value,
         vendor_code: meta_doc.at_css("tool_setting tool_proxy").attribute("vendor_code").value,
-        custom: meta_doc.css("tool_setting custom property").each_with_object({}) { |el, hash| hash[el.attr("name")] = el.text },
-        custom_parameters: meta_doc.css("tool_setting custom_parameters property").each_with_object({}) { |el, hash| hash[el.attr("name")] = el.text }
+        custom: meta_doc.css("tool_setting custom property").to_h { |el| [el.attr("name"), el.text] },
+        custom_parameters: meta_doc.css("tool_setting custom_parameters property").to_h { |el| [el.attr("name"), el.text] }
       }
     end
   end

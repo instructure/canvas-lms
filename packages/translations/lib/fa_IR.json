@@ -146,9 +146,6 @@
     "content_type_2cf90d95": {
         "message": "نوع محتوا"
     },
-    "copy_9748f9f": {
-        "message": "کپی کردن"
-    },
     "copyright_holder_66ee111": {
         "message": "دارنده حق نشر:"
     },
@@ -206,9 +203,6 @@
     "details_98a31b68": {
         "message": "اطلاعات"
     },
-    "dimensions_45ddb7b7": {
-        "message": "ابعاد"
-    },
     "discussion_6719c51d": {
         "message": "بحث"
     },
@@ -259,9 +253,6 @@
     },
     "external_tools_6e77821": {
         "message": "ابزارهای بیرونی"
-    },
-    "failed_276786d": {
-        "message": "انجام نشد"
     },
     "file_name_8fd421ff": {
         "message": "نام فایل"
@@ -418,6 +409,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "به یک تارنمای بیرونی پیوند می شود."
+    },
+    "list_collapsed_9ac35920": {
+        "message": "فهرست جمع شد."
+    },
+    "list_expanded_efec2d0": {
+        "message": "فهرست باز شد."
     },
     "lithuanian_5adcbe24": {
         "message": "لیتوانیایی"
@@ -622,9 +619,6 @@
     },
     "reset_95a81614": {
         "message": "بازنشانی"
-    },
-    "retry_ebd5f8ba": {
-        "message": "تلاش دوباره"
     },
     "rich_content_editor_2708ef21": {
         "message": "ویرایشگر محتوای غنی"

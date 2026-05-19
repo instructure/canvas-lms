@@ -22,6 +22,7 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {InlineList} from '@instructure/ui-list'
 
+import {TruncateText} from '@instructure/ui-truncate-text'
 import {
   IconAssignmentLine,
   IconQuizLine,
@@ -55,6 +56,8 @@ const getAriaLabel = (itemType, itemTitle) => {
     case 'Page':
       return I18n.t('Page, %{itemTitle}', {itemTitle})
     case 'Peer Review':
+      return I18n.t('Peer Review, %{itemTitle}', {itemTitle})
+    case 'Peer Review Sub Assignment':
       return I18n.t('Peer Review, %{itemTitle}', {itemTitle})
     case 'Discussion Checkpoint':
       return I18n.t('Discussion Checkpoint, %{itemTitle}', {itemTitle})
@@ -97,6 +100,9 @@ const getIconComponent = itemType => {
       // @ts-expect-error TS2769 (typescriptify)
       return <IconDocumentLine label={I18n.t('Page')} className="ToDoSidebarItem__Icon" />
     case 'Peer Review':
+      // @ts-expect-error TS2769 (typescriptify)
+      return <IconPeerReviewLine label={I18n.t('Peer Review')} className="ToDoSidebarItem__Icon" />
+    case 'Peer Review Sub Assignment':
       // @ts-expect-error TS2769 (typescriptify)
       return <IconPeerReviewLine label={I18n.t('Peer Review')} className="ToDoSidebarItem__Icon" />
     default:
@@ -166,7 +172,7 @@ export default class ToDoItem extends React.Component {
   render() {
     const title = (
       <Text size="small" lineHeight="fit">
-        {this.itemTitle()}
+        <TruncateText>{this.itemTitle()}</TruncateText>
       </Text>
     )
     // @ts-expect-error TS2339 (typescriptify)

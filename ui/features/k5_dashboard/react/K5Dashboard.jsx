@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {CardDashboardLoader} from '@canvas/dashboard-card'
 import {useFetchDashboardCards} from '@canvas/dashboard-card/dashboardCardQueries'
 import {handleDashboardCardError} from '@canvas/dashboard-card/util/dashboardUtils'
@@ -27,7 +27,6 @@ import ResourcesPage from '@canvas/k5/react/ResourcesPage'
 import SchedulePage from '@canvas/k5/react/SchedulePage'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
-import {getK5ThemeOverrides} from '@canvas/k5/react/k5-theme'
 import {
   MOBILE_NAV_BREAKPOINT_PX,
   TAB_IDS,
@@ -40,7 +39,6 @@ import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 import {responsiviser, store} from '@canvas/planner'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {reloadWindow} from '@canvas/util/globalUtils'
-import {InstUISettingsProvider} from '@instructure/emotion'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -65,8 +63,6 @@ import HomeroomPage from './HomeroomPage'
 import ImportantDates from './ImportantDates'
 import {TodosPage} from './TodosPage'
 import {isUserObservingStudent, getObservedUserId} from './utils'
-
-const componentOverrides = getK5ThemeOverrides()
 
 const I18n = createI18nScope('k5_dashboard')
 
@@ -161,6 +157,7 @@ const K5Dashboard = ({
   assignmentsCompletedForToday,
   createPermission,
   restrictCourseCreation,
+  viewableAccountIds,
   currentUser,
   currentUserRoles,
   timeZone,
@@ -452,6 +449,7 @@ const K5Dashboard = ({
               cards={cards}
               createPermission={createPermission}
               restrictCourseCreation={restrictCourseCreation}
+              viewableAccountIds={viewableAccountIds}
               homeroomAnnouncements={homeroomAnnouncements}
               loadingAnnouncements={loadingAnnouncements}
               visible={currentTab === TAB_IDS.HOMEROOM}
@@ -520,6 +518,7 @@ K5Dashboard.propTypes = {
   loadingOpportunities: PropTypes.bool.isRequired,
   createPermission: PropTypes.oneOf(['admin', 'teacher', 'student', 'no_enrollments']),
   restrictCourseCreation: PropTypes.bool.isRequired,
+  viewableAccountIds: PropTypes.arrayOf(PropTypes.string),
   currentUser: PropTypes.shape({
     id: PropTypes.string,
     display_name: PropTypes.string,
@@ -547,9 +546,7 @@ K5Dashboard.propTypes = {
 const WrappedK5Dashboard = connect(mapStateToProps)(responsiviser()(K5Dashboard))
 
 export default props => (
-  <InstUISettingsProvider theme={{componentOverrides}}>
-    <Provider store={store}>
-      <WrappedK5Dashboard {...props} />
-    </Provider>
-  </InstUISettingsProvider>
+  <Provider store={store}>
+    <WrappedK5Dashboard {...props} />
+  </Provider>
 )

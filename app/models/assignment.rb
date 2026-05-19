@@ -243,6 +243,32 @@ class Assignment < AbstractAssignment
     AssessmentRequest.completed_for_assignment(id).exists?
   end
 
+  def ensure_post_policy(post_manually:)
+    super
+    return unless has_sub_assignments?
+
+    sub_assignments.each { |sa| sa.ensure_post_policy(post_manually:) }
+  end
+
+  def restore(from = nil)
+    transaction do
+      super
+
+      next unless context.feature_enabled?(:peer_review_allocation_and_grading)
+
+      deleted_peer_review_sub = PeerReviewSubAssignment
+                                .unscoped
+                                .where(parent_assignment_id: id, workflow_state: "deleted")
+                                .order(id: :desc)
+                                .first
+      next unless deleted_peer_review_sub
+
+      deleted_peer_review_sub.restore
+      association(:peer_review_sub_assignment).reset
+      PeerReview::PeerReviewUpdaterService.call(parent_assignment: self)
+    end
+  end
+
   private
 
   def before_soft_delete
@@ -250,8 +276,12 @@ class Assignment < AbstractAssignment
     peer_review_sub_assignment&.destroy
   end
 
+  # These methods follow the Rails validation helper convention: they add errors
+  # and use early returns as guards, not to return a boolean predicate value.
+  # rubocop:disable Style/ReturnNilInPredicateMethodDefinition
   def peer_review_count_changes_ok?
-    return false unless peer_reviews? && context.feature_enabled?(:peer_review_allocation_and_grading)
+    return unless peer_reviews?
+    return unless peer_review_sub_assignment.present?
 
     if peer_review_submissions?
       errors.add :peer_review_count,
@@ -260,14 +290,21 @@ class Assignment < AbstractAssignment
   end
 
   def peer_reviews_changes_ok?
-    return true unless peer_reviews_change_to_be_saved == [true, false]
-    return true unless context&.feature_enabled?(:peer_review_allocation_and_grading)
+    return unless peer_reviews_change_to_be_saved == [true, false]
+    return unless peer_review_sub_assignment.present?
 
-    if peer_review_submissions?
+    if context.feature_enabled?(:peer_review_allocation_and_grading)
+      return unless peer_review_submissions?
+
       errors.add :peer_reviews,
-                 I18n.t("cannot be disabled when students have already submitted reviews")
+                 I18n.t("cannot be disabled for assignments with graded peer reviews when students have already submitted reviews")
+    else
+      # For backward compatibility, prevent disabling peer reviews for assignments with graded peer reviews in legacy mode
+      errors.add :peer_reviews,
+                 I18n.t("cannot be disabled for assignments with graded peer reviews in legacy mode")
     end
   end
+  # rubocop:enable Style/ReturnNilInPredicateMethodDefinition
 
   def governs_submittable?
     true

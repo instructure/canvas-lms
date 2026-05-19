@@ -28,12 +28,12 @@ import {
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
-import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess, showFlashError} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {BaseButtonTheme} from '@instructure/shared-types'
 import {useMutation} from '@apollo/client'
 import {SET_WORKFLOW} from '@canvas/assignments/graphql/teacher/Mutations'
-import {BREAKPOINTS, type Breakpoints} from '@canvas/with-breakpoints'
+import {BREAKPOINTS, type Breakpoints} from '@instructure/platform-with-breakpoints'
 
 const I18n = createI18nScope('assignment_publish_button')
 const AssignmentPublishButton = ({

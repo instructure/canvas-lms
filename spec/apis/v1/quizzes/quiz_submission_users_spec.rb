@@ -38,7 +38,7 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
     include Quizzes::QuizUserMessagerSpecHelper
 
     before :once do
-      course_quiz(true)
+      course_quiz(active: true)
       @finder = Quizzes::QuizUserFinder.new(@quiz, @teacher)
       course_with_student(active_all: true, course: @course)
       @user = @teacher

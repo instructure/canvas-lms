@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -40,9 +39,7 @@ export const ViewModeSelect = ({
 
   return (
     <SimpleSelect
-      renderLabel={
-        <ScreenReaderContent>{I18n.t('Rubric Assessment View Mode')}</ScreenReaderContent>
-      }
+      renderLabel={I18n.t('View Mode')}
       width="10rem"
       height="2.375rem"
       value={selectedViewMode}

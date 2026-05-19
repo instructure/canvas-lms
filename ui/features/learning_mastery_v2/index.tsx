@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import ready from '@instructure/ready'
 import LearningMastery from './react'
 
@@ -28,6 +28,5 @@ ready(() => {
     return
   }
 
-  const root = createRoot(container)
-  root.render(<LearningMastery courseId={ENV.GRADEBOOK_OPTIONS.context_id} />)
+  render(<LearningMastery courseId={ENV.GRADEBOOK_OPTIONS.context_id} />, container)
 })

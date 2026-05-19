@@ -54,7 +54,6 @@ describe('DiscussionTopicForm AssetProcessors Submission', () => {
   beforeEach(() => {
     window.ENV = {
       DISCUSSION_TOPIC: {
-        // @ts-expect-error
         PERMISSIONS: {
           CAN_ATTACH: true,
           CAN_MODERATE: true,
@@ -93,58 +92,54 @@ describe('DiscussionTopicForm AssetProcessors Submission', () => {
     vi.resetAllMocks()
   })
 
-  it(
-    'adds a new discussion topic with AssetProcessors',
-    async () => {
-      const mockOnSubmit = vi.fn()
-      const {getByTestId, getByLabelText, getByPlaceholderText, findByText} = setup({
-        isEditing: false,
-        onSubmit: mockOnSubmit,
+  it('adds a new discussion topic with AssetProcessors', async () => {
+    const mockOnSubmit = vi.fn()
+    const {getByTestId, getByLabelText, getByPlaceholderText, findByText} = setup({
+      isEditing: false,
+      onSubmit: mockOnSubmit,
+    })
+
+    fireEvent.input(getByPlaceholderText('Topic Title'), {target: {value: 'a title'}})
+
+    // Switch to graded and wait for form to update
+    await act(async () => {
+      getByLabelText('Graded').click()
+    })
+
+    // Wait for AssetProcessors section to appear (confirms form state updated)
+    await findByText('Document Processing App(s)')
+
+    act(() => {
+      useAssetProcessorsState.getState().addAttachedProcessors({
+        tool: mockToolsForDiscussions[0],
+        data: mockContributionDeepLinkResponse,
+        type: 'ActivityAssetProcessorContribution',
       })
+    })
 
-      fireEvent.input(getByPlaceholderText('Topic Title'), {target: {value: 'a title'}})
+    expect(useAssetProcessorsState.getState().attachedProcessors).toHaveLength(1)
 
-      // Switch to graded and wait for form to update
-      await act(async () => {
-        getByLabelText('Graded').click()
-      })
+    await act(async () => {
+      getByTestId('save-button').click()
+    })
 
-      // Wait for AssetProcessors section to appear (confirms form state updated)
-      await findByText('Document Processing App(s)')
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalled()
+    })
 
-      act(() => {
-        useAssetProcessorsState.getState().addAttachedProcessors({
-          tool: mockToolsForDiscussions[0],
-          data: mockContributionDeepLinkResponse,
-          type: 'ActivityAssetProcessorContribution',
-        })
-      })
-
-      expect(useAssetProcessorsState.getState().attachedProcessors).toHaveLength(1)
-
-      await act(async () => {
-        getByTestId('save-button').click()
-      })
-
-      await waitFor(() => {
-        expect(mockOnSubmit).toHaveBeenCalled()
-      })
-
-      const submissionData = mockOnSubmit.mock.calls[0][0]
-      // For expected structure, see AttachedAssetProcessorGraphqlMutation
-      const aps = submissionData.assignment.assetProcessors
-      expect(aps).toEqual([
-        {
-          newContentItem: {
-            contextExternalToolId: parseInt(mockToolsForDiscussions[0].definition_id),
-            // from mockDeepLinkResponse:
-            text: 'Lti 1.3 Tool Text',
-            title: 'Lti 1.3 Tool Title',
-            report: {},
-          },
+    const submissionData = mockOnSubmit.mock.calls[0][0]
+    // For expected structure, see AttachedAssetProcessorGraphqlMutation
+    const aps = submissionData.assignment.assetProcessors
+    expect(aps).toEqual([
+      {
+        newContentItem: {
+          contextExternalToolId: parseInt(mockToolsForDiscussions[0].definition_id),
+          // from mockDeepLinkResponse:
+          text: 'Lti 1.3 Tool Text',
+          title: 'Lti 1.3 Tool Title',
+          report: {},
         },
-      ])
-    },
-    30000,
-  )
+      },
+    ])
+  }, 30000)
 })

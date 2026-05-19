@@ -20,7 +20,7 @@ import {useEffect} from 'react'
 import {useQuery} from '@apollo/client'
 import useCanvasContext from './useCanvasContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {COURSE_ALIGNMENT_STATS} from '../../graphql/Management'
 
 const I18n = createI18nScope('AlignmentSummary')

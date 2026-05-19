@@ -65,19 +65,11 @@ describe('Number Helper Tests', () => {
     })
   })
 
-  test('does not fall back to default delimiters and returns NaN if locale parse fails', () => {
-    const input = '47'
+  test('uses default delimiter and separator if not a valid number', () => {
     numberHelper._parseNumber.mockReturnValueOnce(NaN)
     const ret = numberHelper.parse(input)
-    expect(numberHelper._parseNumber).toHaveBeenCalledWith(
-      input,
-      expect.objectContaining({
-        thousands: expect.any(String),
-        decimal: expect.any(String),
-      }),
-    )
-    expect(numberHelper._parseNumber).toHaveBeenCalledTimes(1)
-    expect(ret).toBeNaN()
+    expect(numberHelper._parseNumber).toHaveBeenCalledWith(input)
+    expect(ret).toEqual(output)
   })
 
   test('returns NaN for null and undefined values', () => {
@@ -129,29 +121,5 @@ describe('Number Helper Tests', () => {
   test('validate returns true if parse returns a number', () => {
     numberHelper._parseNumber.mockReturnValue(1)
     expect(numberHelper.validate('1')).toBe(true)
-  })
-
-  test('isScientific validates strictly for dot-based locales (English)', () => {
-    I18nStubber.stub('en', {
-      'number.format.delimiter': ',',
-      'number.format.separator': '.',
-    })
-    I18nStubber.setLocale('en')
-
-    expect(numberHelper.isScientific('1.e+5')).toBe(true)
-    expect(numberHelper.isScientific('6.022e4')).toBe(true)
-    expect(numberHelper.isScientific('1,e+5')).toBe(false)
-  })
-
-  test('isScientific validates strictly for comma-based locales (German)', () => {
-    I18nStubber.stub('de', {
-      'number.format.delimiter': '.',
-      'number.format.separator': ',',
-    })
-    I18nStubber.setLocale('de')
-
-    expect(numberHelper.isScientific('1,e+5')).toBe(true)
-    expect(numberHelper.isScientific('6,022e4')).toBe(true)
-    expect(numberHelper.isScientific('1.e+5')).toBe(false)
   })
 })

@@ -27,8 +27,9 @@ describe "Platform Notification Service" do
   let(:course) { course_model }
   let(:base_url) { "http://#{HostUrl.default_host}/test/mock_lti" }
   let(:registration) do
+    scopes = ["https://purl.imsglobal.org/spec/lti/scope/noticehandlers"]
     configuration_params = {
-      scopes: ["https://purl.imsglobal.org/spec/lti/scope/noticehandlers"],
+      scopes:,
       redirect_uris: ["#{base_url}/ui"],
       placements: [{
         placement: "ActivityAssetProcessor",
@@ -38,8 +39,11 @@ describe "Platform Notification Service" do
       public_jwk_url: "#{base_url}/jwks",
       domain: HostUrl.default_host,
     }
+    developer_key_params = {
+      scopes:
+    }
 
-    lti_registration_with_tool(account: course.account, configuration_params:)
+    lti_registration_with_tool(account: course.account, configuration_params:, developer_key_params:)
   end
 
   before do
@@ -49,11 +53,11 @@ describe "Platform Notification Service" do
     course.enroll_teacher(teacher, enrollment_state: "active")
     user_session(teacher)
 
-    Lti::UpdateRegistrationService.call(
-      id: registration.id,
+    Lti::AccountBindingService.call(
       account: course.account,
-      updated_by: teacher,
-      binding_params: { workflow_state: "on" }
+      registration:,
+      user: teacher,
+      workflow_state: :on
     )
 
     key = OpenSSL::PKey::RSA.new 2048
@@ -68,7 +72,8 @@ describe "Platform Notification Service" do
     # Visit the new assignment page
     get("/courses/#{course.id}/assignments/new")
 
-    # Set assignment type to text submission
+    # Select online submission type, then enable text entry
+    click_option("#assignment_submission_type", "Online")
     AssignmentCreateEditPage.select_text_entry_submission_type
 
     # Click the asset processor button

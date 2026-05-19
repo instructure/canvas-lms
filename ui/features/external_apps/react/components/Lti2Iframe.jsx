@@ -18,7 +18,6 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
 export default class Lti2Iframe extends React.Component {
@@ -32,10 +31,6 @@ export default class Lti2Iframe extends React.Component {
 
   componentDidMount() {
     window.addEventListener('message', this.handleMessage, false)
-
-    if (this.iframe) {
-      this.iframe.setAttribute('allow', iframeAllowances())
-    }
   }
 
   componentWillUnmount() {

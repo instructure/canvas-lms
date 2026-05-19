@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import {Flex} from '@instructure/ui-flex'
@@ -30,6 +30,7 @@ import React, {useCallback} from 'react'
 import {useQueryClient, useMutation} from '@tanstack/react-query'
 import {isSuccessful} from '../../common/lib/apiResult/ApiResult'
 import {applyLtiRegistrationUpdateRequest} from '../api/ltiImsRegistration'
+import {refreshRegistrationHistory} from '../api/registrations'
 import {IconConfirmationWrapper} from '../lti_1p3_registration_form/components/IconConfirmationWrapper'
 import {NamingConfirmationWrapper} from '../lti_1p3_registration_form/components/NamingConfirmationWrapper'
 import {PermissionConfirmationWrapper} from '../lti_1p3_registration_form/components/PermissionConfirmationWrapper'
@@ -95,12 +96,12 @@ export const RegistrationUpdateWizardInner = ({
         queryClient.invalidateQueries({
           queryKey: [accountId, 'lti_registrations'],
         })
+        refreshRegistrationHistory(accountId, registrationUpdateRequest.lti_registration_id)
 
         showFlashAlert({
-          message: I18n.t(`Configuration updates applied to *%{appName}*`, {
+          message: I18n.t(`Configuration updates applied to %{appName}`, {
             appName,
-            wrappers: ['<b>$1</b>'],
-          }),
+          }).toString(),
           type: 'success',
         })
         onSuccess()
@@ -132,6 +133,7 @@ export const RegistrationUpdateWizardInner = ({
   const {state, advance, previous, isFirstStep, isLastStep} = wizardState
 
   const isAlreadyApplied = registrationUpdateRequest.status === 'applied'
+  const isRejected = registrationUpdateRequest.status === 'rejected'
 
   const overlayStore = React.useMemo(() => {
     return createLti1p3RegistrationOverlayStore(
@@ -179,6 +181,7 @@ export const RegistrationUpdateWizardInner = ({
             internalConfig={registrationUpdateRequest.internal_lti_configuration}
             overlayStore={overlayStore}
             registrationUpdateRequest={registrationUpdateRequest}
+            originalConfig={registration.configuration}
           />
         )
       case 'PlacementsConfirmation':
@@ -273,6 +276,36 @@ export const RegistrationUpdateWizardInner = ({
               <span
                 dangerouslySetInnerHTML={{
                   __html: I18n.t('This update has already been applied to *%{appName}*.', {
+                    appName,
+                    wrappers: ['<strong>$1</strong>'],
+                  }),
+                }}
+              />
+            </Text>
+          </View>
+        </RegistrationModalBody>
+        <Modal.Footer>
+          <Button onClick={onDismiss} color="primary">
+            {I18n.t('Close')}
+          </Button>
+        </Modal.Footer>
+      </>
+    )
+  }
+
+  if (isRejected) {
+    return (
+      <>
+        <Header onClose={onDismiss} headerText={I18n.t('Already Rejected')} />
+        <RegistrationModalBody>
+          <View as="div" padding="large" textAlign="center">
+            <Heading level="h3" margin="0 0 medium 0">
+              {I18n.t('Update Already Rejected')}
+            </Heading>
+            <Text size="medium">
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: I18n.t('This update has already been rejected for *%{appName}*.', {
                     appName,
                     wrappers: ['<strong>$1</strong>'],
                   }),

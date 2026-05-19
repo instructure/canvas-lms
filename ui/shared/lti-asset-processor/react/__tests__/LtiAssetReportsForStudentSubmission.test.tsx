@@ -16,10 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
+import {render, screen, cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import {queryClient} from '@canvas/query'
+import {vi} from 'vitest'
+import fakeENV from '@canvas/test-utils/fakeENV'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {LtiAssetReportsForStudentSubmission} from '../LtiAssetReportsForStudentSubmission'
 import {defaultGetLtiAssetProcessorsAndReportsForStudentResult} from '../../queries/__fixtures__/LtiAssetProcessorsAndReportsForStudent'
@@ -28,15 +30,22 @@ describe('LtiAssetReportsForStudentSubmission', () => {
   const defaultProps = {
     submissionId: 'submission-123',
     submissionType: 'online_upload',
+    attempt: 1,
     attachmentId: 'attachment-456',
   }
 
   beforeEach(() => {
-    window.ENV = {
-      ...window.ENV,
-      FEATURES: {lti_asset_processor: true},
-    }
+    vi.useFakeTimers()
+    fakeENV.setup({FEATURES: {lti_asset_processor: true}})
     queryClient.clear()
+  })
+
+  afterEach(() => {
+    vi.runAllTimers()
+    vi.useRealTimers()
+    cleanup()
+    queryClient.clear()
+    fakeENV.teardown()
   })
 
   it('returns null when no data is available', () => {
@@ -72,7 +81,7 @@ describe('LtiAssetReportsForStudentSubmission', () => {
   })
 
   it('opens modal when "Please review" link is clicked', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime})
 
     // Set up query data with reports and processors
     const mockData = defaultGetLtiAssetProcessorsAndReportsForStudentResult({
@@ -101,7 +110,7 @@ describe('LtiAssetReportsForStudentSubmission', () => {
   })
 
   it('displays correct report information in modal', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime})
 
     const mockData = defaultGetLtiAssetProcessorsAndReportsForStudentResult({
       attachmentId: defaultProps.attachmentId,
@@ -129,7 +138,7 @@ describe('LtiAssetReportsForStudentSubmission', () => {
   })
 
   it('closes modal when onClose is called', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime})
 
     const mockData = defaultGetLtiAssetProcessorsAndReportsForStudentResult({
       attachmentId: defaultProps.attachmentId,

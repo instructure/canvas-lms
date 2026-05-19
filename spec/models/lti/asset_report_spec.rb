@@ -152,6 +152,21 @@ RSpec.describe Lti::AssetReport do
     end
   end
 
+  describe "#launch_url_path" do
+    let(:report) { lti_asset_report_model(processing_progress: "Processed") }
+
+    it "returns nil when not Processed" do
+      report.processing_progress = "Processing"
+      expect(report.launch_url_path).to be_nil
+    end
+
+    it "includes the asset_processor_id and report_id" do
+      path = report.launch_url_path
+      expect(path).to include(report.lti_asset_processor_id.to_s)
+      expect(path).to include(report.id.to_s)
+    end
+  end
+
   describe "#resubmit_available?" do
     subject { standard_report.resubmit_available? }
 
@@ -221,6 +236,18 @@ RSpec.describe Lti::AssetReport do
 
       it "returns true for a teacher" do
         expect(report.visible_to_user?(teacher)).to be true
+      end
+    end
+
+    context "when submission has been hard-deleted" do
+      let(:report) { lti_asset_report_model(asset:, asset_processor:, visible_to_owner: true) }
+
+      it "returns false for all users" do
+        report # materialize before destroying submission
+        submission.destroy
+        asset.reload
+        expect(report.visible_to_user?(student)).to be false
+        expect(report.visible_to_user?(teacher)).to be false
       end
     end
   end

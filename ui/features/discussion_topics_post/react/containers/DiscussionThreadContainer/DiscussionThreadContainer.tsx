@@ -27,7 +27,7 @@ import {
   addReplyToAllRootEntries,
   addSubentriesCountToParentEntry,
 } from '../../utils'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {
   DELETE_DISCUSSION_ENTRY,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
@@ -657,7 +657,6 @@ export const DiscussionThreadContainer = props => {
   return (
     <Responsive
       match="media"
-      // @ts-expect-error TS2769 (typescriptify)
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         // If you change the padding notation on these, please update the getReplyLeftMargin function

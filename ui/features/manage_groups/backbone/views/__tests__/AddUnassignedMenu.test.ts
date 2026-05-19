@@ -69,34 +69,39 @@ describe('AddUnassignedMenu', () => {
       }),
       restore: vi.fn(),
     }
+    // @ts-expect-error TS7 migration
     waldo = new GroupUser({
       id: 4,
       name: 'Waldo',
       sortable_name: 'Waldo',
     })
+    // @ts-expect-error TS7 migration
     users = new GroupUserCollection(null, {
+      // @ts-expect-error TS7 migration
       group: new Group(),
+      // @ts-expect-error TS7 migration
       category: new GroupCategory(),
     })
-    // @ts-expect-error - Backbone View property
     users.setParam('search_term', 'term')
     users.loaded = true
     // @ts-expect-error - Legacy Backbone typing
     view = new AddUnassignedMenu({collection: users})
     // @ts-expect-error - Backbone View property
     view.group = new Group({id: 777})
-    // @ts-expect-error - Backbone View property
     users.reset([
+      // @ts-expect-error TS7 migration
       new GroupUser({
         id: 1,
         name: 'Frank Herbert',
         sortable_name: 'Herbert, Frank',
       }),
+      // @ts-expect-error TS7 migration
       new GroupUser({
         id: 2,
         name: 'Neal Stephenson',
         sortable_name: 'Stephenson, Neal',
       }),
+      // @ts-expect-error TS7 migration
       new GroupUser({
         id: 3,
         name: 'John Scalzi',

@@ -22,12 +22,12 @@ import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import {vi} from 'vitest'
 import SyllabusRevisionsTray from '../SyllabusRevisionsTray'
-import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError} from '@instructure/platform-alerts'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 
 const server = setupServer()
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 vi.mock('@canvas/rce/RichContentEditor', () => ({
   default: {
     callOnRCE: vi.fn(),
@@ -253,6 +253,44 @@ describe('SyllabusRevisionsTray', () => {
 
     const syllabusElement = document.getElementById('course_syllabus')
     expect(syllabusElement?.innerHTML).toBe('<p>Previous content</p>')
+  })
+
+  it('sets revision_preview data attribute when previewing a version', async () => {
+    document.body.innerHTML = '<div id="course_syllabus"></div>'
+    server.use(
+      http.get('/api/v1/courses/123', () => HttpResponse.json({syllabus_versions: mockVersions})),
+    )
+    render(<SyllabusRevisionsTray {...defaultProps} />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('version-2')).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByTestId('version-2'))
+
+    const $ = require('jquery')
+    expect($('#course_syllabus').data('revision_preview')).toBe('<p>Previous content</p>')
+  })
+
+  it('clears revision_preview data attribute when tray is dismissed', async () => {
+    document.body.innerHTML = '<div id="course_syllabus"><p>Current content</p></div>'
+    server.use(
+      http.get('/api/v1/courses/123', () => HttpResponse.json({syllabus_versions: mockVersions})),
+    )
+    const {rerender} = render(<SyllabusRevisionsTray {...defaultProps} />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('version-2')).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByTestId('version-2'))
+
+    const $ = require('jquery')
+    expect($('#course_syllabus').data('revision_preview')).toBe('<p>Previous content</p>')
+
+    rerender(<SyllabusRevisionsTray {...defaultProps} open={false} />)
+
+    expect($('#course_syllabus').data('revision_preview')).toBeUndefined()
   })
 
   it('shows empty state when no versions available', async () => {

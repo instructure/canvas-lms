@@ -49,7 +49,8 @@ RSpec.shared_context "deep_linking_spec_helper" do
       "https://purl.imsglobal.org/spec/lti-dl/claim/errormsg" => errormsg,
       "https://purl.imsglobal.org/spec/lti-dl/claim/log" => log,
       "https://purl.imsglobal.org/spec/lti-dl/claim/errorlog" => errorlog,
-      "https://canvas.instructure.com/lti/replace_editor_contents" => replace_editor_contents
+      "https://canvas.instructure.com/lti/replace_editor_contents" => replace_editor_contents,
+      "https://canvas.instructure.com/lti/module_name" => module_name
     }.compact
   end
   let(:deep_linking_jwt) do
@@ -57,16 +58,21 @@ RSpec.shared_context "deep_linking_spec_helper" do
     JSON::JWT.new(body).sign(private_jwk, alg).to_s
   end
   let(:developer_key_scopes) { [] }
-  let(:developer_key) do
-    key = DeveloperKey.new(account:, scopes: developer_key_scopes)
-    key.generate_rsa_keypair!
-    key.save!
-    key.developer_key_account_bindings.first.update!(
-      workflow_state: "on"
+  let(:registration) do
+    reg = lti_registration_with_tool(
+      account:,
+      developer_key_params: { scopes: developer_key_scopes },
+      configuration_params: { target_link_uri: "http://tool.url/login" }
     )
-    key
+    dk = reg.developer_key
+    dk.generate_rsa_keypair!(overwrite: true)
+    dk.public_jwk_url = nil
+    dk.save!
+    reg
   end
+  let(:developer_key) { registration.developer_key }
   let(:public_jwk) { JSON::JWK.new(developer_key.public_jwk) }
   let(:private_jwk) { JSON::JWK.new(developer_key.private_jwk) }
   let(:replace_editor_contents) { nil }
+  let(:module_name) { nil }
 end

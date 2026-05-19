@@ -38,7 +38,7 @@ require "authlogic/crypto_providers/bcrypt"
 # http://fishbowl.pastiche.org/2004/01/19/persistent_login_cookie_best_practice/
 #
 # See the PseudonymSession model for the *_cookie methods that use this class.
-class SessionPersistenceToken < ActiveRecord::Base
+class SessionPersistenceToken < ApplicationRecord
   belongs_to :pseudonym
 
   attr_accessor :uncrypted_token

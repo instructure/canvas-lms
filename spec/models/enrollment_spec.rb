@@ -369,13 +369,13 @@ describe Enrollment do
     let(:student) { User.create! }
     let(:teacher) do
       user = User.create!
-      @course.enroll_teacher(user).accept(true)
+      @course.enroll_teacher(user).accept(force: true)
       user
     end
 
     before do
       original_enrollment = @course.enroll_student(student)
-      original_enrollment.accept(true)
+      original_enrollment.accept(force: true)
       assignment.grade_student(student, grade: "10", grader: teacher)
       original_enrollment.destroy!
     end
@@ -1282,7 +1282,7 @@ describe Enrollment do
     @enrollment.type = "ObserverEnrollment"
     @enrollment.user_id = observed.id
     @enrollment.associated_user_id = observed.id
-    expect(@enrollment).to_not be_valid
+    expect(@enrollment).not_to be_valid
   end
 
   it "does not allow an enrollment to be created in a template course" do
@@ -1486,7 +1486,7 @@ describe Enrollment do
       user_with_pseudonym
       e = @course.enroll_student(@user)
       expect(e).to be_inactive
-      expect(e.messages_sent).to_not include("Enrollment Registration")
+      expect(e.messages_sent).not_to include("Enrollment Registration")
 
       Timecop.freeze(2.days.from_now) do
         expect(e).to be_invited
@@ -1511,7 +1511,7 @@ describe Enrollment do
       @course.enroll_student(student)
       student.reload
       observer.reload
-      expect(student.messages).to_not be_empty
+      expect(student.messages).not_to be_empty
       expect(observer.messages).to be_empty
     end
 
@@ -1712,7 +1712,7 @@ describe Enrollment do
         end
       end
 
-      def course_section_availability_test(should_be_invited = false)
+      def course_section_availability_test(should_be_invited: false)
         @section = @course.course_sections.first
         expect(@section).not_to be_nil
         @enrollment.course_section = @section
@@ -1947,7 +1947,7 @@ describe Enrollment do
         end
 
         it "accepts into the right state based on availability dates on course_section" do
-          course_section_availability_test(true)
+          course_section_availability_test(should_be_invited: true)
         end
 
         it "accepts into the right state based on availability dates on course" do
@@ -3327,6 +3327,79 @@ describe Enrollment do
       expect(@recipient_temp_enrollment.temporary_enrollment?).to be_truthy
       expect(@recipient2_temp_enrollment.temporary_enrollment?).to be_falsey
     end
+
+    describe ".excluding_pending_temporary_enrollments" do
+      it "includes non-temporary enrollments" do
+        student = user_factory(active_all: true)
+        enrollment = @course1.enroll_student(student, enrollment_state: "active")
+
+        expect(Enrollment.excluding_pending_temporary_enrollments).to include(enrollment)
+      end
+
+      it "includes temporary enrollments that have started" do
+        @recipient_temp_enrollment.update!(start_at: 1.day.ago, end_at: 1.week.from_now)
+
+        expect(@recipient_temp_enrollment.enrollment_state.state).to eq("active")
+        expect(Enrollment.excluding_pending_temporary_enrollments).to include(@recipient_temp_enrollment)
+      end
+
+      it "excludes temporary enrollments that have not started yet" do
+        @recipient_temp_enrollment.update!(start_at: 1.day.from_now, end_at: 1.week.from_now)
+
+        # Admin enrollments get 'inactive' when future (not view_restrictable?)
+        expect(@recipient_temp_enrollment.enrollment_state.state).to eq("inactive")
+        expect(Enrollment.excluding_pending_temporary_enrollments).not_to include(@recipient_temp_enrollment)
+      end
+
+      it "includes temporary enrollments with no date restrictions" do
+        expect(Enrollment.excluding_pending_temporary_enrollments).to include(@recipient_temp_enrollment)
+      end
+    end
+
+    describe "#temporary_enrollment_display_state" do
+      it "returns nil for non-temporary enrollments" do
+        student = user_factory(active_all: true)
+        enrollment = @course1.enroll_student(student, enrollment_state: "active")
+        expect(enrollment.temporary_enrollment_display_state).to be_nil
+      end
+
+      it "returns 'active' for current temporary enrollments" do
+        expect(@recipient_temp_enrollment.temporary_enrollment_display_state).to eq("active")
+      end
+
+      it "returns 'future' for future temporary enrollments" do
+        @recipient_temp_enrollment.update!(start_at: 1.day.from_now, end_at: 1.week.from_now)
+        expect(@recipient_temp_enrollment.temporary_enrollment_display_state).to eq("future")
+      end
+
+      it "returns 'completed' for completed temporary enrollments" do
+        @recipient_temp_enrollment.enrollment_state.update!(state: "completed", state_is_current: true)
+        expect(@recipient_temp_enrollment.temporary_enrollment_display_state).to eq("completed")
+      end
+
+      it "returns 'inactive' for deactivated temporary enrollments" do
+        @recipient_temp_enrollment.enrollment_state.update!(state: "inactive", state_is_current: true, state_valid_until: nil)
+        expect(@recipient_temp_enrollment.temporary_enrollment_display_state).to eq("inactive")
+      end
+
+      it "returns 'future' for future student temporary enrollments" do
+        student = user_factory(active_all: true)
+        pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default, created_by: account_admin_user)
+        enrollment = @course1.enroll_user(
+          student,
+          "StudentEnrollment",
+          {
+            role: student_role,
+            temporary_enrollment_source_user_id: @source_user.id,
+            temporary_enrollment_pairing_id: pairing.id
+          }
+        )
+        enrollment.update!(start_at: 1.day.from_now, end_at: 1.week.from_now)
+        # Student enrollments (view_restrictable?) get pending_active when future
+        expect(enrollment.enrollment_state.state).to eq("pending_active")
+        expect(enrollment.temporary_enrollment_display_state).to eq("future")
+      end
+    end
   end
 
   describe "#can_be_deleted_by" do
@@ -3992,6 +4065,51 @@ describe Enrollment do
         @enrollment1.deactivate
         expect(other_course_rule.reload.workflow_state).to eq "active"
       end
+    end
+  end
+
+  describe "#add_to_favorites" do
+    let(:user) { user_model }
+    let(:old_course) { course_factory(active_all: true) }
+    let(:new_course) { course_factory(active_all: true) }
+    let(:new_enrollment) { new_course.enroll_student(user, enrollment_state: "active") }
+    let(:old_enrollment) do
+      enrollment = old_course.enroll_student(user, enrollment_state: "active")
+      user.favorites.create!(context: old_course)
+      enrollment
+    end
+
+    it "does not auto-favorite the new course when the user's favorited course enrollment is deleted" do
+      old_enrollment.destroy
+
+      new_enrollment.add_to_favorites
+      expect(user.favorites.where(context: new_course)).not_to exist
+    end
+
+    it "does not auto-favorite the new course when the user's favorited course enrollment is concluded" do
+      old_enrollment.conclude
+
+      new_enrollment.add_to_favorites
+      expect(user.favorites.where(context: new_course)).not_to exist
+    end
+
+    it "does not auto-favorite the new course when the user's favorited course enrollment is inactive" do
+      old_enrollment.deactivate
+
+      new_enrollment.add_to_favorites
+      expect(user.favorites.where(context: new_course)).not_to exist
+    end
+
+    it "auto-favorites the new course when the user has a current enrollment in a favorited course" do
+      old_enrollment
+
+      new_enrollment.add_to_favorites
+      expect(user.favorites.where(context: new_course)).to exist
+    end
+
+    it "does not auto-favorite the new course when the user has never favorited a course" do
+      new_enrollment.add_to_favorites
+      expect(user.favorites.where(context: new_course)).not_to exist
     end
   end
 

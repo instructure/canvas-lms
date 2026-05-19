@@ -35,7 +35,7 @@ shared_examples_for "Takeable Quiz Services" do
   it "accepts a valid access code" do
     participant.access_code = quiz.access_code = "adooken"
 
-    expect { service_action.call }.to_not raise_error
+    expect { service_action.call }.not_to raise_error
   end
 
   it "validates the IP address of the participant" do
@@ -48,7 +48,7 @@ shared_examples_for "Takeable Quiz Services" do
   it "accepts a covered IP" do
     participant.ip_address = quiz.ip_filter = "10.0.0.1"
 
-    expect { service_action.call }.to_not raise_error
+    expect { service_action.call }.not_to raise_error
   end
 end
 
@@ -83,7 +83,7 @@ describe Quizzes::QuizSubmissionService do
       it_behaves_like "Takeable Quiz Services"
 
       it "creates a QS" do
-        expect { subject.create quiz }.to_not raise_error
+        expect { subject.create quiz }.not_to raise_error
       end
 
       context "retrying a quiz" do
@@ -104,7 +104,7 @@ describe Quizzes::QuizSubmissionService do
 
           expect do
             subject.create quiz
-          end.to_not raise_error
+          end.not_to raise_error
         end
 
         it "does not regenerate if the QS is not retriable" do
@@ -147,7 +147,7 @@ describe Quizzes::QuizSubmissionService do
         allow(quiz).to receive(:grants_right?).and_return true
         quiz.context.is_public = true
 
-        expect { subject.create quiz }.to_not raise_error
+        expect { subject.create quiz }.not_to raise_error
       end
 
       it "denies access otherwise" do
@@ -160,7 +160,7 @@ describe Quizzes::QuizSubmissionService do
 
   describe "#create_preview" do
     it "utilizes the user code instead of the user" do
-      expect(quiz).to receive(:generate_submission).with(participant.user_code, true)
+      expect(quiz).to receive(:generate_submission).with(participant.user_code, preview: true)
       allow(quiz).to receive(:grants_right?).and_return true
 
       subject.create_preview quiz, nil
@@ -189,7 +189,7 @@ describe Quizzes::QuizSubmissionService do
       it "completes the QS" do
         expect do
           subject.complete qs, qs.attempt
-        end.to_not raise_error
+        end.not_to raise_error
       end
 
       it "rejects an invalid attempt" do
@@ -247,7 +247,7 @@ describe Quizzes::QuizSubmissionService do
       it "updates a question" do
         expect do
           subject.update_question({ question_5_marked: true }, qs, qs.attempt)
-        end.to_not raise_error
+        end.not_to raise_error
       end
 
       it "rejects when the QS is complete" do
@@ -301,7 +301,7 @@ describe Quizzes::QuizSubmissionService do
           subject.update_scores qs, qs.attempt, {
             fudge_points: 2
           }
-        end.to_not raise_error
+        end.not_to raise_error
       end
 
       it 'generates the correct "legacy" format' do

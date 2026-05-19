@@ -62,8 +62,6 @@
 #
 class ScopesApiController < ApplicationController
   before_action :require_context
-  before_action :require_user
-
   # @API List scopes
   # A list of scopes that can be applied to developer keys and access tokens.
   #

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 describe CommentBankItem do
   let(:course) { course_model }
   let(:user) { user_model }
@@ -73,6 +71,14 @@ describe CommentBankItem do
         user = account_admin_user_with_role_changes(user:, role_changes: { manage_grades: false })
         expect(subject.grants_right?(user, :create)).to be(false)
       end
+    end
+  end
+
+  describe "associations" do
+    it "accepts a PeerReviewSubAssignment as assignment" do
+      peer_review_sub_assignment = peer_review_model(course:)
+      item = CommentBankItem.create!(course:, user:, comment:, assignment: peer_review_sub_assignment)
+      expect(item.assignment).to eql(peer_review_sub_assignment)
     end
   end
 end

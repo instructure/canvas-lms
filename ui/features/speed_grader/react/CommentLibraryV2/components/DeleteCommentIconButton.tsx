@@ -22,7 +22,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {SpeedGraderLegacy_DeleteCommentBankItem} from '../graphql/mutations'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {SpeedGraderLegacy_DeleteCommentBankItemMutation} from '@canvas/graphql/codegen/graphql'
 
 const I18n = createI18nScope('CommentLibrary')

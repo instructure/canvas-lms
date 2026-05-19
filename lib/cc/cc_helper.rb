@@ -91,6 +91,7 @@ module CC
     MODULE_META = "module_meta.xml"
     COURSE_PACES = "course_paces.xml"
     RUBRICS = "rubrics.xml"
+    NAV_MENU_LINKS = "nav_menu_links.xml"
     EXTERNAL_TOOLS = "external_tools.xml"
     FILES_META = "files_meta.xml"
     SYLLABUS = "syllabus.html"
@@ -291,9 +292,7 @@ module CC
           # WikiPagesController allows loosely-matching URLs; fix them before exporting
           if match.obj_id.present?
             url_or_title = match.obj_id
-            lookup = if Account.site_admin.feature_enabled?(:permanent_page_links)
-                       @course.wiki_page_lookups.where(slug: url_or_title.to_url).first
-                     end
+            lookup = find_wiki_page_lookup(url_or_title)
             page = if lookup
                      @course.wiki_pages.deleted_last.where(id: lookup.wiki_page_id).first
                    else
@@ -341,6 +340,17 @@ module CC
         port = ConfigFile.load("domain").try(:[], :domain).try(:split, ":").try(:[], 1)
         @url_prefix = "#{protocol}://#{host}"
         @url_prefix += ":#{port}" if !host&.include?(":") && port.present?
+      end
+
+      def decode_url_slug(url_slug)
+        Rack::Utils.unescape_path(url_slug).to_url
+      end
+
+      def find_wiki_page_lookup(url_or_title)
+        return nil unless Account.site_admin.feature_enabled?(:permanent_page_links)
+
+        @course.wiki_page_lookups.where(slug: url_or_title.to_url).first ||
+          @course.wiki_page_lookups.where(slug: decode_url_slug(url_or_title)).first
       end
 
       def translate_module_item_query(query)
@@ -399,6 +409,10 @@ module CC
         attachment.export_id = @key_generator.create_key(attachment)
         referenced_files[attachment.id] = attachment unless referenced_files[attachment.id]
         File.join(WEB_CONTENT_TOKEN, info[:path])
+      end
+
+      def translate_url(url)
+        @disable_content_rewriting ? url : @rewriter.translate_url(url)
       end
 
       def html_content(html)

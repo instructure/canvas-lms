@@ -17,15 +17,36 @@
  */
 
 import $ from 'jquery'
+import {forwardedMsgSource} from '../forwarded_msg_source'
 import type {LtiMessageHandler} from '../lti_message_handler'
 
-const scrollToTop: LtiMessageHandler = () => {
-  $('html,body').animate(
-    {
-      scrollTop: $('.tool_content_wrapper').offset()?.top,
-    },
-    'fast',
-  )
+const findIframeBySource = (e: MessageEvent<unknown>) => {
+  const source = forwardedMsgSource(e) ?? e.source
+  return Array.from(document.querySelectorAll('iframe')).find(f => f.contentWindow === source)
+}
+
+const scrollToTop: LtiMessageHandler = params => {
+  // When top_navigation_placement FF is on, the page is wrapped in an
+  // InstUI DrawerLayout, so html/body can no longer scroll. The actual
+  // scroll container becomes #drawer-layout-content in that case.
+  const drawerContent = $('#drawer-layout-content')
+  const isTopNavEnabled = ENV.FEATURES?.top_navigation_placement && drawerContent.length
+  const targetToScroll = isTopNavEnabled ? drawerContent : $('html, body')
+
+  let toolWrapper = $('.tool_content_wrapper')
+  if (!toolWrapper.length) {
+    // Fall back to finding the iframe by event source,
+    // e.g. for RCE content embedded tool iframes, there is no .tool_content_wrapper
+    toolWrapper = $(findIframeBySource(params.event) ?? [])
+  }
+  const offset = toolWrapper.offset()?.top
+  if (offset !== undefined) {
+    // For a sub-container (drawer), offset().top is viewport-relative (since window.scrollY=0),
+    // so we must add the container's current scrollTop to get the correct absolute position within it.
+    const scrollTop = offset + (isTopNavEnabled ? (drawerContent.scrollTop() ?? 0) : 0)
+    targetToScroll.animate({scrollTop}, 'fast')
+  }
+
   return false
 }
 

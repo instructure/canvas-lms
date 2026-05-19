@@ -132,7 +132,23 @@ class FilesController < ApplicationController
   # an Account in show_relative
   protect_from_forgery except: [:api_capture, :show_relative], with: :exception
 
-  before_action :require_user, only: :create_pending
+  skip_before_action :require_user, only: %i[api_capture
+                                             api_create
+                                             api_create_success
+                                             api_create_success_cors
+                                             api_index
+                                             api_show
+                                             file_ref
+                                             icon_metadata
+                                             image_thumbnail
+                                             images
+                                             index
+                                             public_url
+                                             react_files
+                                             show
+                                             show_relative
+                                             show_thumbnail
+                                             update_word_count]
   before_action :require_context, except: %i[
     image_thumbnail
     show_thumbnail
@@ -634,6 +650,18 @@ class FilesController < ApplicationController
     end
   end
 
+  # @API Download file
+  # Downloads the file
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/files/<file_id>/download' \
+  #         -H 'Authorization: Bearer <token>'
+  #
+  #   curl 'https://<canvas>/courses/<course_id>/files/<file_id>/download' \
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @returns File
   def show
     # Ensure these links are not indexed by search engines
     response.headers["X-Robots-Tag"] = "noindex, nofollow" unless @allow_robot_indexing
@@ -749,6 +777,16 @@ class FilesController < ApplicationController
           attachment.context_module_action(@current_user, :read)
         end
         format.html do
+          if @context.is_a?(Course) && @context.feature_enabled?(:study_assist) && @context.user_is_student?(@current_user)
+            @show_study_assist = true
+            js_env[:FEATURES][:study_assist] = true
+            js_env({
+                     COURSE_ID: @context.id.to_s,
+                     FILE_ID: attachment.id.to_s,
+                     STUDY_ASSIST_TOOLS: study_assist_enabled_tools
+                   })
+            js_bundle :study_assist
+          end
           if attachment.locked_for?(@current_user, check_policies: true)
             render :show, status: :forbidden
           elsif attachment.inline_content? && !attachment.canvadocable? && safer_domain_available? && !params[:fd_cookie_set]
@@ -816,38 +854,40 @@ class FilesController < ApplicationController
   protected :render_attachment
 
   def show_relative
-    require_context(user_scope: merged_user_scope)
+    GuardRail.activate(:secondary) do
+      require_context(user_scope: merged_user_scope)
 
-    path = params[:file_path]
-    file_id = params[:file_id]
-    file_id = nil unless Api::ID_REGEX.match?(file_id.to_s)
+      path = params[:file_path]
+      file_id = params[:file_id]
+      file_id = nil unless Api::ID_REGEX.match?(file_id.to_s)
 
-    # Manually-invoke verify_authenticity_token for non-Account contexts
-    # This is to allow Account-level file downloads to skip request forgery protection
-    verify_authenticity_token unless @context.is_a?(Account)
+      # Manually-invoke verify_authenticity_token for non-Account contexts
+      # This is to allow Account-level file downloads to skip request forgery protection
+      verify_authenticity_token unless @context.is_a?(Account)
 
-    # if the relative path matches the given file id use that file
-    if file_id && (@attachment = @context.attachments.where(id: file_id).first) &&
-       !(@attachment.matches_full_display_path?(path) || @attachment.matches_full_path?(path))
-      @attachment = nil
+      # if the relative path matches the given file id use that file
+      if file_id && (@attachment = @context.attachments.where(id: file_id).first) &&
+         !(@attachment.matches_full_display_path?(path) || @attachment.matches_full_path?(path))
+        @attachment = nil
+      end
+
+      @attachment ||= Folder.find_attachment_in_context_with_path(@context, path)
+
+      unless @attachment
+        # if the file doesn't exist, don't leak its existence (and the context's name) to an unauthenticated user
+        # (note that it is possible to have access to the file without :read on the context, e.g. with submissions)
+        return unless authorized_action(@context, @current_user, :read)
+
+        @include_js_env = true
+        return render "shared/errors/file_not_found",
+                      status: :bad_request,
+                      formats: [:html]
+      end
+
+      params[:id] = @attachment.id
+
+      params[:download] = "1"
     end
-
-    @attachment ||= Folder.find_attachment_in_context_with_path(@context, path)
-
-    unless @attachment
-      # if the file doesn't exist, don't leak its existence (and the context's name) to an unauthenticated user
-      # (note that it is possible to have access to the file without :read on the context, e.g. with submissions)
-      return unless authorized_action(@context, @current_user, :read)
-
-      @include_js_env = true
-      return render "shared/errors/file_not_found",
-                    status: :bad_request,
-                    formats: [:html]
-    end
-
-    params[:id] = @attachment.id
-
-    params[:download] = "1"
     show
   end
 
@@ -868,12 +908,12 @@ class FilesController < ApplicationController
         redirect_to(named_context_url(@context, :context_file_url, attachment.id))
       end
     else
-      send_stored_file(attachment, false)
+      send_stored_file(attachment, inline: false)
     end
   end
   protected :send_attachment
 
-  def send_stored_file(attachment, inline = true)
+  def send_stored_file(attachment, inline: true)
     user = file_access_user
     attachment.context_module_action(user, :read) if user && !params[:preview]
 
@@ -1515,6 +1555,11 @@ class FilesController < ApplicationController
 
   # @API Reset link verifier
   #
+  # @deprecated_method NOTICE 2026-04-08 EFFECTIVE 2026-07-07
+  #   The UUID-based verification method for file access is being deprecated.
+  #   This endpoint will no longer be available as UUID verification for file
+  #   access is being phased out.
+  #
   # Resets the link verifier. Any existing links to the file using
   # the previous hard-coded "verifier" parameter will no longer
   # automatically grant access.
@@ -1714,6 +1759,7 @@ class FilesController < ApplicationController
       attachment = thumbnail.attachment
       root_account = attachment&.root_account
       old_auth = params[:uuid].present? && params[:uuid] == thumbnail.uuid && root_account.present? && !root_account.feature_enabled?(:disable_file_verifier_access)
+
       return unless old_auth || access_allowed(attachment:, user: @current_user, access_type: :download)
 
       safe_send_file thumbnail.full_filename, content_type: thumbnail.content_type

@@ -20,7 +20,7 @@ import CollectionView from '@canvas/backbone-collection-view'
 import SectionView from './SectionView'
 import OutcomeDetailModal from '../../react/OutcomeDetailModal'
 import {render, rerender} from '@canvas/react'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 
 export default class OutcomeSummaryView extends CollectionView {

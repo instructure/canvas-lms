@@ -21,7 +21,7 @@ import OverTimeModal from '../OverTimeModal'
 import userEvent from '@testing-library/user-event'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 
 // Mock the OverTimeGraph component from its separate file

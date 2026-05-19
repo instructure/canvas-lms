@@ -35,7 +35,7 @@ import '@canvas/jquery/jquery.disableWhileLoading'
 import RosterDialogMixin from './RosterDialogMixin'
 import UserTaggedModal from '@canvas/differentiation-tags/react/UserTaggedModal/UserTaggedModal'
 import MessageBus from '@canvas/util/MessageBus'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {createSectionEnrollments, deleteExistingSectionEnrollments} from '../../react/api'
 
 const I18n = createI18nScope('RosterUserView')
@@ -121,6 +121,12 @@ export default class RosterUserView extends View {
     json.isStudent = this.model.hasEnrollmentType('StudentEnrollment')
     json.isPending = this.model.pending(this.model.currentRole)
     json.isInactive = this.model.inactive()
+    const tempBadge = this.model.temporaryEnrollmentBadge()
+    json.temporaryEnrollmentLabel = tempBadge.label
+    json.temporaryEnrollmentLabelClass = tempBadge.labelClass
+    if (json.temporaryEnrollmentLabel) {
+      json.isInactive = false
+    }
     if (!json.isInactive) {
       json.enrollments = reject(json.enrollments, en => en.enrollment_state === 'inactive') // if not _completely_ inactive, treat the inactive enrollments as deleted
     }

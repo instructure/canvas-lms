@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
 require "webmock"
 require "tempfile"
 require "legacy_multipart"
@@ -376,6 +375,56 @@ describe "CanvasHttp" do
       expect(CanvasHttp).to receive(:insecure_host?).with("127.0.0.1").and_return(true)
       expect { CanvasHttp.validate_url("http://127.0.0.1/嘊", check_host: true) }.to raise_error(CanvasHttp::InsecureUriError)
       expect { CanvasHttp.validate_url("http://example.com/whät", allowed_schemes: ["https"]) }.to raise_error(ArgumentError)
+    end
+
+    describe "nav_menu_link URL fixtures" do
+      # Shared with JS spec — see spec/fixtures/url_validation/nav_menu_link_cases.json
+      let(:cases) do
+        fixture_path = File.expand_path("../../../spec/fixtures/url_validation/nav_menu_link_cases.json", __dir__)
+        JSON.parse(File.read(fixture_path))
+      end
+
+      it "rejects all invalid URLs" do
+        aggregate_failures do
+          cases["invalid"].each do |url|
+            result = begin
+              CanvasHttp.validate_url(url, allowed_schemes: %w[http https])
+              :accepted
+            rescue CanvasHttp::Error, URI::Error, ArgumentError
+              :rejected
+            end
+            expect(result).to eq(:rejected), "expected #{url.inspect} to be invalid"
+          end
+        end
+      end
+
+      it "accepts all valid URLs" do
+        aggregate_failures do
+          cases["valid"].each do |url|
+            result = begin
+              CanvasHttp.validate_url(url, allowed_schemes: %w[http https])
+              :accepted
+            rescue CanvasHttp::Error, URI::Error, ArgumentError
+              :rejected
+            end
+            expect(result).to eq(:accepted), "expected #{url.inspect} to be valid"
+          end
+        end
+      end
+
+      it "accepts the normalized form of all normalizable URLs" do
+        aggregate_failures do
+          cases["normalizable"].each_value do |normalized|
+            result = begin
+              CanvasHttp.validate_url(normalized, allowed_schemes: %w[http https])
+              :accepted
+            rescue CanvasHttp::Error, URI::Error, ArgumentError
+              :rejected
+            end
+            expect(result).to eq(:accepted), "expected normalized #{normalized.inspect} to be valid"
+          end
+        end
+      end
     end
   end
 

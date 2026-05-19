@@ -91,7 +91,7 @@ describe MediaObject do
 
   describe ".ensure_attachment_media_info" do
     it "fixes associated attachments in a weird state" do
-      file_data = fixture_file_upload("292.mp3", "audio/mpeg", true)
+      file_data = fixture_file_upload("292.mp3", "audio/mpeg", binary: true)
       a1 = attachment_model(context: @course, uploaded_data: file_data, media_entry_id: "m-unicorns")
       client = instance_double(CanvasKaltura::ClientV3)
       expect(CanvasKaltura::ClientV3).to receive_messages(new: client)
@@ -665,6 +665,36 @@ describe MediaObject do
           auto_caption_status: "failed_captions"
         )
       end.not_to raise_error
+    end
+  end
+
+  describe "viewer_restrictions validation" do
+    it "is valid with an empty hash" do
+      mo = MediaObject.new(media_id: "x", workflow_state: "active", viewer_restrictions: {})
+      expect(mo).to be_valid
+    end
+
+    it "is valid with only known keys" do
+      mo = MediaObject.new(media_id: "x",
+                           workflow_state: "active",
+                           viewer_restrictions: { "show_rolling_transcript" => true })
+      expect(mo).to be_valid
+    end
+
+    it "is invalid with unknown keys" do
+      mo = MediaObject.new(media_id: "x",
+                           workflow_state: "active",
+                           viewer_restrictions: { "unknown_key" => true })
+      expect(mo).not_to be_valid
+      expect(mo.errors[:viewer_restrictions]).to be_present
+    end
+
+    it "is invalid with non-boolean values" do
+      mo = MediaObject.new(media_id: "x",
+                           workflow_state: "active",
+                           viewer_restrictions: { "show_rolling_transcript" => "yoho" })
+      expect(mo).not_to be_valid
+      expect(mo.errors[:viewer_restrictions]).to be_present
     end
   end
 end

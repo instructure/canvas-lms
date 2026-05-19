@@ -137,7 +137,7 @@ const roles = handleActions(
 
 const selectedRolesReducer = handleActions(
   {
-    [actionTypes.UPDATE_SELECTED_ROLES]: (state, action) => action.payload,
+    [actionTypes.UPDATE_SELECTED_ROLES]: (_state, action) => action.payload,
     [actionTypes.FILTER_NEW_ROLE]: (state, action) => {
       if (allRolesSelected(state)) return state
       const newState = state.slice()
@@ -159,6 +159,7 @@ export default combineReducers({
   activeAddTray: activeAddTrayReducer,
   activePermissionTray: activePermissionTrayReducer,
   contextId: (state, _action) => state || '',
+  isSiteAdmin: (state, _action) => state || false,
   nextFocus: setFocusReducer,
   permissions,
   permissionGroups: (state, _action) => state || {},

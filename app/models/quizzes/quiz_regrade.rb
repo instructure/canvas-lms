@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Quizzes::QuizRegrade < ActiveRecord::Base
+class Quizzes::QuizRegrade < ApplicationRecord
   self.table_name = "quiz_regrades"
 
   belongs_to :quiz, class_name: "Quizzes::Quiz"

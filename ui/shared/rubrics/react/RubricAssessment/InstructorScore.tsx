@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {colors} from '@instructure/canvas-theme'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {possibleString} from '../Points'
+import {TruncateText} from '@instructure/ui-truncate-text'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('rubrics-assessment')
 
@@ -36,6 +38,9 @@ export const InstructorScore = ({
   isPeerReview,
   isPreviewMode,
 }: InstructorScoreProps) => {
+  const scoreLabel = isPeerReview ? I18n.t('Peer Review Score') : I18n.t('Instructor Score')
+  const [isScoreLabelTruncated, setIsScoreLabelTruncated] = useState(false)
+
   return (
     <Flex as="div" height="3rem" alignItems="center">
       <Flex.Item as="div" width="13.813rem" align="center">
@@ -48,10 +53,19 @@ export const InstructorScore = ({
             borderRadius: '.35rem 0 0 .35rem',
           }}
         >
-          <View as="span" margin="0 0 0 small">
-            <Text size="medium" weight="bold">
-              {isPeerReview ? I18n.t('Peer Review Score') : I18n.t('Instructor Score')}
-            </Text>
+          <View as="div" margin={isScoreLabelTruncated ? '0 small' : '0 0 0 small'}>
+            <Tooltip on={isScoreLabelTruncated ? ['hover'] : []} renderTip={scoreLabel}>
+              <Text size="medium" weight="bold">
+                <TruncateText
+                  onUpdate={isScoreLabelTruncated =>
+                    setIsScoreLabelTruncated(isScoreLabelTruncated)
+                  }
+                  position="middle"
+                >
+                  {scoreLabel}
+                </TruncateText>
+              </Text>
+            </Tooltip>
           </View>
         </div>
       </Flex.Item>

@@ -72,6 +72,7 @@ export const TraditionalViewCriterionPoints: FC<TraditionalViewCriterionPointsPr
                     <ScreenReaderContent>{I18n.t('Criterion Score')}</ScreenReaderContent>
                   }
                   readOnly={isPreviewMode}
+                  data-criterion-score-id={criterion.id}
                   data-testid={`criterion-score-${criterion.id}`}
                   placeholder="--"
                   width="3.375rem"

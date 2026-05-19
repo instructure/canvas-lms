@@ -27,7 +27,7 @@ import NotificationAlert, {AccountNotificationData} from './NotificationAlert'
 import EnrollmentInvitation, {EnrollmentInvitationData} from './EnrollmentInvitation'
 import {DASHBOARD_NOTIFICATIONS_KEY} from '../constants'
 import {widgetDashboardPersister} from '../utils/persister'
-import {useBroadcastQuery} from '@canvas/query/broadcast'
+import {useBroadcastQuery} from '@instructure/platform-query/broadcast'
 
 interface DashboardNotificationsResponse {
   accountNotifications?: AccountNotificationData[]

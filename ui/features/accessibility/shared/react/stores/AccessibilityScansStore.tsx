@@ -67,6 +67,7 @@ export type AccessibilityScansState = {
   additionalResourcesEnabled?: boolean
   isCloseIssuesEnabled?: boolean
   isGA2FeaturesEnabled?: boolean
+  isAutomaticScanEnabled?: boolean
   selectedScan: AccessibilityResourceScan | null
   selectedIssue: AccessibilityIssue | null
   selectedIssueIndex: number
@@ -121,6 +122,7 @@ export const initialState: AccessibilityScansState = {
     window.ENV.FEATURES?.a11y_checker_ai_table_caption_generation || false,
   isCloseIssuesEnabled: window.ENV.FEATURES?.a11y_checker_close_issues || false,
   isGA2FeaturesEnabled: window.ENV.FEATURES?.a11y_checker_ga2_features || false,
+  isAutomaticScanEnabled: window.ENV.FEATURES?.accessibility_automatic_scanning || false,
   selectedScan: null,
   isTrayOpen: false,
   selectedIssueIndex: 0,

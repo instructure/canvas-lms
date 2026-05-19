@@ -35,7 +35,7 @@ describe Polling::PollChoicesController, type: :request do
       @poll.poll_choices.create!(text: "Poll Choice 5", is_correct: false, position: 5)
     end
 
-    def get_index(raw = false, data = {}, headers = {})
+    def get_index(data = {}, headers = {}, raw: false)
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_choices",
@@ -67,7 +67,7 @@ describe Polling::PollChoicesController, type: :request do
     end
 
     it "paginates to the jsonapi standard if requested" do
-      json = get_index(false, {}, "Accept" => "application/vnd.api+json")
+      json = get_index({}, { "Accept" => "application/vnd.api+json" })
       poll_choices_json = json["poll_choices"]
       expect(poll_choices_json.size).to eq 5
 
@@ -86,7 +86,7 @@ describe Polling::PollChoicesController, type: :request do
       end
 
       it "is forbidden if there are no open sessions" do
-        get_index(true)
+        get_index(raw: true)
         expect(response).to have_http_status :forbidden
       end
 
@@ -110,7 +110,7 @@ describe Polling::PollChoicesController, type: :request do
       @poll_choice = @poll.poll_choices.create!(text: "A Poll Choice", is_correct: true)
     end
 
-    def get_show(raw = false, data = {})
+    def get_show(data = {}, raw: false)
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_choices/#{@poll_choice.id}",
@@ -136,13 +136,13 @@ describe Polling::PollChoicesController, type: :request do
       end
 
       it "is forbidden if there are no existing sessions" do
-        get_show(true)
+        get_show(raw: true)
         expect(response).to have_http_status :forbidden
       end
 
       it "is authorized if there are existing sessions" do
         Polling::PollSession.create!(course: @course, poll: @poll)
-        get_show(true)
+        get_show(raw: true)
         expect(response).to have_http_status :ok
       end
 
@@ -178,7 +178,7 @@ describe Polling::PollChoicesController, type: :request do
       @poll = @teacher.polls.create!(question: "An Example Poll")
     end
 
-    def post_create(params, raw = false)
+    def post_create(params, raw: false)
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:post,
                   "/api/v1/polls/#{@poll.id}/poll_choices",
@@ -193,13 +193,13 @@ describe Polling::PollChoicesController, type: :request do
 
     context "as a teacher" do
       it "creates a poll choice successfully" do
-        post_create(text: "Poll Choice 1", is_correct: false, position: 1)
+        post_create({ text: "Poll Choice 1", is_correct: false, position: 1 })
         expect(@poll.poll_choices.first.text).to eq "Poll Choice 1"
         expect(@poll.poll_choices.first.position).to eq 1
       end
 
       it "sets is_correct to false if is_correct is provided but blank" do
-        post_create(text: "is correct poll choice", is_correct: "", position: 1)
+        post_create({ text: "is correct poll choice", is_correct: "", position: 1 })
         expect(@poll.poll_choices.first.text).to eq "is correct poll choice"
         expect(@poll.poll_choices.first.is_correct).to be_falsey
       end
@@ -208,7 +208,7 @@ describe Polling::PollChoicesController, type: :request do
     context "as a student" do
       it "is forbidden" do
         student_in_course(active_all: true, course: @course)
-        post_create({ text: "Poll Choice 1" }, true)
+        post_create({ text: "Poll Choice 1" }, raw: true)
         expect(response).to have_http_status :forbidden
       end
     end
@@ -220,7 +220,7 @@ describe Polling::PollChoicesController, type: :request do
       @poll_choice = @poll.poll_choices.create!(text: "Old Poll Choice", is_correct: true)
     end
 
-    def put_update(params, raw = false)
+    def put_update(params, raw: false)
       helper = method(raw ? :raw_api_call : :api_call)
 
       helper.call(:put,
@@ -237,14 +237,14 @@ describe Polling::PollChoicesController, type: :request do
 
     context "as a teacher" do
       it "updates a poll choice successfully" do
-        put_update(text: "New Poll Choice Text")
+        put_update({ text: "New Poll Choice Text" })
         expect(@poll_choice.reload.text).to eq "New Poll Choice Text"
       end
 
       it "sets is_correct to the poll choice's original value if is_correct is provided but blank" do
         original = @poll_choice.is_correct
 
-        put_update(is_correct: "")
+        put_update({ is_correct: "" })
         @poll_choice.reload
         expect(@poll_choice.is_correct).to eq original
       end
@@ -253,7 +253,7 @@ describe Polling::PollChoicesController, type: :request do
     context "as a student" do
       it "is forbidden" do
         student_in_course(active_all: true, course: @course)
-        put_update({ text: "New Text" }, true)
+        put_update({ text: "New Text" }, raw: true)
         expect(response).to have_http_status :forbidden
       end
     end

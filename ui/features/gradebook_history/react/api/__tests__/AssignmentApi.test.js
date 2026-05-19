@@ -39,6 +39,7 @@ describe('AssignmentApi', () => {
     const params = {
       params: {
         search_term: searchTerm,
+        per_page: 10,
       },
     }
 
@@ -46,6 +47,17 @@ describe('AssignmentApi', () => {
 
     expect(getStub).toHaveBeenCalledTimes(1)
     expect(getStub).toHaveBeenCalledWith(url, params)
+  })
+
+  test('getAssignmentsByName makes a request with a single-character search term', async () => {
+    await AssignmentApi.getAssignmentsByName(courseId, 'A')
+    expect(getStub).toHaveBeenCalledTimes(1)
+  })
+
+  test('getAssignmentsByName returns empty results for an empty search term', async () => {
+    const result = await AssignmentApi.getAssignmentsByName(courseId, '')
+    expect(result).toEqual({response: {data: []}})
+    expect(getStub).not.toHaveBeenCalled()
   })
 
   test('getAssignmentsNextPage makes a request with given url', async () => {

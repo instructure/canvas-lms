@@ -49,6 +49,7 @@ export default class AddUnassignedMenu extends PopoverMenuView {
     this.collection.setParam('per_page', 10)
 
     if (options.usersView == null) {
+      // @ts-expect-error TS7 migration
       options.usersView = new AddUnassignedUsersView({
         // @ts-expect-error - Backbone View property
         collection: this.collection,

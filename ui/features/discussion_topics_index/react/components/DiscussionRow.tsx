@@ -69,7 +69,7 @@ import {isPassedDelayedPostAt} from '@canvas/datetime/react/date-utils'
 import select from '@canvas/obj-select'
 import UnreadBadge from '@canvas/unread-badge'
 import {assignLocation} from '@canvas/util/globalUtils'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import {flowRight as compose} from 'es-toolkit/compat'
 import moment from 'moment'
 import actions from '../actions'
@@ -152,7 +152,6 @@ class DiscussionRow extends Component {
     updateDiscussion: func.isRequired,
     DIRECT_SHARE_ENABLED: bool.isRequired,
     dateFormatter: func.isRequired,
-    breakpoints: breakpointsShape.isRequired,
   }
 
   static defaultProps = {

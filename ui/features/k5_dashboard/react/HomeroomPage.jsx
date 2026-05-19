@@ -42,6 +42,7 @@ const HomeroomPage = ({
   cards,
   createPermission,
   restrictCourseCreation,
+  viewableAccountIds,
   homeroomAnnouncements,
   loadingAnnouncements,
   visible,
@@ -136,6 +137,7 @@ const HomeroomPage = ({
           permissions={createPermission}
           restrictToMCCAccount={restrictCourseCreation}
           isK5User={true}
+          viewableAccountIds={viewableAccountIds}
         />
       )}
     </section>
@@ -146,6 +148,7 @@ HomeroomPage.propTypes = {
   cards: PropTypes.array,
   createPermission: PropTypes.oneOf(['admin', 'teacher', 'student', 'no_enrollments']),
   restrictCourseCreation: PropTypes.bool.isRequired,
+  viewableAccountIds: PropTypes.arrayOf(PropTypes.string),
   homeroomAnnouncements: PropTypes.array.isRequired,
   loadingAnnouncements: PropTypes.bool.isRequired,
   visible: PropTypes.bool.isRequired,

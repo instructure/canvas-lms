@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo, useCallback, useState, useRef} from 'react'
+import React, {useMemo, useCallback, useState, useRef, useEffect} from 'react'
 import {flushSync} from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
@@ -26,6 +26,8 @@ import type {Widget, WidgetConfig} from '../types'
 import {getWidget} from './WidgetRegistry'
 import {useResponsiveContext} from '../hooks/useResponsiveContext'
 import {useWidgetLayout} from '../hooks/useWidgetLayout'
+import {useWidgetDashboard} from '../hooks/useWidgetDashboardContext'
+import {WIDGET_TYPES} from '../constants'
 import {Flex} from '@instructure/ui-flex'
 import {DragDropContext, Droppable, Draggable, type DropResult} from 'react-beautiful-dnd'
 import AddWidgetModal from './AddWidgetModal/AddWidgetModal'
@@ -57,7 +59,13 @@ interface WidgetGridProps {
 const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => {
   const {matches} = useResponsiveContext()
   const {moveWidgetToPosition} = useWidgetLayout()
-  const widgetsByColumn = useMemo(() => widgetsAsColumns(config.widgets), [config.widgets])
+  const {currentUserRoles} = useWidgetDashboard()
+  const isObserver = currentUserRoles?.includes('observer') ?? false
+  const visibleWidgets = useMemo(
+    () => config.widgets.filter(w => !(isObserver && w.type === WIDGET_TYPES.INBOX)),
+    [config.widgets, isObserver],
+  )
+  const widgetsByColumn = useMemo(() => widgetsAsColumns(visibleWidgets), [visibleWidgets])
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [addPosition, setAddPosition] = useState<{col: number; row: number} | null>(null)
   const lastDraggedWidgetIdRef = useRef<string | null>(null)
@@ -70,7 +78,7 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
       const destCol = parseInt(result.destination.droppableId.replace('column-', ''), 10)
       const destIndex = result.destination.index
 
-      const destColWidgets = config.widgets
+      const destColWidgets = visibleWidgets
         .filter(w => w.position.col === destCol && w.id !== result.draggableId)
         .sort((a, b) => a.position.row - b.position.row)
 
@@ -95,8 +103,38 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
       }
       lastDraggedWidgetIdRef.current = null
     },
-    [moveWidgetToPosition, config.widgets],
+    [moveWidgetToPosition, visibleWidgets],
   )
+
+  // Prevent keyboard access to widget content (links, filters, pagination) during edit mode.
+  // Edit controls (drag handle + remove button) are excluded and remain keyboard-accessible.
+  useEffect(() => {
+    const FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    const EDIT_CONTROLS = '[data-testid$="-drag-handle"], [data-testid$="-remove-button"]'
+    const STORAGE_ATTR = 'data-original-tabindex'
+
+    if (isEditMode) {
+      const widgetColumns = document.querySelector('[data-testid="widget-columns"]')
+      if (!widgetColumns) return
+
+      widgetColumns.querySelectorAll<HTMLElement>(FOCUSABLE).forEach(el => {
+        if (!el.matches(EDIT_CONTROLS) && !el.hasAttribute(STORAGE_ATTR)) {
+          el.setAttribute(STORAGE_ATTR, el.getAttribute('tabindex') ?? '')
+          el.setAttribute('tabindex', '-1')
+        }
+      })
+    } else {
+      document.querySelectorAll<HTMLElement>(`[${STORAGE_ATTR}]`).forEach(el => {
+        const original = el.getAttribute(STORAGE_ATTR)!
+        if (original === '') {
+          el.removeAttribute('tabindex')
+        } else {
+          el.setAttribute('tabindex', original)
+        }
+        el.removeAttribute(STORAGE_ATTR)
+      })
+    }
+  }, [isEditMode, visibleWidgets.length])
 
   const renderWidget = (widget: Widget, dragHandleProps?: any) => {
     const widgetRenderer = getWidget(widget.type)
@@ -108,8 +146,31 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
     }
 
     const WidgetComponent = widgetRenderer.component
+
+    // In edit mode, elevate the drag handle above the interaction-blocking overlay
+    const enhancedDragHandleProps =
+      isEditMode && dragHandleProps
+        ? {...dragHandleProps, style: {position: 'relative' as const, zIndex: 2}}
+        : dragHandleProps
+
+    const widgetElement = (
+      <WidgetComponent
+        {...widgetRenderer.props}
+        widget={widget}
+        isEditMode={isEditMode}
+        dragHandleProps={enhancedDragHandleProps}
+      />
+    )
+
+    if (!isEditMode) return widgetElement
+
+    // Overlay blocks all widget interactions (links, filters, pagination, etc.)
+    // during customization mode. The drag handle sits above the overlay via z-index.
     return (
-      <WidgetComponent widget={widget} isEditMode={isEditMode} dragHandleProps={dragHandleProps} />
+      <div style={{position: 'relative'}}>
+        {widgetElement}
+        <div aria-hidden="true" style={{position: 'absolute', inset: 0, zIndex: 1}} />
+      </div>
     )
   }
 
@@ -365,6 +426,14 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config, isEditMode = false}) => 
 
   return (
     <>
+      {isEditMode && (
+        <style>{`
+          [data-testid="widget-columns"] [data-testid$="-remove-button"] {
+            position: relative !important;
+            z-index: 2 !important;
+          }
+        `}</style>
+      )}
       {gridContent}
       {addPosition && (
         <AddWidgetModal

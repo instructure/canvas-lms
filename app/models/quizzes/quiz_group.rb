@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Quizzes::QuizGroup < ActiveRecord::Base
+class Quizzes::QuizGroup < ApplicationRecord
   extend RootAccountResolver
 
   self.table_name = "quiz_groups"

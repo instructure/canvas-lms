@@ -26,7 +26,7 @@ import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-tinypubsub'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {windowAlert} from '@canvas/util/globalUtils'
 
 // # this is a partial needed by the 'SetDefaultGradeDialog' template
@@ -225,13 +225,12 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
   const mountPoint = document.getElementById(DEFAULT_GRADE_WITH_CHECKPOINTS_MOUNT_POINT)
 
   if (mountPoint) {
-    const root = createRoot(mountPoint)
-    root.render(<CheckpointsGradeInputs assignment={this.assignment} canEdit={true} />)
+    render(<CheckpointsGradeInputs assignment={this.assignment} canEdit={true} />, mountPoint)
   }
 
   const overwriteExitingGrades = document.getElementsByName('overwrite_existing_grades')[0]
   const infoMountPoint = document.getElementById(DEFAULT_GRADE_WITH_CHECKPOINTS_INFO_MOUNT_POINT)
-  const infoRoot = infoMountPoint ? createRoot(infoMountPoint) : null
+  const infoRoot = infoMountPoint ? render(<span />, infoMountPoint) : null
 
   overwriteExitingGrades.addEventListener(
     'change',
@@ -240,7 +239,10 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
         return
       }
 
-      infoRoot.render(overwriteExitingGrades.checked ? <CheckpointsDefaultGradeInfo /> : <span />)
+      rerender(
+        infoRoot,
+        overwriteExitingGrades.checked ? <CheckpointsDefaultGradeInfo /> : <span />,
+      )
     },
     false,
   )

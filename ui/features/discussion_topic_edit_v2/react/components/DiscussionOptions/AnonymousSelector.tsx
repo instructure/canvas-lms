@@ -40,7 +40,11 @@ type Props = {
   setGroupCategoryId: (value: string | null) => void
   shouldShowPartialAnonymousSelector: boolean
   setAnonymousAuthorState: (value: boolean) => void
+  disabled?: boolean
+  lockedTooltip?: boolean
 }
+
+const LOCKED_TOOLTIP_MSG = () => I18n.t('Modifying this option has been disabled by administrators')
 
 export const AnonymousSelector = ({
   discussionAnonymousState,
@@ -51,68 +55,87 @@ export const AnonymousSelector = ({
   setGroupCategoryId,
   shouldShowPartialAnonymousSelector,
   setAnonymousAuthorState,
+  disabled = false,
+  lockedTooltip = false,
 }: Props) => {
+  const isDisabled = isSelectDisabled || disabled
+
+  const radioInputGroup = (
+    /* Title should not be read by screen readers as "dimmed", single inputs are disabled instead */
+    <RadioInputGroup
+      name="anonymous"
+      description={
+        <>
+          <View display="inline-block">
+            <Heading level="h4">{I18n.t('Anonymous Discussion')}</Heading>
+          </View>
+          <Tooltip
+            renderTip={I18n.t('Grading and Groups are not supported in Anonymous Discussions.')}
+            placement="top"
+            on={['hover', 'focus']}
+            color="primary"
+          >
+            <div
+              style={{display: 'inline-block', marginLeft: theme.spacing.xxSmall}}
+              // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+              tabIndex={0}
+            >
+              <IconInfoLine data-testid="groups_grading_not_allowed" />
+              <ScreenReaderContent>
+                {I18n.t('Grading and Groups are not supported in Anonymous Discussions.')}
+              </ScreenReaderContent>
+            </div>
+          </Tooltip>
+        </>
+      }
+      value={discussionAnonymousState}
+      onChange={(_event, value) => {
+        if (value !== 'off') {
+          setIsGraded(false)
+          setIsGroupDiscussion(false)
+          setGroupCategoryId(null)
+        }
+        setDiscussionAnonymousState(value)
+      }}
+      data-testid="anonymous-discussion-options"
+    >
+      <RadioInput
+        key="off"
+        value="off"
+        label={I18n.t(
+          'Off: student names and profile pictures will be visible to other members of this course',
+        )}
+        disabled={isDisabled}
+      />
+      <RadioInput
+        key="partial_anonymity"
+        value="partial_anonymity"
+        label={I18n.t('Partial: students can choose to reveal their name and profile picture')}
+        disabled={isDisabled}
+      />
+      <RadioInput
+        key="full_anonymity"
+        value="full_anonymity"
+        label={I18n.t('Full: student names and profile pictures will be hidden')}
+        disabled={isDisabled}
+      />
+    </RadioInputGroup>
+  )
+
   return (
     <View display="block" margin="medium 0">
-      {/* Title should not be read by screen readers as "dimmed", single inputs are disabled instead */}
-      <RadioInputGroup
-        name="anonymous"
-        description={
-          <>
-            <View display="inline-block">
-              <Heading level="h4">{I18n.t('Anonymous Discussion')}</Heading>
-            </View>
-            <Tooltip
-              renderTip={I18n.t('Grading and Groups are not supported in Anonymous Discussions.')}
-              placement="top"
-              on={['hover', 'focus']}
-              color="primary"
-            >
-              <div
-                style={{display: 'inline-block', marginLeft: theme.spacing.xxSmall}}
-                // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-                tabIndex={0}
-              >
-                <IconInfoLine data-testid="groups_grading_not_allowed" />
-                <ScreenReaderContent>
-                  {I18n.t('Grading and Groups are not supported in Anonymous Discussions.')}
-                </ScreenReaderContent>
-              </div>
-            </Tooltip>
-          </>
-        }
-        value={discussionAnonymousState}
-        onChange={(_event, value) => {
-          if (value !== 'off') {
-            setIsGraded(false)
-            setIsGroupDiscussion(false)
-            setGroupCategoryId(null)
-          }
-          setDiscussionAnonymousState(value)
-        }}
-        data-testid="anonymous-discussion-options"
-      >
-        <RadioInput
-          key="off"
-          value="off"
-          label={I18n.t(
-            'Off: student names and profile pictures will be visible to other members of this course',
-          )}
-          disabled={isSelectDisabled}
-        />
-        <RadioInput
-          key="partial_anonymity"
-          value="partial_anonymity"
-          label={I18n.t('Partial: students can choose to reveal their name and profile picture')}
-          disabled={isSelectDisabled}
-        />
-        <RadioInput
-          key="full_anonymity"
-          value="full_anonymity"
-          label={I18n.t('Full: student names and profile pictures will be hidden')}
-          disabled={isSelectDisabled}
-        />
-      </RadioInputGroup>
+      {lockedTooltip ? (
+        <Tooltip
+          renderTip={LOCKED_TOOLTIP_MSG()}
+          on={['hover', 'focus']}
+          placement="top"
+          data-testid="locked-setting-tooltip"
+        >
+          <span style={{display: 'inline-block'}}>{radioInputGroup}</span>
+        </Tooltip>
+      ) : (
+        radioInputGroup
+      )}
       {shouldShowPartialAnonymousSelector && (
         <View display="block" margin="medium 0">
           <AnonymousResponseSelector

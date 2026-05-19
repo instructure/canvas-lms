@@ -139,7 +139,7 @@ module Accessibility
         !deleted? &&
         is_a?(DiscussionTopic) &&
         !is_announcement &&
-        @capture_changed_a11y_attributes.include?(:assignment_id)
+        @capture_changed_a11y_attributes&.include?(:assignment_id)
     end
 
     # Because of the multiple saves in one transaction,

@@ -21,10 +21,11 @@ import {IconArrowUpLine, IconArrowDownLine, IconAssignmentLine} from '@instructu
 import {Menu} from '@instructure/ui-menu'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {openWindow} from '@canvas/util/globalUtils'
-import {SortBy, SortOrder} from '@canvas/outcomes/react/utils/constants'
+import {SortBy} from '@canvas/outcomes/react/utils/constants'
 import {ContributingScoreAlignment} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {Sorting} from '@canvas/outcomes/react/types/shapes'
-import {ColumnHeader} from './ColumnHeader'
+import {ColumnHeader} from '@instructure/outcomes-ui/es/components/Gradebook/gradebook-table/ColumnHeader'
+import {SortOrder} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
@@ -32,14 +33,12 @@ export interface ContributingScoreHeaderProps {
   alignment: ContributingScoreAlignment
   courseId: string
   sorting: Sorting
-  titleId?: string
 }
 
 export const ContributingScoreHeader: React.FC<ContributingScoreHeaderProps> = ({
   alignment,
   courseId,
   sorting,
-  titleId,
 }) => {
   const isCurrentlySelected =
     sorting.sortBy === SortBy.ContributingScore &&
@@ -97,7 +96,6 @@ export const ContributingScoreHeader: React.FC<ContributingScoreHeaderProps> = (
   return (
     <ColumnHeader
       title={alignment.associated_asset_name}
-      titleId={titleId}
       icon={<IconAssignmentLine />}
       optionsMenuTriggerLabel={I18n.t('%{assignment} options', {
         assignment: alignment.associated_asset_name,

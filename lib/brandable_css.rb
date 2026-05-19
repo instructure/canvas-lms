@@ -145,7 +145,7 @@ module BrandableCSS
     end
 
     # gets the *effective* value for a brandable variable
-    def brand_variable_value(variable_name, active_brand_config = nil, config_map = variables_map, css_urls = false)
+    def brand_variable_value(variable_name, active_brand_config = nil, config_map = variables_map, css_urls: false)
       config = config_map[variable_name]
       explicit_value = active_brand_config && active_brand_config.get_value(variable_name).presence
       return handle_urls(explicit_value, config, css_urls) if explicit_value
@@ -155,7 +155,7 @@ module BrandableCSS
         if css_urls
           return "var(--#{default[1..]})"
         else
-          return brand_variable_value(default[1..], active_brand_config, config_map, css_urls)
+          return brand_variable_value(default[1..], active_brand_config, config_map, css_urls:)
         end
       end
 
@@ -188,9 +188,9 @@ module BrandableCSS
       end
     end
 
-    def all_brand_variable_values(active_brand_config = nil, css_urls = false)
+    def all_brand_variable_values(active_brand_config = nil, css_urls: false)
       variables_map.each_with_object(computed_variables(active_brand_config)) do |(key, _), memo|
-        memo[key] = brand_variable_value(key, active_brand_config, variables_map_with_image_urls, css_urls)
+        memo[key] = brand_variable_value(key, active_brand_config, variables_map_with_image_urls, css_urls:)
       end
     end
 
@@ -204,7 +204,7 @@ module BrandableCSS
 
     def all_brand_variable_values_as_css(active_brand_config = nil)
       ":root {
-        #{all_brand_variable_values(active_brand_config, true).map { |k, v| "--#{k}: #{v};" }.join("\n")}
+        #{all_brand_variable_values(active_brand_config, css_urls: true).map { |k, v| "--#{k}: #{v};" }.join("\n")}
       }"
     end
 
@@ -216,7 +216,7 @@ module BrandableCSS
       public_brandable_css_folder.join("default")
     end
 
-    def default_brand_file(type, high_contrast = false)
+    def default_brand_file(type, high_contrast: false)
       default_brand_folder.join("variables#{"-high_contrast" if high_contrast}-#{default_variables_md5}.#{type}")
     end
 
@@ -228,29 +228,29 @@ module BrandableCSS
       end.new
     end
 
-    def default(type, high_contrast = false)
+    def default(type, high_contrast: false)
       bc = high_contrast ? high_contrast_overrides : nil
       send(:"all_brand_variable_values_as_#{type}", bc)
     end
 
-    def save_default!(type, high_contrast = false)
+    def save_default!(type, high_contrast: false)
       default_brand_folder.mkpath
-      default_brand_file(type, high_contrast).write(default(type, high_contrast))
-      move_default_to_s3_if_enabled!(type, high_contrast)
+      default_brand_file(type, high_contrast:).write(default(type, high_contrast:))
+      move_default_to_s3_if_enabled!(type, high_contrast:)
     end
 
     def save_default_files!
       [true, false].each do |high_contrast|
-        %w[js css json].each { |type| save_default!(type, high_contrast) }
+        %w[js css json].each { |type| save_default!(type, high_contrast:) }
       end
     end
 
-    def move_default_to_s3_if_enabled!(type, high_contrast = false)
+    def move_default_to_s3_if_enabled!(type, high_contrast: false)
       return unless defined?(Canvas) && Canvas::Cdn.enabled?
 
-      s3_uploader.upload_file(public_default_path(type, high_contrast))
+      s3_uploader.upload_file(public_default_path(type, high_contrast:))
       begin
-        File.delete(default_brand_file(type, high_contrast))
+        File.delete(default_brand_file(type, high_contrast:))
       rescue Errno::ENOENT
         # continue if something else deleted it in another process
       end
@@ -260,7 +260,7 @@ module BrandableCSS
       @s3_uploader ||= Canvas::Cdn::S3Uploader.new
     end
 
-    def public_default_path(type, high_contrast = false)
+    def public_default_path(type, high_contrast: false)
       "dist/brandable_css/default/variables#{"-high_contrast" if high_contrast}-#{default_variables_md5}.#{type}"
     end
 

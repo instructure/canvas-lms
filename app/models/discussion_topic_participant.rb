@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class DiscussionTopicParticipant < ActiveRecord::Base
+class DiscussionTopicParticipant < ApplicationRecord
   include Workflow
 
   belongs_to :discussion_topic
@@ -52,6 +52,7 @@ class DiscussionTopicParticipant < ActiveRecord::Base
 
   def check_planner_cache
     if previously_new_record? ||
+       saved_change_to_workflow_state? ||
        (unread_entry_count_before_last_save == 0 && unread_entry_count > 0) ||
        (unread_entry_count_before_last_save > 0 && unread_entry_count == 0)
       PlannerHelper.clear_planner_cache(user)

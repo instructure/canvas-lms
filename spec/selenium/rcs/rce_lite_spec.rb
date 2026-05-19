@@ -46,7 +46,7 @@ describe "RCE next tests" do
     end
 
     def menu_bar_button(title)
-      element_exists?("//*[contains(concat(\" \",normalize-space(@class),\" \"),\" tox-menubar \")]//*[contains(text(), '#{title}')]", true)
+      element_exists?("//*[contains(concat(\" \",normalize-space(@class),\" \"),\" tox-menubar \")]//*[contains(text(), '#{title}')]", xpath: true)
     end
 
     def toolbar_selector(title)
@@ -58,7 +58,7 @@ describe "RCE next tests" do
     end
 
     def toolbar_button(toolbar_title, button_title)
-      element_exists?("//*[@title='#{toolbar_title}']//*[@aria-label='#{button_title}']", true)
+      element_exists?("//*[@title='#{toolbar_title}']//*[@aria-label='#{button_title}']", xpath: true)
     end
 
     def status_bar

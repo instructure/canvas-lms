@@ -180,9 +180,9 @@ describe Login::LoginBrandConfigFilter do
         end
       end
 
-      context "when new_login_ui_identity_discovery_page is disabled (default)" do
+      context "when discovery page is not allowed (default)" do
         before do
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_login_ui_identity_discovery_page).and_return(false)
+          allow(account).to receive(:discovery_page_allowed?).and_return(false)
         end
 
         it "removes the discovery group" do
@@ -192,9 +192,9 @@ describe Login::LoginBrandConfigFilter do
         end
       end
 
-      context "when new_login_ui_identity_discovery_page is enabled" do
+      context "when discovery page is allowed" do
         before do
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_login_ui_identity_discovery_page).and_return(true)
+          allow(account).to receive(:discovery_page_allowed?).and_return(true)
         end
 
         it "keeps the discovery group" do

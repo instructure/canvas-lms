@@ -17,17 +17,16 @@
  */
 
 import React from 'react'
-import {fireEvent, render, cleanup} from '@testing-library/react'
+import {fireEvent, render, cleanup, waitFor} from '@testing-library/react'
 import {
   RubricAssignmentContainer,
   type RubricAssignmentContainerProps,
 } from '../components/RubricAssignmentContainer'
 import * as RubricFormQueries from '@canvas/rubrics/react/RubricForm/queries/RubricFormQueries'
 import {RUBRIC, RUBRIC_ASSOCIATION, RUBRIC_CONTEXTS, RUBRICS_FOR_CONTEXT} from './fixtures'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
-import type {ViewProps} from '@instructure/ui-view'
+import {destroyContainer as destroyFlashAlertContainer} from '@instructure/platform-alerts'
 
 vi.mock('@canvas/rubrics/react/RubricForm/queries/RubricFormQueries', async importOriginal => {
   const actual =
@@ -44,12 +43,13 @@ vi.mock('../queries', () => ({
   removeRubricFromAssignment: vi.fn(),
   addRubricToAssignment: vi.fn(),
   getGradingRubricContexts: vi.fn().mockResolvedValue([]),
-  getGradingRubricsForContext: vi.fn().mockResolvedValue([]),
+  getGradingRubricsForContext: vi.fn().mockResolvedValue({rubrics: [], totalPages: 1}),
   getRubricSelfAssessmentSettings: vi.fn().mockResolvedValue({
     canUpdateRubricSelfAssessment: true,
     rubricSelfAssessmentEnabled: true,
   }),
   setRubricSelfAssessment: vi.fn().mockResolvedValue({}),
+  RUBRIC_FOR_CONTEXT_PAGINATION_LIMIT: 20,
 }))
 
 describe('RubricAssignmentContainer Tests', () => {
@@ -63,10 +63,10 @@ describe('RubricAssignmentContainer Tests', () => {
     )
 
     queryClient.setQueryData(['fetchGradingRubricContexts', '1'], RUBRIC_CONTEXTS)
-    queryClient.setQueryData(
-      ['fetchGradingRubricsForContext', '1', 'course_2'],
-      RUBRICS_FOR_CONTEXT,
-    )
+    queryClient.setQueryData(['fetchGradingRubricsForContext', '1', 'course_2'], {
+      rubrics: RUBRICS_FOR_CONTEXT,
+      totalPages: 1,
+    })
 
     const rubricSelfAssessmentSettings = {
       canUpdateRubricSelfAssessment: true,
@@ -86,6 +86,7 @@ describe('RubricAssignmentContainer Tests', () => {
     queryClient.setDefaultOptions({
       queries: {
         retry: false,
+        staleTime: Infinity,
       },
     })
   })
@@ -119,8 +120,24 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(getByTestId('find-assignment-rubric-button')).toHaveTextContent('Find Rubric')
     })
 
-    it('should not render anything when there is no rubric and manage_rubrics permissions is false', () => {
+    it('should not render anything when there is no rubric, no rubricAssociation, and canManageRubrics is false', () => {
       const {container} = renderComponent({canManageRubrics: false})
+      expect(container.firstChild).toBeNull()
+    })
+
+    it('should not render anything when rubricAssociation is present but rubric is absent, and canManageRubrics is false', () => {
+      const {container} = renderComponent({
+        canManageRubrics: false,
+        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+      })
+      expect(container.firstChild).toBeNull()
+    })
+
+    it('should not render anything when rubric is present but rubricAssociation is absent, and canManageRubrics is false', () => {
+      const {container} = renderComponent({
+        canManageRubrics: false,
+        assignmentRubric: RUBRIC,
+      })
       expect(container.firstChild).toBeNull()
     })
 
@@ -128,7 +145,7 @@ describe('RubricAssignmentContainer Tests', () => {
       const {getByTestId, queryByTestId} = renderComponent({
         canManageRubrics: false,
         assignmentRubric: RUBRIC,
-        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+        assignmentRubricAssociation: {...RUBRIC_ASSOCIATION, canUpdate: false, canDelete: false},
       })
       expect(queryByTestId('create-assignment-rubric-button')).toBeNull()
       expect(queryByTestId('edit-assignment-rubric-button')).toBeNull()
@@ -174,17 +191,17 @@ describe('RubricAssignmentContainer Tests', () => {
       getByTestId('create-assignment-rubric-button').click()
       const titleInput = getByTestId('rubric-form-title')
       fireEvent.change(titleInput, {target: {value: 'Rubric 1'}})
+      await waitFor(() => expect(getByTestId('add-criterion-button')).toBeInTheDocument())
       fireEvent.click(getByTestId('add-criterion-button'))
 
-      await new Promise(resolve => setTimeout(resolve, 0))
+      await waitFor(() => expect(getByTestId('rubric-criterion-name-input')).toBeInTheDocument())
       fireEvent.change(getByTestId('rubric-criterion-name-input'), {
         target: {value: 'New Criterion Test'},
       })
       fireEvent.click(getByTestId('rubric-criterion-save'))
       fireEvent.click(getByTestId('save-rubric-button'))
 
-      await new Promise(resolve => setTimeout(resolve, 0))
-      expect(onRubricChange).toHaveBeenCalledWith(RUBRIC, RUBRIC_ASSOCIATION)
+      await waitFor(() => expect(onRubricChange).toHaveBeenCalledWith(RUBRIC, RUBRIC_ASSOCIATION))
     })
   })
 
@@ -214,15 +231,39 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(getByText('Rubric 1')).toBeInTheDocument() // Check for the text directly
     })
 
-    it('will not render the edit, remove, and replace buttons when can_manage_rubrics is false', () => {
+    it('will not render the edit button when canUpdate is false', () => {
       const {getByTestId, queryByTestId} = renderComponent({
+        assignmentRubric: RUBRIC,
+        assignmentRubricAssociation: {...RUBRIC_ASSOCIATION, canUpdate: false},
+      })
+      expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
+      expect(queryByTestId('edit-assignment-rubric-button')).toBeNull()
+    })
+
+    it('will not render the remove button when canDelete is false', () => {
+      const {getByTestId, queryByTestId} = renderComponent({
+        assignmentRubric: RUBRIC,
+        assignmentRubricAssociation: {...RUBRIC_ASSOCIATION, canDelete: false},
+      })
+      expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
+      expect(queryByTestId('remove-assignment-rubric-button')).toBeNull()
+    })
+
+    it('will not render the replace button when canManageRubrics is false', () => {
+      const {queryByTestId} = renderComponent({
         assignmentRubric: RUBRIC,
         assignmentRubricAssociation: RUBRIC_ASSOCIATION,
         canManageRubrics: false,
       })
-      expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
-      expect(queryByTestId('edit-assignment-rubric-button')).toBeNull()
-      expect(queryByTestId('remove-assignment-rubric-button')).toBeNull()
+      expect(queryByTestId('find-assignment-rubric-icon-button')).toBeNull()
+    })
+
+    it('will not render the replace button when canUpdate is false', () => {
+      const {queryByTestId} = renderComponent({
+        assignmentRubric: RUBRIC,
+        assignmentRubricAssociation: {...RUBRIC_ASSOCIATION, canUpdate: false},
+        canManageRubrics: true,
+      })
       expect(queryByTestId('find-assignment-rubric-icon-button')).toBeNull()
     })
 
@@ -311,6 +352,17 @@ describe('RubricAssignmentContainer Tests', () => {
       expect(queryAllByText('Unlink Rubric')).toHaveLength(2)
     })
 
+    it('should render "Unlink Rubric" for the trash icon tooltip and modal when associationCount is 1 but public is true', () => {
+      const {getByTestId, queryAllByText} = renderComponent({
+        assignmentRubric: {...RUBRIC, association_count: 1, public: true},
+        assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+      })
+
+      fireEvent.mouseOver(getByTestId('remove-assignment-rubric-button'))
+      expect(queryAllByText('Delete Rubric')).toHaveLength(0)
+      expect(queryAllByText('Unlink Rubric')).toHaveLength(2)
+    })
+
     it('should render "Delete Rubric" for the trash icon tooltip and modal when associationCount is 0', () => {
       const {getByTestId, queryAllByText} = renderComponent({
         assignmentRubric: {...RUBRIC, association_count: 0},
@@ -328,6 +380,15 @@ describe('RubricAssignmentContainer Tests', () => {
           assignmentRubric: RUBRIC,
           assignmentRubricAssociation: RUBRIC_ASSOCIATION,
           rubricSelfAssessmentFFEnabled: false,
+        })
+        expect(queryByTestId('rubric-self-assessment-checkbox')).toBeNull()
+      })
+
+      it('does not render self assessment settings when canUpdate is false', () => {
+        const {queryByTestId} = renderComponent({
+          assignmentRubric: RUBRIC,
+          assignmentRubricAssociation: {...RUBRIC_ASSOCIATION, canUpdate: false},
+          rubricSelfAssessmentFFEnabled: true,
         })
         expect(queryByTestId('rubric-self-assessment-checkbox')).toBeNull()
       })
@@ -383,6 +444,36 @@ describe('RubricAssignmentContainer Tests', () => {
         expect(getByTestId('rubric-points-difference-modal')).toBeInTheDocument()
       })
 
+      it('should show the assignment points mismatch modal when assignmentPointsPossible is 0 and rubric points are non-zero', () => {
+        const {getByTestId} = renderComponent({
+          assignmentPointsPossible: 0,
+          assignmentRubric: RUBRIC,
+          assignmentRubricAssociation: {
+            ...RUBRIC_ASSOCIATION,
+            useForGrading: true,
+          },
+        })
+        fireEvent.click(getByTestId('edit-assignment-rubric-button'))
+        expect(getByTestId('rubric-assignment-create-modal')).toBeInTheDocument()
+        fireEvent.click(getByTestId('save-rubric-button'))
+        expect(getByTestId('rubric-points-difference-modal')).toBeInTheDocument()
+      })
+
+      it('should show the assignment points mismatch modal when rubric pointsPossible is 0 and assignment points are non-zero', () => {
+        const {getByTestId} = renderComponent({
+          assignmentPointsPossible: 10,
+          assignmentRubric: {...RUBRIC, pointsPossible: 0},
+          assignmentRubricAssociation: {
+            ...RUBRIC_ASSOCIATION,
+            useForGrading: true,
+          },
+        })
+        fireEvent.click(getByTestId('edit-assignment-rubric-button'))
+        expect(getByTestId('rubric-assignment-create-modal')).toBeInTheDocument()
+        fireEvent.click(getByTestId('save-rubric-button'))
+        expect(getByTestId('rubric-points-difference-modal')).toBeInTheDocument()
+      })
+
       it('should not show the assignment points mismatch when useForGrading is false', () => {
         const {queryByTestId} = renderComponent({
           assignmentPointsPossible: 200,
@@ -407,10 +498,35 @@ describe('RubricAssignmentContainer Tests', () => {
         })
         expect(queryByTestId('rubric-points-difference-modal')).not.toBeInTheDocument()
       })
+
+      it('should not show the assignment points mismatch modal when there is no assignment', () => {
+        const {getByTestId, queryByTestId} = renderComponent({
+          assignmentId: '',
+          assignmentPointsPossible: 200,
+          assignmentRubric: RUBRIC,
+          assignmentRubricAssociation: {
+            ...RUBRIC_ASSOCIATION,
+            useForGrading: true,
+          },
+        })
+        fireEvent.click(getByTestId('edit-assignment-rubric-button'))
+        expect(getByTestId('rubric-assignment-create-modal')).toBeInTheDocument()
+        fireEvent.click(getByTestId('save-rubric-button'))
+        expect(queryByTestId('rubric-points-difference-modal')).not.toBeInTheDocument()
+      })
     })
   })
 
   describe('search tray', () => {
+    it('should display "No Rubrics Found" when no contexts are returned', async () => {
+      queryClient.setQueryData(['fetchGradingRubricContexts', '1'], [])
+      const {getByTestId, getByText} = renderComponent()
+      fireEvent.click(getByTestId('find-assignment-rubric-button'))
+
+      expect(getByTestId('rubric-search-tray')).toBeInTheDocument()
+      expect(getByText('No Rubrics Found')).toBeInTheDocument()
+    })
+
     it('should open search tray when search button is clicked and load the correct rubric contexts', async () => {
       const {getByTestId, getByText} = renderComponent()
       fireEvent.click(getByTestId('find-assignment-rubric-button'))
@@ -471,6 +587,115 @@ describe('RubricAssignmentContainer Tests', () => {
 
       fireEvent.click(rubricPreviewButtons[0])
       expect(getByTestId('traditional-criterion-1-ratings-0')).toBeInTheDocument()
+    })
+
+    describe('search debounce', () => {
+      beforeEach(() => {
+        vi.useFakeTimers()
+      })
+
+      afterEach(() => {
+        vi.useRealTimers()
+      })
+
+      it('does not filter rubrics immediately on keystroke', () => {
+        const {getByTestId, getByText, queryAllByTestId} = renderComponent()
+        fireEvent.click(getByTestId('find-assignment-rubric-button'))
+        fireEvent.click(getByTestId('rubric-context-select'))
+        fireEvent.click(getByText('Course 2 (Course)'))
+
+        const searchInput = getByTestId('rubric-search-input')
+        fireEvent.change(searchInput, {target: {value: 'Rubric 1'}})
+
+        // Before debounce fires, both rubrics should still be visible
+        expect(queryAllByTestId('rubric-search-row-title')).toHaveLength(2)
+      })
+
+      it('filters rubrics client-side after debounce delay when pagination is disabled', async () => {
+        const {getByTestId, getByText, queryAllByTestId} = renderComponent()
+        fireEvent.click(getByTestId('find-assignment-rubric-button'))
+        fireEvent.click(getByTestId('rubric-context-select'))
+        fireEvent.click(getByText('Course 2 (Course)'))
+
+        const searchInput = getByTestId('rubric-search-input')
+        fireEvent.change(searchInput, {target: {value: 'Rubric 1'}})
+
+        await vi.advanceTimersByTimeAsync(300)
+
+        const titles = queryAllByTestId('rubric-search-row-title')
+        expect(titles).toHaveLength(1)
+        expect(titles[0]).toHaveTextContent('Rubric 1')
+      })
+    })
+
+    describe('pagination', () => {
+      const PAGINATED_CONTEXTS = [
+        ...RUBRIC_CONTEXTS.slice(0, 2),
+        {rubrics: 25, context_code: 'course_2', name: 'Course 2'},
+      ]
+
+      it('shows pagination controls when paginationEnabled and totalPages > 1', async () => {
+        queryClient.setQueryData(['fetchGradingRubricContexts', '1'], PAGINATED_CONTEXTS)
+        queryClient.setQueryData(['fetchGradingRubricsForContext', '1', 'course_2', 1, ''], {
+          rubrics: RUBRICS_FOR_CONTEXT,
+          totalPages: 2,
+        })
+        fakeENV.setup({FEATURES: {grading_rubrics_pagination: true}})
+
+        const {getByTestId, getByText} = renderComponent()
+        fireEvent.click(getByTestId('find-assignment-rubric-button'))
+        fireEvent.click(getByTestId('rubric-context-select'))
+        fireEvent.click(getByText('Course 2 (Course)'))
+
+        await waitFor(() => {
+          expect(
+            document.querySelector('[data-testid="rubric-search-pagination"]'),
+          ).toBeInTheDocument()
+        })
+      })
+
+      it('does not show pagination controls when totalPages is 1', async () => {
+        queryClient.setQueryData(['fetchGradingRubricContexts', '1'], PAGINATED_CONTEXTS)
+        queryClient.setQueryData(['fetchGradingRubricsForContext', '1', 'course_2', 1, ''], {
+          rubrics: RUBRICS_FOR_CONTEXT,
+          totalPages: 1,
+        })
+        fakeENV.setup({FEATURES: {grading_rubrics_pagination: true}})
+
+        const {getByTestId, getByText, queryAllByTestId} = renderComponent()
+        fireEvent.click(getByTestId('find-assignment-rubric-button'))
+        fireEvent.click(getByTestId('rubric-context-select'))
+        fireEvent.click(getByText('Course 2 (Course)'))
+
+        await waitFor(() => {
+          expect(queryAllByTestId('rubric-search-row-title')).toHaveLength(2)
+        })
+        expect(
+          document.querySelector('[data-testid="rubric-search-pagination"]'),
+        ).not.toBeInTheDocument()
+      })
+
+      it('does not paginate when grading_rubrics_pagination flag is off', async () => {
+        queryClient.setQueryData(['fetchGradingRubricContexts', '1'], PAGINATED_CONTEXTS)
+        // Non-paginated key (no page/search in key)
+        queryClient.setQueryData(['fetchGradingRubricsForContext', '1', 'course_2'], {
+          rubrics: RUBRICS_FOR_CONTEXT,
+          totalPages: 1,
+        })
+        fakeENV.setup({FEATURES: {grading_rubrics_pagination: false}})
+
+        const {getByTestId, getByText, queryAllByTestId} = renderComponent()
+        fireEvent.click(getByTestId('find-assignment-rubric-button'))
+        fireEvent.click(getByTestId('rubric-context-select'))
+        fireEvent.click(getByText('Course 2 (Course)'))
+
+        await waitFor(() => {
+          expect(queryAllByTestId('rubric-search-row-title')).toHaveLength(2)
+        })
+        expect(
+          document.querySelector('[data-testid="rubric-search-pagination"]'),
+        ).not.toBeInTheDocument()
+      })
     })
   })
 })

@@ -17,10 +17,19 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
+import {flushSync} from 'react-dom'
 import AvailabilityDates from '../AvailabilityDates'
 import {mockAssignment} from '../../graphql/studentMocks'
 import $ from 'jquery'
+
+let root = null
+
+function renderDates(ui) {
+  const container = document.getElementById('fixtures')
+  if (!root) root = createRoot(container)
+  flushSync(() => root.render(ui))
+}
 
 beforeAll(() => {
   const found = document.getElementById('fixtures')
@@ -32,16 +41,14 @@ beforeAll(() => {
 })
 
 afterEach(() => {
-  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
+  root?.unmount()
+  root = null
 })
 
 it('renders nothing if lockAt and unlockAt are null', async () => {
   const assignment = await mockAssignment()
 
-  ReactDOM.render(
-    <AvailabilityDates assignment={assignment} />,
-    document.getElementById('fixtures'),
-  )
+  renderDates(<AvailabilityDates assignment={assignment} />)
   const element = $('#fixtures')
   expect(element.text()).toEqual('')
 })
@@ -49,10 +56,7 @@ it('renders nothing if lockAt and unlockAt are null', async () => {
 it('renders correctly if lockAt is set and and unlockAt is null', async () => {
   const assignment = await mockAssignment({Assignment: {lockAt: '2016-07-11T23:00:00-00:00'}})
 
-  ReactDOM.render(
-    <AvailabilityDates assignment={assignment} />,
-    document.getElementById('fixtures'),
-  )
+  renderDates(<AvailabilityDates assignment={assignment} />)
   const element = $('#fixtures')
 
   // Rendered twice cause one of them is a screenreader only
@@ -64,10 +68,7 @@ it('renders correctly if lockAt is set and and unlockAt is null', async () => {
 it('renders correctly if unlockAt is set and and lockAt is null', async () => {
   const assignment = await mockAssignment({Assignment: {unlockAt: '2016-07-11T23:00:00-00:00'}})
 
-  ReactDOM.render(
-    <AvailabilityDates assignment={assignment} />,
-    document.getElementById('fixtures'),
-  )
+  renderDates(<AvailabilityDates assignment={assignment} />)
   const element = $('#fixtures')
 
   // Rendered twice cause one of them is a screenreader only
@@ -81,10 +82,7 @@ it('renders correctly if unlockAt and lockAt are set', async () => {
     Assignment: {unlockAt: '2016-07-11T23:00:00-00:00', lockAt: '2016-07-15T23:00:00-00:00'},
   })
 
-  ReactDOM.render(
-    <AvailabilityDates assignment={assignment} />,
-    document.getElementById('fixtures'),
-  )
+  renderDates(<AvailabilityDates assignment={assignment} />)
   const element = $('#fixtures')
 
   // Rendered twice cause one of them is a screenreader only
@@ -98,10 +96,7 @@ it('renders correctly if unlockAt and lockAt are set and rendered in short mode'
     Assignment: {unlockAt: '2016-07-11T23:00:00-00:00', lockAt: '2016-07-15T23:00:00-00:00'},
   })
 
-  ReactDOM.render(
-    <AvailabilityDates assignment={assignment} formatStyle="short" />,
-    document.getElementById('fixtures'),
-  )
+  renderDates(<AvailabilityDates assignment={assignment} formatStyle="short" />)
   const element = $('#fixtures')
 
   // Rendered twice cause one of them is a screenreader only

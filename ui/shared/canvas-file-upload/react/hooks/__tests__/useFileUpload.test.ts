@@ -27,13 +27,17 @@ vi.mock('@canvas/upload-file', () => ({
   uploadFile: vi.fn(),
 }))
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 // Import mocked functions after mocking
 import {uploadFile} from '@canvas/upload-file'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 describe('useFileUpload', () => {
   const mockUploadFile = uploadFile as ReturnType<typeof vi.fn>
@@ -53,7 +57,7 @@ describe('useFileUpload', () => {
     vi.clearAllMocks()
   })
 
-  it('should initialize with empty uploadingFileNames', () => {
+  it('should initialize with empty uploadingFileNames and failedFileNames', () => {
     const {result} = renderHook(() =>
       useFileUpload({
         files: [],
@@ -63,6 +67,7 @@ describe('useFileUpload', () => {
     )
 
     expect(result.current.uploadingFileNames.size).toBe(0)
+    expect(result.current.failedFileNames.size).toBe(0)
     expect(result.current.isUploading).toBe(false)
   })
 
@@ -172,6 +177,50 @@ describe('useFileUpload', () => {
     })
 
     expect(mockOnFilesChange).not.toHaveBeenCalled()
+  })
+
+  it('should add filename to failedFileNames on upload error', async () => {
+    const mockFile = createMockFile('broken.txt', 1024)
+    mockUploadFile.mockRejectedValueOnce(new Error('Network error'))
+
+    const {result} = renderHook(() =>
+      useFileUpload({
+        files: [],
+        onFilesChange: mockOnFilesChange,
+        courseId,
+      }),
+    )
+
+    await result.current.handleDrop([mockFile], [])
+
+    await waitFor(() => {
+      expect(result.current.failedFileNames.has('broken.txt')).toBe(true)
+    })
+  })
+
+  it('should remove filename from failedFileNames when clearFailedFile is called', async () => {
+    const mockFile = createMockFile('broken.txt', 1024)
+    mockUploadFile.mockRejectedValueOnce(new Error('Network error'))
+
+    const {result} = renderHook(() =>
+      useFileUpload({
+        files: [],
+        onFilesChange: mockOnFilesChange,
+        courseId,
+      }),
+    )
+
+    await result.current.handleDrop([mockFile], [])
+
+    await waitFor(() => {
+      expect(result.current.failedFileNames.has('broken.txt')).toBe(true)
+    })
+
+    result.current.clearFailedFile('broken.txt')
+
+    await waitFor(() => {
+      expect(result.current.failedFileNames.has('broken.txt')).toBe(false)
+    })
   })
 
   it('should track uploading state during upload', async () => {

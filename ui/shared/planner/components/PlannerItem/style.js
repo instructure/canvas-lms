@@ -80,7 +80,7 @@ export default function buildStyle() {
     bottomMargin: variables.spacing.xSmall,
     borderWidth: variables.borders.widthSmall,
     borderColor: variables.colors.contrasts.grey1214,
-    iconFontSize: variables.spacing.medium,
+    iconFontSize: '1em',
     iconColor: variables.colors.contrasts.blue4570,
     badgeMargin: '0.0625rem',
     metricsPadding: variables.spacing.xxSmall,

@@ -25,7 +25,7 @@ class Quizzes::OutstandingQuizSubmissionsController < ApplicationController
   include Api::V1::QuizSubmission
   include ::Filters::Quizzes
 
-  before_action :require_user, :require_context, :require_quiz
+  before_action :require_context, :require_quiz
 
   # Index any outstanding quiz submissions
   #

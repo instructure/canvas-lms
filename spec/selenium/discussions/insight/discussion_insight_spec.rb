@@ -27,6 +27,7 @@ describe "Discussion Insight" do
     end
 
     before do
+      allow(FeatureFlags::Hooks).to receive(:tier_2_visible_on_hook).and_return(true)
       course_with_teacher(active_course: true, active_all: true, name: "teacher")
       @topic_title = "Our Discussion Topic with Insight"
       @topic = @course.discussion_topics.create!(

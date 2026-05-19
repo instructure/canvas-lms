@@ -23,7 +23,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {useDebouncedCallback} from 'use-debounce'
 import {IconButton} from '@instructure/ui-buttons'
 import {Alert} from '@instructure/ui-alerts'
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {getLiveRegion} from '@instructure/platform-instui-bindings'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 

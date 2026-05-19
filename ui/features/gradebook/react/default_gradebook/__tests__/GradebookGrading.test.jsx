@@ -23,12 +23,16 @@ import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {createCourseGradesWithGradingPeriods as createGrades} from '@canvas/grading/GradeCalculatorSpecHelper'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: vi.fn(),
-  showFlashError: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashSuccess: vi.fn(),
+    showFlashError: vi.fn(),
+  }
+})
 
 describe('setupGrading', () => {
   let gradebook
@@ -575,7 +579,7 @@ describe('Gradebook#onApplyScoreToUngradedRequested', () => {
     gradebook.onApplyScoreToUngradedRequested(assignmentGroup)
     expect(ReactDOM.render).toHaveBeenCalledTimes(1)
     const renderCall = ReactDOM.render.mock.calls[0]
-    expect(renderCall[0].props.assignmentGroup).toEqual({
+    expect(renderCall[0].props.children.props.assignmentGroup).toEqual({
       id: '100',
       name: 'group',
     })

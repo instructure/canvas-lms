@@ -32,7 +32,7 @@ module ErrorContext
     end
 
     def escape_code(code)
-      EscapeCode::HtmlFormatter.new(code).generate.html_safe
+      EscapeCode::HtmlFormatter.new(code).generate.html_safe # rubocop:disable Rails/OutputSafety
     end
 
     def escape_code_stylesheet
@@ -71,7 +71,7 @@ module ErrorContext
         "#{run[:recorded_at]}: #{contents}"
       end.join("<br>")
 
-      "(newest)<br>#{errors}<br>(oldest)".html_safe
+      "(newest)<br>#{errors}<br>(oldest)".html_safe # rubocop:disable Rails/OutputSafety
     end
 
     def error_template_path

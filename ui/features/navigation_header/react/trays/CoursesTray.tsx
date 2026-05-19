@@ -29,7 +29,7 @@ import type {Course} from '../../../../api.d'
 import {CourseListItemContent, SplitCoursesList} from '../lists/SplitCoursesList'
 import coursesQuery, {hideHomeroomCourseIfK5Student} from '../queries/coursesQuery'
 import {useQuery} from '@tanstack/react-query'
-import {sessionStoragePersister} from '@canvas/query'
+import {sessionStoragePersister} from '@instructure/platform-query'
 
 declare const window: Window & {ENV: GlobalEnv}
 
@@ -40,7 +40,7 @@ export default function CoursesTray() {
   const {data, isLoading, isSuccess} = useQuery<Course[], Error>({
     queryKey: ['courses'],
     queryFn: coursesQuery,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
     refetchOnMount: false,
     select: courses => courses.filter(hideHomeroomCourseIfK5Student),
   })

@@ -57,6 +57,7 @@ RSpec.describe Accessibility::CourseScanController do
         json = response.parsed_body
         expect(json["id"]).to eq(progress.id)
         expect(json["workflow_state"]).to eq("queued")
+        expect(json["created_at"]).to eq(progress.created_at.iso8601)
       end
     end
   end
@@ -69,6 +70,7 @@ RSpec.describe Accessibility::CourseScanController do
       json = response.parsed_body
       expect(json["id"]).to be_present
       expect(json["workflow_state"]).to eq("queued")
+      expect(json["created_at"]).to eq(Progress.find(json["id"]).created_at.iso8601)
 
       # Verify a progress record was created
       progress = Progress.find(json["id"])

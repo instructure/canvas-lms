@@ -21,7 +21,7 @@ import {cleanup, render, act, waitFor, fireEvent} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer} from '@instructure/platform-alerts'
 
 import {AccountCalendarSettings} from '../AccountCalendarSettings'
 import {RESPONSE_ACCOUNT_1, RESPONSE_ACCOUNT_5, RESPONSE_ACCOUNT_6} from './fixtures'

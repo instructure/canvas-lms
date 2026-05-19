@@ -21,7 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import ContentMigrationsForm from './components/migrations_form'
 import ContentMigrationsTable from './components/migrations_table'
 import type {ContentMigrationItem, UpdateMigrationItemType} from './components/types'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = createI18nScope('content_migrations_redesign')

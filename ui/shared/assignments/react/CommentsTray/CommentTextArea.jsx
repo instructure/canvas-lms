@@ -21,17 +21,16 @@ import {IconAttachMediaLine} from '@instructure/ui-icons'
 import {Mutation} from '@apollo/client/react/components'
 import React, {Component} from 'react'
 import {bool} from 'prop-types'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
 import UploadMedia from '@instructure/canvas-media'
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {CREATE_SUBMISSION_COMMENT} from '@canvas/assignments/graphql/student/Mutations'
 import {DEFAULT_ICON} from '@canvas/mime/react/mimeClassIconHelper'
 import FileList from './FileList'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {submissionCommentAttachmentsUpload} from '@canvas/upload-file'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
@@ -41,7 +40,6 @@ import {
   SelectStrings,
 } from '@canvas/upload-media-translations'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
-import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('assignments_2')
 
@@ -65,15 +63,37 @@ export default class CommentTextArea extends Component {
     bottomValue: '0px',
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     if (this.state.commentTextErrors.length > 0 && this.state.bottomValue === '0px') {
-      this.setState({
-        bottomValue:
-          this._commentTextBox.ref.children[0].lastChild.getBoundingClientRect().height + 'px',
-      })
+      const height =
+        this._commentTextBox?.ref?.lastElementChild?.lastChild?.getBoundingClientRect()?.height || 0
+      if (height > 0) {
+        this.setState({bottomValue: height + 'px'})
+      }
     } else if (this.state.commentTextErrors.length === 0 && this.state.bottomValue !== '0px') {
       this.setState({bottomValue: '0px'})
     }
+
+    if (this.props.focusTrigger && this.props.focusTrigger !== prevProps.focusTrigger) {
+      if (this.validateAndShowErrors()) {
+        this._sendButton?.focus()
+      }
+    }
+  }
+
+  validateAndShowErrors = () => {
+    if (this.state.commentText.trim().length > 0 || this.state.currentFiles.length > 0) {
+      return true
+    }
+    const errorMessage = I18n.t('Comment or file required to save')
+    this._commentTextBox?.focus()
+    this.setState({
+      commentTextErrors: [
+        {text: errorMessage, type: 'newError'},
+        {text: errorMessage, type: 'screenreader-only'},
+      ],
+    })
+    return false
   }
   queryVariables() {
     return {
@@ -288,12 +308,9 @@ export default class CommentTextArea extends Component {
         {createSubmissionComment => (
           <div>
             <div id="textarea-emoji-container">
-              <Text as="label" htmlFor="comment-textarea">
-                {I18n.t('Comment')}
-              </Text>
               <TextArea
                 id="comment-textarea"
-                label={<ScreenReaderContent>{I18n.t('Comment input box')}</ScreenReaderContent>}
+                label={I18n.t('Comment')}
                 onChange={this.onTextChange}
                 placeholder={I18n.t('Submit a Comment')}
                 ref={el => {
@@ -392,24 +409,14 @@ export default class CommentTextArea extends Component {
                     }}
                     userLocale={ENV.LOCALE}
                     disableSubmitWhileUploading={true}
-                    useStudioPlayer={ENV.FEATURES?.consolidated_media_player}
                   />
                   <Button
+                    elementRef={el => {
+                      this._sendButton = el
+                    }}
                     onClick={() => {
-                      if (
-                        this.state.commentText.trim().length > 0 ||
-                        this.state.currentFiles.length > 0
-                      ) {
+                      if (this.validateAndShowErrors()) {
                         this.onSendComment(createSubmissionComment)
-                      } else {
-                        const errorMessage = I18n.t('Comment or file required to save')
-                        this._commentTextBox.focus()
-                        this.setState({
-                          commentTextErrors: [
-                            {text: errorMessage, type: 'newError'},
-                            {text: errorMessage, type: 'screenreader-only'},
-                          ],
-                        })
                       }
                     }}
                     data-testid="send-button"

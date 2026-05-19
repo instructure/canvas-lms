@@ -243,6 +243,24 @@ describe('useSubmissionDetails', () => {
     expect(result.current.error).toBeTruthy()
   })
 
+  it('requests comments from all attempts', async () => {
+    let capturedBody: any = null
+    server.use(
+      http.post('/api/graphql', async ({request}) => {
+        capturedBody = (await request.json()) as {query: string}
+        return HttpResponse.json(mockSubmissionDetailsResponse)
+      }),
+    )
+
+    const {result} = renderHook(() => useSubmissionDetails('sub1'), {
+      wrapper: createWrapper(),
+    })
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    expect(capturedBody.query).toContain('allComments: true')
+  })
+
   it('handles null legacyNode response', async () => {
     server.use(
       http.post('/api/graphql', () => {

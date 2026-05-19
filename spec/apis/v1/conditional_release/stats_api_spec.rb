@@ -54,13 +54,13 @@ module ConditionalRelease
         end
 
         it "shows stats for export" do
-          expect(Stats).to receive(:students_per_range).with(@rule, false).and_return [0, 1, 2]
+          expect(Stats).to receive(:students_per_range).with(@rule, include_trend_data: false).and_return [0, 1, 2]
           json = api_call(:get, @url, @base_params, {}, {}, { expected_status: 200 })
           expect(json).to eq [0, 1, 2]
         end
 
         it "includes trend if requested" do
-          expect(Stats).to receive(:students_per_range).with(@rule, true).and_return [0, 1, 2]
+          expect(Stats).to receive(:students_per_range).with(@rule, include_trend_data: true).and_return [0, 1, 2]
           json = api_call(:get, @url, @base_params.merge(include: "trends"), {}, {}, { expected_status: 200 })
           expect(json).to eq [0, 1, 2]
         end

@@ -22,7 +22,7 @@ import {useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
 
 const I18n = createI18nScope('asset_processors_selection')
@@ -43,8 +43,8 @@ const queryFn = async ({queryKey}: {queryKey: [string, number, string]}) => {
 export function useAssetProcessorsToolsList(
   courseId: number,
   type: AssetProcessorType,
-): UseQueryResult<LtiLaunchDefinition[], Error> {
-  const res: UseQueryResult<LtiLaunchDefinition[], Error> = useQuery({
+): UseQueryResult<LtiLaunchDefinition[] | undefined, Error> {
+  const res: UseQueryResult<LtiLaunchDefinition[] | undefined, Error> = useQuery({
     queryKey: ['assetProcessors', courseId, type.toString()],
     queryFn,
   })

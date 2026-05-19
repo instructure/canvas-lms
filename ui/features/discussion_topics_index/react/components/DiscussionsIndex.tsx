@@ -55,7 +55,7 @@ import propTypes from '../propTypes'
 import actions from '../actions'
 import {reorderDiscussionsURL} from '../utils'
 import {CONTENT_SHARE_TYPES} from '@canvas/content-sharing/react/proptypes/contentShare'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import TopNavPortalWithDefaults from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 import ManageThreadedReplies from './ManageThreadedReplies'
 
@@ -85,7 +85,6 @@ export default class DiscussionsIndex extends Component {
     }),
     DIRECT_SHARE_ENABLED: bool.isRequired,
     COURSE_ID: string,
-    breakpoints: breakpointsShape.isRequired,
     allDiscussions: object,
   }
 

@@ -38,10 +38,9 @@ const allReportsDisabled = false
 export type AssetReportsForStudentParams = {
   submissionId: string
   submissionType: string
-  // Allows us to ignore results if the last attempt number is not
-  // the one we are viewing. For students, the server only returns
-  // reports for the last attempt.
-  ifLastAttemptIsNumber?: number
+  attempt?: number
+  // IDs of the current attempt's attachments, used to scope column visibility to the current attempt
+  attachmentIds?: string[]
 }
 
 type SubmissionIdAndTypeAndAttachment = AssetReportsForStudentParams & {
@@ -49,13 +48,35 @@ type SubmissionIdAndTypeAndAttachment = AssetReportsForStudentParams & {
 }
 
 export function useShouldShowLtiAssetReportsForStudent(submission: AssetReportsForStudentParams) {
-  return !!useLtiAssetProcessorsAndReportsForStudentQuery(submission)
+  const data = useLtiAssetProcessorsAndReportsForStudentQuery(submission)
+  if (!data) return false
+  const {attachmentIds, attempt} = submission
+  if (attachmentIds != null && attachmentIds.length > 0) {
+    // For file uploads: show column only if this attempt's attachments have reports
+    return data.reports.some(
+      report =>
+        report.asset?.attachmentId != null && attachmentIds.includes(report.asset.attachmentId),
+    )
+  }
+  if (attempt != null) {
+    // For text entry/discussion: show column only if this attempt has reports
+    return data.reports.some(
+      report =>
+        report.asset?.submissionAttempt === attempt || report.asset?.discussionEntryVersion != null,
+    )
+  }
+  // attempt unknown: hide column (matches useLtiAssetProcessorsAndReportsForStudent behavior)
+  return false
 }
 
 /**
- * Fetches all reports for a student submission, and optionally filters by attachment ID.
- * Because this uses Tanstack query, it can be called multiple times with the same submissionId
- * and different attachmentId and will only make one query.
+ * Fetches all reports for a student submission across all attempts, then filters
+ * to the current attempt. Because this uses Tanstack query, it can be called
+ * multiple times with the same submissionId and will only make one network request.
+ *
+ * When attachmentId is provided (file upload submissions), filters by that specific
+ * attachment. Otherwise, filters by asset.submissionAttempt (text entry) and passes
+ * discussion entry reports through as-is.
  */
 export function useLtiAssetProcessorsAndReportsForStudent({
   attachmentId,
@@ -69,6 +90,21 @@ export function useLtiAssetProcessorsAndReportsForStudent({
   const result = {...data, submissionType}
   if (attachmentId !== undefined) {
     result.reports = result.reports.filter(report => report.asset?.attachmentId === attachmentId)
+  } else if (submission.attempt != null) {
+    // For text entry submissions, filter to the current attempt using asset.submissionAttempt.
+    // Discussion entry reports (asset.discussionEntryVersion set) are always passed through.
+    result.reports = result.reports.filter(
+      report =>
+        report.asset?.submissionAttempt === submission.attempt ||
+        report.asset?.discussionEntryVersion != null,
+    )
+  } else {
+    // attempt unknown: hide all attempt-specific reports to avoid mixing attempts.
+    console.warn(
+      'useLtiAssetProcessorsAndReportsForStudent: attachmentId and attempt are undefined',
+      result.reports,
+    )
+    result.reports = []
   }
   return result
 }
@@ -91,10 +127,10 @@ function unpackGqlQueryResult(
   const assetProcessors =
     assignment?.ltiAssetProcessorsConnection?.nodes?.filter(p => p !== null) ?? []
   const reports = submission?.ltiAssetReportsConnection?.nodes?.filter(r => r !== null)
-  const attempt = submission?.attempt
+  const hasNextPage = submission?.ltiAssetReportsConnection?.pageInfo?.hasNextPage ?? false
 
   if (assignmentName && assetProcessors.length > 0 && reports) {
-    return {assignmentName, assetProcessors, reports, attempt}
+    return {assignmentName, assetProcessors, reports, hasNextPage}
   }
 
   return undefined
@@ -103,7 +139,6 @@ function unpackGqlQueryResult(
 function useLtiAssetProcessorsAndReportsForStudentQuery({
   submissionId,
   submissionType,
-  ifLastAttemptIsNumber,
 }: AssetReportsForStudentParams) {
   const {data} = useQuery({
     queryKey: ['ltiAssetProcessorsAndReportsForStudent', submissionId],
@@ -116,12 +151,6 @@ function useLtiAssetProcessorsAndReportsForStudentQuery({
       !!ensureCompatibleSubmissionType(submissionType),
     select: unpackGqlQueryResult,
   })
-
-  if (ifLastAttemptIsNumber !== undefined && data?.attempt !== ifLastAttemptIsNumber) {
-    // Student view only returns reports for latest attempt.
-    // If we are viewing another attempt, we shouldn't show any reports
-    return undefined
-  }
 
   return data
 }

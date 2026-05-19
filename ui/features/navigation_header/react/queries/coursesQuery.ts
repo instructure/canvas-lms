@@ -38,6 +38,18 @@ export function getFirstPageUrl() {
     if (observedUserId) {
       return `${defaultFirstPageUrl}&observed_user_id=${observedUserId}`
     }
+
+    // If no cookie is set yet, default to the first observee in the list.
+    // If the observer is first in the list (has their own enrollments),
+    // don't filter by observee - return the default URL.
+    const observedUsersList = window.ENV.OBSERVED_USERS_LIST
+    if (observedUsersList && observedUsersList.length > 0) {
+      const firstObservee =
+        observedUsersList[0].id === ENV.current_user_id ? null : observedUsersList[0]
+      if (firstObservee) {
+        return `${defaultFirstPageUrl}&observed_user_id=${firstObservee.id}`
+      }
+    }
   }
   return defaultFirstPageUrl
 }

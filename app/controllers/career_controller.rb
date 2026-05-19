@@ -21,17 +21,24 @@
 class CareerController < ApplicationController
   include HorizonMode
 
-  before_action :require_user, :get_context
+  before_action :get_context
+  allow_public_horizon_access :show
 
   def show
-    app = CanvasCareer::ExperienceResolver.new(@current_user, @context, @domain_root_account, session).resolve
-    return redirect_to(root_path) if app == CanvasCareer::Constants::App::ACADEMIC
+    app = CanvasCareer::Constants::App::CAREER_LEARNER
+
+    if @current_user
+      app = CanvasCareer::ExperienceResolver.new(@current_user, @context, @domain_root_account, session).resolve
+      return redirect_to(add_horizon_params_to_url(root_path)) if app == CanvasCareer::Constants::App::ACADEMIC
+    end
 
     env = {
       FEATURES: features_env,
     }
-    js_env(CANVAS_CAREER: env)
-    js_env(MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size)
+    js_env({
+             CANVAS_CAREER: env,
+             MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size
+           })
 
     config = CanvasCareer::Config.new(@domain_root_account, session)
     if app == CanvasCareer::Constants::App::CAREER_LEARNING_PROVIDER
@@ -54,8 +61,6 @@ class CareerController < ApplicationController
 
   def features_env
     %i[
-      horizon_role_dashboards
-      horizon_dashboard_ai_widgets
       horizon_hris_integrations
       horizon_user_profile_page
       horizon_manual_dashboard_builder
@@ -65,9 +70,9 @@ class CareerController < ApplicationController
       horizon_chart_view
       horizon_native_permissions_page
       horizon_block_content_editor
-      horizon_course_academic_switcher
-      horizon_syncable_objects_redesign
-      horizon_help_navigation
+      horizon_native_inbox
+      horizon_study_tools
+      horizon_autopilot
     ].index_with { |feature| @domain_root_account.feature_enabled?(feature) }
   end
 end

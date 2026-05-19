@@ -19,7 +19,12 @@
 import {cleanup, fireEvent, render, screen} from '@testing-library/react'
 import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
-import {NewLoginDataProvider, NewLoginProvider,useNewLogin} from '../../../context'
+import {
+  NewLoginDataProvider,
+  NewLoginProvider,
+  useNewLogin,
+  useNewLoginData,
+} from '../../../context'
 import Landing from '../Landing'
 
 const mockNavigate = vi.fn()
@@ -31,15 +36,16 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
-
 vi.mock('../../../context', async () => {
   const originalModule = await vi.importActual('../../../context')
   return {
     ...originalModule,
     useNewLogin: vi.fn(() => ({isUiActionPending: false})),
+    useNewLoginData: vi.fn(() => ({customMessageRegistration: undefined})), // default
   }
 })
 const mockUseNewLogin = vi.mocked(useNewLogin)
+const mockUseNewLoginData = vi.mocked(useNewLoginData)
 
 describe('Landing', () => {
   afterEach(() => {
@@ -112,6 +118,51 @@ describe('Landing', () => {
     renderLanding()
     const teacherCard = screen.getByLabelText('Create Teacher Account')
     fireEvent.click(teacherCard)
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it('does not render custom message Alert when customMessageRegistration is undefined', () => {
+    mockUseNewLoginData.mockReturnValueOnce({
+      customMessageRegistration: undefined,
+      isDataLoading: false,
+    })
+    renderLanding()
+    expect(screen.queryByTestId('custom-message-alert')).not.toBeInTheDocument()
+  })
+
+  it('renders custom message Alert when customMessageRegistration is set', () => {
+    const customMsg = 'Welcome to your institution!'
+    mockUseNewLoginData.mockReturnValueOnce({
+      customMessageRegistration: customMsg,
+      isDataLoading: false,
+    })
+    renderLanding()
+    const alert = screen.getByTestId('custom-message-alert')
+    expect(alert).toBeInTheDocument()
+    expect(alert).toHaveTextContent(customMsg)
+  })
+
+  it('uses freeForTeacherRegistrationUrl as teacher card href when set', () => {
+    const fftData = {
+      freeForTeacherRegistrationUrl: 'https://fft.example.com/register',
+      isDataLoading: false,
+    }
+    mockUseNewLoginData.mockReturnValueOnce(fftData).mockReturnValueOnce(fftData)
+    renderLanding()
+    expect(screen.getByLabelText('Create Teacher Account')).toHaveAttribute(
+      'href',
+      'https://fft.example.com/register',
+    )
+  })
+
+  it('does not call navigate when teacher card is clicked and freeForTeacherRegistrationUrl is set', () => {
+    const fftData = {
+      freeForTeacherRegistrationUrl: 'https://fft.example.com/register',
+      isDataLoading: false,
+    }
+    mockUseNewLoginData.mockReturnValueOnce(fftData).mockReturnValueOnce(fftData)
+    renderLanding()
+    fireEvent.click(screen.getByLabelText('Create Teacher Account'))
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 })

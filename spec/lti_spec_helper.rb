@@ -70,7 +70,7 @@ module LtiSpecHelper
     Lti::MessageHandler.create(default_ops.merge(opts))
   end
 
-  def new_valid_external_tool(context, resource_selection = false)
+  def new_valid_external_tool(context, resource_selection: false)
     tool = context.context_external_tools.new(name: (0...8).map { rand(65..90).chr }.join,
                                               consumer_key: "key",
                                               shared_secret: "secret")

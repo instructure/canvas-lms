@@ -12,7 +12,7 @@ If you're not familiar with flamegraphs and don't know how to analyze them, I en
 
 ## Generating an HTML Flamegraph File
 
-Users with Site Admin access can have an interactive HTML flamegraph generated for them, for any request, and have it delivered to their Canvas Files.
+Users with Site Admin access can have an interactive HTML flamegraph generated for them, for any request, and have it delivered to their Canvas Files. Site Admin users can also masquerade as any non-site-admin user and generate a flamegraph report (the resulting report will be in the Site Admin user's Canvas Files).
 
 In order to generate a flamegraph for a given request, simply add the
 

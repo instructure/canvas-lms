@@ -44,7 +44,6 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {ExpandCollapseThreadsButton} from './ExpandCollapseThreadsButton'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
-import {breakpointsShape} from '@canvas/with-breakpoints'
 import {Drilldown} from '@instructure/ui-drilldown'
 import {getGroupDiscussionUrl} from '../../utils'
 import SortOrderDropDown from './SortOrderDropDown'
@@ -187,7 +186,8 @@ const DiscussionPostButtonsToolbar = props => {
       // @ts-expect-error TS18047 (typescriptify)
       !window.top.location.href.includes('speed_grader') &&
       childTopicSize >= 0 &&
-      props.isAdmin
+      props.canViewGroupPages &&
+      !ENV.current_user_is_student
     ) {
       options.push(
         <Drilldown.Option
@@ -221,7 +221,8 @@ const DiscussionPostButtonsToolbar = props => {
         </Drilldown.Option>,
       )
     }
-    if (translationLanguages.current.length > 0) {
+    // @ts-expect-error TS2339 (typescriptify)
+    if (ENV.discussion_translation_available && translationLanguages.current.length > 0) {
       options.push(
         <Drilldown.Option
           id="translation"
@@ -276,7 +277,7 @@ const DiscussionPostButtonsToolbar = props => {
 
     const buttonsMobile = () => {
       if (ENV.current_user_is_student) {
-        return [renderExpandsThreads(), renderGroup()]
+        return [renderExpandsThreads()]
       } else {
         return [
           renderAssignToButton(),
@@ -362,11 +363,11 @@ DiscussionPostButtonsToolbar.propTypes = {
   manageAssignTo: PropTypes.bool,
   isCheckpointed: PropTypes.bool,
   isExpanded: PropTypes.bool,
-  breakpoints: breakpointsShape,
   showAssignTo: PropTypes.bool,
   isSortOrderLocked: PropTypes.bool,
   isExpandedLocked: PropTypes.bool,
   isAnnouncement: PropTypes.bool,
+  breakpoints: PropTypes.object,
 }
 
 export default DiscussionPostButtonsToolbar

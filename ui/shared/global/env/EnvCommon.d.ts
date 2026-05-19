@@ -99,6 +99,11 @@ export interface BlueprintCoursesData {
 
 export interface EnvCommon {
   ASSET_HOST: string
+  JOURNEY_URL?: string
+  WIKI_PAGE_ID?: string
+  WIKI_PAGE_UPDATED_AT?: string
+  FILE_ID?: string
+  STUDY_ASSIST_TOOLS?: string[]
   DOMAIN_ROOT_ACCOUNT_SFID: string
   active_brand_config_json_url: string
   active_brand_config: {
@@ -141,7 +146,10 @@ export interface EnvCommon {
   DOMAIN_ROOT_ACCOUNT_ID: string
   DOMAIN_ROOT_ACCOUNT_UUID: string
   ROOT_ACCOUNT_ID: string
+  ONETRUST_CONSENT_DOMAIN_ID?: string
+  PRE_COOKIE_CONSENT?: string
   PENDO_APP_ID: string
+  PENDO_APP_ENV: string
   ROOT_OUTCOME_GROUP: GroupOutcome
   k12: false
   help_link_name: string
@@ -242,6 +250,7 @@ export interface EnvCommon {
   lolcalize: boolean
   rce_auto_save_max_age_ms: number
   K5_USER: boolean
+  K5_FONT_ONLY?: boolean
   USE_CLASSIC_FONT: string
   K5_HOMEROOM_COURSE: string
   K5_SUBJECT_COURSE: string
@@ -306,10 +315,10 @@ export type SiteAdminFeatureId =
   | 'feature_flag_ui_sorting'
   | 'files_a11y_rewrite'
   | 'files_a11y_rewrite_toggle'
+  | 'files_a11y_folder_duplicates'
   | 'instui_for_import_page'
   | 'instui_header'
   | 'instui_nav'
-  | 'lti_registrations_discover_page'
   | 'media_links_use_attachment_id'
   | 'multiselect_gradebook_filters'
   | 'new_quizzes_navigation_updates'
@@ -317,7 +326,6 @@ export type SiteAdminFeatureId =
   | 'render_both_to_do_lists'
   | 'scheduled_feedback_releases'
   | 'speedgrader_studio_media_capture'
-  | 'student_access_token_management'
   | 'validate_call_to_action'
   | 'youtube_migration'
   | 'youtube_overlay'
@@ -326,10 +334,10 @@ export type SiteAdminFeatureId =
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
  */
 export type RootAccountFeatureId =
+  | 'accessibility_automatic_scanning'
   | 'account_level_mastery_scales'
   | 'ams_root_account_integration'
   | 'ams_advanced_content_organization'
-  | 'api_rate_limits'
   | 'buttons_and_icons_root_account'
   | 'canvas_apps_sub_account_access'
   | 'course_pace_allow_bulk_pace_assign'
@@ -341,15 +349,18 @@ export type RootAccountFeatureId =
   | 'course_pace_weighted_assignments'
   | 'course_paces_skip_selected_days'
   | 'create_course_subaccount_picker'
+  | 'default_discussion_options'
   | 'disable_iframe_sandbox_file_show'
   | 'extended_submission_state'
+  | 'grading_rubrics_pagination'
+  | 'institutional_tags'
   | 'instui_nav'
   | 'login_registration_ui_identity'
-  | 'lti_apps_page_ai_translation'
   | 'lti_asset_processor'
   | 'lti_asset_processor_discussions'
   | 'lti_link_to_apps_from_developer_keys'
   | 'lti_deactivate_registrations'
+  | 'lock_lti_registrations'
   | 'lti_registrations_next'
   | 'lti_registrations_templates'
   | 'lti_dr_registrations_update'
@@ -361,9 +372,9 @@ export type RootAccountFeatureId =
   | 'modules_requirements_allow_percentage'
   | 'nav_menu_links'
   | 'non_scoring_rubrics'
-  | 'open_tools_in_new_tab'
   | 'pendo_extended'
   | 'product_tours'
+  | 'rce_asr_captioning_improvements'
   | 'rce_lite_enabled_speedgrader_comments'
   | 'rce_studio_embed_improvements'
   | 'rce_transform_loaded_content'
@@ -371,7 +382,10 @@ export type RootAccountFeatureId =
   | 'rubric_criterion_range'
   | 'scheduled_page_publication'
   | 'send_usage_metrics'
+  | 'substitution_variable_display'
+  | 'send_usage_metrics_after_consent'
   | 'top_navigation_placement'
+  | 'course_navigation_and_feature_options_permissions'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_SERVICES
@@ -381,10 +395,7 @@ export type RootAccountServiceId = 'account_survey_notifications'
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES
  */
-export type BrandAccountFeatureId =
-  | 'embedded_release_notes'
-  | 'consolidated_media_player'
-  | 'discussion_checkpoints'
+export type BrandAccountFeatureId = 'embedded_release_notes' | 'discussion_checkpoints'
 
 /**
  * Feature id exported in ApplicationController that aren't mentioned in
@@ -396,6 +407,8 @@ export type OtherFeatureId =
   | 'new_math_equation_handling'
   | 'lti_asset_processor_course'
   | 'peer_review_allocation_and_grading'
+  | 'notebook'
+  | 'study_assist'
 
 /**
  * From ApplicationHelper#set_tutorial_js_env

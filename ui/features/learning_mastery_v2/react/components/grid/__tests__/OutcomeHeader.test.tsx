@@ -23,10 +23,17 @@ import {pick} from 'es-toolkit/compat'
 import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
 import {OutcomeHeader, OutcomeHeaderProps} from '../OutcomeHeader'
 import {Outcome} from '@canvas/outcomes/react/types/rollup'
-import {SortOrder, SortBy} from '@canvas/outcomes/react/utils/constants'
+import {SortBy} from '@canvas/outcomes/react/utils/constants'
+import {SortOrder} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import {ContributingScoresForOutcome} from '@canvas/outcomes/react/hooks/useContributingScores'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts')
+vi.mock('../../charts/BarChart', () => ({
+  BarChart: () => null,
+  default: () => null,
+}))
 
 vi.mock('@instructure/ui-icons', async () => {
   const actual = await vi.importActual('@instructure/ui-icons')
@@ -118,20 +125,20 @@ describe('OutcomeHeader', () => {
     expect(screen.getByText('Show Outcome Distribution')).toBeInTheDocument()
   })
 
-  it('renders the outcome description modal when option is selected', async () => {
-    const user = userEvent.setup()
-    renderWithQueryClient(<OutcomeHeader {...defaultProps()} />)
-    await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
-    await user.click(screen.getByText('Outcome Info'))
-    expect(screen.getByTestId('outcome-description-modal')).toBeInTheDocument()
-  })
-
   it('renders the outcome distribution popover when option is selected', async () => {
     const user = userEvent.setup()
     renderWithQueryClient(<OutcomeHeader {...defaultProps()} />)
     await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
     await user.click(screen.getByText('Show Outcome Distribution'))
     expect(screen.getByTestId('outcome-distribution-popover')).toBeInTheDocument()
+  })
+
+  it('renders the outcome description modal when option is selected', async () => {
+    const user = userEvent.setup()
+    renderWithQueryClient(<OutcomeHeader {...defaultProps()} />)
+    await user.click(screen.getByRole('button', {name: 'outcome 1 options'}))
+    await user.click(screen.getByText('Outcome Info'))
+    expect(screen.getByTestId('outcome-description-modal')).toBeInTheDocument()
   })
 
   it('announces to screen readers when showing contributing scores', async () => {

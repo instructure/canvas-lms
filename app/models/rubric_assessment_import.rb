@@ -127,12 +127,13 @@ class RubricAssessmentImport < ApplicationRecord
       raise DataFormatError, I18n.t("Student with ID %{student_id} not found.", student_id:) unless student_to_assess
       raise UnauthorizedError unless rubric_association.user_can_assess_for?(assessor: user, assessee: student_to_assess)
 
-      assessment = assessment.each_with_object({}) do |criterion, hash|
-        hash[:"criterion_#{criterion[:id]}"] = {
-          points: criterion[:points],
-          comments: criterion[:comments],
-          description: criterion[:rating]
-        }
+      assessment = assessment.to_h do |criterion|
+        [:"criterion_#{criterion[:id]}",
+         {
+           points: criterion[:points],
+           comments: criterion[:comments],
+           description: criterion[:rating]
+         }]
       end
       assessment[:assessment_type] = "grading"
 

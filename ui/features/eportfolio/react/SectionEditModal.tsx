@@ -30,7 +30,7 @@ import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 import * as z from 'zod'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {createEntry, updateEntry, deleteEntry, moveEntry} from './utils'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('eportfolio')
 

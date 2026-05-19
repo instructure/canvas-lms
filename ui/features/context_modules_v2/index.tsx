@@ -23,11 +23,12 @@ import ModulesStudentContainer from './react/ModulesStudentContainer'
 import ready from '@instructure/ready'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
-import ErrorBoundary from '@canvas/error-boundary'
-import GenericErrorPage from '@canvas/generic-error-page/react'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {ContextModuleProvider} from './react/hooks/useModuleContext'
 import {handleShortcutKey} from './react/utils/KBNavigator'
 import ObserverOptions from '@canvas/observer-picker'
@@ -59,6 +60,8 @@ ready(() => {
         errorComponent={
           <GenericErrorPage
             imageUrl={errorShipUrl}
+            onReportError={reportError}
+            translations={canvasErrorPageTranslations}
             errorCategory={I18n.t('Context Modules Error Page')}
           />
         }

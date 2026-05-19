@@ -29,6 +29,7 @@ import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment
 
 type HorizontalButtonDisplayProps = {
   buttonDisplay: string
+  criterionId: string
   hidePoints: boolean
   isPreviewMode: boolean
   isSelfAssessment: boolean
@@ -42,6 +43,7 @@ type HorizontalButtonDisplayProps = {
 }
 export const HorizontalButtonDisplay = ({
   buttonDisplay,
+  criterionId,
   hidePoints,
   isPreviewMode,
   ratings,
@@ -62,9 +64,7 @@ export const HorizontalButtonDisplay = ({
   const selectedSelfAssessmentRatingIndex = selectedSelfAssessmentRating
     ? ratings.indexOf(selectedSelfAssessmentRating)
     : -1
-  const min = criterionUseRange
-    ? rangingFrom(ratings, selectedRatingIndex, undefined, true)
-    : undefined
+  const min = criterionUseRange ? rangingFrom(ratings, selectedRatingIndex) : undefined
 
   useEffect(() => {
     if (shouldFocusFirstRating && firstRatingRef.current) {
@@ -85,7 +85,11 @@ export const HorizontalButtonDisplay = ({
   const isButtonDisplayPoints = buttonDisplay === 'points' && !hidePoints
 
   return (
-    <View as="div" data-testid="rubric-assessment-horizontal-display">
+    <View
+      as="div"
+      data-criterion-id={criterionId}
+      data-testid="rubric-assessment-horizontal-display"
+    >
       {ratingDescriptionIndex >= 0 && (
         <View
           as="div"
@@ -129,15 +133,18 @@ export const HorizontalButtonDisplay = ({
             isButtonDisplayPoints && rating.points != null
               ? rating.points.toString()
               : (ratings.length - (index + 1)).toString()
-          const buttonAriaLabel = `${rating.description} ${
-            rating.longDescription
-          } ${getPossibleText(rating.points)}`
+          const buttonAriaLabel = [
+            rating.description,
+            rating.longDescription,
+            getPossibleText(rating.points),
+          ]
+            .filter(Boolean)
+            .join(' ')
 
           return (
             <Flex.Item
               key={`${rating.id}-${buttonLabel}`}
               data-testid={`rating-button-${rating.id}-${index}`}
-              aria-label={buttonAriaLabel}
               elementRef={ref => {
                 if (index === 0) {
                   firstRatingRef.current = ref
@@ -146,6 +153,7 @@ export const HorizontalButtonDisplay = ({
             >
               {isSelfAssessment ? (
                 <SelfAssessmentRatingButton
+                  ariaLabel={buttonAriaLabel}
                   buttonLabel={buttonLabel}
                   isSelected={selectedRatingIndex === index}
                   isPreviewMode={isPreviewMode}
@@ -153,6 +161,7 @@ export const HorizontalButtonDisplay = ({
                 />
               ) : (
                 <RatingButton
+                  ariaLabel={buttonAriaLabel}
                   buttonLabel={buttonLabel}
                   isSelected={selectedRatingIndex === index}
                   isSelfAssessmentSelected={selectedSelfAssessmentRatingIndex === index}

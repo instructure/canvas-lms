@@ -23,17 +23,17 @@ import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {DeleteRubricModal} from '../DeleteRubricModal'
 import * as ViewRubricQueries from '../../../queries/ViewRubricQueries'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer as destroyFlashAlertContainer} from '@instructure/platform-alerts'
 
 vi.mock('react-router', async () => ({
-  ...await vi.importActual('react-router'),
+  ...(await vi.importActual('react-router')),
   useParams: vi.fn(),
 }))
 const onDismiss = vi.fn()
 const setPopoverIsOpen = vi.fn()
 const deleteRubricMock = vi.fn()
 vi.mock('../../../queries/ViewRubricQueries', async () => ({
-  ...await vi.importActual('../../../queries/ViewRubricQueries'),
+  ...(await vi.importActual('../../../queries/ViewRubricQueries')),
   deleteRubric: () => deleteRubricMock,
 }))
 
@@ -93,9 +93,9 @@ describe('RubricForm Tests', () => {
   })
 
   it('deletes the rubric when the delete button is clicked', async () => {
-    vi
-      .spyOn(ViewRubricQueries, 'deleteRubric')
-      .mockImplementation(() => Promise.resolve({id: '1', title: 'Rubric 1', pointsPossible: 10}))
+    vi.spyOn(ViewRubricQueries, 'deleteRubric').mockImplementation(() =>
+      Promise.resolve({id: '1', title: 'Rubric 1', pointsPossible: 10}),
+    )
     const {getByTestId} = renderComponent()
     const deleteButton = getByTestId('delete-rubric-modal-button')
     deleteButton?.click()

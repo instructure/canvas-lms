@@ -17,7 +17,7 @@
  */
 
 import {setupServer} from 'msw/node'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {handleDelete} from '../moduleActionHandlers'
 import {
   handleOpeningModuleUpdateTray,

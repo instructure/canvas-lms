@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {gql} from '@apollo/client'
+import {gql} from 'graphql-tag'
 import {executeGraphQLQuery} from '../utils/graphql'
 import type {CourseInstructorForComponent} from '../hooks/useCourseInstructors'
 

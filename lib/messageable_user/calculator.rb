@@ -79,8 +79,8 @@ class MessageableUser
       # they're definitely messageable
       other_users = users.reject { |u| u.id == @user.id }
       if other_users.present?
-        load_common_courses_with_users(other_users, include_course_id, strict_checks)
-        load_common_groups_with_users(other_users, include_group_id, strict_checks)
+        load_common_courses_with_users(other_users, include_course_id, strict_checks:)
+        load_common_groups_with_users(other_users, include_group_id, strict_checks:)
       end
 
       # keep only the ones that look messageable (have a shared context, are
@@ -279,8 +279,8 @@ class MessageableUser
     # include_course_id came from a CourseSection admin_context?)
     #
     # the optional strict_checks parameter (default: true) is passed down to
-    # the queried scopes (see enrollment_scope and account_user_scope).
-    def load_common_courses_with_users(users, include_course_id = nil, strict_checks = true)
+    # the queried scopes (see enrollment_scope and visible_account_user_scope).
+    def load_common_courses_with_users(users, include_course_id = nil, strict_checks: true)
       scope_options = { strict_checks:, include_deleted: !strict_checks }
       users.each { |u| u.global_common_courses = {} }
 
@@ -333,7 +333,7 @@ class MessageableUser
     #
     # the optional strict_checks parameter (default: true) is passed down to
     # the queried scopes (see group_user_scope).
-    def load_common_groups_with_users(users, include_group_id = nil, strict_checks = true)
+    def load_common_groups_with_users(users, include_group_id = nil, strict_checks: true)
       scope_options = { strict_checks:, include_deleted: !strict_checks }
       users.each { |u| u.global_common_groups = {} }
 
@@ -626,7 +626,11 @@ class MessageableUser
       state_clauses.compact!
       return nil if state_clauses.empty?
 
-      "(#{state_clauses.join(" OR ")}) AND enrollments.type != 'StudentViewEnrollment'"
+      conditions = "(#{state_clauses.join(" OR ")}) AND enrollments.type != 'StudentViewEnrollment'"
+      if options[:exclude_pending_temporary_enrollments]
+        conditions += " AND (#{Enrollment.pending_temporary_enrollment_exclusion_sql})"
+      end
+      conditions
     end
 
     def base_scope(options = {})
@@ -653,7 +657,8 @@ class MessageableUser
     def enrollment_scope(options = {})
       options = {
         common_course_column: "enrollments.course_id",
-        common_role_column: "enrollments.type"
+        common_role_column: "enrollments.type",
+        exclude_pending_temporary_enrollments: temporary_enrollments_enabled?
       }.merge(options)
       scope = base_scope(options)
       scope = scope.joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.user_id=users.id")
@@ -732,29 +737,23 @@ class MessageableUser
       clause
     end
 
-    # scopes MessageableUsers via associations with accounts, setting up the
-    # common context fields to produce fake common_course entries with the
-    # primary enrollment type in the account (see above).
-    #
-    # if :strict_checks is false (default: true), all users will be included,
-    # not just active users. (see MessageableUser.prepped)
-    def account_user_scope(options = {})
-      # uses a clearly fake enrollment type for the user across all active courses in the account.
-      # used to fake a common "course" context with that enrollment type
-      # in users found via the account roster.
+    # scopes MessageableUsers to users associated with accounts in which
+    # I can read the roster (see visible_account_ids), using an EXISTS
+    # subquery rather than a JOIN to avoid row multiplication.
+    def visible_account_user_scope(options = {})
       options = {
         common_course_column: 0,
-        common_role_column: "'FakeEnrollment'"
+        common_role_column: "'FakeEnrollment'",
+        static_common_contexts: true
       }.merge(options)
 
       base_scope(options)
-        .joins("INNER JOIN #{UserAccountAssociation.quoted_table_name} ON user_account_associations.user_id=users.id")
-    end
-
-    # further restricts the account user scope to users associated with
-    # accounts in which I can read the roster (see visible_account_ids).
-    def visible_account_user_scope(options = {})
-      account_user_scope(options).where("user_account_associations.account_id" => visible_account_ids)
+        .where(
+          UserAccountAssociation
+            .where("user_account_associations.user_id = users.id")
+            .where(account_id: visible_account_ids)
+            .arel.exists
+        )
     end
 
     # scopes MessageableUsers via group memberships, setting up the common
@@ -884,7 +883,9 @@ class MessageableUser
                               .where("groups.workflow_state<>'deleted'")
                               .where(MessageableUser::AVAILABLE_CONDITIONS)
                               .where(groups: { context_type: "Course" })
-                              .where(self.class.enrollment_conditions)
+                              .where(self.class.enrollment_conditions(
+                                       exclude_pending_temporary_enrollments: temporary_enrollments_enabled?
+                                     ))
                               .where(enrollments: { course_section_id: visible_section_ids_in_courses(recent_section_visible_courses) })
 
       if student_courses.present?
@@ -1084,6 +1085,10 @@ class MessageableUser
 
     def section_visible_group_ids
       section_visible_group_ids_by_shard[Shard.current] || []
+    end
+
+    def temporary_enrollments_enabled?
+      !!Account.current_domain_root_account&.feature_enabled?(:temporary_enrollments)
     end
 
     def marshal_dump

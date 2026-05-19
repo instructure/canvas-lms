@@ -416,8 +416,7 @@ describe LearnPlatformController do
                    headers: { "Content-Type" => "application/json", "Content-Length" => response_fixture.size })
     end
 
-    it "includes translate_lang for index when feature flag is enabled and locale is not :en" do
-      @account.enable_feature!(:lti_apps_page_ai_translation)
+    it "includes translate_lang for index when locale is not :en" do
       allow(I18n).to receive(:locale).and_return(:es)
 
       expect_any_instance_of(LearnPlatform::Api).to receive(:products) do |_, options|
@@ -431,23 +430,7 @@ describe LearnPlatformController do
       get :index, params: { account_id: @account.id, q: { canvas_integrated_only: true } }
     end
 
-    it "does not include translate_lang for index when feature flag is disabled" do
-      @account.disable_feature!(:lti_apps_page_ai_translation)
-      allow(I18n).to receive(:locale).and_return(:es)
-
-      expect_any_instance_of(LearnPlatform::Api).to receive(:products) do |_, options|
-        expect(options).not_to have_key(:translate_lang)
-        {
-          tools: [{ id: 1, name: "First Tool" }],
-          meta: { page: 1, per_page: 10, total_count: 1 }
-        }
-      end
-
-      get :index, params: { account_id: @account.id, q: { canvas_integrated_only: true } }
-    end
-
     it "does not include translate_lang for index when locale is :en" do
-      @account.enable_feature!(:lti_apps_page_ai_translation)
       allow(I18n).to receive(:locale).and_return(:en)
 
       expect_any_instance_of(LearnPlatform::Api).to receive(:products) do |_, options|
@@ -461,8 +444,7 @@ describe LearnPlatformController do
       get :index, params: { account_id: @account.id, q: { canvas_integrated_only: true } }
     end
 
-    it "includes translate_lang for index_by_category when feature flag is enabled and locale is not :en" do
-      @account.enable_feature!(:lti_apps_page_ai_translation)
+    it "includes translate_lang for index_by_category when locale is not :en" do
       allow(I18n).to receive(:locale).and_return(:fr)
 
       expect_any_instance_of(LearnPlatform::Api).to receive(:products_by_category) do |_, options|
@@ -473,8 +455,7 @@ describe LearnPlatformController do
       get :index_by_category, params: { account_id: @account.id }
     end
 
-    it "includes translate_lang for show when feature flag is enabled and locale is not :en" do
-      @account.enable_feature!(:lti_apps_page_ai_translation)
+    it "includes translate_lang for show when locale is not :en" do
       allow(I18n).to receive(:locale).and_return(:de)
 
       expect_any_instance_of(LearnPlatform::Api).to receive(:product) do |_, id, options|
@@ -486,8 +467,7 @@ describe LearnPlatformController do
       get :show, params: { account_id: @account.id, id: 1 }
     end
 
-    it "includes translate_lang for filters when feature flag is enabled and locale is not :en" do
-      @account.enable_feature!(:lti_apps_page_ai_translation)
+    it "includes translate_lang for filters when locale is not :en" do
       allow(I18n).to receive(:locale).and_return(:it)
 
       expect_any_instance_of(LearnPlatform::Api).to receive(:product_filters) do |_, options|

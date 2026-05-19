@@ -35,6 +35,6 @@ class EnsureTestDbEmpty < ActiveRecord::Migration[7.0]
     # with the exception of the core tables mentioned in the method above, and a single row in the
     # accounts table for the dummy root account. You can test locally by running
     # `RAILS_ENV=test bin/rake db:test:reset`
-    raise "Test database is not empty! Tables with data: #{non_empty_tables.join(", ")}" unless non_empty_tables.empty?
+    raise connection.non_empty_tables_message(non_empty_tables) unless non_empty_tables.empty?
   end
 end

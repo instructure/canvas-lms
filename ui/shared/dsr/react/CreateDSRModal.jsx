@@ -36,7 +36,7 @@ import {datetimeString} from '@canvas/datetime/date-functions'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import preventDefault from '@canvas/util/preventDefault'
 import unflatten from 'obj-unflatten'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 
 const I18n = createI18nScope('dsr')
 

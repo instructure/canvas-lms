@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse, delay} from 'msw'
 import {
@@ -52,6 +53,8 @@ describe('Preview', () => {
     issue: mockIssue,
     resourceId: 123,
     itemType: ResourceType.Assignment,
+    onStaleConflict: vi.fn(),
+    onRescan: vi.fn(),
   }
 
   beforeAll(() => server.listen())
@@ -629,6 +632,127 @@ describe('Preview', () => {
           screen.queryByText('Error previewing fixed accessibility issue.'),
         ).not.toBeInTheDocument()
       })
+    })
+  })
+
+  describe('stale resource (409 conflict)', () => {
+    it('shows warning alert overlay with stale message when GET returns 409', async () => {
+      server.use(http.get('/preview', () => HttpResponse.json({error: 'Conflict'}, {status: 409})))
+
+      render(<Preview {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            'This issue may be outdated. The resource has been updated since this issue was detected.',
+          ),
+        ).toBeInTheDocument()
+      })
+    })
+
+    it('does not show generic error message when GET returns 409', async () => {
+      server.use(http.get('/preview', () => HttpResponse.json({error: 'Conflict'}, {status: 409})))
+
+      render(<Preview {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            'This issue may be outdated. The resource has been updated since this issue was detected.',
+          ),
+        ).toBeInTheDocument()
+      })
+
+      expect(
+        screen.queryByText('Error previewing fixed accessibility issue.'),
+      ).not.toBeInTheDocument()
+    })
+
+    it('does not show loading spinner after 409 response resolves', async () => {
+      server.use(http.get('/preview', () => HttpResponse.json({error: 'Conflict'}, {status: 409})))
+
+      render(<Preview {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            'This issue may be outdated. The resource has been updated since this issue was detected.',
+          ),
+        ).toBeInTheDocument()
+      })
+
+      expect(screen.queryByText('Loading preview...')).not.toBeInTheDocument()
+    })
+
+    it('calls onStaleConflict callback when GET returns 409', async () => {
+      server.use(http.get('/preview', () => HttpResponse.json({error: 'Conflict'}, {status: 409})))
+
+      const onStaleConflict = vi.fn()
+      render(<Preview {...defaultProps} onStaleConflict={onStaleConflict} />)
+
+      await waitFor(() => {
+        expect(onStaleConflict).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    it('shows Rescan this resource button when onRescan prop is provided', async () => {
+      server.use(http.get('/preview', () => HttpResponse.json({error: 'Conflict'}, {status: 409})))
+
+      const onRescan = vi.fn()
+      render(<Preview {...defaultProps} onRescan={onRescan} />)
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', {name: 'Rescan this resource'})).toBeInTheDocument()
+      })
+    })
+
+    it('calls onRescan callback when Rescan this resource button is clicked', async () => {
+      server.use(http.get('/preview', () => HttpResponse.json({error: 'Conflict'}, {status: 409})))
+
+      const onRescan = vi.fn()
+      render(<Preview {...defaultProps} onRescan={onRescan} />)
+
+      const rescanButton = await screen.findByRole('button', {name: 'Rescan this resource'})
+      await userEvent.click(rescanButton)
+
+      expect(onRescan).toHaveBeenCalledTimes(1)
+    })
+
+    it('clears stale warning and shows content when successful request follows 409', async () => {
+      server.use(http.get('/preview', () => HttpResponse.json({error: 'Conflict'}, {status: 409})))
+
+      const ref = React.createRef<PreviewHandle>()
+      render(<Preview {...defaultProps} ref={ref} />)
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            'This issue may be outdated. The resource has been updated since this issue was detected.',
+          ),
+        ).toBeInTheDocument()
+      })
+
+      // Override the handler to return success on the next GET
+      server.use(
+        http.get('/preview', () =>
+          HttpResponse.json({
+            content: '<div>Fresh content</div>',
+            path: '//div',
+          }),
+        ),
+      )
+
+      ref.current?.reload()
+
+      await waitFor(() => {
+        expect(
+          screen.queryByText(
+            'This issue may be outdated. The resource has been updated since this issue was detected.',
+          ),
+        ).not.toBeInTheDocument()
+      })
+
+      expect(screen.getByText('Fresh content')).toBeInTheDocument()
     })
   })
 })

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class BlockEditorTemplate < ActiveRecord::Base
+class BlockEditorTemplate < ApplicationRecord
   include Workflow
 
   belongs_to :context, polymorphic: %i[account course user]

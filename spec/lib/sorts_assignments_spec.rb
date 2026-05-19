@@ -672,8 +672,8 @@ describe SortsAssignments do
             include_discussion_checkpoints: false
           )
           assignment_ids = sorter_no_checkpoints.assignments(:upcoming).pluck(:id)
-          expect(assignment_ids).to_not include(@reply_to_topic.id)
-          expect(assignment_ids).to_not include(@reply_to_entry.id)
+          expect(assignment_ids).not_to include(@reply_to_topic.id)
+          expect(assignment_ids).not_to include(@reply_to_entry.id)
         end
       end
     end

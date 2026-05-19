@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module ConditionalRelease
-  class AssignmentSet < ActiveRecord::Base
+  class AssignmentSet < ApplicationRecord
     include Deletion
 
     belongs_to :scoring_range, optional: false

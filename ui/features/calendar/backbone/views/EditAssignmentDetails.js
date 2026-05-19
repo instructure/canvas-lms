@@ -29,7 +29,7 @@ import editAssignmentOverrideTemplate from '../../jst/editAssignmentOverride.han
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import genericSelectOptionsTemplate from '../../jst/genericSelectOptions.handlebars'
 import datePickerFormat from '@instructure/moment-utils/datePickerFormat'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import withinMomentDates from '../../momentDateHelper'
 import * as tz from '@instructure/moment-utils'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'

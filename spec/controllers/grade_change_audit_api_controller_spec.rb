@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe GradeChangeAuditApiController do
   let_once(:admin) { account_admin_user }
   let_once(:course) { Course.create! }
@@ -54,6 +52,18 @@ describe GradeChangeAuditApiController do
     it "returns events with the student's id included" do
       get(:for_assignment, params:)
       expect(student_ids).to include(student.id.to_s)
+    end
+
+    it "returns successfully for non-admin users" do
+      user_session(teacher)
+      get(:for_assignment, params:)
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "returns 404 for students" do
+      user_session(student)
+      get(:for_assignment, params:)
+      expect(response).to have_http_status(:not_found)
     end
 
     describe "override grade change events" do
@@ -302,7 +312,8 @@ describe GradeChangeAuditApiController do
         course_id: course.id,
         grader_id: teacher.id,
         assignment_id: assignment.id,
-        student_id: student.id
+        student_id: student.id,
+        format: :json
       }
     end
 
@@ -313,6 +324,35 @@ describe GradeChangeAuditApiController do
     it "returns events with the student's id included" do
       get(:query, params:)
       expect(student_ids).to include(student.id.to_s)
+    end
+
+    describe "permission checks" do
+      it "returns 403 for non-admin users when course_id or assignment_id are missing" do
+        user_session(teacher)
+        params = { grader_id: teacher.id, student_id: student.id, format: :json }
+        get(:query, params:)
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it "returns successfully for teachers/subaccount users when course_id is provided" do
+        user_session(teacher)
+        params = { course_id: course.id, format: :json }
+        get(:query, params:)
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "returns successfully for teachers/subaccount users when assignment_id is provided" do
+        user_session(teacher)
+        params = { assignment_id: assignment.id, format: :json }
+        get(:query, params:)
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "returns 404 for students" do
+        user_session(student)
+        get(:query, params:)
+        expect(response).to have_http_status(:not_found)
+      end
     end
 
     context "when assignment is anonymous and muted" do
@@ -410,6 +450,49 @@ describe GradeChangeAuditApiController do
       it "returns override grade changes" do
         get :query, params: { student_id: student.id }
         expect(returned_assignment_ids).to contain_exactly(assignment.id, nil)
+      end
+    end
+  end
+
+  describe "GET for_course_and_other_parameters" do
+    context "with a checkpoint parent assignment" do
+      let_once(:checkpoints) do
+        course.account.enable_feature!(:discussion_checkpoints)
+        graded_discussion_topic_with_checkpoints(context: course)
+      end
+      let_once(:reply_to_topic_checkpoint) { checkpoints[0] }
+      let_once(:reply_to_entry_checkpoint) { checkpoints[1] }
+      let_once(:parent_assignment) { checkpoints[2].assignment }
+
+      before do
+        reply_to_topic_checkpoint.grade_student(student, grader: teacher, score: 4)
+        reply_to_entry_checkpoint.grade_student(student, grader: teacher, score: 5)
+      end
+
+      it "returns grade change events for all checkpoint sub-assignments" do
+        get :for_course_and_other_parameters, params: { course_id: course.id, assignment_id: parent_assignment.id }
+        event_assignment_ids = returned_events.map { |e| e.dig("links", "assignment") }
+        expect(event_assignment_ids).to contain_exactly(reply_to_topic_checkpoint.id, reply_to_entry_checkpoint.id)
+      end
+
+      it "filters by grader_id" do
+        get :for_course_and_other_parameters, params: {
+          course_id: course.id,
+          assignment_id: parent_assignment.id,
+          grader_id: teacher.id
+        }
+        event_grader_ids = returned_events.map { |e| e.dig("links", "grader") }
+        expect(event_grader_ids).to all(eql(teacher.id.to_s))
+      end
+
+      it "filters by student_id" do
+        get :for_course_and_other_parameters, params: {
+          course_id: course.id,
+          assignment_id: parent_assignment.id,
+          student_id: student.id
+        }
+        event_student_ids = returned_events.map { |e| e.dig("links", "student") }
+        expect(event_student_ids).to all(eql(student.id.to_s))
       end
     end
   end

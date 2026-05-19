@@ -18,7 +18,6 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {render} from '@canvas/react'
-import {createRoot} from 'react-dom/client'
 import SuspendedIcon from '../react/SuspendedIcon'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
@@ -217,8 +216,7 @@ ready(() => {
       const innerDiv = document.createElement('div')
       icon.replaceChildren(innerDiv)
 
-      const root = createRoot(innerDiv)
-      root.render(<SuspendedIcon login={login} />)
+      render(<SuspendedIcon login={login} />, innerDiv)
     }
 
     function unsetSuspend(id) {

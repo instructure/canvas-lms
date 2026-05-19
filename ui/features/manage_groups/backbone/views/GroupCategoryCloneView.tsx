@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import $ from 'jquery'
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -31,7 +31,6 @@ const I18n = createI18nScope('groups')
 // @ts-expect-error - Legacy Backbone typing
 extend(GroupCategoryCloneView, DialogFormView)
 
-// @ts-expect-error - Legacy Backbone typing
 function GroupCategoryCloneView() {
   // @ts-expect-error - Legacy Backbone typing
   this.onSaveSuccess = this.onSaveSuccess.bind(this)
@@ -145,8 +144,12 @@ GroupCategoryCloneView.prototype.showErrors = function (errors) {
     }
     const errorsContainer = this.$el.find('#cloned_category_name_errors')[0]
     if (errorsContainer) {
-      if (!this.errorRoot) this.errorRoot = createRoot(errorsContainer)
-      this.errorRoot.render(<FormattedErrorMessage message={msg} margin="x-small 0 0 0" />)
+      if (!this.errorRoot)
+        this.errorRoot = render(
+          <FormattedErrorMessage message={msg} margin="x-small 0 0 0" />,
+          errorsContainer,
+        )
+      else rerender(this.errorRoot, <FormattedErrorMessage message={msg} margin="x-small 0 0 0" />)
     }
   }
 }

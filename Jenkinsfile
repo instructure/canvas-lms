@@ -48,11 +48,14 @@ loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
 commitMessageFlag.setDefaultValues(commitMessageFlagDefaults() + commitMessageFlagPrivateDefaults())
 
+pipelineHelpers.preBuildChecks()
+
 pipeline {
   agent { label 'canvas-docker' }
 
   options {
-    timeout(time: 1, unit: 'HOURS')
+    skipDefaultCheckout()
+    timeout(time: 2, unit: 'HOURS')
     ansiColor('xterm')
     timestamps()
     lock (label: 'canvas_build_global_mutex', quantity: 1)
@@ -97,18 +100,18 @@ pipeline {
 
     IMAGE_CACHE_BUILD_SCOPE = configuration.gerritChangeNumber()
     IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
-    IMAGE_CACHE_UNIQUE_SCOPE = "${imageTagVersion()}-$TAG_SUFFIX"
+    IMAGE_CACHE_UNIQUE_SCOPE = imageTag.applyTestSuffix("${imageTagVersion()}-$TAG_SUFFIX")
 
     DYNAMODB_IMAGE_TAG = "$DYNAMODB_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     POSTGRES_IMAGE_TAG = "$POSTGRES_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     WEBPACK_BUILDER_IMAGE = "$WEBPACK_BUILDER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     WEBPACK_ASSETS_IMAGE = "$WEBPACK_ASSETS_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
 
-    DYNAMODB_MERGE_IMAGE = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}"
+    DYNAMODB_MERGE_IMAGE = imageTag.applyTestSuffix("$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}")
     KARMA_RUNNER_IMAGE = "$KARMA_RUNNER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
-    KARMA_MERGE_IMAGE = "$KARMA_RUNNER_PREFIX:$IMAGE_CACHE_MERGE_SCOPE"
+    KARMA_MERGE_IMAGE = imageTag.applyTestSuffix("$KARMA_RUNNER_PREFIX:$IMAGE_CACHE_MERGE_SCOPE")
     LINTERS_RUNNER_IMAGE = "$LINTERS_RUNNER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
-    POSTGRES_MERGE_IMAGE = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}"
+    POSTGRES_MERGE_IMAGE = imageTag.applyTestSuffix("$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}")
 
     // This is primarily for the plugin build
     // for testing canvas-lms changes against plugin repo changes
@@ -345,15 +348,38 @@ pipeline {
 
     stage('Locales Only Changes') {
       when {
-        expression { !configuration.isChangeMerged() }
-        environment name: 'GERRIT_PROJECT', value: 'canvas-lms'
-        expression {
-          sh(script: "${WORKSPACE}/build/new-jenkins/locales-changes.sh", returnStatus: true) == 0
+        allOf {
+          expression { !configuration.isChangeMerged() }
+          environment name: 'GERRIT_PROJECT', value: 'canvas-lms'
         }
       }
       steps {
         script {
-          submitGerritReview('--label Lint-Review=-2', 'This commit contains only changes to config/locales/, this could be a bad sign!')
+          def changedFiles = sh(
+            script: "git show --pretty='' --name-only $env.GERRIT_PATCHSET_REVISION",
+            returnStdout: true
+          ).trim().split('\n').findAll { it }
+
+          // Any file outside config/locales/ means the commit is fine
+          if (!changedFiles || !changedFiles.every { it.startsWith('config/locales/') }) {
+            return
+          }
+
+          // Remove 'safe' files allowed to be the only change
+          def unsafeFiles = changedFiles - ['config/locales/locales.yml', 'config/locales/community.csv']
+
+          if (!unsafeFiles) {
+            // Only safe files changed
+            return
+          }
+
+          if (unsafeFiles.every { it.endsWith('.yml') }) {
+            // All concerning files are auto-generated *.yml — strong signal something is wrong
+            submitGerritReview('--label Lint-Review=-2', 'This commit contains only auto-generated config/locales/*.yml changes without other source changes. These files should not be modified directly.')
+          } else {
+            // Mix of yml + non-yml, or only non-yml (e.g. .rb) — warn but could be intentional
+            submitGerritReview('--label Lint-Review=-1', 'Warning: this commit contains only changes to config/locales/ without other source changes. Please verify this is intentional.')
+          }
         }
       }
     }
@@ -477,7 +503,6 @@ pipeline {
               steps {
                 script {
                   if (configuration.isChangeMerged() || env.GERRIT_CHANGE_ID != '0') {
-                    lintersStage.provisionDocker()
                     lintersStage.runLintersInline()
                   }
                 }
@@ -537,24 +562,6 @@ pipeline {
                 'Local Docker Dev Build',
                 '/Canvas/test-suites/local-docker-dev-smoke',
                 buildParameters
-              )
-            }
-          }
-        }
-
-        stage('Contract Tests') {
-          when {
-            expression { shouldStageRun('Contract') }
-          }
-          steps {
-            script {
-              pipelineHelpers.runTestSuite(
-                'Contract Tests',
-                '/Canvas/test-suites/contract-tests',
-                buildParameters + [
-                  string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                  string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}")
-                ]
               )
             }
           }
@@ -635,6 +642,7 @@ pipeline {
           // Only run the post-build cleanup if the build wasn't skipped, since skipped builds may not have set up docker or other resources
           pipelineHelpers.postBuildAlways()
         }
+        pipelineHelpers.cleanupDocker()
       }
     }
 

@@ -20,8 +20,27 @@
 
 module Validators
   class AccountSettingsValidator < ActiveModel::Validator
+    DISCOVERY_PAGE_MAX_ITEMS = 10
     DISCOVERY_PAGE_REQUIRED_KEYS = %i[authentication_provider_id label].freeze
-    DISCOVERY_PAGE_OPTIONAL_KEYS = %i[icon_url].freeze
+    DISCOVERY_PAGE_OPTIONAL_KEYS = %i[icon].freeze
+    DISCOVERY_PAGE_LABEL_MAX_LENGTH = 255
+
+    DISCOVERY_PAGE_ICON_VALUES = %w[
+      apple
+      auth0
+      canvas
+      classlink
+      clever
+      default
+      facebook
+      github
+      google
+      linkedin
+      microsoft
+      okta
+      onelogin
+      ping
+    ].freeze
 
     def validate(record)
       # Discovery Page
@@ -33,10 +52,6 @@ module Validators
     def validate_discovery_page(record)
       data = record.settings[:discovery_page]
 
-      # Load authentication providers into memory and validate there
-      # to avoid N+1 queries during #validate_discovery_page_entry
-      record.authentication_providers.load unless record.authentication_providers.loaded?
-
       %i[primary secondary].each do |section|
         section_data = data[section]
         next if section_data.nil?
@@ -45,8 +60,23 @@ module Validators
           record.errors.add(:settings, "discovery_page.#{section} must be an array")
           next
         end
+      end
 
-        section_data.each_with_index do |entry, index|
+      return if record.errors.any?
+
+      total = (data[:primary] || []).length + (data[:secondary] || []).length
+      if total > DISCOVERY_PAGE_MAX_ITEMS
+        record.errors.add(
+          :settings,
+          "discovery_page total items cannot exceed #{DISCOVERY_PAGE_MAX_ITEMS} (#{total} given)"
+        )
+        return
+      end
+
+      %i[primary secondary].each do |section|
+        next if data[section].nil?
+
+        data[section].each_with_index do |entry, index|
           validate_discovery_page_entry(record, section, entry, index)
         end
       end
@@ -54,7 +84,7 @@ module Validators
 
     def validate_discovery_page_entry(record, section, entry, index)
       provider_id = entry[:authentication_provider_id].to_i
-      unless record.authentication_providers.find { it.id == provider_id }&.active?
+      unless record.authentication_providers.valid_for_discovery_page.find_by(id: provider_id)
         record.errors.add(:settings, "discovery_page.#{section}[#{index}].authentication_provider_id is invalid or inactive")
         return
       end
@@ -65,15 +95,20 @@ module Validators
         end
       end
 
-      return unless entry[:icon_url].present?
+      validate_discovery_page_label(record, section, entry[:label], index)
 
-      begin
-        uri = URI.parse(entry[:icon_url])
-        unless uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
-          record.errors.add(:settings, "discovery_page.#{section}[#{index}].icon_url must be a valid URL")
-        end
-      rescue URI::InvalidURIError
-        record.errors.add(:settings, "discovery_page.#{section}[#{index}].icon_url must be a valid URL")
+      return unless entry[:icon].present?
+
+      unless DISCOVERY_PAGE_ICON_VALUES.include?(entry[:icon])
+        record.errors.add(:settings, "discovery_page.#{section}[#{index}].icon must be one of: #{DISCOVERY_PAGE_ICON_VALUES.join(", ")}")
+      end
+    end
+
+    def validate_discovery_page_label(record, section, label, index)
+      return if label.blank?
+
+      if label.length > DISCOVERY_PAGE_LABEL_MAX_LENGTH
+        record.errors.add(:settings, "discovery_page.#{section}[#{index}].label must be #{DISCOVERY_PAGE_LABEL_MAX_LENGTH} characters or fewer")
       end
     end
   end

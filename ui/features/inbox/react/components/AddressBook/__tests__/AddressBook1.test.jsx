@@ -18,7 +18,7 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {AddressBook, USER_TYPE, CONTEXT_TYPE} from '../AddressBook'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {ApolloProvider} from '@apollo/client'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '@canvas/msw/mswClient'

@@ -31,6 +31,11 @@ module Services
     class << self
       private
 
+      Canvas::Reloader.on_reload do
+        @config = nil
+        @client = nil
+      end
+
       def client
         return @client if instance_variable_defined?(:@client)
 

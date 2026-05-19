@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Group < ActiveRecord::Base
+class Group < ApplicationRecord
   include Context
   include Workflow
   include CustomValidations

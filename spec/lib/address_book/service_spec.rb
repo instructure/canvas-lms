@@ -60,17 +60,15 @@ describe AddressBook::Service do
   end
 
   def stub_common_contexts(args, returns = {})
-    args << false # ignore_result
     returns = expand_common_contexts(returns)
-    allow(Services::AddressBook).to receive(:common_contexts).with(*args).and_return(returns)
+    allow(Services::AddressBook).to receive(:common_contexts).with(*args, ignore_result: false).and_return(returns)
   end
 
-  def stub_known_in_context(args, compact_returns = {})
+  def stub_known_in_context(args, compact_returns = {}, ignore_result: false)
     args << nil if args.length < 3 # user_ids
-    args << false if args.length < 4 # ignore_result
     user_ids = expand_user_ids(compact_returns)
     common_contexts = expand_common_contexts(compact_returns)
-    allow(Services::AddressBook).to receive(:known_in_context).with(*args).and_return([user_ids, common_contexts])
+    allow(Services::AddressBook).to receive(:known_in_context).with(*args, ignore_result:).and_return([user_ids, common_contexts])
   end
 
   describe "known_users" do
@@ -121,9 +119,8 @@ describe AddressBook::Service do
 
     describe "with optional :context" do
       def stub_roles_in_context(args, returns = {})
-        args << false # ignore_result
         returns = expand_common_contexts(returns)
-        allow(Services::AddressBook).to receive(:roles_in_context).with(*args).and_return(returns)
+        allow(Services::AddressBook).to receive(:roles_in_context).with(*args, ignore_result: false).and_return(returns)
       end
 
       before do
@@ -335,12 +332,11 @@ describe AddressBook::Service do
 
   describe "search_users" do
     def stub_search_users(args, compact_returns = {})
-      args << false # ignore_result
       user_ids = expand_user_ids(compact_returns)
       common_contexts = expand_common_contexts(compact_returns)
       cursors = expand_cursors(compact_returns)
       returns = [user_ids, common_contexts, cursors]
-      allow(Services::AddressBook).to receive(:search_users).with(*args).and_return(returns)
+      allow(Services::AddressBook).to receive(:search_users).with(*args, ignore_result: false).and_return(returns)
     end
 
     it "returns a paginatable collection" do

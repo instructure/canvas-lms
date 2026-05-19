@@ -17,9 +17,6 @@
     "add_alt_text_for_the_image_48cd88aa": {
         "message": "Adjon hozzá alternatív szöveget a képhez"
     },
-    "add_another_f4e50d57": {
-        "message": "Másik hozzáadása"
-    },
     "add_cc_subtitles_55f0394e": {
         "message": "Felirat hozzáadása"
     },
@@ -347,9 +344,6 @@
     "complex_numbers_a543d004": {
         "message": "Komplex számok"
     },
-    "compose_44c904f4": {
-        "message": "Összeállítani"
-    },
     "computer_1d7dfa6f": {
         "message": "Számítógép"
     },
@@ -376,9 +370,6 @@
     },
     "coproduct_e7838082": {
         "message": "Társtermék"
-    },
-    "copy_9748f9f": {
-        "message": "Másolás"
     },
     "copyright_holder_66ee111": {
         "message": "Jog tulajdonosa:"
@@ -452,9 +443,6 @@
     "custom_6979cd81": {
         "message": "Egyéni"
     },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Egyéni szélesség és magasság (képpont)"
-    },
     "cyan_c1d5f68a": {
         "message": "Cián"
     },
@@ -509,9 +497,6 @@
     "describe_the_icon_f6a18823": {
         "message": "(Írja le az ikont)"
     },
-    "describe_the_video_2fe8f46a": {
-        "message": "(A videó leírása)"
-    },
     "description_436c48d7": {
         "message": "Leírás"
     },
@@ -532,9 +517,6 @@
     },
     "dimension_type_f5fa9170": {
         "message": "Méret típusa"
-    },
-    "dimensions_45ddb7b7": {
-        "message": "Méretek"
     },
     "directionality_26ae9e08": {
         "message": "Irányítottság"
@@ -757,9 +739,6 @@
     },
     "f_function_fe422d65": {
         "message": "F (függvény)"
-    },
-    "failed_276786d": {
-        "message": "Sikertelen"
     },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Nem sikerült beolvasni a fájl tartalmát"
@@ -1261,6 +1240,12 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Linkek egy külső oldalra"
+    },
+    "list_collapsed_9ac35920": {
+        "message": "Összecsukott lista."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Lista kibontva."
     },
     "lists_should_be_formatted_as_lists_f862de8d": {
         "message": "A listákat listákként kell formázni."
@@ -1826,9 +1811,6 @@
     "result_index_of_max_7db5ad8b": {
         "message": "Eredmény: { index } / { max }."
     },
-    "retry_ebd5f8ba": {
-        "message": "Újra"
-    },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Reverse Turnstile (Does Not Yield)"
     },
@@ -1987,9 +1969,6 @@
     },
     "shortcut_911d6255": {
         "message": "Parancsikon"
-    },
-    "show_all_967a90f0": {
-        "message": "Mindent megmutat"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Képbeállítások mutatása"
@@ -2470,9 +2449,6 @@
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Képernyőolvasók által egy kép tartalmának leírásához használt szöveg"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Képernyőolvasók által a videó leírásához használt szöveg"
     },
     "user_documents_c206e61f": {
         "message": "A felhasználó dokumentumai"

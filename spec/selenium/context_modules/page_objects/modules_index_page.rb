@@ -484,7 +484,7 @@ module ModulesIndexPage
   end
 
   def big_course_setup
-    course_modules = create_modules(3, true)
+    course_modules = create_modules(3, published: true)
     course_assignments = create_assignments([@course.id], 70)
 
     51.times do |i|
@@ -570,7 +570,7 @@ module ModulesIndexPage
   end
 
   def module_item_exists?(course_id, module_item_id)
-    element_exists?(module_item_name_selector(course_id, module_item_id), true)
+    element_exists?(module_item_name_selector(course_id, module_item_id), xpath: true)
   end
 
   def any_module_items?(module_id)

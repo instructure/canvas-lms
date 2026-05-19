@@ -39,7 +39,7 @@ import {uniqBy} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import UserLink from './UserLink'
 import AddPeopleApp from '@canvas/add-people'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('account_course_user_search')
 

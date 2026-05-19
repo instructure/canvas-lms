@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 describe ModerationGrader do
   subject { ModerationGrader.create!(user: @user, assignment: @assignment, anonymous_id: "aaaaa") }
 

@@ -43,6 +43,7 @@ export interface Outcome {
 
 export interface Score {
   score: number
+  count?: number
   links: {
     outcome: string | number
   }
@@ -71,6 +72,7 @@ export interface Student {
 export interface OutcomeRollup {
   outcomeId: string | number
   score: number
+  count?: number
   rating: Rating & {
     color: string
   }

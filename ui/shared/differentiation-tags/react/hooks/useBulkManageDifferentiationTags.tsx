@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import doFetchApi, {FetchApiError} from '@canvas/do-fetch-api-effect'
 import type {DifferentiationTagCategory, DifferentiationTagGroup} from '../types'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -49,9 +49,9 @@ interface UseBulkManageDifferentiationTagsVariables {
  * The API will return the group category plus arrays of created, updated, and deleted groups.
  */
 interface BulkManageDiffTagResponse {
-  created: DifferentiationTagGroup[]
-  updated: DifferentiationTagGroup[]
-  deleted: DifferentiationTagGroup[]
+  created: Array<{group: DifferentiationTagGroup}>
+  updated: Array<{group: DifferentiationTagGroup}>
+  deleted: Array<{group: DifferentiationTagGroup}>
   group_category: DifferentiationTagCategory
 }
 

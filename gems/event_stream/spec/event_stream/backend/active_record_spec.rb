@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe EventStream::Backend::ActiveRecord do
   let(:ar_type) do
     Class.new do
@@ -95,7 +93,7 @@ describe EventStream::Backend::ActiveRecord do
     it "only indexes items for which there is an entry" do
       event_record = instance_double(EventStream::Record, id: -2)
       ar_backend = EventStream::Backend::ActiveRecord.new(stream)
-      expect { ar_backend.execute(:insert, event_record) }.to_not raise_error
+      expect { ar_backend.execute(:insert, event_record) }.not_to raise_error
       expect(ar_type.written_recs.first).to eq(event_record)
     end
 

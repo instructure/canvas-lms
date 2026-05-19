@@ -26,7 +26,7 @@ import File from '../../backbone/models/File'
 import filesEnv from '../modules/filesEnv'
 import {dateString, timeString} from '@canvas/datetime/date-functions'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
-import {mergeTimeAndDate} from '@instructure/moment-utils'
+import {mergeTimeAndDate, parse} from '@instructure/moment-utils'
 import classnames from 'classnames'
 
 const I18n = createI18nScope('restrict_student_access')
@@ -113,9 +113,13 @@ class RestrictedRadioButtons extends React.Component {
   ]
 
   componentDidMount() {
-    renderDatetimeField($(this.unlock_at), {dateOnly: true})
+    const unlockDate = this.state.unlock_at ? parse(this.state.unlock_at) : undefined
+    const lockDate = this.state.lock_at ? parse(this.state.lock_at) : undefined
+
+    renderDatetimeField($(this.unlock_at), {dateOnly: true, time: unlockDate})
     renderDatetimeField($(this.unlock_at_time), {timeOnly: true})
-    renderDatetimeField($(this.lock_at), {dateOnly: true})
+
+    renderDatetimeField($(this.lock_at), {dateOnly: true, time: lockDate})
     renderDatetimeField($(this.lock_at_time), {timeOnly: true})
   }
 

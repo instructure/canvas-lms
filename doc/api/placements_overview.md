@@ -7,6 +7,7 @@ For placement settings, go to the <a href="file.lti_dev_key_config.html#placemen
 ## List of Supported Placements
 
 - [Account Navigation](#account-navigation)
+- [Assignment Document Processor](#assignment-document-processor)
 - [Assignment Edit](#assignment-edit)
 - [Assignment Group Menu](#assignment-group-menu)
 - [Assignment Index Menu](#assignment-index-menu)
@@ -49,6 +50,12 @@ For placement settings, go to the <a href="file.lti_dev_key_config.html#placemen
 name: account_navigation
 
 <img class="lti-placement-image" src="./images/placements/account_navigation.png" alt="Account Navigation Screenshot">
+
+# Assignment Document Processor
+
+name: ActivityAssetProcessor
+
+<img class="lti-placement-image" src="./images/placements/ActivityAssetProcessor.png" alt="Assignment Document Processor Screenshot">
 
 # Assignment Edit
 

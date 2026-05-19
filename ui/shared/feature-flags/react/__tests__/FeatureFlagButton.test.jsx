@@ -33,10 +33,10 @@ afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 describe('feature_flags::FeatureFlagButton', () => {
-  const originalEnv = JSON.parse(JSON.stringify(window.ENV))
+  const originalEnvSnapshot = JSON.stringify(window.ENV)
 
   afterEach(() => {
-    window.ENV = originalEnv
+    window.ENV = JSON.parse(originalEnvSnapshot)
   })
 
   it('Renders the correct icons for on state', () => {
@@ -145,6 +145,14 @@ describe('feature_flags::FeatureFlagButton', () => {
     const button = container.querySelector('button')
     const areSameElement = document.activeElement === button
     expect(areSameElement).toBeTruthy()
+  })
+
+  it('disables the button when manage_course_feature_options permission is false', () => {
+    window.ENV.PERMISSIONS = {manage_course_feature_options: false}
+    const {container} = render(
+      <FeatureFlagButton featureFlag={sampleData.allowedFeature.feature_flag} />,
+    )
+    expect(container.querySelector('button')).toBeDisabled()
   })
 
   describe('and the context is site admin', () => {

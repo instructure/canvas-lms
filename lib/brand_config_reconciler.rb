@@ -144,9 +144,11 @@ class BrandConfigReconciler
     accounts_with_configs.filter_map do |account|
       local_parent_md5 = account.brand_config.local_parent_md5
 
-      if !existing_md5s.include?(local_parent_md5)
+      if !existing_md5s.include?(local_parent_md5) && account.brand_config.parent.nil?
+        # Parent config may live on another shard; verify before flagging
         { type: :orphaned_parent, account: }
-      elsif local_parent_md5 != expected_parent_md5s[account.id]
+      elsif local_parent_md5 != expected_parent_md5s[account.id] &&
+            parent_actually_stale?(account, local_parent_md5)
         { type: :stale_parent, account: }
       end
     end
@@ -168,7 +170,8 @@ class BrandConfigReconciler
     expected_parent_md5s = batch_compute_expected_parent_md5s(accounts)
 
     sbcs.filter_map do |sbc|
-      if sbc.brand_config.local_parent_md5 != expected_parent_md5s[sbc.account.id]
+      if sbc.brand_config.local_parent_md5 != expected_parent_md5s[sbc.account.id] &&
+         parent_actually_stale?(sbc.account, sbc.brand_config.local_parent_md5)
         { type: :stale_shared_brand_config, shared_brand_config: sbc, account: sbc.account }
       end
     end
@@ -257,6 +260,11 @@ class BrandConfigReconciler
     return true if issue[:shared_brand_config] && @failed_sbc_ids.include?(issue[:shared_brand_config].id)
 
     false
+  end
+
+  # Batch lookup may miss cross-shard ancestors; verify before flagging
+  def parent_actually_stale?(account, local_parent_md5)
+    local_parent_md5 != account.first_parent_brand_config&.md5
   end
 
   def handle_error(entity_type, entity_id, exception)

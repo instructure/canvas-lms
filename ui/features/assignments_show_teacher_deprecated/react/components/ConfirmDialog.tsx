@@ -46,8 +46,6 @@ export default class ConfirmDialog extends React.Component {
     modalLabel: string, // defaults to heading
     // properties to pass to the modal
     modalProps: shape({
-      // by default Modal.propTypes.label "isRequired" but ours is not because we fall back to this.props.heading
-      ...Modal.propTypes,
       label: string,
     }),
     closeLabel: string,

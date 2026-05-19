@@ -34,7 +34,7 @@ describe Mutations::CreateSubmissionComment do
     )
   end
 
-  def value_or_null(value, stringify = true)
+  def value_or_null(value, stringify: true)
     return "null" if value.nil?
 
     stringify ? "\"#{value}\"" : value
@@ -44,7 +44,7 @@ describe Mutations::CreateSubmissionComment do
     <<~GQL
       mutation {
         createSubmissionComment(input: {
-          attempt: #{value_or_null(attempt, false)}
+          attempt: #{value_or_null(attempt, stringify: false)}
           comment: #{value_or_null(comment)}
           fileIds: #{file_ids}
           groupComment: #{group_comment}

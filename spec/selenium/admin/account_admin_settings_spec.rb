@@ -125,11 +125,12 @@ describe "root account basic settings" do
 
       user_session(@admin)
       get account_settings_url
-      el = f("#account_settings_suppress_notifications")
-      el.location_once_scrolled_into_view
+      el = f("label[for='account_settings_suppress_notifications']")
+      scroll_into_view(el)
       el.click
-      driver.switch_to.alert.accept
       submit_form("#account_settings")
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
       expect(Account.default.reload.settings[:suppress_notifications]).to be true
     end
 
@@ -288,8 +289,8 @@ describe "root account basic settings" do
         expect(modal_body.find("#parameters_include_deleted")).to be_disabled
 
         modal_body.find("#parameters_courses").click
-        expect(modal_body.find("#parameters_created_by_sis")).to_not be_disabled
-        expect(modal_body.find("#parameters_include_deleted")).to_not be_disabled
+        expect(modal_body.find("#parameters_created_by_sis")).not_to be_disabled
+        expect(modal_body.find("#parameters_include_deleted")).not_to be_disabled
       end
 
       it "disables report options for SIS export report form when a report hasn't been selected" do
@@ -301,8 +302,8 @@ describe "root account basic settings" do
         expect(modal_body.find("#parameters_include_deleted")).to be_disabled
 
         modal_body.find("#parameters_users").click
-        expect(modal_body.find("#parameters_created_by_sis")).to_not be_disabled
-        expect(modal_body.find("#parameters_include_deleted")).to_not be_disabled
+        expect(modal_body.find("#parameters_created_by_sis")).not_to be_disabled
+        expect(modal_body.find("#parameters_include_deleted")).not_to be_disabled
       end
 
       it "creates a report with correct parameters" do

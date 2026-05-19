@@ -21,12 +21,12 @@ import userEvent from '@testing-library/user-event'
 import {MockedProvider} from '@apollo/client/testing'
 import {InMemoryCache} from '@apollo/client'
 import {CommentLibraryTray} from '../CommentLibraryTray'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 import {SpeedGraderLegacy_CommentBankItems} from '../../graphql/queries'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 const server = setupServer()
 
@@ -117,9 +117,7 @@ describe('CommentLibraryTray', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Default handler for user settings API
-    server.use(
-      http.put('/api/v1/users/self/settings', () => HttpResponse.json({})),
-    )
+    server.use(http.put('/api/v1/users/self/settings', () => HttpResponse.json({})))
   })
 
   afterEach(() => {

@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'

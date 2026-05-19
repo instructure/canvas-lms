@@ -123,22 +123,33 @@ describe Oak::PermissionChecker do
       let_once(:teacher) { user_model }
 
       before do
+        account.enable_feature!(:oak_for_admins)
         account.enable_feature!(:oak_for_teachers)
         course.enroll_teacher(teacher, enrollment_state: "active")
       end
 
-      context "when user has access_oak_teacher permission" do
+      context "when oak_for_admins feature flag is disabled" do
         before do
-          teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: account.id)
-          account.role_overrides.create!(permission: :access_oak_teacher, role: teacher_role, enabled: true)
+          account.disable_feature!(:oak_for_admins)
         end
 
+        it "returns false" do
+          expect(Oak::PermissionChecker.user_permitted?(teacher, account)).to be false
+        end
+      end
+
+      context "when user has access_oak_teacher permission" do
         it "returns true" do
           expect(Oak::PermissionChecker.user_permitted?(teacher, account)).to be true
         end
       end
 
       context "when user does not have access_oak_teacher permission" do
+        before do
+          teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: account.id)
+          account.role_overrides.create!(permission: :access_oak_teacher, role: teacher_role, enabled: false)
+        end
+
         it "returns false" do
           expect(Oak::PermissionChecker.user_permitted?(teacher, account)).to be false
         end
@@ -161,6 +172,53 @@ describe Oak::PermissionChecker do
 
         it "returns false" do
           expect(Oak::PermissionChecker.user_permitted?(user_without_course, account)).to be false
+        end
+      end
+
+      context "when user has multiple courses with one expired through enrollment term" do
+        let_once(:expired_term) do
+          account.enrollment_terms.create!(
+            name: "Expired Term",
+            start_at: 2.months.ago,
+            end_at: 1.month.ago
+          )
+        end
+        let_once(:expired_course) { course_factory(active_all: true, account:) }
+        let_once(:active_course) { course_factory(active_all: true, account:) }
+
+        before do
+          expired_course.update!(enrollment_term: expired_term)
+          teacher.enrollments.destroy_all
+          expired_course.enroll_teacher(teacher, enrollment_state: "active")
+          active_course.enroll_teacher(teacher, enrollment_state: "active")
+        end
+
+        it "returns true because at least one course grants access" do
+          expect(Oak::PermissionChecker.user_permitted?(teacher, account)).to be true
+        end
+      end
+
+      context "when user has multiple courses all expired through enrollment term" do
+        let_once(:expired_term) do
+          account.enrollment_terms.create!(
+            name: "Expired Term",
+            start_at: 2.months.ago,
+            end_at: 1.month.ago
+          )
+        end
+        let_once(:expired_course1) { course_factory(active_all: true, account:) }
+        let_once(:expired_course2) { course_factory(active_all: true, account:) }
+
+        before do
+          expired_course1.update!(enrollment_term: expired_term)
+          expired_course2.update!(enrollment_term: expired_term)
+          teacher.enrollments.destroy_all
+          expired_course1.enroll_teacher(teacher, enrollment_state: "active")
+          expired_course2.enroll_teacher(teacher, enrollment_state: "active")
+        end
+
+        it "returns false because no course grants access" do
+          expect(Oak::PermissionChecker.user_permitted?(teacher, account)).to be false
         end
       end
     end

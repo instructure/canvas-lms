@@ -19,7 +19,6 @@
 
 class AccessibilityIssuesController < ApplicationController
   before_action :require_context
-  before_action :require_user
   before_action :check_authorized_action
   before_action :set_issue, only: [:update]
 
@@ -45,7 +44,7 @@ class AccessibilityIssuesController < ApplicationController
   private
 
   def check_authorized_action
-    return render_unauthorized_action unless tab_enabled?(Course::TAB_ACCESSIBILITY)
+    return render_unauthorized_action unless tab_enabled?(Course::TAB_ACCESSIBILITY, no_render: true)
 
     authorized_action(@context, @current_user, [:read, :update])
   end

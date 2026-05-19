@@ -23,6 +23,16 @@ import {ReviewScreen} from '../../registration_wizard_forms/ReviewScreen'
 import type {LtiPlacement} from '../../model/LtiPlacement'
 import {filterPlacementObjectsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
+import {useDomainDuplicates} from '../../api/domainDuplicates'
+import {getAccountId} from '../../../common/lib/getAccountId'
+import {toUndefined} from '../../../common/lib/toUndefined'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Flex} from '@instructure/ui-flex'
+import {Spinner} from '@instructure/ui-spinner'
+import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
+
+const I18n = createI18nScope('lti_registration.wizard')
+
 export type ReviewScreenWrapperProps = {
   registration: LtiRegistrationWithConfiguration
   overlayStore: DynamicRegistrationOverlayStore
@@ -35,6 +45,29 @@ export const ReviewScreenWrapper = ({
   transitionToConfirmationState,
 }: ReviewScreenWrapperProps) => {
   const [overlayState] = useOverlayStore(overlayStore)
+  const accountId = getAccountId()
+  const domain = registration.configuration.domain
+
+  // Check for duplicate domains and wait for the query to complete
+  // Show a spinner while checking to ensure users see any duplicate warnings
+  const domainDuplicatesQuery = useDomainDuplicates(accountId, toUndefined(domain))
+
+  // Show loading spinner while checking for duplicates
+  if (domainDuplicatesQuery.isLoading) {
+    return (
+      <RegistrationModalBody>
+        <Flex justifyItems="center" alignItems="center" height="100%">
+          <Spinner size="large" renderTitle={I18n.t('Checking for duplicate domains...')} />
+        </Flex>
+      </RegistrationModalBody>
+    )
+  }
+
+  // After loading completes, use the results if successful, otherwise pass empty array
+  const domainDuplicates = domainDuplicatesQuery.isSuccess
+    ? domainDuplicatesQuery.data.json.duplicates
+    : []
+
   const scopes = registration.configuration.scopes.filter(
     s => !overlayState.overlay.disabled_scopes?.includes(s),
   )
@@ -89,6 +122,8 @@ export const ReviewScreenWrapper = ({
       description={description}
       defaultPlacementIconUrls={defaultPlacementIconUrls}
       defaultIconUrl={defaultIconUrl}
+      domainDuplicates={domainDuplicates}
+      accountId={accountId}
       onEditScopes={() => transitionToConfirmationState('Reviewing', 'PermissionConfirmation')}
       onEditNaming={() => transitionToConfirmationState('Reviewing', 'NamingConfirmation')}
       onEditPlacements={() => transitionToConfirmationState('Reviewing', 'PlacementsConfirmation')}

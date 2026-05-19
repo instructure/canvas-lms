@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AppointmentGroup < ActiveRecord::Base
+class AppointmentGroup < ApplicationRecord
   include Workflow
   include TextHelper
   include ConversationsHelper
@@ -537,7 +537,7 @@ class AppointmentGroup < ActiveRecord::Base
       save!
       appointments.map do |a|
         a.updating_user = updating_user
-        a.destroy(false)
+        a.destroy(update_context_or_parent: false)
       end
     end
   end

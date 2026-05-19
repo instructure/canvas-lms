@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Progress < ActiveRecord::Base
+class Progress < ApplicationRecord
   belongs_to :context, polymorphic: [
     :content_migration,
     :course,

@@ -26,17 +26,22 @@ import {type MockedFunction} from 'vitest'
 import {AccessTokensSection} from '../AccessTokensSection'
 import {ZTokenId, type Token} from '../Token'
 import {ZUserId} from '../UserId'
-import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
+import {confirmDanger} from '@instructure/platform-instui-bindings'
 
 const mockConfirmDanger = confirmDanger as MockedFunction<typeof confirmDanger>
 
-vi.mock('@canvas/instui-bindings/react/Confirm', () => ({
+vi.mock('@instructure/platform-instui-bindings', async () => ({
+  ...(await vi.importActual<typeof import('@instructure/platform-instui-bindings')>('@instructure/platform-instui-bindings')),
   confirmDanger: vi.fn(),
 }))
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 // Mock TruncateText component, we don't need to test that
 // it truncates text correctly

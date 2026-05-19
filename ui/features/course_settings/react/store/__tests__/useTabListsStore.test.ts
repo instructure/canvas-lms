@@ -17,7 +17,7 @@
  */
 
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {useTabListsStore, type NavigationTab} from '../useTabListsStore'
+import {useTabListsStore, getLinkTabUrl, type NavigationTab} from '../useTabListsStore'
 
 function makeExistingTab(
   id: number | string,
@@ -605,5 +605,35 @@ describe('useTabListsStore', () => {
       const state = useTabListsStore.getState()
       expect(state.disabledTabs.map(t => t.externalId)).toEqual([5, 'context_external_tool_2'])
     })
+  })
+})
+
+describe('getLinkTabUrl', () => {
+  const makeLinkTab = (url: string): NavigationTab => ({
+    type: 'newLink',
+    internalId: 'test-id',
+    label: 'My Link',
+    href: 'nav_menu_link_url',
+    args: [url],
+  })
+
+  it('returns absolute URLs unchanged', () => {
+    expect(getLinkTabUrl(makeLinkTab('https://example.com/path'))).toBe('https://example.com/path')
+  })
+
+  it('prefixes relative URLs with window.location.origin', () => {
+    expect(getLinkTabUrl(makeLinkTab('/courses/123'))).toBe(
+      window.location.origin + '/courses/123',
+    )
+  })
+
+  it('returns undefined for non-link tabs', () => {
+    const nonLinkTab: NavigationTab = {
+      type: 'existing',
+      externalId: 1,
+      internalId: '1',
+      label: 'Assignments',
+    }
+    expect(getLinkTabUrl(nonLinkTab)).toBeUndefined()
   })
 })

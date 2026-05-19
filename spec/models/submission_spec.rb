@@ -2474,7 +2474,7 @@ describe Submission do
         expect(@submission.assignment).to eql(@assignment)
         expect(@submission.assignment.state).to be(:published)
         @submission = @assignment.grade_student(@student, grader: @teacher, score: 5).first
-        expect(@submission.messages_sent).to_not include("Submission Graded")
+        expect(@submission.messages_sent).not_to include("Submission Graded")
       end
 
       it "notifies observers" do
@@ -2533,9 +2533,9 @@ describe Submission do
         expect(@submission.submission_comments.last).to be_hidden
         expect(@user.stream_item_instances.last).to be_hidden
         @assignment.post_submissions
-        expect(@submission.submission_comments.last).to_not be_hidden
+        expect(@submission.submission_comments.last).not_to be_hidden
         expect(@submission.reload.submission_comments_count).to eq 1
-        expect(@user.stream_item_instances.last).to_not be_hidden
+        expect(@user.stream_item_instances.last).not_to be_hidden
       end
 
       it "does not create hidden stream_item_instances for instructors when muted, graded, and published" do
@@ -2544,7 +2544,7 @@ describe Submission do
         expect do
           @submission.add_comment(author: @student, comment: "some comment")
         end.to change StreamItemInstance, :count
-        expect(@teacher.stream_item_instances.last).to_not be_hidden
+        expect(@teacher.stream_item_instances.last).not_to be_hidden
       end
 
       it "does not hide any existing stream_item_instances for instructors when muted" do
@@ -2552,10 +2552,10 @@ describe Submission do
         expect do
           @submission.add_comment(author: @student, comment: "some comment")
         end.to change StreamItemInstance, :count
-        expect(@teacher.stream_item_instances.last).to_not be_hidden
+        expect(@teacher.stream_item_instances.last).not_to be_hidden
         @assignment.mute!
         @teacher.reload
-        expect(@teacher.stream_item_instances.last).to_not be_hidden
+        expect(@teacher.stream_item_instances.last).not_to be_hidden
       end
 
       it "does not create a message for admins and teachers with quiz submissions" do
@@ -2574,11 +2574,11 @@ describe Submission do
 
         user = account_admin_user
         communication_channel(user, { username: "admin@example.com" })
-        submission = quiz.generate_submission(user, false)
+        submission = quiz.generate_submission(user)
         Quizzes::SubmissionGrader.new(submission).grade_submission
 
         communication_channel(@teacher, { username: "chang@example.com" })
-        submission2 = quiz.generate_submission(@teacher, false)
+        submission2 = quiz.generate_submission(@teacher)
         Quizzes::SubmissionGrader.new(submission2).grade_submission
 
         expect(submission.submission.messages_sent).not_to include("Submission Graded")
@@ -3215,6 +3215,20 @@ describe Submission do
       end
     end
 
+    context "with NQ anonymous participants" do
+      before(:once) do
+        @assignment.update!(anonymous_participants: true)
+      end
+
+      it "returns true when the user is the submission's owner" do
+        expect(@submission.can_read_submission_user_name?(@student, nil)).to be true
+      end
+
+      it "returns false when the user is not the submission's owner" do
+        expect(@submission.can_read_submission_user_name?(@teacher, nil)).to be false
+      end
+    end
+
     context "non-anonymous assignments" do
       it "returns true for any user" do
         student2 = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
@@ -3625,10 +3639,23 @@ describe Submission do
 
       before { student_in_course(active_all: true) }
 
-      it "includes attachment ids from 'attachment_id'" do
+      it "includes attachment ids from 'attachment_id' by default" do
         submission = @assignment.submit_homework(@student, submission_type: "online_upload", attachments:)
         submission.update!(attachment_id: single_attachment)
         expect(submission.attachment_ids_for_version).to match_array attachments.map(&:id) + [single_attachment.id]
+      end
+
+      it "optionally excludes attachment ids from 'attachment_id'" do
+        submission = @assignment.submit_homework(@student, submission_type: "online_upload", attachments:)
+        submission.update!(attachment_id: single_attachment)
+        ids = submission.attachment_ids_for_version(include_attachment_id: false)
+        expect(ids).to match_array attachments.map(&:id)
+      end
+
+      it "returns unique attachment ids" do
+        submission = @assignment.submit_homework(@student, submission_type: "online_upload", attachments:)
+        submission.update!(attachment_id: attachments.first.id)
+        expect(submission.attachment_ids_for_version).to match_array attachments.map(&:id)
       end
     end
 
@@ -4554,7 +4581,7 @@ describe Submission do
     # set up the data to have a submission with a quiz submission with multiple versions
     course_factory
     quiz = @course.quizzes.create!
-    quiz_submission = quiz.generate_submission @user, false
+    quiz_submission = quiz.generate_submission @user, preview: false
     quiz_submission.save
 
     @assignment.submissions.find_by!(user: @user).update!(quiz_submission_id: quiz_submission.id)
@@ -4936,7 +4963,7 @@ describe Submission do
   describe "graded?" do
     it "is false before graded" do
       submission, _ = @assignment.find_or_create_submission(@user)
-      expect(submission).to_not be_graded
+      expect(submission).not_to be_graded
     end
 
     it "is true for graded assignments" do
@@ -4956,10 +4983,10 @@ describe Submission do
 
     it "returns false when its not autograded" do
       submission = Submission.new
-      expect(submission).to_not be_autograded
+      expect(submission).not_to be_autograded
 
       submission.grader_id = Shard.global_id_for(@user.id)
-      expect(submission).to_not be_autograded
+      expect(submission).not_to be_autograded
     end
 
     it "returns true when its autograded" do
@@ -5564,6 +5591,41 @@ describe Submission do
         expect(submission.seconds_late).to eq 0
       end
 
+      it "fetches checkpoint completion time using user_id rather than the user AR association" do
+        topic = DiscussionTopic.create_graded_topic!(course: @checkpoint_course, title: "Test Discussion", user: @teacher)
+        topic.create_checkpoints(
+          reply_to_topic_points: 5,
+          reply_to_entry_points: 10,
+          reply_to_entry_required_count: 2
+        )
+        topic.reply_to_entry_checkpoint.update!(due_at: 1.day.ago)
+        topic.ensure_submission(@student)
+        submission = topic.reply_to_entry_checkpoint.submissions.find_by(user: @student)
+
+        # Remove the user AR association from this instance to prove the code path
+        # uses user_id only. If user_id is ever changed back to user, this raises.
+        submission.singleton_class.undef_method(:user)
+
+        result = submission.send(:fetch_checkpoint_completion_time)
+        expect(result).to be_nil
+      end
+
+      it "computes seconds_late via public interface using user_id rather than the user AR association" do
+        topic = DiscussionTopic.create_graded_topic!(course: @checkpoint_course, title: "Test Discussion", user: @teacher)
+        topic.create_checkpoints(
+          reply_to_topic_points: 5,
+          reply_to_entry_points: 10,
+          reply_to_entry_required_count: 2
+        )
+        topic.reply_to_entry_checkpoint.update!(due_at: 1.day.ago)
+        topic.ensure_submission(@student)
+        submission = topic.reply_to_entry_checkpoint.submissions.find_by(user: @student)
+
+        submission.singleton_class.undef_method(:user)
+
+        expect { submission.seconds_late }.not_to raise_error
+      end
+
       it "uses earliest reply time for non-checkpoint submissions" do
         due_date = 2.days.from_now
         topic = @checkpoint_course.discussion_topics.create!(
@@ -5922,7 +5984,7 @@ describe Submission do
 
       body = "<a href=/users/#{@user.id}/files/#{f.id}>blah.txt</a>"
 
-      sub = @assignment.submit_homework(@user, submission_type: "online_text_entry", body:, saving_user: @user)
+      sub = @assignment.submit_homework(@user, submission_type: "online_text_entry", body:, updating_user: @user)
       expect(f.attachment_associations.pluck(:context_type)).to eq ["Submission"]
       expect(f.attachment_associations.pluck(:context_id)).to eq [sub.id]
     end
@@ -5933,6 +5995,64 @@ describe Submission do
       sub = @assignment.submit_homework(@user, submission_type: "online_upload", attachments: [f])
       expect(f.attachment_associations.pluck(:context_type)).to eq ["Submission"]
       expect(f.attachment_associations.pluck(:context_id)).to eq [sub.id]
+    end
+
+    it "keeps attachment associations from previous text entry attempts when new text entry submissions are submitted" do
+      @course.enroll_student(@user, enrollment_state: :active)
+      attachment_model(filename: "blah.txt", user: @user, context: @user)
+      body = "<a href=/users/#{@user.id}/files/#{@attachment.id}>blah.txt</a>"
+
+      sub = @assignment.submit_homework(@user, submission_type: "online_text_entry", body:)
+      expect(sub.reload.attachment_associations.count).to eq 1
+      aa = sub.attachment_associations.take
+      expect(aa.attributes).to include({
+                                         "attachment_id" => @attachment.id,
+                                         "context_id" => sub.id,
+                                         "context_type" => "Submission",
+                                         "root_account_id" => @course.root_account_id,
+                                         "user_id" => @user.id,
+                                         "context_concern" => nil
+                                       })
+
+      @assignment.submit_homework(@user, submission_type: "online_text_entry", body: "meh", updating_user: @user)
+      expect(sub.reload.attachment_associations).to eq([aa])
+    end
+
+    it "keeps attachment associations from previous file upload attempts when new file uploads are submitted" do
+      @assignment.update!(submission_types: "online_upload")
+      @course.enroll_student(@user, enrollment_state: :active)
+
+      attachment1 = Attachment.create!(
+        uploaded_data: StringIO.new("attempt 1 file 1"),
+        context: @user,
+        filename: "attempt1_file1.txt"
+      )
+      attachment2 = Attachment.create!(
+        uploaded_data: StringIO.new("attempt 1 file 2"),
+        context: @user,
+        filename: "attempt1_file2.txt"
+      )
+      attachment3 = Attachment.create!(
+        uploaded_data: StringIO.new("attempt 2 file 1"),
+        context: @user,
+        filename: "attempt2_file1.txt"
+      )
+
+      Timecop.freeze(30.minutes.ago) do
+        @assignment.submit_homework(@user, attachments: [attachment1, attachment2]) # first attempt
+      end
+
+      Timecop.freeze(15.minutes.ago) do
+        @assignment.submit_homework(@user, attachments: [attachment3]) # second attempt
+      end
+
+      sub = @assignment.submissions.find_by(user: @user)
+      history_attempt_1 = sub.submission_history.find { it.attempt == 1 }
+      history_attempt_2 = sub.submission_history.find { it.attempt == 2 }
+      expect(sub.attachment_associations.pluck(:attachment_id)).to match_array [attachment1.id, attachment2.id, attachment3.id]
+      expect(sub.attachments).to match_array [attachment3]
+      expect(history_attempt_1.attachments).to match_array [attachment1, attachment2]
+      expect(history_attempt_2.attachments).to match_array [attachment3]
     end
   end
 
@@ -6651,7 +6771,7 @@ describe Submission do
                                            @u2.id => { posted_grade: 10 }
                                          }
                                        })
-      end.to_not raise_error
+      end.not_to raise_error
       expect(@progress.reload.failed?).to be_truthy
 
       expect(@a1.submission_for_student(@u1).grade).to be_nil
@@ -6813,7 +6933,7 @@ describe Submission do
 
       it do
         expect { @submission.find_or_create_provisional_grade!(@teacher, force_save: true) }
-          .to_not change { AnonymousOrModerationEvent.provisional_grade_updated.count }
+          .not_to change { AnonymousOrModerationEvent.provisional_grade_updated.count }
       end
 
       context "given an existing provisional grade" do
@@ -6988,7 +7108,7 @@ describe Submission do
     end
 
     it "returns a collection of moderated grading ids" do
-      moderated_grading_ids = @student.moderated_grading_ids(false)
+      moderated_grading_ids = @student.moderated_grading_ids
       expect(@submission.moderated_grading_allow_list.first).to eq moderated_grading_ids
     end
 
@@ -7798,7 +7918,8 @@ describe Submission do
           expect(assessments).to contain_exactly(@final_assessment)
         end
 
-        it "returns only the selected rubric assessment for students when grades are published" do
+        it "returns only the selected rubric assessment for students when grades are published and posted" do
+          @moderated_submission.update!(posted_at: Time.zone.now)
           assessments = @moderated_submission.visible_rubric_assessments_for(@student)
           expect(assessments).to contain_exactly(@final_assessment)
         end
@@ -7807,6 +7928,19 @@ describe Submission do
           assessments = @moderated_submission.visible_rubric_assessments_for(@final_grader, include_provisional: true, provisional_assessments: @all_provisional_assessments)
           expect(assessments).to contain_exactly(@final_assessment)
           expect(assessments).not_to include(@provisional_assessment, @other_assessment)
+        end
+
+        context "when grades are not yet posted to students" do
+          it "does not return rubric assessments to students" do
+            expect(@moderated_submission.posted_at).to be_nil
+            assessments = @moderated_submission.visible_rubric_assessments_for(@student)
+            expect(assessments).to be_empty
+          end
+
+          it "still returns rubric assessments to teachers" do
+            assessments = @moderated_submission.visible_rubric_assessments_for(@final_grader)
+            expect(assessments).to contain_exactly(@final_assessment)
+          end
         end
       end
     end
@@ -8139,7 +8273,7 @@ describe Submission do
           it "creates an event when graded by a quiz" do
             real_submission = quiz_submission.submission
             real_submission.audit_grade_changes = true
-            expect { quiz_submission.with_versioning(true) { quiz_submission.save! } }.to change {
+            expect { quiz_submission.with_versioning { quiz_submission.save! } }.to change {
               AnonymousOrModerationEvent.where(assignment: quiz_assignment, submission: real_submission).count
             }.by(1)
           end
@@ -9716,6 +9850,76 @@ describe Submission do
     end
   end
 
+  describe "referencing attachment scopes" do
+    before do
+      @assignment.update!(submission_types: "online_upload")
+      @course.enroll_student(@user, enrollment_state: :active)
+      Timecop.freeze(30.minutes.ago) do
+        @assignment.submit_homework(@user, attachments: [first_attempt_attachment])
+      end
+    end
+
+    let(:first_attempt_attachment) do
+      Attachment.create!(
+        uploaded_data: StringIO.new("attempt 1"),
+        context: @user,
+        filename: "attempt1.txt"
+      )
+    end
+
+    let(:second_attempt_attachment) do
+      Attachment.create!(
+        uploaded_data: StringIO.new("attempt 2"),
+        context: @user,
+        filename: "attempt2.txt"
+      )
+    end
+
+    let(:submission) { @assignment.submissions.find_by(user: @user) }
+
+    describe "scope: referencing_attachment" do
+      it "finds submissions that include the attachment in their most recent attempt" do
+        expect(Submission.referencing_attachment(first_attempt_attachment.id)).to include(submission)
+      end
+
+      it "does not find submissions that only reference the attachment in past attempts" do
+        @assignment.submit_homework(@user, attachments: [second_attempt_attachment])
+
+        expect(Submission.referencing_attachment(first_attempt_attachment.id)).not_to include(submission)
+      end
+
+      it "returns submissions referencing an attachment even if an AttachmentAssociation record is not in place" do
+        submission.attachment_associations.delete_all
+        expect(Submission.referencing_attachment(first_attempt_attachment.id)).to include(submission)
+      end
+
+      it "can be passed an attachment object instead of an attachment id" do
+        expect(Submission.referencing_attachment(first_attempt_attachment)).to include(submission)
+      end
+    end
+
+    describe "scope: referencing_linked_attachment" do
+      it "finds submissions that include the attachment in their most recent attempt" do
+        expect(Submission.referencing_linked_attachment(first_attempt_attachment.id)).to include(submission)
+      end
+
+      it "does not find submissions that only reference the attachment in past attempts" do
+        @assignment.submit_homework(@user, attachments: [second_attempt_attachment])
+
+        expect(Submission.referencing_linked_attachment(first_attempt_attachment.id)).not_to include(submission)
+      end
+
+      it "does not return submissions that reference an attachment but do not have an AttachmentAssociation record in place" do
+        submission.attachment_associations.delete_all
+        expect(Submission.referencing_linked_attachment(first_attempt_attachment.id)).not_to include(submission)
+      end
+
+      it "can be passed an attachment object instead of an attachment id" do
+        expect(Submission.referencing_linked_attachment(first_attempt_attachment)).to include(submission)
+      end
+    end
+  end
+
   describe "#filter_attributes_for_user" do
     let(:user) { instance_double(User, id: 1) }
     let(:session) { {} }
@@ -9804,7 +10008,7 @@ describe Submission do
       it "does nothing when there is no line item" do
         expect do
           submission.update!(score: 1.3)
-        end.to_not change { submission.lti_result }.from(nil)
+        end.not_to change { submission.lti_result }.from(nil)
       end
 
       context "when there is a line item" do
@@ -9813,7 +10017,7 @@ describe Submission do
         it "does nothing if score has not changed" do
           expect do
             submission.update!(body: "hello abc")
-          end.to_not change { submission.lti_result }.from(nil)
+          end.not_to change { submission.lti_result }.from(nil)
         end
 
         it "creates an the lti_result with the correct score_given if the score has changed" do
@@ -9825,7 +10029,7 @@ describe Submission do
         it "does nothing if the lti_result was updated by a tool" do
           expect do
             submission.update!(score: 1.3, grader_id: -123)
-          end.to_not change { submission.lti_result }.from(nil)
+          end.not_to change { submission.lti_result }.from(nil)
         end
       end
     end
@@ -9837,7 +10041,7 @@ describe Submission do
       it "does nothing if score has not changed" do
         expect do
           submission.save!
-        end.to_not change { lti_result.result_score }
+        end.not_to change { lti_result.result_score }
       end
 
       it "updates the lti_result score_given if the score has changed" do
@@ -9849,7 +10053,7 @@ describe Submission do
       it "does nothing if the lti_result was updated by a tool" do
         expect do
           submission.update!(score: 1.3, grader_id: -123)
-        end.to_not change { lti_result.reload.result_score }
+        end.not_to change { lti_result.reload.result_score }
       end
     end
   end
@@ -9956,6 +10160,57 @@ describe Submission do
 
       @assignment.grade_student(@threshold.student, score: 10, grader: @teacher)
     end
+
+    it "does not create an alert when the assignment uses a manual posting policy and grade is not posted" do
+      @assignment.post_policy.update!(post_manually: true)
+
+      expect do
+        @assignment.grade_student(@threshold.student, score: 10, grader: @teacher)
+      end.not_to change {
+        ObserverAlert.where(context: @assignment, alert_type: :assignment_grade_high).count
+      }
+    end
+
+    it "creates an alert when a manually-posted assignment's grades are posted" do
+      @assignment.post_policy.update!(post_manually: true)
+      @assignment.grade_student(@threshold.student, score: 10, grader: @teacher)
+
+      expect do
+        @assignment.post_submissions
+      end.to change {
+        ObserverAlert.where(context: @assignment, alert_type: :assignment_grade_high).count
+      }.by(1)
+    end
+
+    it "creates exactly one alert when the score changes multiple times before posting" do
+      @assignment.post_policy.update!(post_manually: true)
+
+      # Grade changed multiple times while hidden — none should fire an alert
+      @assignment.grade_student(@threshold.student, score: 5, grader: @teacher)
+      @assignment.grade_student(@threshold.student, score: 8, grader: @teacher)
+      @assignment.grade_student(@threshold.student, score: 9, grader: @teacher)
+      expect(ObserverAlert.where(context: @assignment).count).to eq(0)
+
+      # Posting should create exactly one alert, not one per grade change
+      expect do
+        @assignment.post_submissions
+      end.to change {
+        ObserverAlert.where(context: @assignment, alert_type: :assignment_grade_high).count
+      }.by(1)
+    end
+
+    it "does not create an alert when an autograded submission's grades are posted" do
+      @assignment.post_policy.update!(post_manually: true)
+      submission = @assignment.submissions.find_by(user: @threshold.student)
+      # grader_id < 0 is the convention for autograded submissions (e.g. quizzes)
+      submission.update_columns(score: 10, grade: "10", grader_id: -1, workflow_state: "graded")
+
+      expect do
+        @assignment.post_submissions
+      end.not_to change {
+        ObserverAlert.where(context: @assignment, alert_type: :assignment_grade_high).count
+      }
+    end
   end
 
   describe "#grade_posting_in_progress" do
@@ -10013,7 +10268,7 @@ describe Submission do
           submission.assignment.submission_types = submission_type
           submission.assignment.save!
           submission.extra_attempts = 10
-          expect(submission).to_not be_valid
+          expect(submission).not_to be_valid
         end
       end
     end
@@ -10070,7 +10325,7 @@ describe Submission do
         context "the submitted_at changed" do
           it "is invalid" do
             submission.submitted_at = Time.zone.now
-            expect(submission).to_not be_valid
+            expect(submission).not_to be_valid
           end
         end
 
@@ -10485,7 +10740,7 @@ describe Submission do
     def check_cache_clear
       key = @student.cache_key(:submissions)
       yield
-      expect(@student.cache_key(:submissions)).to_not eq key
+      expect(@student.cache_key(:submissions)).not_to eq key
     end
 
     it "clears key when submission is deleted" do
@@ -10515,7 +10770,7 @@ describe Submission do
 
     it "works cross-shard" do
       @shard1.activate do
-        expect(@assignment.submissions.postable.to_sql).to_not include(@shard1.name)
+        expect(@assignment.submissions.postable.to_sql).not_to include(@shard1.name)
       end
     end
   end
@@ -10551,8 +10806,10 @@ describe Submission do
       submission_text = "Text based submission with some words"
       attachment1 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
       attachment2 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
+      # Simulate DocViewer setting word counts
+      attachment1.update_column(:word_count, 6)
+      attachment2.update_column(:word_count, 6)
       sub = @assignment.submit_homework(@student, attachments: [attachment1, attachment2])
-      Timecop.freeze(6.minutes.from_now) { run_jobs }
       expect(sub.reload.word_count).to eq 12
     end
 
@@ -10562,7 +10819,8 @@ describe Submission do
       attachment = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
       sub = @assignment.submit_homework(@student, attachments: [attachment])
       sub.update!(body: "")
-      Timecop.freeze(6.minutes.from_now) { run_jobs }
+      # Simulate DocViewer setting word counts
+      attachment.update_column(:word_count, 8)
       expect(sub.reload.word_count).to eq 8
     end
 

@@ -58,7 +58,7 @@ describe WikiPage do
     p.notify_of_update = true
     p.save!
     p.update(body: "Awgawg")
-    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to_not include(@student)
+    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).not_to include(@student)
   end
 
   it "only sends page updated notifications to students assigned to the page" do
@@ -384,7 +384,7 @@ describe WikiPage do
     p1.save
 
     # doesn't delete the lookups
-    expect(p1.current_lookup).to_not be_nil
+    expect(p1.current_lookup).not_to be_nil
 
     # therefore we can't reuse the url
     p2 = @course.wiki_pages.create(title: "Asdf")
@@ -403,6 +403,24 @@ describe WikiPage do
     course_with_teacher(active_all: true)
     wp = @course.wiki_pages.create!(title: "Asdf")
     expect(wp.root_account_id).to eql @course.root_account_id
+  end
+
+  it "versions attachment associations with the page" do
+    course_with_teacher
+    attachment_model(context: @course)
+    page = @course.wiki_pages.create!(title: "meh", body: "file linke: <a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>file</a>", updating_user: @teacher)
+    page.reload.update(body: "meh", updating_user: @teacher)
+
+    expect(YAML.load(page.reload.versions.find_by(number: 1).yaml)["attachment_associations"][0]).to include({
+                                                                                                               attachment_id: @attachment.id,
+                                                                                                               context_id: page.id,
+                                                                                                               context_type: "WikiPage",
+                                                                                                               root_account_id: @course.root_account_id,
+                                                                                                               user_id: @teacher.id,
+                                                                                                               context_concern: nil
+                                                                                                             })
+
+    expect(YAML.load(page.reload.versions.find_by(number: 2).yaml)["attachment_associations"]).to eq([])
   end
 
   context "unpublished" do
@@ -1637,7 +1655,6 @@ describe WikiPage do
       course = Course.create!
       course.update!(horizon_course: true)
       course.account.enable_feature!(:horizon_course_setting)
-      course.account.enable_feature!(:horizon_learning_object_ingestion_on_change)
       course
     end
     let(:regular_course) { Course.create! }
@@ -1692,12 +1709,6 @@ describe WikiPage do
 
       it "no relevant fields changed" do
         wiki_page.save!
-        expect(wiki_page.should_index_in_pine?).to be false
-      end
-
-      it "feature flag is not enabled" do
-        horizon_course.account.disable_feature!(:horizon_learning_object_ingestion_on_change)
-        wiki_page.body = "Updated"
         expect(wiki_page.should_index_in_pine?).to be false
       end
     end
@@ -1814,12 +1825,11 @@ describe WikiPage do
       course = Course.create!
       course.update!(horizon_course: true)
       course.account.enable_feature!(:horizon_course_setting)
-      course.account.enable_feature!(:horizon_learning_object_ingestion_on_change)
       course
     end
     let(:wiki_page) { horizon_course.wiki_pages.create!(title: "Test Page", body: "<p>Test content</p>") }
     let(:pine_client_mock) { class_double(PineClient) }
-    let(:null_user) { Struct.new(:uuid, :global_id, keyword_init: true).new(uuid: nil, global_id: nil) }
+    let(:null_user) { Struct.new(:uuid, :global_id).new(uuid: nil, global_id: nil) }
 
     before do
       allow(pine_client_mock).to receive_messages(enabled?: true, delete_document: true)
@@ -1925,6 +1935,185 @@ describe WikiPage do
 
         expect(regular_page).not_to receive(:delete_from_pine)
         regular_page.destroy
+      end
+    end
+  end
+
+  describe "ContentService methods" do
+    let(:wiki_page) { wiki_page_model(title: "Test Page") }
+
+    let(:user_uuid) { "user-uuid-1234" }
+    let(:data) { { "content" => "block data" } }
+    let(:external_content_id) { "ext-uuid-5678" }
+
+    before do
+      stub_const("ContentServiceClient", Class.new do
+        def self.create_content(**) = nil
+        def self.update_content(**) = nil
+        def self.get_content(**) = nil
+      end)
+
+      allow(Canvas).to receive(:retriable).and_yield
+    end
+
+    describe "#create_block_editor_data" do
+      before do
+        allow(ContentServiceClient).to receive(:create_content)
+          .and_return(double(external_content_id:))
+      end
+
+      it "passes correct params to ContentServiceClient" do
+        wiki_page.create_block_editor_data(user_uuid:, data:)
+
+        expect(ContentServiceClient).to have_received(:create_content).with(
+          root_account_uuid: wiki_page.context.root_account.uuid,
+          user_uuid:,
+          context_type: "WikiPage",
+          context_id: wiki_page.id,
+          data:
+        )
+      end
+
+      it "stores the returned external_content_id" do
+        wiki_page.create_block_editor_data(user_uuid:, data:)
+
+        expect(wiki_page.external_content_reference).to be_present
+        expect(wiki_page.external_content_reference.content_id).to eql external_content_id
+      end
+
+      context "when data is nil" do
+        it "passes nil data to ContentServiceClient" do
+          wiki_page.create_block_editor_data(user_uuid:, data: nil)
+
+          expect(ContentServiceClient).to have_received(:create_content).with(
+            hash_including(data: nil)
+          )
+        end
+      end
+    end
+
+    describe "#update_block_editor_data" do
+      before do
+        wiki_page.create_external_content_reference!(content_id: external_content_id)
+        allow(ContentServiceClient).to receive(:update_content).and_return(nil)
+      end
+
+      it "passes correct params to ContentServiceClient" do
+        wiki_page.update_block_editor_data(user_uuid:, data:)
+
+        expect(ContentServiceClient).to have_received(:update_content).with(
+          root_account_uuid: wiki_page.context.root_account.uuid,
+          user_uuid:,
+          external_content_id:,
+          data:
+        )
+      end
+
+      context "when the page has no ExternalContentReference" do
+        let(:page_without_ref) { wiki_page_model(title: "No Ref Page") }
+
+        before do
+          allow(ContentServiceClient).to receive(:create_content)
+            .and_return(double(external_content_id:))
+        end
+
+        it "does not call ContentServiceClient.update_content" do
+          page_without_ref.update_block_editor_data(user_uuid:, data:)
+
+          expect(ContentServiceClient).not_to have_received(:update_content)
+        end
+
+        it "falls back to create_block_editor_data" do
+          page_without_ref.update_block_editor_data(user_uuid:, data:)
+
+          expect(ContentServiceClient).to have_received(:create_content).with(
+            root_account_uuid: page_without_ref.context.root_account.uuid,
+            user_uuid:,
+            context_type: "WikiPage",
+            context_id: page_without_ref.id,
+            data:
+          )
+        end
+
+        it "creates an ExternalContentReference" do
+          page_without_ref.update_block_editor_data(user_uuid:, data:)
+
+          expect(page_without_ref.external_content_reference).to be_present
+          expect(page_without_ref.external_content_reference.content_id).to eql external_content_id
+        end
+      end
+    end
+
+    describe "#get_block_editor_data" do
+      let(:block_editor_data) { { "type" => "doc", "content" => [] } }
+
+      before do
+        wiki_page.create_external_content_reference!(content_id: external_content_id)
+        allow(ContentServiceClient).to receive(:get_content)
+          .and_return(double(data: block_editor_data))
+      end
+
+      it "passes correct params to ContentServiceClient" do
+        wiki_page.get_block_editor_data(user_uuid:)
+
+        expect(ContentServiceClient).to have_received(:get_content).with(
+          root_account_uuid: wiki_page.context.root_account.uuid,
+          user_uuid:,
+          external_content_id:
+        )
+      end
+
+      it "returns the block_editor_data data" do
+        result = wiki_page.get_block_editor_data(user_uuid:)
+
+        expect(result).to eql block_editor_data
+      end
+
+      context "when the page has no ExternalContentReference" do
+        let(:page_without_ref) { wiki_page_model(title: "No Ref Page") }
+
+        it "returns nil without calling ContentServiceClient" do
+          result = page_without_ref.get_block_editor_data(user_uuid:)
+
+          expect(result).to be_nil
+          expect(ContentServiceClient).not_to have_received(:get_content)
+        end
+      end
+
+      context "when ContentServiceClient raises" do
+        let(:client_error) do
+          InstructureMiscPlugin::Extensions::ContentServiceClient::ClientError.new("service failure")
+        end
+
+        before do
+          allow(Canvas).to receive(:retriable).and_raise(client_error)
+        end
+
+        it "propagates the error" do
+          expect { wiki_page.get_block_editor_data(user_uuid:) }
+            .to raise_error(InstructureMiscPlugin::Extensions::ContentServiceClient::ClientError)
+        end
+      end
+    end
+
+    describe "retry configuration" do
+      it "defaults to 3" do
+        allow(ContentServiceClient).to receive(:create_content).and_return(double(external_content_id:))
+
+        wiki_page.create_block_editor_data(user_uuid:, data:)
+
+        expect(Canvas).to have_received(:retriable).with(hash_including(tries: 3))
+      end
+
+      it "reads the value from Setting" do
+        Setting.set("content_service_client_max_retries", "5")
+        allow(ContentServiceClient).to receive(:create_content).and_return(double(external_content_id:))
+
+        wiki_page.create_block_editor_data(user_uuid:, data:)
+
+        expect(Canvas).to have_received(:retriable).with(hash_including(tries: 5))
+      ensure
+        Setting.remove("content_service_client_max_retries")
       end
     end
   end

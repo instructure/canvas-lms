@@ -54,15 +54,15 @@ class JobsV2Controller < ApplicationController
 
         jobs_server = @domain_root_account.shard.delayed_jobs_shard&.database_server_id
         cluster = @domain_root_account.shard&.database_server_id
-        js_env(
-          manage_jobs: Account.site_admin.grants_right?(@current_user, session, :manage_jobs),
-          jobs_scope_filter: {
-            jobs_server: (jobs_server && t("Server: %{server}", server: jobs_server)) || t("All Jobs"),
-            cluster: cluster && t("Cluster: %{cluster}", cluster:),
-            shard: t("Shard: %{shard}", shard: @domain_root_account.shard.name),
-            account: t("Account: %{account}", account: @domain_root_account.name)
-          }.compact
-        )
+        js_env({
+                 manage_jobs: Account.site_admin.grants_right?(@current_user, session, :manage_jobs),
+                 jobs_scope_filter: {
+                   jobs_server: (jobs_server && t("Server: %{server}", server: jobs_server)) || t("All Jobs"),
+                   cluster: cluster && t("Cluster: %{cluster}", cluster:),
+                   shard: t("Shard: %{shard}", shard: @domain_root_account.shard.name),
+                   account: t("Account: %{account}", account: @domain_root_account.name)
+                 }.compact
+               })
 
         render html: "", layout: true
       end
@@ -74,9 +74,9 @@ class JobsV2Controller < ApplicationController
       format.html do
         @page_title = t("Jobs Stats by Cluster")
 
-        js_env(
-          manage_jobs: Account.site_admin.grants_right?(@current_user, session, :manage_jobs)
-        )
+        js_env({
+                 manage_jobs: Account.site_admin.grants_right?(@current_user, session, :manage_jobs)
+               })
 
         deferred_js_bundle :job_stats
         render html: "", layout: true

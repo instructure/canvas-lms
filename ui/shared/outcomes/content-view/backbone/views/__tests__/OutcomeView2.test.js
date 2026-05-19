@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {act} from 'react'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
@@ -82,7 +83,8 @@ describe('OutcomeView', () => {
     $('.ui-dialog').remove()
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    await act(async () => {})
     $('.ui-dialog').remove()
     $('.ui-widget-overlay').remove()
     document.body.innerHTML = ''
@@ -147,6 +149,7 @@ describe('OutcomeView', () => {
         state: 'show',
       })
       expect(view.$('#assessed_info_banner')).toHaveLength(0)
+      view.remove()
     })
   })
 
@@ -218,7 +221,7 @@ describe('OutcomeView', () => {
       console.warn.mockRestore()
     })
 
-    it('shows confirmation dialog when outcome calculation is modified', () => {
+    it('shows confirmation dialog when outcome calculation is modified', async () => {
       const view = createView({
         model: newOutcome(
           {assessed: true, native: true, has_updateable_rubrics: true},
@@ -231,7 +234,7 @@ describe('OutcomeView', () => {
       view.$('#title').val('this is a brand new title')
       view.$('form').trigger('submit')
 
-      return new Promise(resolve => {
+      await new Promise(resolve => {
         setTimeout(() => {
           expect($('.confirm-outcome-edit-modal-container').length).toBeGreaterThan(0)
           // cleanup
@@ -240,6 +243,7 @@ describe('OutcomeView', () => {
           resolve()
         })
       })
+      view.remove()
     })
 
     // Fickle: Backbone view with waitFrames — times out at 30s in CI

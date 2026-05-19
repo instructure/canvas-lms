@@ -242,10 +242,8 @@
 #
 class ContextModuleItemsApiController < ApplicationController
   before_action :require_context
-  before_action :require_user, only: [:select_mastery_path]
+  skip_before_action :require_user, only: %i[index item_sequence show]
   before_action :find_student, only: %i[index show select_mastery_path]
-  before_action :disable_escape_html_entities, only: [:index, :show]
-  after_action :enable_escape_html_entities, only: [:index, :show]
   include Api::V1::ContextModule
   include PlannerApiHelper
 
@@ -562,7 +560,7 @@ class ContextModuleItemsApiController < ApplicationController
           if module_item_publishable?(@tag)
             @tag.publish
           else
-            return render json: { message: "item can't be published" }, status: :unprocessable_entity
+            return render json: { message: "item can't be published" }, status: :unprocessable_content
           end
         elsif module_item_unpublishable?(@tag)
           @tag.unpublish
@@ -570,7 +568,7 @@ class ContextModuleItemsApiController < ApplicationController
           return render json: { message: "item can't be unpublished" }, status: :forbidden
         end
         @tag.save
-        @tag.update_asset_workflow_state!
+        @tag.update_asset_workflow_state!(user: @current_user)
         @tag.context_module.save
       end
 
@@ -801,16 +799,6 @@ class ContextModuleItemsApiController < ApplicationController
       end
     end
   end
-
-  def disable_escape_html_entities
-    ActiveSupport.escape_html_entities_in_json = false
-  end
-  private :disable_escape_html_entities
-
-  def enable_escape_html_entities
-    ActiveSupport.escape_html_entities_in_json = true
-  end
-  private :enable_escape_html_entities
 
   def set_position
     return true unless @tag && params[:module_item][:position]

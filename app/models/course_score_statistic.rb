@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CourseScoreStatistic < ActiveRecord::Base
+class CourseScoreStatistic < ApplicationRecord
   belongs_to :course
 
   validates :course, :average, :score_count, presence: true

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 describe OutcomesService::Service do
   let(:root_account) { account_model }
   let(:course) { course_model(root_account:) }

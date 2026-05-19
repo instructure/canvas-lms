@@ -27,8 +27,8 @@ import ready from '@instructure/ready'
 import NewTabIndicator from './react/NewTabIndicator'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {getExternalTools} from './react/utils'
-import AlertManager from '@canvas/alerts/react/AlertManager'
-import {queryClient} from '@canvas/query'
+import {AlertManager} from '@instructure/platform-alerts'
+import {queryClient} from '@instructure/platform-query'
 
 const I18n = createI18nScope('common')
 
@@ -88,7 +88,7 @@ ready(() => {
       // Render MobileNavigation after SideNav
       render(
         <QueryClientProvider client={queryClient}>
-          <AlertManager breakpoints={{}}>
+          <AlertManager>
             <MobileNavigation navIsOpen={globalNavIsOpen} />
           </AlertManager>
         </QueryClientProvider>,
@@ -109,7 +109,7 @@ ready(() => {
       if (mobileContextNavContainer) {
         render(
           <QueryClientProvider client={queryClient}>
-            <AlertManager breakpoints={{}}>
+            <AlertManager>
               <MobileNavigation />
             </AlertManager>
           </QueryClientProvider>,

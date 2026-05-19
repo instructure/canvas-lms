@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class DiscussionTopicInsight < ActiveRecord::Base
+class DiscussionTopicInsight < ApplicationRecord
   include LocaleSelection
 
   belongs_to :root_account, class_name: "Account"

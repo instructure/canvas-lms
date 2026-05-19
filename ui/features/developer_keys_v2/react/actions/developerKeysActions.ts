@@ -170,6 +170,7 @@ export const actions = {
   listDeveloperKeysReplaceBindingState: (payload: {
     developerKeyId: string
     newAccountBinding: DeveloperKeyAccountBinding
+    newLtiRegistrationWorkflowState?: string
   }) => ({
     type: actions.LIST_DEVELOPER_KEYS_REPLACE_BINDING_STATE,
     payload,
@@ -328,6 +329,7 @@ export const actions = {
   setBindingWorkflowStateFailed: (payload: {
     developerKeyId: string
     previousAccountBinding: DeveloperKeyAccountBinding
+    previousLtiRegistrationWorkflowState?: string
   }) => ({
     type: actions.SET_BINDING_WORKFLOW_STATE_FAILED,
     payload,
@@ -386,12 +388,16 @@ export const actions = {
       const url = `/api/v1/accounts/${accountId}/developer_keys/${developerKey.id}/developer_key_account_bindings`
 
       const previousAccountBinding = developerKey.developer_key_account_binding || {}
+      const previousLtiRegistrationWorkflowState =
+        developerKey.lti_registration_workflow_state || 'inactive'
+      const newLtiRegistrationWorkflowState = workflowState === 'on' ? 'active' : 'inactive'
 
       dispatch(
         actions.listDeveloperKeysReplaceBindingState({
           developerKeyId: developerKey.id,
           // @ts-expect-error
           newAccountBinding: {...previousAccountBinding, workflow_state: workflowState},
+          newLtiRegistrationWorkflowState,
         }),
       )
       axios
@@ -409,6 +415,7 @@ export const actions = {
               developerKeyId: developerKey.id,
               // @ts-expect-error
               previousAccountBinding,
+              previousLtiRegistrationWorkflowState,
             }),
           )
           $.flashError(error.message)

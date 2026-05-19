@@ -25,7 +25,6 @@ class AccountGradingSettingsController < ApplicationController
   before_action :require_context
   add_crumb(proc { t "#crumbs.grading_settings", "Grading" }) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_grading_settings_url }
   before_action { |c| c.active_tab = "grading_standards" }
-  before_action :require_user
 
   include HorizonMode
 

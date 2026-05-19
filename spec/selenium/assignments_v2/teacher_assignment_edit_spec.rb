@@ -54,11 +54,11 @@ describe "as a teacher" do
       end
 
       it "shows edit assignment" do
-        expect(TeacherCreateEditPageV2.assignment_title("Edit Assignment")).to_not be_nil
+        expect(TeacherCreateEditPageV2.assignment_title("Edit Assignment")).not_to be_nil
       end
 
       it "shows publish status" do
-        expect(TeacherCreateEditPageV2.publish_status(@assignment.workflow_state)).to_not be_nil
+        expect(TeacherCreateEditPageV2.publish_status(@assignment.workflow_state)).not_to be_nil
       end
 
       it "shows options button" do
@@ -95,11 +95,11 @@ describe "as a teacher" do
       end
 
       it "shows create assignment" do
-        expect(TeacherCreateEditPageV2.assignment_title("Create Assignment")).to_not be_nil
+        expect(TeacherCreateEditPageV2.assignment_title("Create Assignment")).not_to be_nil
       end
 
       it "shows unpublished status" do
-        expect(TeacherCreateEditPageV2.publish_status("Unpublished")).to_not be_nil
+        expect(TeacherCreateEditPageV2.publish_status("Unpublished")).not_to be_nil
       end
 
       it "shows options button" do

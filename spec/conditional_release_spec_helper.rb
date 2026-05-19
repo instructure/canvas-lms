@@ -40,7 +40,7 @@ RSpec.shared_examples "a soft-deletable model" do
     instance = create(described_class.name.underscore.sub("conditional_release/", "").to_sym)
     copy = instance.clone
     instance.destroy!
-    expect { copy.save! }.to_not raise_error
+    expect { copy.save! }.not_to raise_error
   end
 end
 

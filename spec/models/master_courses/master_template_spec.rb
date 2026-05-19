@@ -210,7 +210,7 @@ describe MasterCourses::MasterTemplate do
 
       @template.update_attribute(:default_restrictions, { content: true, due_dates: true })
       # now should update
-      expect(@quiz1.reload.updated_at.to_i).to_not eq old_time.to_i
+      expect(@quiz1.reload.updated_at.to_i).not_to eq old_time.to_i
       expect(@quiz2.reload.updated_at.to_i).to eq old_time.to_i # has custom restrictions
     end
 
@@ -237,8 +237,8 @@ describe MasterCourses::MasterTemplate do
                          "Quizzes::Quiz" => { content: true, due_dates: true }
                        })
       expect(@assmt.reload.updated_at.to_i).to eq old_time.to_i
-      expect(@topic.reload.updated_at.to_i).to_not eq old_time.to_i
-      expect(@quiz.reload.updated_at.to_i).to_not eq old_time.to_i
+      expect(@topic.reload.updated_at.to_i).not_to eq old_time.to_i
+      expect(@quiz.reload.updated_at.to_i).not_to eq old_time.to_i
     end
   end
 

@@ -22,11 +22,15 @@ class Accessibility::AiGenerationService
   include Accessibility::NokogiriMethods
 
   class InvalidParameterError < StandardError; end
+  class AttachmentNotFoundError < StandardError; end
+  class AttachmentPermissionError < StandardError; end
+  class AttachmentTooLargeError < StandardError; end
+  class UnsupportedImageTypeError < StandardError; end
 
   AI_ALT_TEXT_TYPE = "Base64"
   AI_ALT_TEXT_FEATURE_FLAG_SLUG = "alttext"
   AI_ALT_TEXT_MAX_LENGTH = 200
-  AI_ALT_TEXT_MAX_IMAGE_SIZE = 10.megabytes
+  AI_ALT_TEXT_MAX_IMAGE_SIZE = 3.megabytes # Cedar API constraint
   AI_ALT_TEXT_SUPPORTED_IMAGE_TYPES = Attachment.valid_content_types_hash.select { |_, type| type == "image" }.keys.freeze
   AI_TABLE_CAPTION_FEATURE_FLAG_SLUG = "table-caption-generate"
   FILE_LINK_REGEX = %r{\A(?!//).*?/files/(\d+)(?:[/?]|$)}
@@ -119,10 +123,13 @@ class Accessibility::AiGenerationService
 
   def load_and_validate_attachment(attachment_id)
     attachment = Attachment.find_by(id: attachment_id)
+    raise AttachmentNotFoundError unless attachment
 
-    raise InvalidParameterError unless attachment&.grants_right?(@current_user, :read) &&
-                                       attachment.size <= AI_ALT_TEXT_MAX_IMAGE_SIZE &&
-                                       AI_ALT_TEXT_SUPPORTED_IMAGE_TYPES.include?(attachment.content_type)
+    raise AttachmentPermissionError unless attachment.grants_right?(@current_user, :read)
+
+    raise AttachmentTooLargeError unless attachment.size <= AI_ALT_TEXT_MAX_IMAGE_SIZE
+
+    raise UnsupportedImageTypeError unless AI_ALT_TEXT_SUPPORTED_IMAGE_TYPES.include?(attachment.content_type)
 
     attachment
   end

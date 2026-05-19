@@ -24,7 +24,7 @@ module CanvasPandaPub
   # pushes take precedence over earlier pushes.
 
   class AsyncWorker
-    def initialize(start_thread = true)
+    def initialize(start_thread: true)
       @queue = Queue.new
       @logger = CanvasPandaPub.logger
       @interval = CanvasPandaPub.process_interval

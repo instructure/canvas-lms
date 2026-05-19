@@ -129,7 +129,7 @@ describe AccountsController do
         post "remove_user", params: { account_id: @account.id, user_id: @user.id }, format: "json"
         expect(flash[:notice]).to match(/successfully deleted/)
         expect(json_parse(response.body)).to eq json_parse(@user.reload.to_json)
-        expect(@user.associated_accounts.map(&:id)).to_not include(@account.id)
+        expect(@user.associated_accounts.map(&:id)).not_to include(@account.id)
       end
     end
 
@@ -213,7 +213,7 @@ describe AccountsController do
         expect(progress.reload.workflow_state).to eq "completed"
         expect(progress.results[:errors]).to have_key("9999")
         expect(@account.reload.users.find_by(name: "Alice")).to be_nil
-        expect(@account.reload.users.find_by(name: "Bob")).to_not be_nil
+        expect(@account.reload.users.find_by(name: "Bob")).not_to be_nil
       end
 
       it "returns bad request if user_ids are over the limit" do
@@ -394,7 +394,7 @@ describe AccountsController do
       expect(response).to be_successful
 
       new_admin = CommunicationChannel.find_by(path: "testadmin@example.com").user
-      expect(new_admin).to_not be_nil
+      expect(new_admin).not_to be_nil
       @account.reload
       expect(@account.account_users.map(&:user)).to include(new_admin)
       expect(@account.account_users.find_by(role_id: role.id).user).to eq new_admin
@@ -721,6 +721,43 @@ describe AccountsController do
       expect(@account.admins_can_change_passwords?).to be_truthy
       expect(@account.admins_can_view_notifications?).to be_truthy
       expect(@account.limit_parent_app_web_access?).to be_truthy
+    end
+
+    it "does not allow non-site-admins to update impact_account_type" do
+      account_with_admin_logged_in
+      post "update", params: { id: @account.id,
+                               account: { settings: {
+                                 impact_account_type: "consortium"
+                               } } }
+      @account.reload
+      expect(@account.settings[:impact_account_type]).to be_nil
+    end
+
+    it "allows site_admin to update impact_account_type for root account" do
+      user_factory
+      user_session(@user)
+      @account = Account.create!
+      Account.site_admin.account_users.create!(user: @user)
+      post "update", params: { id: @account.id,
+                               account: { settings: {
+                                 impact_account_type: "consortium"
+                               } } }
+      @account.reload
+      expect(@account.settings[:impact_account_type]).to eq("consortium")
+    end
+
+    it "allows site_admin to update impact_account_type for subaccount" do
+      user_factory
+      user_session(@user)
+      @account = Account.create!
+      @subaccount = @account.sub_accounts.create!
+      Account.site_admin.account_users.create!(user: @user)
+      post "update", params: { id: @subaccount.id,
+                               account: { settings: {
+                                 impact_account_type: "subaccount"
+                               } } }
+      @subaccount.reload
+      expect(@subaccount.settings[:impact_account_type]).to eq("subaccount")
     end
 
     it "does not allow anyone to set unexpected settings" do
@@ -1327,6 +1364,21 @@ describe AccountsController do
     end
   end
 
+  describe "institutional tags permissions in course_user_search" do
+    before do
+      account_with_admin_logged_in
+      @account.enable_feature!(:institutional_tags)
+    end
+
+    it "includes institutional tags permissions in PERMISSIONS js_env" do
+      get "show", params: { id: @account.id }
+      permissions = assigns[:js_env][:PERMISSIONS]
+      expect(permissions[:can_view_institutional_tags]).to be true
+      expect(permissions[:can_create_institutional_tags]).to be true
+      expect(permissions[:can_edit_institutional_tags]).to be true
+    end
+  end
+
   describe "#acceptable_use_policy" do
     before do
       @account = Account.create!
@@ -1495,7 +1547,7 @@ describe AccountsController do
                                  } } }
         @account.reload
         eik = @account.external_integration_keys.where(key_type: :external_key2).first
-        expect(eik).to_not be_nil
+        expect(eik).not_to be_nil
         expect(eik.key_value).to eq "2142"
       end
 
@@ -1838,6 +1890,22 @@ describe AccountsController do
       expect(response).to be_successful
       expect(response.body).to match(/#{@c1.id}/)
       expect(response.body).to match(/#{@c2.id}/)
+    end
+
+    it "accepts array of enrollment terms and correctly filters courses" do
+      admin_logged_in(@account)
+      term1 = @account.root_account.enrollment_terms.create!(name: "Term A")
+      term2 = @account.root_account.enrollment_terms.create!(name: "Term B")
+      term3 = @account.root_account.enrollment_terms.create!(name: "Term C")
+
+      course1 = course_model(account: @account, enrollment_term: term1)
+      course_model(account: @account, enrollment_term: term2)
+      course3 = course_model(account: @account, enrollment_term: term3)
+
+      get "courses_api", params: { account_id: @account.id, enrollment_term_id: [term1.id, term3.id] }, format: :json
+      expect(response).to be_successful
+      data = response.parsed_body
+      expect(data.pluck("id")).to contain_exactly(course1.id, course3.id)
     end
 
     context "post_manually" do
@@ -3220,6 +3288,57 @@ describe AccountsController do
         expect(data["resolved"]).to eq(8)
       end
     end
+
+    context "enrollment term filtering" do
+      before(:once) do
+        @account.enable_feature!(:a11y_checker)
+        Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
+        account_admin_user(account: @account)
+      end
+
+      before do
+        user_session(@user)
+      end
+
+      it "returns only counts for courses in the specified enrollment term" do
+        term = @account.root_account.enrollment_terms.create!(name: "Spring 2025")
+        other_term = @account.root_account.enrollment_terms.create!(name: "Fall 2025")
+
+        course_in_term = course_model(account: @account, enrollment_term: term)
+        course_in_other_term = course_model(account: @account, enrollment_term: other_term)
+
+        AccessibilityCourseStatistic.create!(course: course_in_term, workflow_state: "active", active_issue_count: 4, resolved_issue_count: 2)
+        AccessibilityCourseStatistic.create!(course: course_in_other_term, workflow_state: "active", active_issue_count: 10, resolved_issue_count: 6)
+
+        get "accessibility_issue_summary", params: { account_id: @account.id, enrollment_term_id: term.id }, format: :json
+        expect(response).to be_successful
+        data = response.parsed_body
+        expect(data["active"]).to eq(4)
+        expect(data["resolved"]).to eq(2)
+      end
+
+      it "returns all courses when no enrollment_term_id param is given" do
+        term1 = @account.root_account.enrollment_terms.create!(name: "Term A")
+        term2 = @account.root_account.enrollment_terms.create!(name: "Term B")
+
+        course1 = course_model(account: @account, enrollment_term: term1)
+        course2 = course_model(account: @account, enrollment_term: term2)
+
+        AccessibilityCourseStatistic.create!(course: course1, workflow_state: "active", active_issue_count: 3, resolved_issue_count: 1)
+        AccessibilityCourseStatistic.create!(course: course2, workflow_state: "active", active_issue_count: 7, resolved_issue_count: 5)
+
+        get "accessibility_issue_summary", params: { account_id: @account.id }, format: :json
+        expect(response).to be_successful
+        data = response.parsed_body
+        expect(data["active"]).to eq(10)
+        expect(data["resolved"]).to eq(6)
+      end
+
+      it "returns 404 when the enrollment_term_id does not exist" do
+        get "accessibility_issue_summary", params: { account_id: @account.id, enrollment_term_id: 0 }, format: :json
+        expect(response).to be_not_found
+      end
+    end
   end
 
   describe "nav_menu_links in update action" do
@@ -3249,7 +3368,7 @@ describe AccountsController do
       # Update: keep one existing link, remove the other, and add a new link
       link_objects = [
         { type: "existing", id: link_to_keep.id.to_s, label: "Keep This" },
-        { type: "new", url: "https://example.com/new", label: "New Link" }
+        { type: "new", url: "https://example.com/new", label: "New Link", placements: { course_nav: true } }
       ].to_json
 
       expect do
@@ -3283,6 +3402,52 @@ describe AccountsController do
       }
       expect(flash[:error]).to include("settings update failed")
     end
+
+    context "with manage_nav_menu_links permission" do
+      it "passes can_manage_links: true when user has permission" do
+        @account.root_account.enable_feature!(:nav_menu_links)
+
+        link_objects = [
+          { type: "new", url: "https://example.com/new", label: "New Link", placements: { course_nav: true } }
+        ].to_json
+
+        expect(NavMenuLink).to receive(:sync_with_link_objects_json)
+          .with(hash_including(can_manage_links: true))
+          .and_call_original
+
+        post "update", params: {
+          id: @account.id,
+          account: { nav_menu_links: link_objects }
+        }
+
+        expect(response).to be_redirect
+      end
+
+      it "passes can_manage_links: false when user lacks permission" do
+        @account.root_account.enable_feature!(:nav_menu_links)
+
+        # Revoke permission from admin role (by default, admins have this permission)
+        role = @admin.account_users.first.role
+        @account.root_account.role_overrides.create!(permission: :manage_nav_menu_links, role:, enabled: false)
+
+        link_objects = [
+          { type: "new", url: "https://example.com/new", label: "New Link" }
+        ].to_json
+
+        expect(NavMenuLink).to receive(:sync_with_link_objects_json)
+          .with(hash_including(can_manage_links: false))
+          .and_call_original
+
+        post "update", params: {
+          id: @account.id,
+          account: { nav_menu_links: link_objects, name: "Updated Name" }
+        }
+
+        expect(response).to be_redirect
+        # Account update should still succeed
+        expect(@account.reload.name).to eq("Updated Name")
+      end
+    end
   end
 
   describe "settings action with nav_menu_links" do
@@ -3311,8 +3476,8 @@ describe AccountsController do
       get "settings", params: { account_id: @account.id }
 
       expect(assigns[:js_env][:NAV_MENU_LINKS]).to eq([
-                                                        { type: "existing", id: @link1.id, label: "Link One" },
-                                                        { type: "existing", id: @link2.id, label: "Link Two" }
+                                                        { type: "existing", id: @link1.id, label: "Link One", url: "https://example.com/1", placements: { course_nav: true, account_nav: false, user_nav: false } },
+                                                        { type: "existing", id: @link2.id, label: "Link Two", url: "https://example.com/2", placements: { course_nav: true, account_nav: false, user_nav: false } }
                                                       ])
     end
 
@@ -3321,6 +3486,45 @@ describe AccountsController do
         @account.root_account.disable_feature!(:nav_menu_links)
         get "settings", params: { account_id: @account.id }
         expect(assigns[:js_env]).not_to have_key(:NAV_MENU_LINKS)
+      end
+    end
+  end
+
+  describe "#sis_import" do
+    before do
+      @account = Account.default
+      @account.allow_sis_import = true
+      @account.save!
+    end
+
+    context "as a site admin" do
+      before do
+        @user = user_factory
+        Account.site_admin.account_users.create!(user: @user)
+        user_session(@user)
+      end
+
+      it "sets SHOW_SITE_ADMIN_CONFIRMATION to true" do
+        get "sis_import", params: { account_id: @account.id }
+        expect(assigns[:js_env][:SHOW_SITE_ADMIN_CONFIRMATION]).to be true
+      end
+
+      it "sets SHOW_SITE_ADMIN_CONFIRMATION to false when also a direct account admin" do
+        @account.account_users.create!(user: @user)
+        get "sis_import", params: { account_id: @account.id }
+        expect(assigns[:js_env][:SHOW_SITE_ADMIN_CONFIRMATION]).to be false
+      end
+    end
+
+    context "as an account admin who is not a site admin" do
+      before do
+        account_admin_user(account: @account)
+        user_session(@admin)
+      end
+
+      it "sets SHOW_SITE_ADMIN_CONFIRMATION to false" do
+        get "sis_import", params: { account_id: @account.id }
+        expect(assigns[:js_env][:SHOW_SITE_ADMIN_CONFIRMATION]).to be false
       end
     end
   end

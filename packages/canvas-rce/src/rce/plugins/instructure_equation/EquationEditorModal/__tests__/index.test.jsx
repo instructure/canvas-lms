@@ -365,6 +365,38 @@ describe('EquationEditorModal', () => {
     expect(mockFn).toHaveBeenCalled()
   })
 
+  describe('XSS prevention', () => {
+    it('does not parse HTML in formula when rendering advanced preview', async () => {
+      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({explicit_latex_typesetting: false})
+      jest.spyOn(Mathml.prototype, 'processNewMathInElem')
+      const actualDebounceRate = EquationEditorModal.debounceRate
+      EquationEditorModal.debounceRate = 100
+
+      renderModal({openAdvanced: true})
+      editInAdvancedMode('"><img src=x onerror=alert(origin)>')
+      await act(async () => jest.runAllTimers())
+      await waitFor(() => {
+        expect(advancedPreview().querySelector('img')).toBeNull()
+      })
+
+      EquationEditorModal.debounceRate = actualDebounceRate
+    })
+
+    it('clears math-field value before dismiss on Done', () => {
+      renderModal({onModalDismiss: mockFn, onEquationSubmit: jest.fn()})
+      fireEvent.click(screen.getByText('Done'))
+      expect(EquationEditorModal.prototype.setMathField).toHaveBeenCalledWith('')
+      expect(mockFn).toHaveBeenCalled()
+    })
+
+    it('clears math-field value before dismiss on Cancel', () => {
+      renderModal({onModalDismiss: mockFn})
+      fireEvent.click(screen.getByText('Cancel'))
+      expect(EquationEditorModal.prototype.setMathField).toHaveBeenCalledWith('')
+      expect(mockFn).toHaveBeenCalled()
+    })
+  })
+
   describe('advanced mode flag', () => {
     it('is cleared when the user toggles from advanced to basic mode', () => {
       advancedPreference.isSet.mockReturnValueOnce(true)

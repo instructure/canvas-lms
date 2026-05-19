@@ -23,7 +23,7 @@ import classnames from 'classnames'
 import ProgressBar from '@canvas/progress/react/components/ProgressBar'
 import mimeClass from '@canvas/mime/mimeClass'
 import UploadQueue from '../modules/UploadQueue'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {isIWork, getIWorkType} from '@instructure/canvas-rce/es/rce/plugins/shared/fileTypeUtils'
 
 const I18n = createI18nScope('files_upload_progress')

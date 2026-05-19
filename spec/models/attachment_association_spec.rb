@@ -205,7 +205,7 @@ describe AttachmentAssociation do
           instance_variable_set(:"@aq_attachment#{i}", aq_a)
         end
 
-        course_quiz(true)
+        course_quiz(active: true)
         @quiz_desc_att = attachment_with_context(@teacher)
         @quiz.description = "<p>Quiz description <a href=\"/users/#{@teacher.id}/files/#{@quiz_desc_att.id}/download\">Download</a></p>"
         @quiz.updating_user = @teacher

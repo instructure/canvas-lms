@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
 import Course from '@canvas/courses/backbone/models/Course'
 import AssignmentGroupListView from './backbone/views/AssignmentGroupListView'
@@ -42,6 +42,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('assignment_index')
 
 ready(() => {
+  // @ts-expect-error TS7 migration
   const course = new Course({
     // @ts-expect-error
     id: encodeURIComponent(splitAssetString(ENV.context_asset_string)[1]),
@@ -53,6 +54,7 @@ ready(() => {
 
   const userIsAdmin = ENV.current_user_is_admin
 
+  // @ts-expect-error TS7 migration
   const assignmentGroups = new AssignmentGroupCollection([], {
     course,
     // @ts-expect-error
@@ -64,6 +66,7 @@ ready(() => {
   let createGroupView = false
   let showByView = false
 
+  // @ts-expect-error TS7 migration
   const assignmentGroupsView = new AssignmentGroupListView({
     collection: assignmentGroups,
     // @ts-expect-error
@@ -129,16 +132,15 @@ ready(() => {
   app.render()
 
   // kick it all off
-  // @ts-expect-error
   course.trigger('change')
 
   const node = document.querySelector('.loadingIndicator')
   if (node instanceof HTMLElement) {
-    const root = createRoot(node)
-    root.render(
+    render(
       <View padding="x-small" textAlign="center" as="div" display="block">
         <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
       </View>,
+      node,
     )
   }
 
@@ -154,8 +156,11 @@ ready(() => {
         assignmentGroups.reset(data)
         // @ts-expect-error
         const mockJqXHR = {getResponseHeader: h => res.headers.get(h)}
+        // @ts-expect-error TS7 migration
         assignmentGroups._setStateAfterFetch(mockJqXHR, {})
+        // @ts-expect-error TS7 migration
         if (!assignmentGroups.loadedAll) {
+          // @ts-expect-error TS7 migration
           return assignmentGroups.fetch({page: 'next'})
         }
       }),

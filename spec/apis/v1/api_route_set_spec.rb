@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 class ApiRouteSetSpecController < ActionController::Base # rubocop:disable Rails/ApplicationController
   def action_with_foobar_id
     render plain: "Action With Foobar Id: #{params[:foobar_id]}"
@@ -62,7 +60,7 @@ RSpec.describe ApiRouteSet, type: :request do
 
     def expect_no_route_matches(url)
       get(url.to_s)
-      expect(response).to_not be_successful
+      expect(response).not_to be_successful
     end
 
     def expect_route_matches(url, expected_response)

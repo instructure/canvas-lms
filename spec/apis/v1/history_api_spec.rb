@@ -136,7 +136,7 @@ describe HistoryController, type: :request do
                         format: "json",
                         user_id: "self",
                         expected_status: :bad_request)
-        expect(json["error"]).to_not be_nil
+        expect(json["error"]).not_to be_nil
       end
 
       it "gracefully handles an unauthorized request" do
@@ -148,7 +148,7 @@ describe HistoryController, type: :request do
                         format: "json",
                         user_id: "self",
                         expected_status: :not_found)
-        expect(json["error"]).to_not be_nil
+        expect(json["error"]).not_to be_nil
       end
 
       it "gracefully handles not found request" do
@@ -160,7 +160,7 @@ describe HistoryController, type: :request do
                         format: "json",
                         user_id: "self",
                         expected_status: :not_found)
-        expect(json["error"]).to_not be_nil
+        expect(json["error"]).not_to be_nil
       end
 
       it "gracefully handles rate limit exceeded" do
@@ -172,7 +172,7 @@ describe HistoryController, type: :request do
                         format: "json",
                         user_id: "self",
                         expected_status: :too_many_requests)
-        expect(json["error"]).to_not be_nil
+        expect(json["error"]).not_to be_nil
       end
 
       it "gracefully handles a pv4 timeout" do
@@ -184,7 +184,7 @@ describe HistoryController, type: :request do
                         format: "json",
                         user_id: "self",
                         expected_status: :bad_gateway)
-        expect(json["error"]).to_not be_nil
+        expect(json["error"]).not_to be_nil
       end
 
       it "gracefully handles an empty response" do
@@ -196,7 +196,7 @@ describe HistoryController, type: :request do
                         format: "json",
                         user_id: "self",
                         expected_status: :service_unavailable)
-        expect(json["error"]).to_not be_nil
+        expect(json["error"]).not_to be_nil
       end
     end
 

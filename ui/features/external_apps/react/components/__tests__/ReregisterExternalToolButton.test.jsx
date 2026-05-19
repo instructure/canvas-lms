@@ -58,14 +58,14 @@ describe('ExternalApps.ReregisterExternalToolButton', () => {
     })
 
     const reregisterLink = screen.getByRole('menuitem', {name: /reregister sometool/i})
-    userEvent.click(reregisterLink)
+    await userEvent.click(reregisterLink)
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
 
     const closeButton = screen.getByRole('button', {name: /close/i})
-    userEvent.click(closeButton)
+    await userEvent.click(closeButton)
 
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument()

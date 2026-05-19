@@ -243,7 +243,7 @@ module Canvas::Migration
       end
     end
 
-    def add_learning_outcome_to_overview(overview, outcome, parent_children = nil, parent_migration_id = nil, selectable_outcomes = false)
+    def add_learning_outcome_to_overview(overview, outcome, parent_children = nil, parent_migration_id = nil, selectable_outcomes: false)
       child_groups = []
       if outcome[:type] == "learning_outcome_group"
         if selectable_outcomes
@@ -256,7 +256,7 @@ module Canvas::Migration
         overview[:learning_outcomes] << lo
       end
       outcome[:outcomes]&.each do |sub_outcome|
-        overview = add_learning_outcome_to_overview(overview, sub_outcome, child_groups, outcome[:migration_id], selectable_outcomes)
+        overview = add_learning_outcome_to_overview(overview, sub_outcome, child_groups, outcome[:migration_id], selectable_outcomes:)
       end
       overview
     end
@@ -464,7 +464,7 @@ module Canvas::Migration
         @course[:learning_outcomes].each do |outcome|
           next unless outcome
 
-          add_learning_outcome_to_overview(@overview, outcome, nil, nil, selectable_outcomes)
+          add_learning_outcome_to_overview(@overview, outcome, nil, nil, selectable_outcomes:)
         end
       end
 

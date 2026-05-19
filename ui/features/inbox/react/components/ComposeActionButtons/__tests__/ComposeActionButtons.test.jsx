@@ -21,10 +21,14 @@ import {render, cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ComposeActionButtons} from '../ComposeActionButtons'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: () => {},
-  showFlashError: () => () => {},
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: () => {},
+    showFlashError: () => () => {},
+  }
+})
 
 const createProps = overrides => ({
   onAttachmentUpload: vi.fn(),

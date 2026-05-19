@@ -36,6 +36,7 @@ vi.mock('../../context', async () => {
   return {
     ...actualContext,
     useNewLoginData: vi.fn(() => ({
+      customMessageLogin: undefined,
       isDataLoading: false,
       loginHandleName: 'Email',
     })),
@@ -53,6 +54,8 @@ vi.mock('../../context', async () => {
     })),
   }
 })
+const mockUseNewLoginData = vi.mocked(useNewLoginData)
+const mockUseNewLogin = vi.mocked(useNewLogin)
 
 vi.mock('../../services/auth', () => ({
   performSignIn: vi.fn().mockResolvedValue({}),
@@ -88,7 +91,7 @@ describe('SignIn', () => {
     vi.clearAllMocks()
     vi.restoreAllMocks()
     // reset the mock implementation to return the default values
-    vi.mocked(useNewLoginData).mockImplementation(() => ({
+    mockUseNewLoginData.mockImplementation(() => ({
       isDataLoading: false,
       loginHandleName: 'Email',
     }))
@@ -138,6 +141,25 @@ describe('SignIn', () => {
       })
     })
 
+    it('calls performSignIn with a plain username (non-email)', async () => {
+      vi.mocked(windowPathname).mockReturnValue('/login/canvas')
+      const {getByTestId} = setup()
+      const usernameInput = getByTestId('username-input')
+      const passwordInput = getByTestId('password-input')
+      const loginButton = getByTestId('login-button')
+      await userEvent.type(usernameInput, 'testuser')
+      await userEvent.type(passwordInput, 'password123')
+      await userEvent.click(loginButton)
+      await waitFor(() => {
+        expect(performSignIn).toHaveBeenCalledWith(
+          'testuser',
+          'password123',
+          false,
+          '/login/canvas',
+        )
+      })
+    })
+
     // Skip: Error message doesn't render properly with current mock setup
     it.skip('displays a login error alert when invalid credentials are submitted', async () => {
       vi.mocked(performSignIn).mockRejectedValueOnce({response: {status: 400}})
@@ -181,7 +203,7 @@ describe('SignIn', () => {
   describe('ui State', () => {
     it('disables the "Log In" button when isUiActionPending is true', async () => {
       // Mock the useNewLogin hook to return isUiActionPending: true
-      vi.mocked(useNewLogin).mockReturnValue({
+      mockUseNewLogin.mockReturnValue({
         isUiActionPending: true,
         setIsUiActionPending: vi.fn(),
         otpRequired: false,
@@ -201,7 +223,7 @@ describe('SignIn', () => {
 
     it('disables the username and password inputs during login submission', async () => {
       // Mock the useNewLogin hook to return isUiActionPending: true
-      vi.mocked(useNewLogin).mockReturnValue({
+      mockUseNewLogin.mockReturnValue({
         isUiActionPending: true,
         setIsUiActionPending: vi.fn(),
         otpRequired: false,

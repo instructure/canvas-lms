@@ -41,7 +41,7 @@ describe PluginSetting do
     it "considers a freshly loaded encrypted object to be clean" do
       PluginSetting.create!(name: "plugin_setting_test", settings: { bar: "qwerty", foo: "asdf" })
       settings = PluginSetting.find_by(name: "plugin_setting_test")
-      expect(settings.changed?).to_not be_truthy
+      expect(settings.changed?).not_to be_truthy
     end
   end
 

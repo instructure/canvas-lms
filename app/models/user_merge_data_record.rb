@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class UserMergeDataRecord < ActiveRecord::Base
+class UserMergeDataRecord < ApplicationRecord
   belongs_to :previous_user, class_name: "User"
   belongs_to :merge_data, class_name: "UserMergeData", inverse_of: :records, foreign_key: "user_merge_data_id"
   belongs_to :context, polymorphic: [:account_user,
@@ -30,5 +30,6 @@ class UserMergeDataRecord < ActiveRecord::Base
                                      :user_service,
                                      :submission,
                                      { quiz_submission: "Quizzes::QuizSubmission" },
-                                     :assignment_override_student]
+                                     :assignment_override_student,
+                                     :institutional_tag_association]
 end

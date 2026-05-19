@@ -37,7 +37,7 @@ import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
 import '@canvas/rails-flash-notifications'
 import 'jquery-tinypubsub'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import replaceTags from '@canvas/util/replaceTags'
 import useStore from '../stores'
 import {FocusRegionManager} from '@instructure/ui-a11y-utils'

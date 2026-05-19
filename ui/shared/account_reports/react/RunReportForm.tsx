@@ -18,11 +18,11 @@
 
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import React, {useEffect, useRef, useState} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Portal} from '@instructure/ui-portal'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
@@ -30,8 +30,6 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {AccountReport} from '../types'
 import $ from 'jquery'
-
-const I18n = createI18nScope('account_reports')
 
 interface Props {
   formHTML: string
@@ -88,6 +86,7 @@ const getFormData = (form: HTMLDivElement) => {
 }
 
 export default function ConfigureReportForm(props: Props) {
+  const {t} = useTranslation('account_reports')
   const formRef = useRef<HTMLDivElement | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [dateRefs, setDateRefs] = useState<Record<string, [string, HTMLElement]>>({})
@@ -179,7 +178,7 @@ export default function ConfigureReportForm(props: Props) {
         props.onSuccess(json!)
         props.closeModal()
       } catch (e) {
-        showFlashError(I18n.t('Failed to start report.'))(e as Error)
+        showFlashError(t('Failed to start report.'))(e as Error)
         setIsLoading(false)
       }
     }
@@ -190,7 +189,7 @@ export default function ConfigureReportForm(props: Props) {
       return (
         <Modal.Body>
           <View margin="small auto" as="div" textAlign="center">
-            <Spinner renderTitle={I18n.t('Starting report')} />
+            <Spinner renderTitle={t('Starting report')} />
           </View>
         </Modal.Body>
       )
@@ -223,10 +222,10 @@ export default function ConfigureReportForm(props: Props) {
                 }}
                 description={<ScreenReaderContent>{dateLabel}</ScreenReaderContent>}
                 dateRenderLabel={dateLabel}
-                prevMonthLabel={I18n.t('Previous month')}
-                nextMonthLabel={I18n.t('Next month')}
-                timeRenderLabel={I18n.t('Time')}
-                invalidDateTimeMessage={I18n.t('Invalid date and time.')}
+                prevMonthLabel={t('Previous month')}
+                nextMonthLabel={t('Next month')}
+                timeRenderLabel={t('Time')}
+                invalidDateTimeMessage={t('Invalid date and time.')}
                 timezone={ENV.TIMEZONE}
                 locale={ENV.LOCALE}
               />
@@ -239,12 +238,12 @@ export default function ConfigureReportForm(props: Props) {
   }
   return (
     <Modal
-      label={I18n.t('Configure Report')}
+      label={t('Configure Report')}
       size={Object.entries(dateRefs).length > 0 ? 'medium' : 'small'}
       open
     >
       <Modal.Header>
-        <Heading>{I18n.t('Configure Report')}</Heading>
+        <Heading>{t('Configure Report')}</Heading>
         <CloseButton
           data-testid="close-button"
           placement="end"
@@ -254,13 +253,13 @@ export default function ConfigureReportForm(props: Props) {
               props.closeModal()
             }
           }}
-          screenReaderLabel={I18n.t('Close')}
+          screenReaderLabel={t('Close')}
         />
       </Modal.Header>
       {renderContent()}
       <Modal.Footer>
         <Button data-testid="run-report" disabled={isLoading} color="primary" onClick={onSubmit}>
-          {I18n.t('Run Report')}
+          {t('Run Report')}
         </Button>
       </Modal.Footer>
     </Modal>

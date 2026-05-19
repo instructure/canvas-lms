@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Mutations::PostAssignmentGradesForSections do
@@ -289,6 +288,30 @@ describe Mutations::PostAssignmentGradesForSections do
           submissions_posted_messages.count
         }.by(1)
       end
+    end
+  end
+
+  context "with a peer review sub assignment" do
+    let(:context) { { current_user: teacher } }
+    let(:peer_review_sub_assignment) { peer_review_model(parent_assignment: assignment) }
+
+    it "posts grades by section when the feature flag is enabled" do
+      result = execute_query(mutation_str(assignment_id: peer_review_sub_assignment.id, section_ids: [section1.id]), context)
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "postAssignmentGradesForSections", "progress")).to be_present
+    end
+
+    it "returns not found when the feature flag is disabled" do
+      id = peer_review_sub_assignment.id
+      course.disable_feature!(:peer_review_allocation_and_grading)
+      result = execute_query(mutation_str(assignment_id: id, section_ids: [section1.id]), context)
+      expect(result.dig("errors", 0, "message")).to eql "not found"
+    end
+
+    it "does not cause regression for regular assignments" do
+      result = execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id]), context)
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "postAssignmentGradesForSections", "progress")).to be_present
     end
   end
 

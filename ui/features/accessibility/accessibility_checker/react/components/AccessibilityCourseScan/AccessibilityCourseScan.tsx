@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {QueryClient, useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+
+import {showFlashError} from '@instructure/platform-alerts'
 import {FetchApiError} from '@canvas/do-fetch-api-effect'
-import GenericErrorPage from '@canvas/generic-error-page/react'
-import ErrorShip from '@canvas/images/ErrorShip.svg'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
+import ErrorShip from '@instructure/platform-images/assets/ErrorShip.svg'
 import {LoadingView} from './components/LoadingView'
 import {NoScanFoundView} from './components/NoScanFoundView'
 import {ScanningInProgressView} from './components/ScanningInProgressView'
@@ -32,6 +34,9 @@ import {accessibilityScanQuery, createAccessibilityScanMutation} from './utils/a
 import {type CourseScanProps} from './types'
 import {ACCESSIBILITY_SCAN_QUERY_KEY, QUERY_LAST_SCAN, CREATE_SCAN} from './constants'
 import {useA11yTracking} from '../../../../shared/react/hooks/useA11yTracking'
+import {useScreenReaderAlert} from '../../../../shared/react/hooks/useScreenReaderAlert'
+import {useAccessibilityScansStore} from '../../../../shared/react/stores/AccessibilityScansStore'
+import {useShallow} from 'zustand/react/shallow'
 
 const I18n = createI18nScope('accessibility_scan')
 
@@ -55,6 +60,13 @@ export const AccessibilityCourseScan: React.FC<CourseScanProps> = ({
   const queryClient = useQueryClient()
   const [isMutationLoading, setIsMutationLoading] = useState(false)
   const {trackA11yEvent} = useA11yTracking()
+  const updateReportButtonRef = useRef<HTMLElement | null>(null)
+  const prevWorkflowStateRef = useRef<string | null | undefined>(undefined)
+  const alertScreenReader = useScreenReaderAlert()
+
+  const [isAutomaticScanEnabled] = useAccessibilityScansStore(
+    useShallow(state => [state.isAutomaticScanEnabled]),
+  )
 
   const {isLoading, isError, data} = useQuery({
     queryKey: [ACCESSIBILITY_SCAN_QUERY_KEY, QUERY_LAST_SCAN, courseId],
@@ -75,6 +87,24 @@ export const AccessibilityCourseScan: React.FC<CourseScanProps> = ({
     },
     refetchIntervalInBackground: false,
   })
+
+  useEffect(() => {
+    const state = data?.workflow_state
+    const prevState = prevWorkflowStateRef.current
+    const wasScanning = prevState === 'queued' || prevState === 'running'
+
+    if (wasScanning && state === 'completed') {
+      // Defer focus so Responsive finishes its render cycle and the button is in the DOM
+      const timerId = window.setTimeout(() => {
+        updateReportButtonRef.current?.focus()
+        alertScreenReader(I18n.t('Report is ready'))
+      }, 0)
+      prevWorkflowStateRef.current = state
+      return () => window.clearTimeout(timerId)
+    }
+
+    prevWorkflowStateRef.current = state
+  }, [data?.workflow_state, alertScreenReader])
 
   const mutation = useMutation({
     mutationKey: [ACCESSIBILITY_SCAN_QUERY_KEY, CREATE_SCAN, courseId],
@@ -99,6 +129,9 @@ export const AccessibilityCourseScan: React.FC<CourseScanProps> = ({
   }
 
   const mutationInProgress = isMutationLoading
+  const scanCourseLabel = I18n.t('Scan Course')
+  const updateReportLabel = I18n.t('Update report')
+  const buttonLabel = isAutomaticScanEnabled ? scanCourseLabel : updateReportLabel
 
   if (isLoading) {
     return <LoadingView />
@@ -108,6 +141,8 @@ export const AccessibilityCourseScan: React.FC<CourseScanProps> = ({
     return (
       <GenericErrorPage
         imageUrl={ErrorShip}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject={I18n.t('Scan loading error')}
         errorCategory={I18n.t('Accessibility Scan Error Page.')}
         errorMessage={I18n.t('Try to reload the page.')}
@@ -120,6 +155,7 @@ export const AccessibilityCourseScan: React.FC<CourseScanProps> = ({
       <NoScanFoundView
         handleCourseScan={handleCourseScan}
         isRequestLoading={mutationInProgress || scanDisabled}
+        buttonLabel={scanCourseLabel}
       />
     )
   }
@@ -129,12 +165,13 @@ export const AccessibilityCourseScan: React.FC<CourseScanProps> = ({
       <LastScanFailedResultView
         handleCourseScan={handleCourseScan}
         isRequestLoading={mutationInProgress || scanDisabled}
+        buttonLabel={buttonLabel}
       />
     )
   }
 
   if (data.workflow_state === 'queued' || data.workflow_state === 'running' || mutationInProgress) {
-    return <ScanningInProgressView />
+    return <ScanningInProgressView buttonLabel={buttonLabel} />
   }
 
   if (data.workflow_state === 'completed') {
@@ -142,6 +179,9 @@ export const AccessibilityCourseScan: React.FC<CourseScanProps> = ({
       <ScanHandler
         handleCourseScan={handleCourseScan}
         scanButtonDisabled={mutationInProgress || scanDisabled}
+        buttonLabel={buttonLabel}
+        lastChecked={!isAutomaticScanEnabled ? data.created_at : undefined}
+        buttonRef={updateReportButtonRef}
       >
         {children}
       </ScanHandler>

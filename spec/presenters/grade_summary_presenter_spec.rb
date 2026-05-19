@@ -454,14 +454,14 @@ describe GradeSummaryPresenter do
     end
 
     it "does not return 'Assignment Group' as an option if the course has no assignments" do
-      expect(presenter.sort_options).to_not include assignment_group_option
+      expect(presenter.sort_options).not_to include assignment_group_option
     end
 
     it "does not return 'Assignment Group' as an option if all of the " \
        "assignments belong to the same assignment group" do
       @course.assignments.create!(title: "Math Assignment")
       @course.assignments.create!(title: "Science Assignment")
-      expect(presenter.sort_options).to_not include assignment_group_option
+      expect(presenter.sort_options).not_to include assignment_group_option
     end
 
     it "returns 'Assignment Group' as an option if there are " \
@@ -473,7 +473,7 @@ describe GradeSummaryPresenter do
     end
 
     it "does not return 'Module' as an option if the course does not have any modules" do
-      expect(presenter.sort_options).to_not include module_option
+      expect(presenter.sort_options).not_to include module_option
     end
 
     it "returns 'Module' as an option if the course has any modules" do

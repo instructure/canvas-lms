@@ -99,7 +99,7 @@ describe AssetUserAccessLog do
 
     it "aborts job immediately if plugin setting is nil" do
       PluginSetting.where(name: "asset_user_access_logs").delete_all
-      expect(AssetUserAccess).to_not receive(:compact_partition)
+      expect(AssetUserAccess).not_to receive(:compact_partition)
       AssetUserAccessLog.compact
       expect(@asset_1.reload.view_score).to be_nil
     end
@@ -108,13 +108,13 @@ describe AssetUserAccessLog do
       ps = PluginSetting.where(name: "asset_user_access_logs").first
       ps.settings[:write_path] = "update"
       ps.save!
-      expect(AssetUserAccess).to_not receive(:compact_partition)
+      expect(AssetUserAccess).not_to receive(:compact_partition)
       AssetUserAccessLog.compact
       expect(@asset_1.reload.view_score).to be_nil
     end
 
     it "doesn't fail when there is no data" do
-      expect { AssetUserAccessLog.compact }.to_not raise_error
+      expect { AssetUserAccessLog.compact }.not_to raise_error
     end
 
     describe "with data via postgres" do

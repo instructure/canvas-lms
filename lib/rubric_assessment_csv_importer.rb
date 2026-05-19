@@ -42,16 +42,17 @@ class RubricAssessmentCSVImporter
   end
 
   def build_criteria_ratings_lookup
-    @rubric.criteria.each_with_object({}) do |criterion, hash|
-      hash[criterion[:id]] = criterion[:ratings]&.each_with_object({}) do |rating, ratings_hash|
-        ratings_hash[rating[:description]] = rating[:points]
-      end || {}
+    @rubric.criteria.to_h do |criterion|
+      [criterion[:id],
+       (criterion[:ratings]&.to_h do |rating|
+         [rating[:description], rating[:points]]
+       end) || {}]
     end
   end
 
   def parse_assessment_headers(row)
-    criteria_name_indices = @rubric.criteria.each_with_object({}) do |obj, hash|
-      hash[obj[:description]] = { id: obj[:id] }
+    criteria_name_indices = @rubric.criteria.to_h do |obj|
+      [obj[:description], { id: obj[:id] }]
     end
 
     criteria_separator = " - "

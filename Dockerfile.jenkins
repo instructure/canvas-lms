@@ -4,7 +4,7 @@
 
 ARG RUBY=3.4
 
-FROM starlord.inscloudgate.net/jenkins/ruby-passenger:$RUBY-jammy
+FROM 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/instructure/ruby-passenger:$RUBY-jammy
 LABEL maintainer="Instructure"
 
 ARG RUBY

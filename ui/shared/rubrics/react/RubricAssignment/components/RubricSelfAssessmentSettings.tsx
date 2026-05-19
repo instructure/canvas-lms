@@ -16,13 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Checkbox} from '@instructure/ui-checkbox'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconInfoLine} from '@instructure/ui-icons'
+import {Flex} from '@instructure/ui-flex'
+import {Popover} from '@instructure/ui-popover'
+import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {getRubricSelfAssessmentSettings, setRubricSelfAssessment} from '../queries'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {useMutation, useQuery} from '@tanstack/react-query'
 
@@ -37,7 +41,6 @@ export const RubricSelfAssessmentSettings = ({
   rubricId,
 }: RubricSelfAssessmentSettingsProps) => {
   const queryKey = ['assignment-self-assessment-settings', assignmentId, rubricId ?? '']
-  const [showTooltip, setShowTooltip] = React.useState(false)
 
   const {isPending: mutationLoading, mutateAsync} = useMutation({
     mutationFn: setRubricSelfAssessment,
@@ -71,29 +74,46 @@ export const RubricSelfAssessmentSettings = ({
   return (
     <View as="div">
       <View as="div" margin="small 0">
-        <Tooltip
-          renderTip={
-            <View width="336px" as="div">
-              {I18n.t(
-                'This toggle will be disabled if the due date has passed OR there have already been self-assessments made on this assignment OR if the assignment is a group assignment.',
-              )}
-            </View>
-          }
-          isShowingContent={!canUpdateRubricSelfAssessment && showTooltip}
-          placement="top start"
-          offsetX="10px"
-        >
-          <Checkbox
-            data-testid="rubric-self-assessment-checkbox"
-            label={I18n.t('Enable self assessment')}
-            checked={rubricSelfAssessmentEnabled}
-            disabled={mutationLoading || !canUpdateRubricSelfAssessment}
-            name="self-assessment-settings"
-            onChange={e => handleSettingChange(e.target.checked)}
-            onMouseOver={() => setShowTooltip(true)}
-            onMouseOut={() => setShowTooltip(false)}
-          />
-        </Tooltip>
+        <Flex alignItems="center">
+          <Flex.Item>
+            <Checkbox
+              data-testid="rubric-self-assessment-checkbox"
+              label={I18n.t('Enable self assessment')}
+              checked={rubricSelfAssessmentEnabled}
+              disabled={mutationLoading || !canUpdateRubricSelfAssessment}
+              name="self-assessment-settings"
+              onChange={e => handleSettingChange(e.target.checked)}
+            />
+          </Flex.Item>
+          {!canUpdateRubricSelfAssessment && (
+            <Flex.Item margin="0 0 0 x-small">
+              <Popover
+                renderTrigger={
+                  <IconButton
+                    screenReaderLabel={I18n.t('Why is self assessment disabled?')}
+                    size="small"
+                    withBackground={false}
+                    withBorder={false}
+                    data-testid="self-assessment-info-button"
+                  >
+                    <IconInfoLine />
+                  </IconButton>
+                }
+                on={['click', 'hover', 'focus']}
+                placement="top center"
+                shouldCloseOnDocumentClick={true}
+              >
+                <View padding="small" maxWidth="21rem" as="div">
+                  <Text>
+                    {I18n.t(
+                      'This toggle will be disabled if the due date has passed OR there have already been self-assessments made on this assignment OR if the assignment is a group assignment.',
+                    )}
+                  </Text>
+                </View>
+              </Popover>
+            </Flex.Item>
+          )}
+        </Flex>
       </View>
     </View>
   )

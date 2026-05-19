@@ -41,9 +41,10 @@ module SectionTabHelper
   ].freeze
 
   # if a tab depends on a Course FF, it should be included here so that the cache is busted
-  FLAGS_FOR_CACHE_KEY = [
-    :smart_search,
-    :youtube_migration
+  FLAGS_FOR_CACHE_KEY = %i[
+    new_quizzes_native_experience
+    smart_search
+    youtube_migration
   ].freeze
 
   def available_section_tabs
@@ -76,8 +77,9 @@ module SectionTabHelper
           )
         end
       end
+    @section_tabs ||= ""
 
-    raw(@section_tabs)
+    @section_tabs
   end
 
   def section_tab_tag(tab, context, active_tab)
@@ -143,10 +145,12 @@ module SectionTabHelper
         "section_tabs_hash",
         I18n.locale
       ]
-      # need to include FF for courses in order to bust the cache
-      if context.is_a?(Course)
+      # need to include FF for courses and accounts in order to bust the cache
+      if context.is_a?(Course) || context.is_a?(Account)
         flag_states = FLAGS_FOR_CACHE_KEY.map { |flag| context.feature_enabled?(flag) }
         k.concat(flag_states)
+      end
+      if context.is_a?(Course)
         if context.elementary_homeroom_course?
           k << "homeroom_course"
         end
@@ -255,14 +259,14 @@ module SectionTabHelper
 
     def indicate_external_link
       if @tab.nav_menu_link?
-        "<i class='icon-external-link' aria-hidden='true' role='presentation' style='padding-left: .3em'></i>".html_safe
+        tag.i class: %w[icon-external-link], aria: { hidden: true }, role: "presentation", style: "padding-left: .3em"
       end
     end
 
     def indicate_hidden
       return unless @tab.hide? || @tab.unused?
 
-      "<i class='nav-icon icon-off' aria-hidden='true' role='presentation'></i>".html_safe
+      tag.i class: %w[nav-icon icon-off], aria: { hidden: true }, role: "presentation"
     end
 
     # include the css_class of tabs here to show a "new" pill in the nav
@@ -272,7 +276,7 @@ module SectionTabHelper
     def indicate_new
       return unless NEW_TABS.include? @tab.css_class
 
-      "<span class='new-tab-indicator nav-icon' data-tabname='#{@tab.css_class}'></span>".html_safe
+      tag.span class: "new-tab-indicator nav-icon", data: { tabname: @tab.css_class }
     end
 
     def to_html

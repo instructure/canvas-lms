@@ -28,7 +28,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 class BreadcrumbLinkWithTip extends Breadcrumb.Link {
   renderLink = () => {
     const {children, href, onClick} = this.props as any
-    const props = omitProps(this.props, Breadcrumb.Link.propTypes)
+    const props = omitProps(this.props, Breadcrumb.Link.allowedProps)
 
     return (
       <Link as={(this as any).element} {...props} href={href} onClick={onClick}>
@@ -39,7 +39,7 @@ class BreadcrumbLinkWithTip extends Breadcrumb.Link {
 
   render() {
     const {onClick} = this.props as any
-    const props = omitProps(this.props, Breadcrumb.Link.propTypes)
+    const props = omitProps(this.props, Breadcrumb.Link.allowedProps)
 
     return (
       <Tooltip color="primary" as="div" renderTip={props.tip}>

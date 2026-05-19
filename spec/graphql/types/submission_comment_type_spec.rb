@@ -67,10 +67,37 @@ describe Types::SubmissionCommentType do
       ).to eq("html comment")
     end
 
-    it "html_comment includes html tags" do
-      expect(
-        submission_type2.resolve("commentsConnection(filter: {allComments: true}) { nodes { htmlComment }}").first
-      ).to eq(@html_comment.comment)
+    describe "html_comment" do
+      it "preserves safe HTML tags" do
+        expect(
+          submission_type2.resolve("commentsConnection(filter: {allComments: true}) { nodes { htmlComment }}").first
+        ).to eql("<div>html comment</div>")
+      end
+
+      it "strips script tags" do
+        @submission2.add_comment(
+          author: @student2,
+          comment: "<script>alert('xss')</script>injected text",
+          attempt: nil
+        )
+        result = GraphQLTypeTester.new(@submission2, current_user: @teacher).resolve(
+          "commentsConnection(filter: {allComments: true}) { nodes { htmlComment }}"
+        ).last
+        expect(result).not_to include("<script>")
+        expect(result).not_to include("alert")
+      end
+
+      it "strips event handler attributes" do
+        @submission2.add_comment(
+          author: @student2,
+          comment: '<img src="x" onerror="alert(1)">',
+          attempt: nil
+        )
+        result = GraphQLTypeTester.new(@submission2, current_user: @teacher).resolve(
+          "commentsConnection(filter: {allComments: true}) { nodes { htmlComment }}"
+        ).last
+        expect(result).not_to include("onerror")
+      end
     end
 
     it "does not throw an error for poorly formatted html" do
@@ -420,6 +447,23 @@ describe Types::SubmissionCommentType do
         )
         expect(result).to eq([nil, "teacher 1 name", "teacher 2 name"])
       end
+    end
+  end
+
+  describe "publishable" do
+    before(:once) do
+      @submission.add_comment(author: @teacher, comment: "draft comment", draft_comment: true, attempt: 2)
+    end
+
+    it "exposes publishable_for? on the comment" do
+      results = submission_type.resolve("commentsConnection(includeDraftComments: true) { nodes { publishable }}")
+      expect(results).to include(true)
+    end
+
+    it "returns no comments when current_user is nil" do
+      unauthenticated_type = GraphQLTypeTester.new(@submission, current_user: nil)
+      results = unauthenticated_type.resolve("commentsConnection(includeDraftComments: true) { nodes { publishable }}")
+      expect(results).to be_nil
     end
   end
 

@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 describe JwtsController do
   include_context "JWT setup"
   let(:token_user) { user_with_pseudonym }
@@ -148,13 +146,13 @@ describe JwtsController do
       it "generates a token that doesn't have context_id" do
         post "create", params: { workflows: ["ui"] }, format: "json"
         decrypted_token_body = translate_token.call(response)
-        expect(decrypted_token_body).to_not have_key(:context_id)
+        expect(decrypted_token_body).not_to have_key(:context_id)
       end
 
       it "generates a token that doesn't have context_type" do
         post "create", params: { workflows: ["ui"] }, format: "json"
         decrypted_token_body = translate_token.call(response)
-        expect(decrypted_token_body).to_not have_key(:context_type)
+        expect(decrypted_token_body).not_to have_key(:context_type)
       end
     end
 
@@ -293,7 +291,7 @@ describe JwtsController do
 
       it "requires a jwt param" do
         post "refresh"
-        expect(response).to_not have_http_status(:ok)
+        expect(response).not_to have_http_status(:ok)
       end
 
       it "returns a refreshed token for user" do
@@ -318,7 +316,7 @@ describe JwtsController do
         )
         post "refresh", params: { jwt: original_jwt }
         refreshed_jwt = response.parsed_body["token"]
-        expect(refreshed_jwt).to_not eq(original_jwt)
+        expect(refreshed_jwt).not_to eq(original_jwt)
       end
 
       it "returns an error if jwt is invalid for refresh" do

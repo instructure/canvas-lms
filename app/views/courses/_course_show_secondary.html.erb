@@ -126,6 +126,15 @@
     </a>
     <% end %>
 
+    <%#
+      TODO: BUG - @context_enrollment is set via context_enrollment_scope.first which is non-deterministic
+      for users dually-enrolled as both a teacher and a student (e.g., a TA who is also a student).
+      When such a user has both a StudentEnrollment and a TeacherEnrollment, the .first call picks
+      whichever enrollment has the lowest ID, so the teacher to-do list may or may not be shown
+      depending on enrollment creation order. This should be fixed to explicitly check enrollment
+      types when determining which to-do list to display. Needs team discussion before changing.
+      see https://instructure.atlassian.net/browse/EGG-2364
+    %>
     <%= render :partial => '/courses/to_do_list', :locals => {:contexts => [@context], :show_legacy_todo_list => !@context_enrollment&.student?} %>
     <%= render :partial => "/courses/group_list", :locals => {:group_list => @user_groups} %>
     <%= nbsp unless @current_user %>

@@ -43,9 +43,9 @@ describe('FocusMode', () => {
     expect(screen.queryByText('Test Content')).not.toBeInTheDocument()
   })
 
-  it('renders with default title "Conversation"', () => {
+  it('renders with default title "Knowledge Chat"', () => {
     render(<FocusMode {...defaultProps} />)
-    expect(screen.getByText('Conversation')).toBeInTheDocument()
+    expect(screen.getByText('Knowledge Chat')).toBeInTheDocument()
   })
 
   it('renders with custom title', () => {
@@ -60,16 +60,6 @@ describe('FocusMode', () => {
     const closeButton = screen.getByTestId('focus-mode-exit-button').querySelector('button')
     expect(closeButton).not.toBeNull()
     await user.click(closeButton!)
-
-    expect(mockOnClose).toHaveBeenCalledTimes(1)
-  })
-
-  it('calls onClose when exit button in footer is clicked', async () => {
-    const user = userEvent.setup()
-    render(<FocusMode {...defaultProps} />)
-
-    const exitButton = screen.getByTestId('focus-mode-exit-button-footer')
-    await user.click(exitButton)
 
     expect(mockOnClose).toHaveBeenCalledTimes(1)
   })
@@ -116,11 +106,6 @@ describe('FocusMode', () => {
   it('has correct screen reader text for close button', () => {
     render(<FocusMode {...defaultProps} />)
     expect(screen.getByText('Exit focus mode')).toBeInTheDocument()
-  })
-
-  it('displays Exit Focus Mode button text in footer', () => {
-    render(<FocusMode {...defaultProps} />)
-    expect(screen.getByText('Exit Focus Mode')).toBeInTheDocument()
   })
 
   it('modal has fullscreen size', () => {

@@ -78,7 +78,7 @@ module DifferentiatedAssignments
           DifferentiatedAssignments::Discussion.new(assignee)
         end
 
-        def assign_discussion_overrides(short = false)
+        def assign_discussion_overrides(short: false)
           if short
             short_list.each(&:assign_overrides)
           else

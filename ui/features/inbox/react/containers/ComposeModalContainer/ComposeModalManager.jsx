@@ -21,7 +21,7 @@ import {
   CREATE_CONVERSATION,
   CREATE_SUBMISSION_COMMENT,
 } from '../../../graphql/Mutations'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import ComposeModalContainer from './ComposeModalContainer'
 import {Conversation} from '../../../graphql/Conversation'
 import {ConversationMessage} from '../../../graphql/ConversationMessage'

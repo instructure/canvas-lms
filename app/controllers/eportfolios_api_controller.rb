@@ -118,7 +118,6 @@
 #       }
 #     }
 class EportfoliosApiController < ApplicationController
-  before_action :require_user
   before_action :reject_student_view_student
   before_action :verified_user_check
 

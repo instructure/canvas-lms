@@ -25,13 +25,13 @@ describe "Canvas::RedisConnections" do
 
   describe "disconnect!" do
     it "checkes connections without exploding" do
-      expect { Canvas::RedisConnections.disconnect! }.to_not raise_error
+      expect { Canvas::RedisConnections.disconnect! }.not_to raise_error
     end
   end
 
   describe ".clear_idle!" do
     it "culls connections without exploding" do
-      expect { Canvas::RedisConnections.clear_idle! }.to_not raise_error
+      expect { Canvas::RedisConnections.clear_idle! }.not_to raise_error
     end
   end
 end

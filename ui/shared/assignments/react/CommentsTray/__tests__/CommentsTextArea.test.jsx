@@ -19,7 +19,7 @@
 /* global vi */
 import * as uploadFileModule from '@canvas/upload-file'
 import $ from 'jquery'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 
 if (typeof vi !== 'undefined') vi.mock('@canvas/upload-file')
 vi.mock('@canvas/upload-file')
@@ -379,6 +379,17 @@ describe('CommentTextArea', () => {
     const textArea = container.querySelector('#comment-textarea')
     expect(textArea).toBeInTheDocument()
     expect(labelElement.getAttribute('for')).toBe(textArea.getAttribute('id'))
+  })
+
+  it('does not have a separate screen-reader-only label on the comment textarea', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {queryByText} = render(
+      <MockedProvider>
+        <CommentTextArea {...props} />
+      </MockedProvider>,
+    )
+
+    expect(queryByText('Comment input box')).not.toBeInTheDocument()
   })
 
   it.skip('notifies users when a submission comments with files is sent', async () => {

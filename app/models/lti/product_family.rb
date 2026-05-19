@@ -19,7 +19,7 @@
 #
 
 module Lti
-  class ProductFamily < ActiveRecord::Base
+  class ProductFamily < ApplicationRecord
     belongs_to :root_account, class_name: "Account"
     has_many :tool_proxies, class_name: "Lti::ToolProxy", dependent: :destroy
     belongs_to :developer_key

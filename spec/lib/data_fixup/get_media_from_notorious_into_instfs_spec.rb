@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe DataFixup::GetMediaFromNotoriousIntoInstfs do
   let(:course) { course_model }
 
@@ -89,7 +87,7 @@ describe DataFixup::GetMediaFromNotoriousIntoInstfs do
       expect(CanvasHttp).to receive(:get).with("http://example.com/asset").and_raise ArgumentError
       expect do
         DataFixup::GetMediaFromNotoriousIntoInstfs.send(:get_it_to_intfs, "m-frommediaobject-3")
-      end.to_not raise_error
+      end.not_to raise_error
     end
   end
 end

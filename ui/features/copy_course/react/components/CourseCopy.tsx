@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {showFlashError} from '@instructure/platform-alerts'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import ErrorShip from '@canvas/images/ErrorShip.svg'
+import ErrorShip from '@instructure/platform-images/assets/ErrorShip.svg'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
@@ -117,6 +118,8 @@ export const CourseCopy = ({
     return (
       <GenericErrorPage
         imageUrl={ErrorShip}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject={I18n.t('Page loading error')}
         errorCategory={I18n.t('Course Copy Error Page')}
         errorMessage={I18n.t('Try to reload the page.')}

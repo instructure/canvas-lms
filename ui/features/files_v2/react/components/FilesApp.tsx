@@ -22,7 +22,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import {canvas} from '@instructure/ui-themes'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {getFilesEnv} from '../../utils/filesEnvUtils'
 import {FileManagementProvider} from '../contexts/FileManagementContext'
@@ -44,11 +44,15 @@ import Breadcrumbs from './FileFolderTable/Breadcrumbs'
 import BulkActionButtons from './FileFolderTable/BulkActionButtons'
 import CurrentUploads from './FilesHeader/CurrentUploads'
 import CurrentDownloads from './FilesHeader/CurrentDownloads'
-import NotFoundArtwork from '@canvas/generic-error-page/react/NotFoundArtwork'
+import {NotFoundPage} from '@instructure/platform-generic-error-page'
+import {canvasNotFoundTranslations} from '@canvas/error-page-utils'
+import SVGWrapper from '@canvas/svg-wrapper'
 import {FilesGenericSessionExpired} from './FilesGenericSessionExpired'
 import {BasicPagination} from './BasicPagination'
 import {usePreviewHandler} from '../hooks/usePreviewHandler'
 import {FilePreviewModal} from './FileFolderTable/FilePreviewModal'
+import {DuplicateFoldersModal} from './DuplicateFoldersModal'
+import {useCheckDuplicateFolders} from '../hooks/useCheckDuplicateFolders'
 
 const I18n = createI18nScope('files_v2')
 
@@ -66,6 +70,8 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
   const [paginationAlert, setPaginationAlert] = useState<string>('')
   const [rowToFocus, setRowToFocus] = useState<number | SELECT_ALL_FOCUS_STRING | null>(null)
   const [sessionExpired, setSessionExpired] = useState(false)
+  const [showDuplicatesModal, setShowDuplicatesModal] = useState(false)
+  const modalShownForFolderIdRef = useRef<string | null>(null)
   const currentFolderWrapper = useRef<BBFolderWrapper | null>(null)
   const fileDropRef = useRef<HTMLInputElement | null>(null)
   const selectAllRef = useRef<Checkbox | null>(null)
@@ -181,6 +187,25 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
     contextId: contextId,
   })
 
+  const {data: duplicateFolders = []} = useCheckDuplicateFolders({
+    folderId,
+    contextType,
+    contextId,
+    enabled:
+      !isLoading && !!filesEnv.isDuplicateFoldersFeatureEnabled && userCanEditFilesForContext,
+  })
+
+  useEffect(() => {
+    modalShownForFolderIdRef.current = null
+  }, [folderId])
+
+  useEffect(() => {
+    if (duplicateFolders.length > 0 && modalShownForFolderIdRef.current !== folderId) {
+      setShowDuplicatesModal(true)
+      modalShownForFolderIdRef.current = folderId
+    }
+  }, [folderId, duplicateFolders])
+
   return (
     <FileManagementProvider
       value={{
@@ -286,6 +311,11 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
               error={previewState.error}
             />
           )}
+          <DuplicateFoldersModal
+            open={showDuplicatesModal}
+            duplicateFolders={duplicateFolders}
+            onClose={() => setShowDuplicatesModal(false)}
+          />
         </RowsProvider>
       </RowFocusProvider>
       {selectionAnnouncement && (
@@ -313,7 +343,13 @@ const ResponsiveFilesApp = () => {
 
   const isNotFoundError = error instanceof NotFoundError
   if (isNotFoundError) {
-    return <NotFoundArtwork />
+    return (
+      <NotFoundPage
+        artwork={<SVGWrapper url="/images/not_found_page/empty-planet.svg" />}
+        title={canvasNotFoundTranslations.title()}
+        description={canvasNotFoundTranslations.description()}
+      />
+    )
   }
 
   if (!folders) {

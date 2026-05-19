@@ -33,14 +33,14 @@ import {
   fetchUserWithRelations,
   User,
 } from './common'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {Controller, SubmitHandler, useForm} from 'react-hook-form'
 import * as z from 'zod'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('merge_users')

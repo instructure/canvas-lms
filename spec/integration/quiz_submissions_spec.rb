@@ -22,7 +22,7 @@ describe Quizzes::QuizSubmissionsController do
     course_with_student_logged_in(active_all: true)
     quiz_model(course: @course)
     @quiz.update_attribute :one_question_at_a_time, true
-    @qs = @quiz.generate_submission(@student, false)
+    @qs = @quiz.generate_submission(@student)
     @qs.quiz_data = [
       {
         id: 1,

@@ -18,6 +18,9 @@
 
 import React from 'react'
 import {render, screen, waitFor, waitForElementToBeRemoved, fireEvent} from '@testing-library/react'
+import {showFlashAlert} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts')
 import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
@@ -129,6 +132,7 @@ const renderWithClient = (
 describe('ModuleItemListSmart', () => {
   afterEach(() => {
     localStorage.clear()
+    vi.clearAllMocks()
   })
 
   describe('rendering', () => {
@@ -147,8 +151,11 @@ describe('ModuleItemListSmart', () => {
       const summary = await screen.findByTestId('pagination-info-text')
       expect(summary).toHaveTextContent(`Showing 1-10 of ${itemCount} items`)
 
-      const alert = await screen.findByRole('alert')
-      expect(alert).toHaveTextContent(/all module items loaded/i)
+      await waitFor(() => {
+        expect(vi.mocked(showFlashAlert)).toHaveBeenCalledWith(
+          expect.objectContaining({message: 'All module items loaded'}),
+        )
+      })
     })
 
     it('navigates to the next page and updates visible items', async () => {

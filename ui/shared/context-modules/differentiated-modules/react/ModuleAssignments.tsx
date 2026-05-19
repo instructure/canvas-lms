@@ -21,7 +21,7 @@ import AssigneeSelector from './AssigneeSelector'
 import type {FormMessage} from '@instructure/ui-form-field'
 import type {AssigneeOption} from './Item/types'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 export interface ModuleAssignmentsProps {
   courseId: string

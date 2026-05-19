@@ -29,7 +29,7 @@ describe ExternalContentController do
     it "gets a context for external_tool_dialog" do
       c = course_factory
       get :success, params: { service: "external_tool_dialog", course_id: c.id }
-      expect(assigns[:context]).to_not be_nil
+      expect(assigns[:context]).not_to be_nil
     end
   end
 
@@ -79,7 +79,7 @@ describe ExternalContentController do
         post(:success, params:)
 
         data = controller.js_env[:retrieved_data]
-        expect(data).to_not be_nil
+        expect(data).not_to be_nil
         expect(data.first).to be_a(IMS::LTI::Models::ContentItems::ContentItem)
 
         expect(data.first.id).to eq("http://lti-tool-provider-example.dev/messages/blti")
@@ -179,7 +179,7 @@ describe ExternalContentController do
 
         context "when returning from a non-internal service" do
           it "does not set the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
-            expect(controller).not_to receive(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "http://test.com" }, true)
+            expect(controller).not_to receive(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "http://test.com" }, overwrite: true)
             subject
           end
         end
@@ -193,7 +193,7 @@ describe ExternalContentController do
           it "sets the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
             allow(controller).to receive(:js_env)
             subject
-            expect(controller).to have_received(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "http://test.com" }, true)
+            expect(controller).to have_received(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "http://test.com" }, overwrite: true)
           end
 
           context "when the tool has a domain and not a url" do
@@ -212,7 +212,7 @@ describe ExternalContentController do
             it "sets the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
               allow(controller).to receive(:js_env)
               subject
-              expect(controller).to have_received(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "https://test.com" }, true)
+              expect(controller).to have_received(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "https://test.com" }, overwrite: true)
             end
           end
         end

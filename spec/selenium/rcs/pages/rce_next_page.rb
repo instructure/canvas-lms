@@ -513,11 +513,11 @@ module RCENextPage
   end
 
   def course_item_link_exists?(title)
-    element_exists?("//*[@data-testid = 'instructure_links-Link']//*[text() = '#{title}']", true)
+    element_exists?("//*[@data-testid = 'instructure_links-Link']//*[text() = '#{title}']", xpath: true)
   end
 
   def pages_list_item_exists?(title)
-    element_exists?("//a[. = '#{title}']", true)
+    element_exists?("//a[. = '#{title}']", xpath: true)
   end
 
   def course_item_links_list
@@ -1075,7 +1075,7 @@ module RCENextPage
 
   def assignment_due_date_exists?(due_date)
     modified_due_date = due_date.strftime("%B %-d, %Y")
-    element_exists?("//*[contains(text(),'#{modified_due_date}')]", true)
+    element_exists?("//*[contains(text(),'#{modified_due_date}')]", xpath: true)
   end
 
   #=====================================================================================================================

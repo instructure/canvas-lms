@@ -34,7 +34,7 @@ import {uniqueId, compact} from 'es-toolkit/compat'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import type {FormMessage} from '@instructure/ui-form-field'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('app_shared_components')
 

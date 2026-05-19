@@ -43,7 +43,7 @@ if Qti.migration_executable
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
 
-    def get_question(id, clear_ids = true)
+    def get_question(id, clear_ids: true)
       question = @questions.find { |q| q[:migration_id] == id }
       question[:answers].each { |a| a.delete(:id) } if clear_ids
       question
@@ -51,7 +51,7 @@ if Qti.migration_executable
 
     it "has matching ids for assessments and questions" do
       @assessment[:questions].each do |question|
-        expect(get_question(question[:migration_id], false)).not_to be_nil
+        expect(get_question(question[:migration_id], clear_ids: false)).not_to be_nil
       end
     end
 
@@ -125,7 +125,7 @@ if Qti.migration_executable
     end
 
     it "converts matching questions" do
-      hash = get_question("4609865194341", false)
+      hash = get_question("4609865194341", clear_ids: false)
       # make sure the ids are correctly referencing each other
       matches = {}
       hash[:matches].each { |m| matches[m[:match_id]] = m[:text] }

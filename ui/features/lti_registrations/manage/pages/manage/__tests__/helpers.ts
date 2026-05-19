@@ -95,7 +95,6 @@ export const mockRegistration = (
     created_by: user,
     updated_at: date,
     updated_by: user,
-    workflow_state: 'on',
   }
   return {
     id: id as LtiRegistrationId,
@@ -104,16 +103,20 @@ export const mockRegistration = (
     account_binding: {
       id: id as LtiRegistrationAccountBindingId,
       registration_id: id as unknown as LtiRegistrationId,
+      workflow_state: 'on',
       ...common,
     },
+    workflow_state: 'active',
     developer_key_id: id as DeveloperKeyId,
     internal_service: false,
-    ims_registration_id: ZLtiImsRegistrationId.parse(id),
+    ims_registration_id: null,
     manual_configuration_id: null,
     icon_url: null,
     vendor: null,
     description: null,
     admin_nickname: n,
+    lock_deploying: false,
+    template_registration_id: null,
     configuration: {
       custom_fields: {},
       placements: [],

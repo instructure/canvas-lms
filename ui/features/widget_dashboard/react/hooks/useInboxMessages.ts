@@ -22,7 +22,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {getCurrentUserId, executeGraphQLQuery, createUserQueryConfig} from '../utils/graphql'
 import {INBOX_MESSAGES_KEY, QUERY_CONFIG} from '../constants'
 import {widgetDashboardPersister} from '../utils/persister'
-import {useBroadcastQuery} from '@canvas/query/broadcast'
+import {useBroadcastQuery} from '@instructure/platform-query/broadcast'
 import type {InboxMessage} from '../types'
 
 const I18n = createI18nScope('widget_dashboard')

@@ -48,7 +48,6 @@ interface ColumnProps {
 
 const Column = (props: ColumnProps) => (
   <th scope="col">
-    {/* @ts-expect-error - SightedUserContent legacy component doesn't have typed props */}
     <SightedUserContent tagName="i" className="inline">
       {props.icon}
     </SightedUserContent>{' '}

@@ -24,7 +24,6 @@ class GradingSchemesJsonController < ApplicationController
   GRADING_SCHEMES_LIMIT = 100
   USED_LOCATIONS_PER_PAGE = 50
   before_action :require_context
-  before_action :require_user
   before_action :validate_read_permission, only: %i[grouped_list detail_list summary_list show]
 
   def grouped_list

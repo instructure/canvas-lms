@@ -23,9 +23,9 @@ import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {Outcome, StudentRollupData} from '@canvas/outcomes/react/types/rollup'
-import {ScoreDisplayFormat} from '@canvas/outcomes/react/utils/constants'
+import {ScoreDisplayFormat} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import {useOutcomeAlignments} from '../../../hooks/useOutcomeAlignments'
 import {StudentOutcomeScore} from '../../grid/StudentOutcomeScore'
 
@@ -112,6 +112,7 @@ export const OutcomeResultSection: React.FC<OutcomeResultSectionProps> = ({
           <Flex direction="column" gap="small">
             {alignedOutcomes.map(outcome => {
               const outcomeScore = outcomeScoresMap.get(String(outcome.id))
+              const score = outcomeScore?.score
               return (
                 <FlexItem key={`${studentId}-${assignmentId}-${outcome.id}`}>
                   <Flex direction="row" alignItems="center" justifyItems="space-between">
@@ -133,12 +134,12 @@ export const OutcomeResultSection: React.FC<OutcomeResultSectionProps> = ({
                       <FlexItem size="2rem">
                         <StudentOutcomeScore
                           outcome={outcome}
-                          score={outcomeScore ? outcomeScore.score : undefined}
+                          score={score}
                           scoreDisplayFormat={ScoreDisplayFormat.ICON_ONLY}
                         />
                       </FlexItem>
                       <FlexItem width="2rem">
-                        <Text>{outcomeScore ? outcomeScore.score.toFixed(1) : ''}</Text>
+                        <Text>{score !== undefined ? score.toFixed(1) : ''}</Text>
                       </FlexItem>
                     </Flex>
                   </Flex>

@@ -17,11 +17,11 @@ GEM
     rspec-expectations (3.13.5)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
-    rspec-mocks (3.13.7)
+    rspec-mocks (3.13.8)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
-    rspec-support (3.13.6)
-    timecop (0.9.10)
+    rspec-support (3.13.7)
+    timecop (0.9.11)
 
 PLATFORMS
   aarch64-linux

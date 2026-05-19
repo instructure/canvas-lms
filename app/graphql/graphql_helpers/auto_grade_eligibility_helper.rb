@@ -31,11 +31,9 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
   MAX_RUBRIC_CATEGORY_NAME_LENGTH = 1_000
 
   NO_SUBMISSION_MSG               = -> { I18n.t("No essay submission found.") }
-  IMAGE_UPLOAD_MSG                = -> { I18n.t("Please note that AI Grading Assistance for this submission will ignore any embedded images and only evaluate the text portion of the submission.") }
   INVALID_FILE_MSG                = -> { I18n.t("Only PDF and DOCX files are supported.") }
   INVALID_TYPE_MSG                = -> { I18n.t("Submission must be a text entry type or file upload.") }
   SHORT_ESSAY_MSG                 = -> { I18n.t("Submission must be at least 5 words.") }
-  MISSING_RATING_MSG              = -> { I18n.t("Rubric is missing rating description.") }
   FILE_UPLOADS_DISABLED_MSG       = -> { I18n.t("Grading assistance is disabled for file uploads.") }
   GRADING_ASSISTANCE_DISABLED_MSG = -> { I18n.t("Grading assistance is not available right now.") }
   NO_RUBRIC_MSG                   = -> { I18n.t("No rubric is attached to this assignment.") }
@@ -53,8 +51,11 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
     rubric = assignment&.rubric
     return false unless rubric
 
-    rubric.data.any? do |data_entry|
-      data_entry[:ratings].any? { |rating| rating[:long_description].blank? }
+    rubric.data.any? do |criterion|
+      criterion[:ratings].any? do |rating|
+        effective_description = GradeService.rating_description_for(criterion, rating)
+        effective_description.blank?
+      end
     end
   end
 
@@ -96,12 +97,9 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
   ].freeze
 
   def self.validate_assignment(assignment:)
-    ASSIGNMENT_CHECKS.each do |entry|
-      if entry[:check].call(assignment)
-        return { level: entry[:level], message: entry[:message].call }
-      end
+    ASSIGNMENT_CHECKS.filter_map do |entry|
+      { level: entry[:level], message: entry[:message].call } if entry[:check].call(assignment)
     end
-    nil
   end
 
   def self.no_submission?(submission)
@@ -109,11 +107,6 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
       submission.attempt.to_i < 1 ||
       (submission.submission_type == "online_text_entry" && submission.body.blank?) ||
       (submission.submission_type == "online_upload" && submission.attachments.none?)
-  end
-
-  def self.contains_images?(submission)
-    extracted_text = submission.read_extracted_text
-    extracted_text.fetch(:contains_images, false)
   end
 
   def self.invalid_file?(submission)
@@ -144,21 +137,18 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
   end
 
   SUBMISSION_CHECKS = [
-    { level: "error", message: NO_SUBMISSION_MSG,          check: ->(s) { no_submission?(s) } },
     { level: "error", message: INVALID_TYPE_MSG,           check: ->(s) { invalid_type?(s) } },
     { level: "error", message: FILE_UPLOADS_DISABLED_MSG,  check: ->(s) { file_uploads_feature_disabled?(s) } },
     { level: "error", message: INVALID_FILE_MSG,           check: ->(s) { invalid_file?(s) } },
-    { level: "warning", message: IMAGE_UPLOAD_MSG,         check: ->(s) { contains_images?(s) } },
     { level: "error", message: SHORT_ESSAY_MSG,            check: ->(s) { short_essay?(s) } },
     { level: "error", message: ESSAY_TOO_LONG_MSG,         check: ->(s) { essay_too_long?(s) } }
   ].freeze
 
   def self.validate_submission(submission:)
-    SUBMISSION_CHECKS.each do |entry|
-      if entry[:check].call(submission)
-        return { level: entry[:level], message: entry[:message].call }
-      end
+    return [{ level: "error", message: NO_SUBMISSION_MSG.call }] if no_submission?(submission)
+
+    SUBMISSION_CHECKS.filter_map do |entry|
+      { level: entry[:level], message: entry[:message].call } if entry[:check].call(submission)
     end
-    nil
   end
 end

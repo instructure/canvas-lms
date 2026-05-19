@@ -16,17 +16,24 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-module DataFixup::MoveAttachmentAssociationsToReplacedAttachments
-  def self.run
-    Attachment.where.not(replacement_attachment_id: nil)
-              .where(file_state: "deleted")
-              .where("EXISTS (SELECT 1 FROM #{AttachmentAssociation.quoted_table_name} WHERE attachment_id = #{Attachment.quoted_table_name}.id)")
-              .find_in_batches do |replaced_attachments|
-                attachment_ids = replaced_attachments.map(&:id)
 
-                AttachmentAssociation.where(attachment_id: attachment_ids).in_batches do |batch|
-                  batch.update_all(
-                    "attachment_id = (
+module DataFixup
+  class MoveAttachmentAssociationsToReplacedAttachments < CanvasOperations::DataFixup
+    setting :range_batch_size, default: 10_000, type_cast: :to_i
+
+    self.mode = :batch
+    self.progress_tracking = Rails.env.production?
+
+    scope do
+      AttachmentAssociation
+        .joins(:attachment)
+        .where(attachments: { file_state: "deleted" })
+        .where.not(attachments: { replacement_attachment_id: nil })
+    end
+
+    def process_batch(attachment_association_batch)
+      attachment_association_batch.update_all(
+        "attachment_id = (
             WITH RECURSIVE replacement_chain AS (
               SELECT id, replacement_attachment_id, 0 as depth
               FROM #{Attachment.quoted_table_name}
@@ -38,15 +45,14 @@ module DataFixup::MoveAttachmentAssociationsToReplacedAttachments
               FROM #{Attachment.quoted_table_name} a
               INNER JOIN replacement_chain rc ON a.id = rc.replacement_attachment_id
               WHERE rc.replacement_attachment_id IS NOT NULL
-                AND rc.depth < 50  -- Safety limit to prevent infinite loops
+                AND rc.depth < 50
             )
             SELECT id
             FROM replacement_chain
             ORDER BY depth DESC
             LIMIT 1
           )"
-                  )
-                end
+      )
     end
   end
 end

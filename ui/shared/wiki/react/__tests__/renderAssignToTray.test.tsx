@@ -18,7 +18,7 @@
 
 import {render, waitFor} from '@testing-library/react'
 import {renderAssignToTray} from '../renderAssignToTray'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import fakeEnv from '@canvas/test-utils/fakeENV'

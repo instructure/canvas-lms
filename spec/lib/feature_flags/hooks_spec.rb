@@ -575,41 +575,79 @@ describe FeatureFlags::Hooks do
   end
 
   describe "oak_visible_on_hook" do
-    let(:context) { instance_double(Account) }
+    let(:context) { account_model }
     let(:database_server) { instance_double(DatabaseServer, config: { region: "us-east-1" }) }
-    let(:current_shard) { instance_double(Shard, database_server:) }
     let(:oak_predicate) { instance_double(FeatureFlags::OakPredicate) }
 
     before do
-      allow(Shard).to receive(:current).and_return(current_shard)
+      allow(context.shard).to receive(:database_server).and_return(database_server)
       allow(FeatureFlags::OakPredicate).to receive(:new).and_return(oak_predicate)
       allow(oak_predicate).to receive(:call)
     end
 
-    it "creates a new OakPredicate with context and region" do
-      expect(FeatureFlags::OakPredicate).to receive(:new).with(context, "us-east-1")
+    context "when tier_2_visible_on_hook returns false" do
+      before do
+        allow(FeatureFlags::Hooks).to receive(:tier_2_visible_on_hook).and_return(false)
+      end
 
-      FeatureFlags::Hooks.oak_visible_on_hook(context)
+      it "returns false without calling OakPredicate" do
+        expect(FeatureFlags::OakPredicate).not_to receive(:new)
+        expect(FeatureFlags::Hooks.oak_visible_on_hook(context)).to be false
+      end
     end
 
-    it "calls .call on the OakPredicate instance" do
-      expect(oak_predicate).to receive(:call)
+    context "when tier_2_visible_on_hook returns true" do
+      before do
+        allow(FeatureFlags::Hooks).to receive(:tier_2_visible_on_hook).and_return(true)
+      end
 
-      FeatureFlags::Hooks.oak_visible_on_hook(context)
+      it "creates a new OakPredicate with context and region" do
+        expect(FeatureFlags::OakPredicate).to receive(:new).with(context, "us-east-1")
+
+        FeatureFlags::Hooks.oak_visible_on_hook(context)
+      end
+
+      it "calls .call on the OakPredicate instance" do
+        expect(oak_predicate).to receive(:call)
+
+        FeatureFlags::Hooks.oak_visible_on_hook(context)
+      end
     end
   end
 
   describe "oak_for_users_visible_on_hook" do
-    let(:context) { instance_double(Course) }
-    let(:domain_root_account) { instance_double(Account) }
+    let(:domain_root_account) { account_model }
 
     before do
       allow(Account).to receive(:current_domain_root_account).and_return(domain_root_account)
-      allow(FeatureFlags::Hooks).to receive(:oak_visible_on_hook).and_return(true)
       allow(Oak::PermissionChecker).to receive(:user_permitted?).and_return(true)
     end
 
+    context "when context is not a User" do
+      context "with Account context" do
+        let(:context) { account_model }
+
+        it "returns false" do
+          result = FeatureFlags::Hooks.oak_for_users_visible_on_hook(context)
+
+          expect(result).to be false
+        end
+      end
+
+      context "with Course context" do
+        let(:context) { course_model }
+
+        it "returns false" do
+          result = FeatureFlags::Hooks.oak_for_users_visible_on_hook(context)
+
+          expect(result).to be false
+        end
+      end
+    end
+
     context "when oak_visible_on_hook returns false" do
+      let(:context) { user_model }
+
       before do
         allow(FeatureFlags::Hooks).to receive(:oak_visible_on_hook).and_return(false)
       end
@@ -624,6 +662,8 @@ describe FeatureFlags::Hooks do
     end
 
     context "when oak_visible_on_hook returns true" do
+      let(:context) { user_model }
+
       before do
         allow(FeatureFlags::Hooks).to receive(:oak_visible_on_hook).and_return(true)
       end
@@ -649,6 +689,46 @@ describe FeatureFlags::Hooks do
 
         expect(result).to be false
       end
+    end
+  end
+
+  describe "oak_for_teachers_visible_on_hook" do
+    let(:context) { instance_double(Account) }
+
+    it "returns true when oak_for_admins feature is enabled" do
+      allow(context).to receive(:feature_enabled?).with(:oak_for_admins).and_return(true)
+
+      result = FeatureFlags::Hooks.oak_for_teachers_visible_on_hook(context)
+
+      expect(result).to be true
+    end
+
+    it "returns false when oak_for_admins feature is disabled" do
+      allow(context).to receive(:feature_enabled?).with(:oak_for_admins).and_return(false)
+
+      result = FeatureFlags::Hooks.oak_for_teachers_visible_on_hook(context)
+
+      expect(result).to be false
+    end
+  end
+
+  describe "study_assist_visible_on_hook" do
+    let(:context) { instance_double(Account) }
+
+    it "returns true when study_assist feature is enabled" do
+      allow(context).to receive(:feature_enabled?).with(:study_assist).and_return(true)
+
+      result = FeatureFlags::Hooks.study_assist_visible_on_hook(context)
+
+      expect(result).to be true
+    end
+
+    it "returns false when study_assist feature is disabled" do
+      allow(context).to receive(:feature_enabled?).with(:study_assist).and_return(false)
+
+      result = FeatureFlags::Hooks.study_assist_visible_on_hook(context)
+
+      expect(result).to be false
     end
   end
 end

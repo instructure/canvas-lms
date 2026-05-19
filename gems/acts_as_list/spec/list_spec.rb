@@ -85,12 +85,12 @@ describe "ListTest" do
 
       new = ListMixin.create(parent_id: 20)
       expect(new.pos).to eq 2
-      expect(new).to_not be_first
+      expect(new).not_to be_first
       expect(new).to be_last
 
       new = ListMixin.create(parent_id: 20)
       expect(new.pos).to eq 3
-      expect(new).to_not be_first
+      expect(new).not_to be_first
       expect(new).to be_last
 
       new = ListMixin.create(parent_id: 0)
@@ -160,7 +160,7 @@ describe "ListTest" do
     it "remove_from_list should then fail in_list?" do
       expect(ListMixin.find(1)).to be_in_list
       ListMixin.find(1).remove_from_list
-      expect(ListMixin.find(1)).to_not be_in_list
+      expect(ListMixin.find(1)).not_to be_in_list
     end
 
     it "remove_from_list should set position to nil" do

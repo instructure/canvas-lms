@@ -198,7 +198,7 @@ module AssignmentsCommon
     )
   end
 
-  def create_assignment_for_group(submission_type, grade_group_students_individually = false)
+  def create_assignment_for_group(submission_type, grade_group_students_individually: false)
     group_test_setup(2, 1, 2)
     add_user_to_group(@students.first, @testgroup[0])
     @assignment = @course.assignments.create!(

@@ -73,7 +73,7 @@ module CC::Importer::Standard
 
         main_file[:file_name] = File.basename main_file[:path_name]
         main_file[:type] = "FILE_TYPE"
-        add_course_file(main_file, true)
+        add_course_file(main_file, overwrite: true)
       end
 
       new_assignments.each do |a|

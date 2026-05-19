@@ -40,7 +40,7 @@ if Qti.migration_executable
       hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node:, base_dir: file_path)
 
       expect(hash[:answers].pluck(:text)).to match_array(["True", "False", "Not Sure"])
-      expect(hash[:question_text]).to_not include("Not Sure")
+      expect(hash[:question_text]).not_to include("Not Sure")
     end
 
     it "gets answers correctly even when people write more gross xml" do
@@ -70,7 +70,7 @@ if Qti.migration_executable
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node:, base_dir: file_path)
 
       # the old code was terrible and doubled the text when it hit html tags and also ignored them... srsly who wrote it? ugh
-      expect(hash[:question_text]).to_not include("sillynode")
+      expect(hash[:question_text]).not_to include("sillynode")
       expect(hash[:question_text]).to include("I have a whole bunch of html that is <p>super nested</p> and stuff <br></br>")
 
       expect(hash[:answers].select { |a| a[:blank_id] == "RESPONSE" }.pluck(:text)).to match_array(%w[pen pan ten])

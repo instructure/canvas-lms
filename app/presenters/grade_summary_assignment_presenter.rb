@@ -266,7 +266,7 @@ class GradeSummaryAssignmentPresenter
 
   def plagiarism(type)
     plag_data = if type == "vericite"
-                  submission.vericite_data(true)
+                  submission.vericite_data(lookup_data: true)
                 else
                   submission.originality_data
                 end
@@ -316,7 +316,7 @@ class GradeSummaryAssignmentPresenter
   def plagiarism_attachment?(a)
     @originality_reports.any? { |o| o.attachment == a } ||
       (submission.turnitin_data && submission.turnitin_data[a.asset_string]).present? ||
-      (submission.vericite_data(true) && submission.vericite_data(true)[a.asset_string]).present?
+      (submission.vericite_data(lookup_data: true) && submission.vericite_data(lookup_data: true)[a.asset_string]).present?
   end
 
   def comments
@@ -338,7 +338,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   FULLWIDTH = 150.0
-  GradeSummaryGraph = Struct.new(:high, :low, :lower_q, :upper_q, :median, :mean, :points_possible, :score, :legacy, keyword_init: true) do
+  GradeSummaryGraph = Struct.new(:high, :low, :lower_q, :upper_q, :median, :mean, :points_possible, :score, :legacy) do
     def low_pos
       pixels_for(legacy ? 0 : low)
     end

@@ -65,7 +65,8 @@ module AccountReports
         add_outcome_order_text
         new_quizzes_scope = ReportHelper.activate_report_db { outcomes_new_quiz_scope }
         config_options = { new_quizzes_scope: }
-        write_outcomes_report(HEADERS, outcome_results_scope, config_options)
+        results_scope = ReportHelper.activate_report_db { outcome_results_scope }
+        write_outcomes_report(HEADERS, results_scope, config_options)
       end
 
       private

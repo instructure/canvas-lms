@@ -78,39 +78,38 @@ export interface PeerReviewSubAssignment {
 export interface RubricRating {
   _id: string
   description: string
-  long_description?: string
+  longDescription?: string
   points: number
-  criterion_id?: string
 }
 
 export interface RubricCriterion {
   _id: string
   description: string
-  long_description?: string
+  longDescription?: string
   points: number
-  criterion_use_range?: boolean
+  criterionUseRange?: boolean
   ratings: RubricRating[]
-  ignore_for_scoring?: boolean
-  mastery_points?: number
-  learning_outcome_id?: string
+  ignoreForScoring?: boolean
+  masteryPoints?: number
+  learningOutcomeId?: string
 }
 
 export interface Rubric {
   _id: string
   title: string
   criteria: RubricCriterion[]
-  free_form_criterion_comments?: boolean
-  hide_score_total?: boolean
-  points_possible: number
+  freeFormCriterionComments?: boolean
+  hideScoreTotal?: boolean
+  pointsPossible: number
   ratingOrder?: string
-  button_display?: string
+  buttonDisplay?: string
 }
 
 export interface RubricAssociation {
   _id: string
-  hide_points?: boolean
-  hide_score_total?: boolean
-  use_for_grading?: boolean
+  hidePoints?: boolean
+  hideScoreTotal?: boolean
+  useForGrading?: boolean
 }
 
 export interface Assignment {

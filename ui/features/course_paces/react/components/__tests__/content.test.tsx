@@ -32,7 +32,9 @@ import fetchMock from 'fetch-mock'
 import {actions as uiActions} from '../../actions/ui'
 import type {APIPaceContextTypes, Pace, PaceContextsState} from '../../types'
 import * as tz from '@instructure/moment-utils'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
+vi.mock('@instructure/platform-alerts')
 vi.mock('../../actions/ui', async () => {
   const actualModule = await vi.importActual<typeof import('../../actions/ui')>('../../actions/ui')
   return {
@@ -169,7 +171,9 @@ describe('PaceContextsContent', () => {
 
       expect(queryByText('D-F')).not.toBeInTheDocument()
       expect(queryByText('G-K')).not.toBeInTheDocument()
-      expect(getByText('Showing 1 result below')).toBeInTheDocument()
+      expect(vi.mocked(showFlashAlert)).toHaveBeenCalledWith(
+        expect.objectContaining({message: 'Showing 1 result below'}),
+      )
     })
 
     it("shows no results if there's no contexts for the search", async () => {
@@ -184,7 +188,10 @@ describe('PaceContextsContent', () => {
       fireEvent.change(searchInput, {target: {value: 'A'}})
       act(() => searchButton.click())
       const noResults = await findAllByText('No results found')
-      expect(noResults).toHaveLength(2) // no results label, SR-only alert
+      expect(noResults).toHaveLength(1) // visible no results label only; SR alert verified via mock
+      expect(vi.mocked(showFlashAlert)).toHaveBeenCalledWith(
+        expect.objectContaining({message: 'No results found'}),
+      )
       expect(getByText('Please try another search term')).toBeInTheDocument()
     })
 

@@ -184,26 +184,17 @@ describe WikiPagesApiController, type: :request do
       expect(att_occurences.values).to all eq 1
     end
 
-    it "updates with removed attachments should keep the associations" do
-      wiki_response = create_wiki_page(@teacher, { title: "Pläcëhöldër", body: @aa_test_data.base_html }, expected_status: 200)
-      @wiki_page = WikiPage.find(wiki_response["page_id"])
-      update_wiki_page(@teacher, @wiki_page, { body: @aa_test_data.removed_html })
-      id_occurences, att_occurences = @aa_test_data.count_aa_records("WikiPage", wiki_response["page_id"])
-
-      expect(id_occurences.keys).to match_array [wiki_response["page_id"]]
-      expect(id_occurences.values).to all eq 1
-      expect(att_occurences.keys).to match_array [@aa_test_data.attachment1.id]
-      expect(att_occurences.values).to all eq 1
-    end
-
     it "reverts as expected" do
       wiki_response = create_wiki_page(@teacher, { title: "Pläcëhöldër", body: @aa_test_data.base_html }, expected_status: 200)
       @wiki_page = WikiPage.find(wiki_response["page_id"])
       update_wiki_page(@teacher, @wiki_page, { body: @aa_test_data.added_html })
-      revisions = revisions_of_wiki_page(@teacher, @wiki_page)
+      expect(@wiki_page.reload.attachment_associations.pluck(:attachment_id)).to match_array([@aa_test_data.attachment1.id, @aa_test_data.attachment2.id])
       expect do
-        revert_wiki_page(@teacher, @wiki_page, revisions.last["revision_id"])
+        revert_wiki_page(@teacher, @wiki_page, "1")
       end.not_to raise_error
+      expect(@wiki_page.reload.attachment_associations.pluck(:attachment_id)).to match_array([@aa_test_data.attachment1.id])
+      revert_wiki_page(@teacher, @wiki_page, "2")
+      expect(@wiki_page.reload.attachment_associations.pluck(:attachment_id)).to match_array([@aa_test_data.attachment1.id, @aa_test_data.attachment2.id])
     end
   end
 
@@ -253,6 +244,272 @@ describe WikiPagesApiController, type: :request do
         expect do
           update_wiki_page(@teacher, @wiki_page, { title: "Another Title" })
         end.not_to raise_error
+      end
+    end
+  end
+
+  describe "horizon_block_content_editor" do
+    let(:external_content_id) { "87654321-4321-4321-4321-210987654321" }
+    let(:block_editor_data) { { "content" => "test content", "version" => "1.0" } }
+
+    before :once do
+      account = @course.account
+      account.enable_feature!(:horizon_course_setting)
+      account.horizon_account = true
+      account.save!
+      account.enable_feature!(:horizon_block_content_editor)
+    end
+
+    before do
+      stub_const("ContentServiceClient", Class.new do
+        def self.enabled? = true
+        def self.create_content(**) = nil
+        def self.update_content(**) = nil
+        def self.get_content(**) = nil
+      end)
+      allow(ContentServiceClient).to receive_messages(
+        create_content: double(external_content_id:),
+        update_content: nil,
+        get_content: double(data: block_editor_data)
+      )
+    end
+
+    def get_wiki_page(user, wiki_page, expected_status: 200)
+      url = "/api/v1/courses/#{@course.id}/pages/#{wiki_page.url}"
+      path = {
+        controller: "wiki_pages_api",
+        action: "show",
+        format: "json",
+        course_id: @course.id.to_s,
+        url_or_id: wiki_page.url
+      }
+      api_call_as_user(user, :get, url, path, {}, {}, { expected_status: })
+    end
+
+    describe "POST #create" do
+      context "when block_editor_data is present" do
+        it "calls create_block_editor_data with the correct parameters" do
+          expect_any_instance_of(WikiPage).to receive(:create_block_editor_data).with(
+            user_uuid: @teacher.uuid,
+            data: block_editor_data
+          )
+
+          create_wiki_page(@teacher, { title: "New Page", block_editor_data: })
+        end
+      end
+
+      context "when the feature flag is disabled" do
+        before do
+          @course.account.disable_feature!(:horizon_block_content_editor)
+        end
+
+        it "does not call create_block_editor_data" do
+          expect_any_instance_of(WikiPage).not_to receive(:create_block_editor_data)
+
+          create_wiki_page(@teacher, { title: "New Page", block_editor_data: })
+        end
+      end
+    end
+
+    describe "PUT #update" do
+      before :once do
+        wiki_page_model(title: "Horizon Page")
+        @wiki_page = @page
+        @wiki_page.create_external_content_reference!(content_id: "existing-ext-uuid")
+      end
+
+      before do
+        @wiki_page.reload
+      end
+
+      context "when block_editor_data is present and ExternalContentReference exists" do
+        it "calls update_block_editor_data with the correct parameters" do
+          expect_any_instance_of(WikiPage).to receive(:update_block_editor_data).with(
+            user_uuid: @teacher.uuid,
+            data: block_editor_data
+          )
+
+          update_wiki_page(@teacher, @wiki_page, { block_editor_data: })
+        end
+      end
+
+      context "when the page has no ExternalContentReference" do
+        let(:page_without_ref) { wiki_page_model(title: "No Ref Page") }
+
+        it "does not raise and succeeds" do
+          expect_any_instance_of(WikiPage).to receive(:update_block_editor_data).with(
+            user_uuid: @teacher.uuid,
+            data: block_editor_data
+          ).and_call_original
+
+          update_wiki_page(@teacher, page_without_ref, { block_editor_data: })
+        end
+      end
+
+      context "when the feature flag is disabled" do
+        before do
+          @course.account.disable_feature!(:horizon_block_content_editor)
+        end
+
+        it "does not call update_block_editor_data" do
+          expect_any_instance_of(WikiPage).not_to receive(:update_block_editor_data)
+
+          update_wiki_page(@teacher, @wiki_page, { block_editor_data: })
+        end
+      end
+    end
+
+    describe "GET #show" do
+      before :once do
+        wiki_page_model(title: "Show Page")
+        @wiki_page = @page
+        @wiki_page.create_external_content_reference!(content_id: external_content_id)
+      end
+
+      before do
+        @wiki_page.reload
+      end
+
+      context "when an ExternalContentReference exists" do
+        it "returns block_editor_data from the Content Service" do
+          json = get_wiki_page(@teacher, @wiki_page)
+
+          expect(json["block_editor_data"]).to eql block_editor_data
+        end
+
+        it "calls get_block_editor_data with correct parameters" do
+          expect_any_instance_of(WikiPage).to receive(:get_block_editor_data).with(
+            user_uuid: @teacher.uuid
+          ).and_return(block_editor_data)
+
+          get_wiki_page(@teacher, @wiki_page)
+        end
+      end
+
+      context "when the page has no ExternalContentReference" do
+        before do
+          @wiki_page.external_content_reference.destroy
+        end
+
+        it "does not include block_editor_data" do
+          json = get_wiki_page(@teacher, @wiki_page)
+
+          expect(json["block_editor_data"]).to be_nil
+        end
+      end
+
+      context "when the feature flag is disabled" do
+        before do
+          @course.account.disable_feature!(:horizon_block_content_editor)
+        end
+
+        it "does not include block_editor_data" do
+          json = get_wiki_page(@teacher, @wiki_page)
+
+          expect(json["block_editor_data"]).to be_nil
+        end
+      end
+    end
+
+    describe "Content Service error handling" do
+      let(:error_report_id) { 12_345 }
+
+      let(:service_errors) do
+        [
+          { "message" => "Invalid GraphQL request", "extensions" => { "code" => "GRAPHQL_VALIDATION_FAILED" } }
+        ]
+      end
+
+      let(:client_error) do
+        InstructureMiscPlugin::Extensions::ContentServiceClient::ClientError.new(
+          "An error occurred while communicating with the Content Service.",
+          service_errors:
+        )
+      end
+
+      before do
+        allow(ErrorReport).to receive(:log_error).and_return(double(id: error_report_id))
+        allow(Canvas).to receive(:retriable).and_yield
+      end
+
+      context "POST #create with ContentServiceClient error" do
+        before do
+          allow(ContentServiceClient).to receive(:create_content).and_raise(client_error)
+        end
+
+        it "returns 503 with error details instead of 500" do
+          json = create_wiki_page(@teacher, { title: "New Page", block_editor_data: }, expected_status: 503)
+
+          expect(json["error"]).to eq("An error occurred while communicating with the Content Service.")
+          expect(json["error_report_id"]).to eq(error_report_id)
+        end
+
+        it "logs error report with service_errors" do
+          expect(ErrorReport).to receive(:log_error).with(
+            "content_service_client_error",
+            { message: "An error occurred while communicating with the Content Service.", service_errors: }
+          ).and_return(double(id: error_report_id))
+
+          create_wiki_page(@teacher, { title: "New Page", block_editor_data: }, expected_status: 503)
+        end
+      end
+
+      context "PUT #update with ContentServiceClient error" do
+        before :once do
+          wiki_page_model(title: "Update Error Page")
+          @wiki_page = @page
+          @wiki_page.create_external_content_reference!(content_id: "error-test-uuid")
+        end
+
+        before do
+          @wiki_page.reload
+          allow(ContentServiceClient).to receive(:update_content).and_raise(client_error)
+        end
+
+        it "returns 503 with error details instead of 500" do
+          json = update_wiki_page(@teacher, @wiki_page, { block_editor_data: }, expected_status: 503)
+
+          expect(json["error"]).to eq("An error occurred while communicating with the Content Service.")
+          expect(json["error_report_id"]).to eq(error_report_id)
+        end
+
+        it "logs error report with service_errors" do
+          expect(ErrorReport).to receive(:log_error).with(
+            "content_service_client_error",
+            { message: "An error occurred while communicating with the Content Service.", service_errors: }
+          ).and_return(double(id: error_report_id))
+
+          update_wiki_page(@teacher, @wiki_page, { block_editor_data: }, expected_status: 503)
+        end
+      end
+
+      context "GET #show with ContentServiceClient error" do
+        before :once do
+          wiki_page_model(title: "Show Error Page")
+          @wiki_page = @page
+          @wiki_page.create_external_content_reference!(content_id: "show-error-uuid")
+        end
+
+        before do
+          @wiki_page.reload
+          allow(ContentServiceClient).to receive(:get_content).and_raise(client_error)
+        end
+
+        it "returns 503 with error details instead of 500" do
+          json = get_wiki_page(@teacher, @wiki_page, expected_status: 503)
+
+          expect(json["error"]).to eq("An error occurred while communicating with the Content Service.")
+          expect(json["error_report_id"]).to eq(error_report_id)
+        end
+
+        it "logs error report with service_errors" do
+          expect(ErrorReport).to receive(:log_error).with(
+            "content_service_client_error",
+            { message: "An error occurred while communicating with the Content Service.", service_errors: }
+          ).and_return(double(id: error_report_id))
+
+          get_wiki_page(@teacher, @wiki_page, expected_status: 503)
+        end
       end
     end
   end
@@ -366,7 +623,7 @@ describe WikiPagesApiController, type: :request do
               end
 
               def self.generate_alt_text(*)
-                Struct.new(:image, keyword_init: true).new(image: { "altText" => "AI generated text." })
+                Struct.new(:image).new(image: { "altText" => "AI generated text." })
               end
             end)
             allow(CedarClient).to receive(:enabled?).and_return(true)

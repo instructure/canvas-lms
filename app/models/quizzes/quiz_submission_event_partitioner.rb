@@ -23,7 +23,7 @@ class Quizzes::QuizSubmissionEventPartitioner
   PRECREATE_TABLES = 2
   KEEP_MONTHS = 6
 
-  def self.process(in_migration = false, prune: false)
+  def self.process(in_migration: false, prune: false)
     Shard.current.database_server.unguard do
       GuardRail.activate(:deploy) do
         log "*" * 80

@@ -40,6 +40,7 @@ import {
   IconVideoCameraLine,
   IconLtiLine,
   IconEmptyLine,
+  IconExternalLinkLine,
   IconCoursesLine,
   IconGroupLine,
   IconStatsLine,
@@ -113,7 +114,12 @@ const icons: Record<string, React.ComponentType> = {
 }
 
 const getIcon = (tab: Tab): React.ComponentType =>
-  icons[tab.id] || (tab.type === 'external' ? IconLtiLine : IconEmptyLine)
+  icons[tab.id] ||
+  (tab.type === 'external'
+    ? tab.id?.startsWith('nav_menu_link_')
+      ? IconExternalLinkLine
+      : IconLtiLine
+    : IconEmptyLine)
 
 function srText(tab: Tab): string {
   if (tab.hidden) return I18n.t('Disabled. Not visible to students.')
@@ -147,15 +153,21 @@ export default function MobileContextMenu({
         const isTabOff = tab.hidden || tab.unused
         // @ts-expect-error - active_context_tab not in GlobalEnv type definition
         const isCurrentTab = ENV?.active_context_tab === tab.id
+        const isNavMenuLink = tab.type === 'external' && tab.id?.startsWith('nav_menu_link_')
         return (
           <Grid.Row key={tab.id}>
-            <Grid.Col width="auto">
-              <Link renderIcon={Icon} href={tab.html_url} isWithinText={false}>
+            <Grid.Col>
+              <Link
+                renderIcon={Icon}
+                href={tab.html_url}
+                isWithinText={false}
+                target={isNavMenuLink ? '_blank' : undefined}
+              >
                 <Text weight={isCurrentTab ? 'bold' : 'normal'}>{tab.label}</Text>
                 {isTabOff && <ScreenReaderContent>{'- ' + srText(tab)}</ScreenReaderContent>}
               </Link>
             </Grid.Col>
-            <Grid.Col>{isTabOff && <IconOffLine />}</Grid.Col>
+            <Grid.Col width="auto">{isTabOff && <IconOffLine />}</Grid.Col>
           </Grid.Row>
         )
       })}

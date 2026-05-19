@@ -25,9 +25,13 @@ import ConfirmCommunicationChannel, {
   type ConfirmCommunicationChannelProps,
 } from '../ConfirmCommunicationChannel'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 const server = setupServer()
 

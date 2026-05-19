@@ -100,14 +100,6 @@ describe Loaders::SubmissionLtiAssetReportsLoader do
     end
   end
 
-  it "raises ArgumentError when for_student: true with latest: false" do
-    expect do
-      GraphQL::Batch.batch do
-        described_class.for(for_student: true, latest: false)
-      end
-    end.to raise_error(ArgumentError)
-  end
-
   # Tests for raw_asset_reports method
   describe "#raw_asset_reports" do
     include LtiSpecHelper
@@ -412,14 +404,72 @@ describe Loaders::SubmissionLtiAssetReportsLoader do
         expect(result[@multi_submission.id]).to include(@first_report, @second_report, @third_report)
       end
 
-      it "students always see only latest attempt, and only processed reports, regardless of last_submission_attempt_only" do
-        # for_student implies last_submission_attempt_only
+      it "students with latest: true see only latest attempt processed reports" do
         result = execute_loader(submission_ids: [@multi_submission.id], for_student: true, latest: true)
 
         expect(result[@multi_submission.id]).to be_a(Array)
         expect(result[@multi_submission.id]).to include(@second_report)
         expect(result[@multi_submission.id]).not_to include(@first_report)
         expect(result[@multi_submission.id]).not_to include(@third_report)
+      end
+
+      it "students with latest: false see all attempts' processed reports for client-side filtering" do
+        @first_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PROCESSED)
+
+        result = execute_loader(submission_ids: [@multi_submission.id], for_student: true, latest: false)
+
+        expect(result[@multi_submission.id]).to be_a(Array)
+        # Both attempt 1 and attempt 2 processed reports are returned
+        expect(result[@multi_submission.id]).to include(@first_report, @second_report)
+        # Unprocessed reports are still excluded
+        expect(result[@multi_submission.id]).not_to include(@third_report)
+      end
+
+      it "students with latest: false return nil when no visible reports exist at all" do
+        @first_report.update!(visible_to_owner: false)
+        @second_report.update!(visible_to_owner: false)
+        @third_report.update!(visible_to_owner: false)
+
+        result = execute_loader(submission_ids: [@multi_submission.id], for_student: true, latest: false)
+
+        expect(result[@multi_submission.id]).to be_nil
+      end
+
+      it "students with latest: false return [] when visible reports exist but none are processed" do
+        @first_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
+        # @second_report is PROGRESS_PROCESSED by default, make it pending too
+        @second_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PENDING)
+        # @third_report is PROGRESS_PROCESSING
+
+        result = execute_loader(submission_ids: [@multi_submission.id], for_student: true, latest: false)
+
+        expect(result[@multi_submission.id]).to eq([])
+      end
+
+      it "students with latest: true return [] (No result) when latest attempt has no reports but prior attempts do" do
+        # Simulate: text entry attempt 1 has a processed report,
+        # but the student re-submitted (attempt 2) and no report exists for that attempt.
+        # The grades page uses latest: true, so it should show "No result" (not "Please review").
+        @second_report.update!(visible_to_owner: false)
+        @third_report.update!(visible_to_owner: false)
+        @first_report.update!(processing_progress: Lti::AssetReport::PROGRESS_PROCESSED)
+        # Now: attempt 1 has a visible processed report; attempt 2 has no visible reports
+
+        result = execute_loader(submission_ids: [@multi_submission.id], for_student: true, latest: true)
+
+        # Should return [] ("No result") not nil (hidden), because the processor
+        # has activity for this submission (just not for the latest attempt).
+        expect(result[@multi_submission.id]).to eq([])
+      end
+
+      it "students with latest: true return nil when no reports exist for any attempt" do
+        @first_report.update!(visible_to_owner: false)
+        @second_report.update!(visible_to_owner: false)
+        @third_report.update!(visible_to_owner: false)
+
+        result = execute_loader(submission_ids: [@multi_submission.id], for_student: true, latest: true)
+
+        expect(result[@multi_submission.id]).to be_nil
       end
     end
 
@@ -455,7 +505,7 @@ describe Loaders::SubmissionLtiAssetReportsLoader do
 
         result = execute_loader(submission_ids: [text_submission.id], for_student: true, latest: true)
 
-        expect(result[text_submission.id]).to be_nil
+        expect(result[text_submission.id]).to eq([])
       end
 
       it "handles attachment_ids comparison correctly with string conversion" do

@@ -159,7 +159,7 @@ module Qti
           text = ""
           case node.name
           when "div"
-            text = sanitize_html_string(node.text, true)
+            text = sanitize_html_string(node.text, remove_extraneous_nodes: true)
           when "extendedTextInteraction"
             id = node["responseIdentifier"]
             text = " [#{id}] "
@@ -174,7 +174,7 @@ module Qti
         text = get_node_val(match, "baseValue")
         answer = { id: unique_local_id, weight: AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT }
         answer[:migration_id] = blank_id
-        answer[:text] = sanitize_html_string(text, true)
+        answer[:text] = sanitize_html_string(text, remove_extraneous_nodes: true)
         answer[:blank_id] = blank_id
         @question[:answers] << answer
       end
@@ -189,7 +189,7 @@ module Qti
           weight: AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT,
           id: unique_local_id,
           migration_id: blank_id,
-          text: sanitize_html_string(val_node.text, true),
+          text: sanitize_html_string(val_node.text, remove_extraneous_nodes: true),
           blank_id:,
         }
       end

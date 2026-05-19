@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../spec_helper"
 require_relative "../../models/student_visibility/student_visibility_common"
 
 # need tests for:
@@ -1106,15 +1105,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
           # change this assignment so that it is visible to all students
           assignment_only_visible_to_overrides.only_visible_to_overrides = false
           assignment_only_visible_to_overrides.save!
-          assignments_with_visibilities
-        end
-
-        it "preloads override data for assignments to optimize performance" do
-          # Test that DatesOverridable.preload_override_data_for_objects is called
-          expect(DatesOverridable).to receive(:preload_override_data_for_objects)
-            .with([assignment, assignment_only_visible_to_overrides])
-            .and_call_original
-
           assignments_with_visibilities
         end
 

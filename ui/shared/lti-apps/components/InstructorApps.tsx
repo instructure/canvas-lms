@@ -35,8 +35,8 @@ import type {Product} from '../models/Product'
 import {View} from '@instructure/ui-view'
 import useBreakpoints from '../hooks/useBreakpoints'
 import useCreateScreenReaderFilterMessage from '../hooks/useCreateScreenReaderFilterMessage'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {showFlashError} from '@instructure/platform-alerts'
+import {getLiveRegion} from '@instructure/platform-instui-bindings'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const queryFn = ({queryKey}: {queryKey: [string, DiscoverParams]}) => {

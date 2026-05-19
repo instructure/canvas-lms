@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ContentParticipation < ActiveRecord::Base
+class ContentParticipation < ApplicationRecord
   include Workflow
 
   ACCESSIBLE_ATTRIBUTES = %i[content user workflow_state content_item].freeze

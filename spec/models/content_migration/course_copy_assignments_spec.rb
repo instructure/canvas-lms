@@ -337,7 +337,7 @@ describe ContentMigration do
         export.selected_content = { "assignments" => { mig_id(assign2) => "1" } }
       end
       new_group = @copy_to.assignments.where(migration_id: mig_id(assign2)).first.assignment_group
-      expect(new_group).to_not eq group
+      expect(new_group).not_to eq group
       expect(new_group).to be_available
       expect(new_group.name).to eq "Imported Assignments"
     end

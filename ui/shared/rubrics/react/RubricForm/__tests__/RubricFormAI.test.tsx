@@ -23,9 +23,9 @@ import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {RubricForm, type RubricFormComponentProp} from '../index'
 import * as RubricFormQueries from '../queries/RubricFormQueries'
 import * as ProgressHelpers from '@canvas/progress/ProgressHelpers'
-import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer as destroyFlashAlertContainer} from '@instructure/platform-alerts'
 import fakeEnv from '@canvas/test-utils/fakeENV'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {RUBRICS_QUERY_RESPONSE} from './fixtures'
 
 vi.mock('../queries/RubricFormQueries', async () => ({
@@ -44,12 +44,12 @@ const mockCriteria = [
     description: 'Generated Criterion 1',
     points: 20,
     ratings: [],
-    longDescription: '',
-    outcome: undefined,
-    learningOutcomeId: undefined,
-    ignoreForScoring: false,
-    criterionUseRange: false,
-    masteryPoints: 0,
+    long_description: '',
+    learning_outcome_id: undefined,
+    ignore_for_scoring: false,
+    criterion_use_range: false,
+    mastery_points: 0,
+    generated: true,
   },
 ]
 
@@ -69,6 +69,7 @@ const ROOT_OUTCOME_GROUP = {
 
 describe('RubricForm AI Tests', () => {
   beforeEach(() => {
+    queryClient.clear()
     fakeEnv.setup({
       context_asset_string: 'user_1',
       AI_FEEDBACK_LINK: 'https://example.com/feedback',
@@ -76,6 +77,7 @@ describe('RubricForm AI Tests', () => {
   })
 
   afterEach(() => {
+    queryClient.clear()
     vi.resetAllMocks()
     fakeEnv.teardown()
     destroyFlashAlertContainer()
@@ -116,6 +118,32 @@ describe('RubricForm AI Tests', () => {
       expect(getByTestId('additional-prompt-info-input')).toBeInTheDocument()
     })
 
+    it('sends default totalPoints in generate request when assignmentPointsPossible is not provided', async () => {
+      const generateCriteriaMock = RubricFormQueries.generateCriteria as Mock
+      generateCriteriaMock.mockResolvedValue({
+        id: 1,
+        workflow_state: 'running',
+      })
+
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        courseId: '1',
+      })
+
+      expect(getByTestId('criteria-total-points-input')).toHaveValue('20')
+
+      fireEvent.click(getByTestId('generate-criteria-button'))
+
+      await waitFor(() => {
+        expect(generateCriteriaMock).toHaveBeenCalledWith(
+          '1',
+          '1',
+          expect.objectContaining({totalPoints: '20'}),
+        )
+      })
+    })
+
     it('auto-populates assignment points possible in total points input', () => {
       const {getByTestId} = renderComponent({
         aiRubricsEnabled: true,
@@ -124,6 +152,33 @@ describe('RubricForm AI Tests', () => {
         courseId: '1',
       })
       expect(getByTestId('criteria-total-points-input')).toHaveValue('50')
+    })
+
+    it('sends assignmentPointsPossible as totalPoints in generate request', async () => {
+      const generateCriteriaMock = RubricFormQueries.generateCriteria as Mock
+      generateCriteriaMock.mockResolvedValue({
+        id: 1,
+        workflow_state: 'running',
+      })
+
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        assignmentPointsPossible: 50,
+        courseId: '1',
+      })
+
+      expect(getByTestId('criteria-total-points-input')).toHaveValue('50')
+
+      fireEvent.click(getByTestId('generate-criteria-button'))
+
+      await waitFor(() => {
+        expect(generateCriteriaMock).toHaveBeenCalledWith(
+          '1',
+          '1',
+          expect.objectContaining({totalPoints: '50'}),
+        )
+      })
     })
 
     it('does not show the form when aiRubricsEnabled is false', () => {
@@ -136,12 +191,11 @@ describe('RubricForm AI Tests', () => {
     })
 
     it('does not show regenerate button when aiRubricsEnabled is false', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {queryAllByTestId} = renderComponent({
         aiRubricsEnabled: false,
         assignmentId: '1',
-        courseId: '1',
         rubricId: '1',
       })
 

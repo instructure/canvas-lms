@@ -265,6 +265,25 @@ describe BrandConfig do
         @subaccount_bc.save_all_files!
       end
     end
+
+    describe "with cdn enabled and concurrent file deletion" do
+      before do
+        allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
+        s3 = instance_double(Aws::S3::Resource, bucket: nil)
+        allow(Aws::S3::Resource).to receive(:new).and_return(s3)
+        allow(@subaccount_bc.s3_uploader).to receive(:upload_file)
+          .and_raise(Errno::ENOENT, "No such file or directory")
+      end
+
+      it "does not raise when another process already uploaded and deleted the file" do
+        expect { @subaccount_bc.save_all_files! }.not_to raise_error
+      end
+
+      it "does not attempt to delete the local file" do
+        expect(File).not_to receive(:delete)
+        @subaccount_bc.save_all_files!
+      end
+    end
   end
 
   it "doesn't let you update an existing brand config" do

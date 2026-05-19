@@ -464,7 +464,8 @@ class SisImportsApiController < ApplicationController
   #   1. As a multipart/form-data form field named +attachment+
   #   2. As a raw post with a Content-Type of application/zip or application/octet-stream
   #   3. Using the {file:file.file_uploads.html File Upload} process, which can be more reliable
-  #      for large files. Use the +pre_attachment[name]+ argument to start that flow.
+  #      for large files. Use the +pre_attachment[name]+ argument to start that flow. See that
+  #      parameter below for more information.
   #
   #   +attachment+ is required for multipart/form-data style posts. Assumed to
   #   be SIS data from a file upload form field named +attachment+.
@@ -499,10 +500,21 @@ class SisImportsApiController < ApplicationController
   #   fail. There is a hard cap of 50 GB.
   #
   # @argument pre_attachment[name] [String]
-  #   The name of the file to be uploaded in a separate request via the
-  #   {file:file.file_uploads.html File Upload} workflow. Do not supply +attachment+
-  #   when using this option. This option decouples the file upload from the
-  #   SIS import request, which can improve reliability with larger files.
+  #   The name of the file to be uploaded (in a separate request) via the
+  #   {file:file.file_uploads.html File Upload} workflow. This is the recommended
+  #   way to upload larger batches, since the upload itself no longer has to finish
+  #   within the 1-minute Canvas request timeout period. This argument cannot be combined
+  #   with the +attachment+ argument; use one or the other.
+  #
+  #   To use this flow:
+  #   1. Perform a POST to this endpoint with file information in +pre_attachment+
+  #   2. {file:file.file_uploads.html Upload the file} using the data in the response's +pre_attachment+
+  #   3. Once the file has been uploaded, the SIS import will begin.
+  #   4. {api:SisImportsApiController#show Check the progress} of the import as usual.
+  #
+  #   NOTE: this option must be sent as either a query parameter or as a JSON
+  #   body parameter; +application/x-www-form-urlencoded+ is not supported due to
+  #   conflicts with raw post body data.
   #
   # @argument pre_attachment[*] [String]
   #   Other file upload properties; see {file:file.file_uploads.html File Upload Documentation}
@@ -641,7 +653,11 @@ class SisImportsApiController < ApplicationController
           file_obj.set_file_attributes("sis_import.#{params[:extension]}",
                                        Attachment.mimetype("sis_import.#{params[:extension]}"))
         else
-          charset = request.media_type_params["charset"]
+          env = request.env.dup
+          env["CONTENT_TYPE"] = env["ORIGINAL_CONTENT_TYPE"]
+          # copy of request with original content type restored
+          request2 = Rack::Request.new(env)
+          charset = request2.media_type_params["charset"]
           if charset.present? && !charset.casecmp?("utf-8")
             return render json: { error: t("errors.invalid_content_type", "Invalid content type, UTF-8 required") }, status: :bad_request
           end
@@ -649,9 +665,9 @@ class SisImportsApiController < ApplicationController
           params[:extension] ||= { "application/zip" => "zip",
                                    "text/xml" => "xml",
                                    "text/plain" => "csv",
-                                   "text/csv" => "csv" }[request.media_type] || "zip"
+                                   "text/csv" => "csv" }[request2.media_type] || "zip"
           file_obj.set_file_attributes("sis_import.#{params[:extension]}",
-                                       request.media_type)
+                                       request2.media_type)
         end
       end
 
@@ -712,13 +728,13 @@ class SisImportsApiController < ApplicationController
 
       if batch.attachment
         batch.process
-
-        unless api_request?
-          @account.current_sis_batch_id = batch.id
-          @account.save
-        end
       else
         attachment_preflight = api_attachment_preflight(batch, request, params: params[:pre_attachment], check_quota: false, return_json: true)
+      end
+
+      unless api_request?
+        @account.current_sis_batch_id = batch.id
+        @account.save
       end
 
       render json: sis_import_json(batch, @current_user, session, attachment_preflight:)

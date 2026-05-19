@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe LinkedAttachmentHandler do
   let(:enrollment) { course_with_teacher({ active_all: true }) }
   let(:course) { enrollment.course }
@@ -131,18 +129,6 @@ describe LinkedAttachmentHandler do
         expect(fetch_list_with_field_name(nil)).to be_empty
       end
 
-      it "keeps wiki page associations" do
-        wiki_page = course.wiki_pages.create!(title: "Test Page")
-        html = <<~HTML
-          <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a>
-            <img id="3" src="/courses/#{course.id}/files/#{course_attachment2.id}/preview"></p>
-        HTML
-        wiki_page.associate_attachments_to_rce_object(html, teacher)
-        wiki_page.associate_attachments_to_rce_object("", teacher)
-        associations = AttachmentAssociation.where(context: wiki_page).pluck(:attachment_id)
-        expect(associations).to match_array([course_attachment.id, course_attachment2.id])
-      end
-
       it "keeps association if the user doesn't have manage access to the file" do
         html = <<~HTML
           <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a>
@@ -172,6 +158,42 @@ describe LinkedAttachmentHandler do
         aa = AttachmentAssociation.find_by(context: course, context_concern: "syllabus_body")
         expect(aa.attachment_id).to eql @attachment.global_id
         expect(aa.context_id).to eql course.local_id
+      end
+    end
+
+    context "error handling for missing user" do
+      let(:html) do
+        <<~HTML
+          <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a></p>
+        HTML
+      end
+
+      context "in development environment" do
+        it "raises an error when user is missing" do
+          allow(Rails.env).to receive(:development?).and_return(true)
+          expect do
+            course.associate_attachments_to_rce_object(html, nil)
+          end.to raise_error(/User is required/)
+        end
+      end
+
+      context "in production environment" do
+        before do
+          allow(Rails.env).to receive(:local?).and_return(false)
+        end
+
+        it "captures error to Sentry and does not raise" do
+          expect(Sentry).to receive(:capture_message).with(anything, level: :warning)
+          expect do
+            course.associate_attachments_to_rce_object(html, nil)
+          end.not_to raise_error
+        end
+
+        it "does not create associations when user is missing" do
+          allow(Sentry).to receive(:capture_message)
+          course.associate_attachments_to_rce_object(html, nil)
+          expect(fetch_list_with_field_name(nil)).to be_empty
+        end
       end
     end
   end

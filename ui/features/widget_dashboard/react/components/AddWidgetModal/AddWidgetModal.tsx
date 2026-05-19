@@ -16,15 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import React, {useCallback, useMemo} from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {getAllWidgets} from '../WidgetRegistry'
+import {getWidgetsForRole} from '../WidgetRegistry'
 import {useWidgetLayout} from '../../hooks/useWidgetLayout'
 import {useResponsiveContext} from '../../hooks/useResponsiveContext'
+import {useWidgetDashboard} from '../../hooks/useWidgetDashboardContext'
+import {WIDGET_TYPES, EDUCATOR_CANVAS_ROLES, EDUCATOR_WIDGET_ROLE} from '../../constants'
 import WidgetCard from './WidgetCard'
 
 const I18n = createI18nScope('widget_dashboard')
@@ -44,6 +46,17 @@ const AddWidgetModal: React.FC<AddWidgetModalProps> = ({
 }) => {
   const {addWidget, config} = useWidgetLayout()
   const {isMobile} = useResponsiveContext()
+  const {currentUserRoles} = useWidgetDashboard()
+  const isObserver = currentUserRoles?.includes('observer') ?? false
+  const widgetRole = EDUCATOR_CANVAS_ROLES.some(r => currentUserRoles?.includes(r))
+    ? EDUCATOR_WIDGET_ROLE
+    : undefined
+
+  const visibleWidgets = useMemo(() => {
+    const widgets = Object.entries(getWidgetsForRole(widgetRole))
+    // TODO: observer INBOX exclusion owned by learner dashboard team — remove when they add role tagging to INBOX
+    return isObserver ? widgets.filter(([type]) => type !== WIDGET_TYPES.INBOX) : widgets
+  }, [widgetRole, isObserver])
 
   const isWidgetOnDashboard = useCallback(
     (widgetType: string): boolean => {
@@ -80,7 +93,7 @@ const AddWidgetModal: React.FC<AddWidgetModalProps> = ({
       </Modal.Header>
       <Modal.Body>
         <Flex direction="row" wrap="wrap" gap="small" alignItems="stretch">
-          {Object.entries(getAllWidgets()).map(([type, renderer]) => (
+          {visibleWidgets.map(([type, renderer]) => (
             <Flex.Item key={type} width={isMobile ? '100%' : 'calc(50% - 0.5rem)'}>
               <WidgetCard
                 type={type}

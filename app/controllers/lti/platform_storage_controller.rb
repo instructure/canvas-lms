@@ -52,6 +52,7 @@ module Lti
       end
 
     before_action :ensure_decoded_jwt
+    skip_before_action :load_user, :require_user, only: :post_message_forwarding
 
     # The forwarder iframe HTML and Javascript are heavily cached. This
     # fingerprints the ruby and JS files. This can then be used as a query

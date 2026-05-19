@@ -62,13 +62,13 @@ export default function factory(spec) {
       /**
        * Load the first page of data for the given params
        */
-      load(params, successHandler = () => {}) {
+      load(params, successHandler = () => {}, errorHandler = () => {}) {
         const key = this.getKey(params)
         this.lastParams = params
         const normalizedParams = this.normalizeParams(params)
         const url = this.getUrl()
 
-        return this._load(key, url, normalizedParams, {successHandler})
+        return this._load(key, url, normalizedParams, {successHandler, errorHandler})
       },
 
       /**
@@ -157,6 +157,7 @@ export default function factory(spec) {
               this.mergeState(key, {loading: false})
             } else {
               this.mergeState(key, {error: true, loading: false})
+              if (options.errorHandler) options.errorHandler()
             }
           },
         )

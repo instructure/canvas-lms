@@ -149,4 +149,72 @@ describe('WhyMattersPopover', () => {
     const importantHeading = screen.getByText('IMPORTANT').closest('h4')
     expect(importantHeading).toBeInTheDocument()
   })
+
+  it('renders community link when ruleId is in COMMUNITY_LINKS', async () => {
+    const user = userEvent.setup()
+    const issueWithCommunityLink: AccessibilityIssue = {
+      ...mockIssue,
+      ruleId: 'img-alt',
+    }
+    render(<WhyMattersPopover issue={issueWithCommunityLink} />)
+
+    const button = screen.getByTestId('why-it-matters-button')
+    await user.click(button)
+
+    const link = screen.getByRole('link', {name: /Read about writing alt text/i})
+    expect(link).toBeInTheDocument()
+    expect(link).toHaveAttribute(
+      'href',
+      'https://community.instructure.com/en/discussion/665374/image-accessibility-alt-text',
+    )
+    expect(link).toHaveAttribute('target', '_blank')
+  })
+
+  it('does not render community link when ruleId is not in COMMUNITY_LINKS', async () => {
+    const user = userEvent.setup()
+    render(<WhyMattersPopover issue={mockIssue} />)
+
+    const button = screen.getByTestId('why-it-matters-button')
+    await user.click(button)
+
+    expect(screen.queryByRole('link', {name: /Read about/i})).not.toBeInTheDocument()
+  })
+
+  it('renders community link for list-structure rule', async () => {
+    const user = userEvent.setup()
+    const issueWithListStructure: AccessibilityIssue = {
+      ...mockIssue,
+      ruleId: 'list-structure',
+    }
+    render(<WhyMattersPopover issue={issueWithListStructure} />)
+
+    const button = screen.getByTestId('why-it-matters-button')
+    await user.click(button)
+
+    const link = screen.getByRole('link', {name: /Read about accessible lists/i})
+    expect(link).toBeInTheDocument()
+    expect(link).toHaveAttribute(
+      'href',
+      'https://community.instructure.com/en/discussion/665371/accessible-list-formatting?utm_source=community-share',
+    )
+  })
+
+  it('renders community link for small-text-contrast rule', async () => {
+    const user = userEvent.setup()
+    const issueWithTextContrast: AccessibilityIssue = {
+      ...mockIssue,
+      ruleId: 'small-text-contrast',
+    }
+    render(<WhyMattersPopover issue={issueWithTextContrast} />)
+
+    const button = screen.getByTestId('why-it-matters-button')
+    await user.click(button)
+
+    const link = screen.getByRole('link', {name: /Read about text contrast/i})
+    expect(link).toBeInTheDocument()
+    expect(link).toHaveAttribute(
+      'href',
+      'https://community.instructure.com/en/discussion/665372/text-color-contrast-accessibility?utm_source=community-share',
+    )
+  })
 })

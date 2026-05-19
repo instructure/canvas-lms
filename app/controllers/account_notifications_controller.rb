@@ -84,7 +84,6 @@ class AccountNotificationsController < ApplicationController
   include Api::V1::AccountNotifications
   include HorizonMode
 
-  before_action :require_user
   before_action :require_account_admin, only: %i[create update destroy]
   before_action :check_user_param, only: %i[user_index_deprecated user_close_notification_deprecated show_deprecated]
   before_action :load_canvas_career, only: %i[render_past_global_announcements]
@@ -147,7 +146,7 @@ class AccountNotificationsController < ApplicationController
   def render_past_global_announcements
     add_crumb(@current_user.short_name, profile_path)
     add_crumb(t("Global Announcements"))
-    js_env(global_notifications: html_to_string)
+    js_env({ global_notifications: html_to_string })
     @show_left_side = true
     @context = @current_user.profile
     set_active_tab("past_global_announcements")

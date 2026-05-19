@@ -22,9 +22,9 @@ import {setupServer} from 'msw/node'
 import {render, cleanup, waitFor, act} from '@testing-library/react'
 import OutcomesImporter, {showOutcomesImporterIfInProgress} from '../OutcomesImporter'
 
-import * as alerts from '@canvas/alerts/react/FlashAlert'
+import * as alerts from '@instructure/platform-alerts'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 // Use a valid MIME type to encourage multipart/form-data usage
 const file = new File(['dummy content'], 'filename.csv', {type: 'text/csv'})

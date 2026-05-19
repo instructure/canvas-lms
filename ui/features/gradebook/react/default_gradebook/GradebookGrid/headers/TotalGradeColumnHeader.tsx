@@ -132,18 +132,21 @@ export default class TotalGradeColumnHeader extends ColumnHeader<Props, State> {
       onMoveToBack: func.isRequired,
     }).isRequired,
     onApplyScoreToUngraded: func,
-    // @ts-expect-error
-    onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
+    onMenuDismiss: func.isRequired,
     grabFocus: bool,
     pointsBasedGradingScheme: bool.isRequired,
     viewUngradedAsZero: bool.isRequired,
     isRunningScoreToUngraded: bool,
-    ...ColumnHeader.propTypes,
+    addGradebookElement: func,
+    removeGradebookElement: func,
+    onHeaderKeyDown: func,
   }
 
   static defaultProps = {
     grabFocus: false,
-    ...ColumnHeader.defaultProps,
+    addGradebookElement() {},
+    removeGradebookElement() {},
+    onHeaderKeyDown() {},
   }
 
   switchGradeDisplay = () => {

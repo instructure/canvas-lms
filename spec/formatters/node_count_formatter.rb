@@ -25,6 +25,10 @@ class NodeCountRecorder
   end
 
   def dump_summary(output)
+    # Weights are (examples per node per process). Derived from assumed average
+    # example durations — review if rspecqTargetTime in Jenkinsfile.rspecq changes significantly:
+    #   selenium:     ~1 example / (25  * RSPEC_PROCESSES) nodes
+    #   non-selenium: ~1 example / (190 * RSPEC_PROCESSES) nodes
     node_total = output.examples.reduce(0.0) { |sum, e| sum + (e.location.include?("selenium") ? 1.0 / (25 * ENV["RSPEC_PROCESSES"].to_f) : 1.0 / (190 * ENV["RSPEC_PROCESSES"].to_f)) }.ceil
     spec_total = output.examples.count
 

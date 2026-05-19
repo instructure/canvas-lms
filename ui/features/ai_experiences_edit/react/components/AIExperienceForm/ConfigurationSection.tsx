@@ -22,12 +22,20 @@ import {TextArea} from '@instructure/ui-text-area'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {IconAiLine} from '@instructure/ui-icons'
 import {AIExperienceFormData} from '../../../types'
 import CanvasFileUpload from '@canvas/canvas-file-upload/react/CanvasFileUpload'
 import type {ContextFile} from '@canvas/canvas-file-upload/react/types'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import {
+  lightBlueButtonTheme,
+  navyButtonTheme,
+} from '../../../../../shared/ai-experiences/react/brand'
+
+declare const ENV: GlobalEnv & {
+  FEATURES?: {ai_experiences_context_file_upload?: boolean}
+  CONTEXT_FILE_MAX_SIZE_MB?: number
+}
 
 const I18n = createI18nScope('ai_experiences_edit')
 
@@ -41,6 +49,7 @@ interface ConfigurationSectionProps {
   contextFiles: ContextFile[]
   onContextFilesChange: (files: ContextFile[]) => void
   courseId: string
+  initialFailedFileNames?: string[]
 }
 
 const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
@@ -51,125 +60,149 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
   contextFiles,
   onContextFilesChange,
   courseId,
+  initialFailedFileNames,
 }) => {
   return (
     <View as="div" margin="large 0 0 0">
-      <Heading level="h2" margin="0 0 small 0">
-        {I18n.t('Configurations')}
-      </Heading>
-
-      <div
-        style={{
-          border: '3px solid',
-          borderImage: 'linear-gradient(135deg, #7B5FB3 0%, #5585C7 100%) 1',
-          borderRadius: '0.25rem',
-          overflow: 'hidden',
-        }}
+      <View
+        as="div"
+        background="primary"
+        borderWidth="small"
+        borderRadius="medium"
+        padding="medium"
       >
-        <div
-          style={{
-            background: 'linear-gradient(135deg, #7B5FB3 0%, #5585C7 100%)',
-            padding: '1rem',
-          }}
-        >
-          <Flex alignItems="center">
-            <Flex.Item padding="0 x-small 0 0">
-              <IconAiLine color="primary-inverse" />
-            </Flex.Item>
-            <Flex.Item>
-              <View>
-                <View as="div" margin="0 0 xx-small 0">
-                  <Text color="primary-inverse" weight="bold" size="large">
-                    {I18n.t('Learning Design')}
-                  </Text>
-                </View>
-                <Text color="primary-inverse" size="small">
-                  {I18n.t('What should students know and how should the AI behave?')}
-                </Text>
-              </View>
-            </Flex.Item>
-          </Flex>
-        </div>
+        <Heading level="h2" margin="0 0 x-small 0">
+          <strong>{I18n.t('Configurations')}</strong>
+        </Heading>
+        <View as="div" margin="0 0 large 0">
+          <Text size="medium">
+            {I18n.t(
+              'Define the completion rules, pedagogical guidance, and sources of the large language model (LLM).',
+            )}
+          </Text>
+        </View>
 
-        <div style={{padding: '1rem'}}>
+        {/* Completion rules section */}
+        <View as="div">
+          <Heading level="h3" margin="0 0 xx-small 0">
+            <strong>{I18n.t('Completion rules')}</strong>
+          </Heading>
+          <View as="div" margin="0 0 small 0">
+            <Text size="small" color="secondary">
+              {I18n.t(
+                'Set the learning objectives that learners need to cover in order to complete the activity.',
+              )}
+            </Text>
+          </View>
+          <FormFieldGroup description="" layout="stacked">
+            <TextArea
+              data-testid="ai-experience-edit-learning-objective-input"
+              label={I18n.t('Learning objective targets')}
+              value={formData.learning_objective}
+              onChange={onChange('learning_objective')}
+              required
+              resize="vertical"
+              height="80px"
+              maxHeight="300px"
+              messages={[
+                ...(showErrors && errors.learning_objective
+                  ? [{type: 'newError' as const, text: errors.learning_objective}]
+                  : []),
+                {
+                  type: 'hint' as const,
+                  text: I18n.t(
+                    'Add a learning objective on a new line or separate by semi-colon (;).',
+                  ),
+                },
+              ]}
+            />
+          </FormFieldGroup>
+        </View>
+
+        {/* Pedagogical activity guidance section */}
+        <View as="div" margin="large 0 0 0">
+          <Heading level="h3" margin="0 0 xx-small 0">
+            <strong>{I18n.t('Pedagogical activity guidance')}</strong>
+          </Heading>
+          <View as="div" margin="0 0 small 0">
+            <Text size="small" color="secondary">
+              {I18n.t('Define the instructions for the activity.')}
+            </Text>
+          </View>
+          <FormFieldGroup description="" layout="stacked">
+            <TextArea
+              data-testid="ai-experience-edit-pedagogical-guidance-input"
+              label={I18n.t('Pedagogical guidance')}
+              value={formData.pedagogical_guidance}
+              onChange={onChange('pedagogical_guidance')}
+              resize="vertical"
+              height="80px"
+              maxHeight="300px"
+              messages={[
+                ...(showErrors && errors.pedagogical_guidance
+                  ? [{type: 'newError' as const, text: errors.pedagogical_guidance}]
+                  : []),
+                {
+                  type: 'hint' as const,
+                  text: I18n.t(
+                    'Provide us a prompt that tells the LLM (language learning model) how to facilitate the activity.',
+                  ),
+                },
+              ]}
+            />
+          </FormFieldGroup>
+        </View>
+
+        {/* Source materials section */}
+        <View as="div" margin="large 0 0 0">
+          <Heading level="h3" margin="0 0 xx-small 0">
+            <strong>{I18n.t('Source materials')}</strong>
+          </Heading>
+          <View as="div" margin="0 0 small 0">
+            <Text size="small" color="secondary">
+              {I18n.t('Provide sources for the LLM to reference.')}
+            </Text>
+          </View>
           <FormFieldGroup description="" layout="stacked">
             <TextArea
               data-testid="ai-experience-edit-facts-input"
-              label={I18n.t('Facts Students Should Know')}
+              label={I18n.t('Text source')}
               value={formData.facts}
               onChange={onChange('facts')}
               required
-              placeholder={I18n.t(
-                'Key facts or details the student is expected to recall (e.g., Wright brothers, 1903, Kitty Hawk).',
-              )}
               resize="vertical"
-              height="120px"
-              messages={showErrors && errors.facts ? [{type: 'newError', text: errors.facts}] : []}
+              height="80px"
+              maxHeight="300px"
+              messages={[
+                ...(showErrors && errors.facts
+                  ? [{type: 'newError' as const, text: errors.facts}]
+                  : []),
+                {
+                  type: 'hint' as const,
+                  text: I18n.t('Copy and paste information, data, key facts, etc.'),
+                },
+              ]}
             />
           </FormFieldGroup>
 
           {/* Only render if feature flag is enabled */}
-          {(window as any).ENV?.FEATURES?.ai_experiences_context_file_upload && (
-            <View as="div" margin="medium 0 0 0" padding="xxx-small">
-              <Heading level="h4" margin="0 0 x-small 0">
-                {I18n.t('Source Materials')}
-              </Heading>
-              <View as="div" margin="0 0 small 0">
-                <Text size="small" color="secondary">
-                  {I18n.t(
-                    'Upload files to provide context for this AI Experience. Supported formats: DOCX, XLSX, XLS, PPTX, PDF, TXT, HTML.',
-                  )}
-                </Text>
-              </View>
+          {ENV?.FEATURES?.ai_experiences_context_file_upload && (
+            <View as="div" margin="medium 0 0 0">
               <CanvasFileUpload
                 files={contextFiles}
                 onFilesChange={onContextFilesChange}
                 courseId={courseId}
                 allowedFileTypes={['.docx', '.xlsx', '.xls', '.pptx', '.pdf', '.txt', '.html']}
-                maxFileSizeMB={300}
+                maxFileSizeMB={ENV?.CONTEXT_FILE_MAX_SIZE_MB ?? 300}
                 maxFiles={10}
+                initialFailedFileNames={initialFailedFileNames}
+                primaryButtonThemeOverride={navyButtonTheme}
+                secondaryButtonThemeOverride={lightBlueButtonTheme}
               />
             </View>
           )}
-
-          <FormFieldGroup description="" layout="stacked">
-            <TextArea
-              data-testid="ai-experience-edit-learning-objective-input"
-              label={I18n.t('Learning Objectives')}
-              value={formData.learning_objective}
-              onChange={onChange('learning_objective')}
-              required
-              placeholder={I18n.t(
-                'Enter each objective on a new line or separated by semicolons.\nExample:\n- Understand photosynthesis\n- Explain cellular respiration\n- Describe ATP production',
-              )}
-              resize="vertical"
-              height="120px"
-              messages={
-                showErrors && errors.learning_objective
-                  ? [{type: 'newError', text: errors.learning_objective}]
-                  : []
-              }
-            />
-
-            <TextArea
-              data-testid="ai-experience-edit-pedagogical-guidance-input"
-              label={I18n.t('Pedagogical Guidance')}
-              value={formData.pedagogical_guidance}
-              onChange={onChange('pedagogical_guidance')}
-              placeholder={I18n.t(
-                'Describe the role or style of the AI (e.g., friendly guide, strict examiner, storyteller).',
-              )}
-              resize="vertical"
-              height="120px"
-              messages={
-                showErrors && errors.pedagogical_guidance
-                  ? [{type: 'newError', text: errors.pedagogical_guidance}]
-                  : []
-              }
-            />
-          </FormFieldGroup>
-        </div>
-      </div>
+        </View>
+      </View>
     </View>
   )
 }

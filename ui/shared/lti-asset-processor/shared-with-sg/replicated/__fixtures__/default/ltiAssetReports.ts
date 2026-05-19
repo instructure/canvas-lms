@@ -48,11 +48,11 @@ export function makeMockReport(
 
 export function defaultLtiAssetReports({
   attachmentId,
-  submissionAttempt,
+  submissionAttempt = 1,
 }: {
   attachmentId?: string
   submissionAttempt?: number
-}): LtiAssetReport[] {
+} = {}): LtiAssetReport[] {
   return [
     makeMockReport({
       _id: '1234',

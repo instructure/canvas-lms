@@ -72,15 +72,15 @@ class AuthenticationProvidersPresenter
   end
 
   def ldap_configs
-    configs.select { |c| c.is_a?(AuthenticationProvider::LDAP) }
+    configs.grep(AuthenticationProvider::LDAP)
   end
 
   def saml_configs
-    configs.select { |c| c.is_a?(AuthenticationProvider::SAML) }
+    configs.grep(AuthenticationProvider::SAML)
   end
 
   def cas_configs
-    configs.select { |c| c.is_a?(AuthenticationProvider::CAS) }
+    configs.grep(AuthenticationProvider::CAS)
   end
 
   def sso_options

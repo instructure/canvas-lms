@@ -17,26 +17,25 @@
  */
 
 import React, {useState, useEffect, useMemo} from 'react'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {View} from '@instructure/ui-view'
+import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
 import {Alert} from '@instructure/ui-alerts'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {AIExperience, AIExperienceFormData} from '../../../types'
-import PreviewConfirmationModal from './PreviewConfirmationModal'
-import DeleteConfirmationModal from './DeleteConfirmationModal'
 import FormHeader from './FormHeader'
 import ConfigurationSection from './ConfigurationSection'
-import FormActions from './FormActions'
 import type {ContextFile} from '@canvas/canvas-file-upload/react/types'
+import {roundedTheme} from '../../../../../shared/ai-experiences/react/brand'
 
 const I18n = createI18nScope('ai_experiences_edit')
 
 interface AIExperienceFormProps {
   aiExperience?: AIExperience | null
-  onSubmit: (data: AIExperienceFormData, shouldPreview?: boolean) => void
+  onSubmit: (data: AIExperienceFormData) => void
   isLoading: boolean
   onCancel?: () => void
 }
@@ -55,9 +54,6 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
     pedagogical_guidance: '',
   })
   const [contextFiles, setContextFiles] = useState<ContextFile[]>([])
-  const [showPreviewModal, setShowPreviewModal] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showErrors, setShowErrors] = useState(false)
   const [showErrorBanner, setShowErrorBanner] = useState(false)
@@ -71,7 +67,9 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
         learning_objective: aiExperience.learning_objective || '',
         pedagogical_guidance: aiExperience.pedagogical_guidance || '',
       })
-      // Context files will be managed separately in component state for now
+      if (aiExperience.context_files) {
+        setContextFiles(aiExperience.context_files as ContextFile[])
+      }
     }
   }, [aiExperience])
 
@@ -98,15 +96,13 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
 
   const handleContextFilesChange = (files: ContextFile[]) => {
     setContextFiles(files)
-    // Note: Files are kept in local state only for now (not persisted to backend)
-    // TODO: Integrate with backend when ready
   }
 
   const validateForm = (): Record<string, string> => {
     const newErrors: Record<string, string> = {}
 
     if (!formData.title.trim()) {
-      newErrors.title = I18n.t('Title required')
+      newErrors.title = I18n.t('Knowledge chat name required')
     }
 
     if (!formData.facts.trim()) {
@@ -136,7 +132,11 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
       return
     }
 
-    onSubmit(formData)
+    const dataToSubmit: AIExperienceFormData = {
+      ...formData,
+      context_file_ids: contextFiles.map(f => f.id),
+    }
+    onSubmit(dataToSubmit)
   }
 
   const handleCancel = () => {
@@ -147,126 +147,99 @@ const AIExperienceForm: React.FC<AIExperienceFormProps> = ({
     }
   }
 
-  const handlePreviewExperience = () => {
-    setShowPreviewModal(true)
-  }
-
-  const handleConfirmPreview = () => {
-    const validationErrors = validateForm()
-    setErrors(validationErrors)
-
-    if (Object.keys(validationErrors).length > 0) {
-      setShowErrors(true)
-      setShowErrorBanner(true)
-      setShowPreviewModal(false)
-      return
-    }
-
-    setShowPreviewModal(false)
-    // Save as draft first, then redirect to preview
-    onSubmit(formData, true)
-  }
-
-  const handleDeleteClick = () => {
-    if (isEdit) {
-      setShowDeleteModal(true)
-    }
-  }
-
-  const handleConfirmDelete = async () => {
-    if (!aiExperience?.id) return
-
-    setIsDeleting(true)
-    try {
-      const courseId = (window as any).ENV?.COURSE_ID
-      await doFetchApi({
-        path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperience.id}`,
-        method: 'DELETE',
-      })
-      showFlashSuccess(I18n.t('AI Experience deleted successfully'))()
-      window.location.href = `/courses/${courseId}/ai_experiences`
-    } catch (error: any) {
-      const errorMessage =
-        error?.message || I18n.t('An error occurred while deleting the AI Experience')
-      showFlashError(I18n.t('Failed to delete AI Experience: %{error}', {error: errorMessage}))()
-      setIsDeleting(false)
-      setShowDeleteModal(false)
-    }
-  }
-
   const isEdit = useMemo(() => !!aiExperience?.id, [aiExperience?.id])
 
   return (
-    <View as="div" maxWidth="1000px" margin="0 auto" padding="medium">
-      {showErrorBanner && showErrors && Object.keys(errors).length > 0 && (
-        <Alert
-          variant="error"
-          renderCloseButtonLabel={I18n.t('Close')}
-          onDismiss={() => setShowErrorBanner(false)}
-          margin="0 0 medium 0"
-        >
-          {I18n.t(
-            'Some required information is missing. Please complete all highlighted fields before saving.',
-          )}
-        </Alert>
-      )}
+    <InstUISettingsProvider theme={roundedTheme}>
+      <View as="div" maxWidth="1000px" margin="0 auto" padding="medium">
+        {aiExperience?.failed_context_file_names?.length && (
+          <Alert
+            variant="error"
+            renderCloseButtonLabel={false}
+            margin="0 0 medium 0"
+            data-testid="ai-experience-edit-index-failed-notice"
+          >
+            {I18n.t(
+              "Activity couldn't be loaded. A source file has an issue. To try again, remove %{names} from your configurations.",
+              {names: aiExperience.failed_context_file_names.join(', ')},
+            )}
+          </Alert>
+        )}
 
-      <FormHeader isEdit={isEdit} title={aiExperience?.title} onDeleteClick={handleDeleteClick} />
+        {showErrorBanner && showErrors && Object.keys(errors).length > 0 && (
+          <Alert
+            variant="error"
+            renderCloseButtonLabel={I18n.t('Close')}
+            onDismiss={() => setShowErrorBanner(false)}
+            margin="0 0 medium 0"
+          >
+            {I18n.t(
+              'Some required information is missing. Please complete all highlighted fields before saving.',
+            )}
+          </Alert>
+        )}
 
-      <form onSubmit={handleSubmit} noValidate={true}>
-        <View as="div" margin="0 0 large 0">
-          <TextInput
-            data-testid="ai-experience-edit-title-input"
-            renderLabel={I18n.t('Title')}
-            value={formData.title}
-            onChange={handleInputChange('title')}
-            isRequired
-            messages={showErrors && errors.title ? [{type: 'newError', text: errors.title}] : []}
+        <form onSubmit={handleSubmit} noValidate={true}>
+          <FormHeader
+            isEdit={isEdit}
+            title={aiExperience?.title}
+            onCancel={handleCancel}
+            isLoading={isLoading}
           />
-        </View>
 
-        <View as="div" margin="0 0 large 0">
-          <TextArea
-            data-testid="ai-experience-edit-description-input"
-            label={I18n.t('Description')}
-            value={formData.description}
-            onChange={handleInputChange('description')}
-            resize="vertical"
-            height="120px"
+          <View
+            as="div"
+            background="primary"
+            borderWidth="small"
+            borderRadius="medium"
+            padding="medium"
+            margin="0 0 large 0"
+          >
+            <Heading level="h2" margin="0 0 x-small 0">
+              <strong>{I18n.t('Content')}</strong>
+            </Heading>
+            <View as="div" margin="0 0 large 0">
+              <Text size="medium">
+                {I18n.t('Provide context and learning expectations to learners.')}
+              </Text>
+            </View>
+
+            <View as="div" margin="0 0 medium 0">
+              <TextInput
+                data-testid="ai-experience-edit-title-input"
+                renderLabel={I18n.t('Knowledge chat name')}
+                value={formData.title}
+                onChange={handleInputChange('title')}
+                isRequired
+                messages={
+                  showErrors && errors.title ? [{type: 'newError', text: errors.title}] : []
+                }
+              />
+            </View>
+
+            <TextArea
+              data-testid="ai-experience-edit-description-input"
+              label={I18n.t('Knowledge chat description')}
+              value={formData.description}
+              onChange={handleInputChange('description')}
+              resize="vertical"
+              height="120px"
+            />
+          </View>
+
+          <ConfigurationSection
+            formData={formData}
+            onChange={handleInputChange}
+            showErrors={showErrors}
+            errors={errors}
+            contextFiles={contextFiles}
+            onContextFilesChange={handleContextFilesChange}
+            courseId={((window as any).ENV?.COURSE_ID || '').toString()}
+            initialFailedFileNames={aiExperience?.failed_context_file_names}
           />
-        </View>
-
-        <ConfigurationSection
-          formData={formData}
-          onChange={handleInputChange}
-          showErrors={showErrors}
-          errors={errors}
-          contextFiles={contextFiles}
-          onContextFilesChange={handleContextFilesChange}
-          courseId={((window as any).ENV?.COURSE_ID || '').toString()}
-        />
-
-        <FormActions
-          isLoading={isLoading}
-          onCancel={handleCancel}
-          onPreview={handlePreviewExperience}
-        />
-      </form>
-
-      <PreviewConfirmationModal
-        open={showPreviewModal}
-        onDismiss={() => setShowPreviewModal(false)}
-        onConfirm={handleConfirmPreview}
-      />
-
-      <DeleteConfirmationModal
-        open={showDeleteModal}
-        onDismiss={() => setShowDeleteModal(false)}
-        onConfirm={handleConfirmDelete}
-        title={formData.title}
-        isDeleting={isDeleting}
-      />
-    </View>
+        </form>
+      </View>
+    </InstUISettingsProvider>
   )
 }
 

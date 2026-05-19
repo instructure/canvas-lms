@@ -208,8 +208,8 @@ module Lti
         expect(tabs.count).to eq 2
         tab1 = tabs.find { |t| t[:id] == "lti/message_handler_#{@mh1.id}" }
         tab2 = tabs.find { |t| t[:id] == "lti/message_handler_#{@mh2.id}" }
-        expect(tab1).to_not be_nil
-        expect(tab2).to_not be_nil
+        expect(tab1).not_to be_nil
+        expect(tab2).not_to be_nil
       end
 
       it "returns message handlers tabs for course with course_navigation placement" do
@@ -220,8 +220,8 @@ module Lti
         expect(tabs.count).to eq 2
         tab1 = tabs.find { |t| t[:id] == "lti/message_handler_#{@mh1.id}" }
         tab2 = tabs.find { |t| t[:id] == "lti/message_handler_#{@mh3.id}" }
-        expect(tab1).to_not be_nil
-        expect(tab2).to_not be_nil
+        expect(tab1).not_to be_nil
+        expect(tab2).not_to be_nil
       end
     end
 

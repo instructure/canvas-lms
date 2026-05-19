@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 RSpec.describe ApplicationController do
   context "group 1" do
     before do
@@ -113,6 +111,38 @@ RSpec.describe ApplicationController do
           expect(controller.send(:user_content, @course.discussion_topics.first.message, location: discussion_topic.asset_string.to_s)).to include("location=#{discussion_topic.asset_string}")
         end
       end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "does not replace absolute URLs from another host with relative links" do
+          course1 = course_factory(active_all: true)
+          course1.root_account.account_domains.new(host: "host1.example.com").save!(validate: false)
+          att1 = attachment_model(id: 5, context: @course)
+          teacher1 = @teacher
+          @shard1.activate do
+            course_factory(account: Account.create!)
+            @course.root_account.account_domains.new(host: "host2.example.com").save!(validate: false)
+            aq = assessment_question_model(bank: assessment_question_bank_model)
+            attachment_model(id: 5, context: aq)
+            @syllabus_body = "<img src=\"https://host2.example.com/assessment_questions/#{aq.id}/files/#{@attachment.id}/preview?verifier=#{@attachment.uuid}\"/>"
+            @expected = "<img src=\"https://host2.example.com/assessment_questions/#{aq.id}/files/#{@attachment.id}/preview?verifier=#{@attachment.uuid}\" loading=\"lazy\">"
+          end
+
+          user_content = controller.send(:user_content, @syllabus_body, context: course1, user: teacher1)
+          expect(user_content).to eq @expected
+          expect(user_content).not_to include att1.uuid
+        end
+      end
+
+      context "when disable_file_verifiers_in_public_syllabus is enabled but file_association_access is not" do
+        it "keeps location tags in the HTML" do
+          @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+          content_with_location = "<p><a href='/files/123?location=course_syllabus_1'>File</a></p>"
+          result = controller.send(:user_content, content_with_location, context: @course, location: "course_syllabus_#{@course.id}")
+          expect(result).to include("location=course_syllabus_")
+        end
+      end
     end
 
     describe "js_env" do
@@ -122,7 +152,7 @@ RSpec.describe ApplicationController do
 
       it "sets items" do
         expect(HostUrl).to receive(:file_host).with(Account.default, "test.host").and_return("files.example.com")
-        controller.js_env FOO: "bar"
+        controller.js_env({ FOO: "bar" })
         expect(controller.js_env[:FOO]).to eq "bar"
         expect(controller.js_env[:files_domain]).to eq "files.example.com"
       end
@@ -367,6 +397,11 @@ RSpec.describe ApplicationController do
               course2.enroll_student(@user).tap(&:accept!)
               expect(controller.js_env[:widget_dashboard_overridable]).to be false
             end
+
+            it "is not set for account admins" do
+              Account.default.account_users.create!(user: @user)
+              expect(controller.js_env[:widget_dashboard_overridable]).to be_nil
+            end
           end
         end
       end
@@ -487,19 +522,19 @@ RSpec.describe ApplicationController do
       end
 
       it "allows multiple items" do
-        controller.js_env A: "a", B: "b"
+        controller.js_env({ A: "a", B: "b" })
         expect(controller.js_env[:A]).to eq "a"
         expect(controller.js_env[:B]).to eq "b"
       end
 
       it "does not allow overwriting a key" do
-        controller.js_env REAL_SLIM_SHADY: "please stand up"
-        expect { controller.js_env(REAL_SLIM_SHADY: "poser") }.to raise_error("js_env key REAL_SLIM_SHADY is already taken")
+        controller.js_env({ REAL_SLIM_SHADY: "please stand up" })
+        expect { controller.js_env({ REAL_SLIM_SHADY: "poser" }) }.to raise_error("js_env key REAL_SLIM_SHADY is already taken")
       end
 
       it "overwrites a key if told explicitly to do so" do
-        controller.js_env REAL_SLIM_SHADY: "please stand up"
-        controller.js_env({ REAL_SLIM_SHADY: "poser" }, true)
+        controller.js_env({ REAL_SLIM_SHADY: "please stand up" })
+        controller.js_env({ REAL_SLIM_SHADY: "poser" }, overwrite: true)
         expect(controller.js_env[:REAL_SLIM_SHADY]).to eq "poser"
       end
 
@@ -575,7 +610,8 @@ RSpec.describe ApplicationController do
           "encrypted-media *",
           "autoplay *",
           "clipboard-write *",
-          "display-capture *"
+          "display-capture *",
+          "fullscreen *"
         ]
       end
 
@@ -807,6 +843,350 @@ RSpec.describe ApplicationController do
           end
         end
       end
+
+      describe "usage metrics and cookie consent" do
+        before do
+          Account.default.settings[:enable_usage_metrics] = true
+          request.host = "trusty.instructure.com"
+        end
+
+        def mock_dynamic_settings_for_pendo_cc(pendo_app_id = nil, pendo_regional_app_id = nil, pendo_regional_app_env = nil, domain_id = nil, vanity_domain_id = nil, beta_domain_id = nil)
+          allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+          allow(DynamicSettings).to receive(:find).with("onetrust-cookie-consent").and_return(
+            DynamicSettings::FallbackProxy.new({ domain_id:, vanity_domain_id:, beta_domain_id: })
+          )
+          allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(
+            DynamicSettings::FallbackProxy.new({ pendo_app_id:, pendo_regional_app_id:, pendo_regional_app_env: })
+          )
+        end
+
+        def mock_session_for_webview(mobile_cookie_consent: false)
+          allow(controller).to receive(:session).and_return({
+                                                              session_id: "slartibartfast",
+                                                              is_mobile_webview: true,
+                                                              mobile_cookie_consent:
+                                                            })
+        end
+
+        describe "#potentially_underage_user?" do
+          it "returns false if there is no current user" do
+            controller.instance_variable_set(:@current_user, nil)
+            expect(controller.send(:potentially_underage_user?)).to be false
+          end
+
+          it "returns true if @current_user might be underage" do
+            user = user_model
+            user.preferences[:underage] = true
+            controller.instance_variable_set(:@current_user, user)
+            expect(controller.send(:potentially_underage_user?)).to be true
+          end
+
+          it "returns true if the account's k12 FF is on" do
+            allow(BrandConfig).to receive(:k12_config)
+            controller.instance_variable_set(:@current_user, user_model)
+            Account.default.enable_feature!(:k12)
+            expect(controller.send(:potentially_underage_user?)).to be true
+          end
+
+          it "returns true if the account's has_underage_users setting is true" do
+            account_model
+            @account.settings[:has_underage_users] = true
+            @account.save
+            @account.disable_feature!(:k12)
+            controller.instance_variable_set(:@context, @account)
+            controller.instance_variable_set(:@domain_root_account, @account)
+            controller.instance_variable_set(:@current_user, user_model)
+            expect(controller.send(:potentially_underage_user?)).to be true
+          end
+
+          it "returns true if the user is a k5 user" do
+            expect(controller).to receive(:k5_user?).and_return(true)
+            Account.default.disable_feature!(:k12)
+            controller.instance_variable_set(:@current_user, user_model)
+            expect(controller.send(:potentially_underage_user?)).to be true
+          end
+
+          it "returns false otherwise" do
+            controller.instance_variable_set(:@current_user, user_model)
+            Account.default.disable_feature!(:k12)
+            expect(controller.send(:potentially_underage_user?)).to be false
+          end
+        end
+
+        describe "#should_track_usage" do
+          before do
+            mock_dynamic_settings_for_pendo_cc("pendos!", "pendos!", "io", "domain!", "vanity!", "beta!")
+          end
+
+          describe "returns no_track_usage" do
+            it "if there is no current user" do
+              controller.instance_variable_set(:@current_user, nil)
+              Account.default.enable_feature!(:send_usage_metrics)
+              expect(controller.send(:should_track_usage)).to eq "no_track_usage"
+            end
+
+            it "if both SUM and SUMAC are disabled" do
+              controller.instance_variable_set(:@current_user, user_model)
+              Account.default.disable_feature!(:send_usage_metrics)
+              Account.default.disable_feature!(:send_usage_metrics_after_consent)
+              expect(controller.send(:should_track_usage)).to eq "no_track_usage"
+            end
+
+            it "if the user might be a minor" do
+              allow(BrandConfig).to receive(:k12_config)
+              controller.instance_variable_set(:@current_user, user_model)
+              Account.default.enable_feature!(:send_usage_metrics)
+              Account.default.enable_feature!(:k12)
+              expect(controller.send(:should_track_usage)).to eq "no_track_usage"
+            end
+          end
+
+          describe "returns track_usage" do
+            it "if SUM is activated" do
+              controller.instance_variable_set(:@current_user, user_model)
+              Account.default.enable_feature!(:send_usage_metrics)
+              Account.default.enable_feature!(:cookie_consent_necessary)
+              expect(controller.send(:should_track_usage)).to eq "track_usage"
+            end
+
+            it "if SUMAC is activated but CCN is not" do
+              controller.instance_variable_set(:@current_user, user_model)
+              Account.default.enable_feature!(:send_usage_metrics_after_consent)
+              Account.default.disable_feature!(:cookie_consent_necessary)
+              expect(controller.send(:should_track_usage)).to eq "track_usage"
+            end
+          end
+
+          describe "returns ask_for_consent" do
+            it "if SUMAC is activated and CCN is activated" do
+              controller.instance_variable_set(:@current_user, user_model)
+              Account.default.enable_feature!(:send_usage_metrics_after_consent)
+              Account.default.enable_feature!(:cookie_consent_necessary)
+              expect(controller.send(:should_track_usage)).to eq "ask_for_consent"
+            end
+          end
+        end
+
+        describe "PENDO_APP_ID" do
+          describe "when used in classic SUM flow" do
+            it "when send_usage_metrics is disabled and the ID is set, it is not included in js_env" do
+              Account.default.disable_feature!(:send_usage_metrics)
+              mock_dynamic_settings_for_pendo_cc("pendos!")
+              expect(controller.js_env[:PENDO_APP_ID]).to be_nil
+              expect(controller.js_env[:PENDO_APP_ENV]).to be_nil
+            end
+
+            it "when send_usage_metrics is enabled and the ID is not set, it is not included in js_env" do
+              Account.default.enable_feature!(:send_usage_metrics)
+              mock_dynamic_settings_for_pendo_cc
+              expect(controller.js_env[:PENDO_APP_ID]).to be_nil
+              expect(controller.js_env[:PENDO_APP_ENV]).to be_nil
+            end
+
+            it "when send_usage_metrics is enabled and the ID is set, it is included in js_env" do
+              Account.default.enable_feature!(:send_usage_metrics)
+              mock_dynamic_settings_for_pendo_cc("pendos!")
+              expect(controller.js_env[:PENDO_APP_ID]).to eq "pendos!"
+              expect(controller.js_env[:PENDO_APP_ENV]).to eq "io"
+            end
+          end
+
+          describe "when used in SUMAC flow" do
+            it "does not set envvars when SUMAC is off" do
+              Account.default.disable_feature!(:send_usage_metrics_after_consent)
+              mock_dynamic_settings_for_pendo_cc(nil, "pendos!", "jp")
+              expect(controller.js_env[:PENDO_APP_ID]).to be_nil
+              expect(controller.js_env[:PENDO_APP_ENV]).to be_nil
+            end
+
+            it "does not set envvars when the regional app ID is not set" do
+              Account.default.enable_feature!(:send_usage_metrics_after_consent)
+              mock_dynamic_settings_for_pendo_cc(nil, nil, "jp")
+              expect(controller.js_env[:PENDO_APP_ID]).to be_nil
+              expect(controller.js_env[:PENDO_APP_ENV]).to be_nil
+            end
+
+            it "does not set envvars when the regional app env is not set" do
+              Account.default.enable_feature!(:send_usage_metrics_after_consent)
+              mock_dynamic_settings_for_pendo_cc(nil, "pendos!", nil)
+              expect(controller.js_env[:PENDO_APP_ID]).to be_nil
+              expect(controller.js_env[:PENDO_APP_ENV]).to be_nil
+            end
+
+            it "when the ID and the env are set, they are included in js_env" do
+              Account.default.enable_feature!(:send_usage_metrics_after_consent)
+              mock_dynamic_settings_for_pendo_cc(nil, "pendos!", "jp")
+              expect(controller.js_env[:PENDO_APP_ID]).to eq "pendos!"
+              expect(controller.js_env[:PENDO_APP_ENV]).to eq "jp"
+            end
+          end
+        end
+
+        describe "PRE_COOKIE_CONSENT" do
+          describe "without SUM or SUMAC" do
+            it "is implied to be ''null''" do
+              Account.default.disable_feature!(:send_usage_metrics)
+              Account.default.disable_feature!(:send_usage_metrics_after_consent)
+              mock_dynamic_settings_for_pendo_cc
+              expect(controller.js_env[:PRE_COOKIE_CONSENT]).to eq("null")
+            end
+          end
+
+          describe "with SUM" do
+            before do
+              Account.default.enable_feature!(:send_usage_metrics)
+              mock_dynamic_settings_for_pendo_cc("pendos!", "pendos!", "io", "cookie!")
+            end
+
+            it "is implied to be ''true''" do
+              expect(controller.js_env[:PRE_COOKIE_CONSENT]).to eq("true")
+            end
+
+            it "is implied to be ''false'' if the user might be a minor" do
+              Account.default.enable_feature!(:k12)
+              allow(BrandConfig).to receive(:k12_config)
+              expect(controller.js_env[:PRE_COOKIE_CONSENT]).to eq("false")
+            end
+          end
+
+          describe "with SUMAC" do
+            before do
+              Account.default.enable_feature!(:send_usage_metrics_after_consent)
+              mock_dynamic_settings_for_pendo_cc(nil, "pendos!", "jp", "cookie!")
+            end
+
+            it "is implied ''true'' if cookie consent is not necessary" do
+              mock_session_for_webview(mobile_cookie_consent: true)
+              Account.default.disable_feature!(:cookie_consent_necessary)
+              expect(controller.js_env[:PRE_COOKIE_CONSENT]).to eq("true")
+            end
+
+            it "is implied ''false'' if cookie consent is not necessary but the user might be a minor" do
+              Account.default.disable_feature!(:cookie_consent_necessary)
+              Account.default.enable_feature!(:k12)
+              allow(BrandConfig).to receive(:k12_config)
+              expect(controller.js_env[:PRE_COOKIE_CONSENT]).to eq("false")
+            end
+
+            context "when cookie consent is necessary" do
+              before do
+                Account.default.enable_feature!(:cookie_consent_necessary)
+              end
+
+              it "is ''null'' when it's not a mobile webview request" do
+                allow(controller).to receive(:session).and_return({
+                                                                    session_id: "slartibartfast"
+                                                                  })
+                expect(controller.js_env[:PRE_COOKIE_CONSENT]).to eq("null")
+              end
+
+              context "when the request comes from a mobile webview" do
+                it "is ''true'' when consent was given in the mobile client" do
+                  mock_session_for_webview(mobile_cookie_consent: true)
+                  expect(controller.js_env[:PRE_COOKIE_CONSENT]).to eq("true")
+                end
+
+                it "is ''false'' when consent was not given in the mobile client" do
+                  mock_session_for_webview(mobile_cookie_consent: false)
+                  expect(controller.js_env[:PRE_COOKIE_CONSENT]).to eq("false")
+                end
+              end
+            end
+          end
+        end
+
+        describe "ONETRUST_CONSENT_DOMAIN_ID" do
+          describe "when it should not be included" do
+            it "is not included if SUMAC is off" do
+              Account.default.disable_feature!(:send_usage_metrics_after_consent)
+              Account.default.enable_feature!(:cookie_consent_necessary)
+              mock_dynamic_settings_for_pendo_cc(nil, "pendos!", "io", "cookie!")
+              expect(controller.js_env[:ONETRUST_CONSENT_DOMAIN_ID]).to be_nil
+            end
+
+            it "is not included if SUM is on" do
+              Account.default.disable_feature!(:send_usage_metrics_after_consent)
+              Account.default.enable_feature!(:send_usage_metrics)
+              Account.default.enable_feature!(:cookie_consent_necessary)
+              mock_dynamic_settings_for_pendo_cc(nil, "pendos!", "io", "cookie!")
+              expect(controller.js_env[:ONETRUST_CONSENT_DOMAIN_ID]).to be_nil
+            end
+
+            it "is not included if CCN is off" do
+              Account.default.enable_feature!(:send_usage_metrics_after_consent)
+              Account.default.disable_feature!(:cookie_consent_necessary)
+              mock_dynamic_settings_for_pendo_cc(nil, "pendos!", "io", "cookie!")
+              expect(controller.js_env[:ONETRUST_CONSENT_DOMAIN_ID]).to be_nil
+            end
+
+            it "is not included if settings are missing" do
+              Account.default.enable_feature!(:send_usage_metrics_after_consent)
+              Account.default.enable_feature!(:cookie_consent_necessary)
+              mock_dynamic_settings_for_pendo_cc(nil, "pendos!", "io", nil)
+              expect(controller.js_env[:ONETRUST_CONSENT_DOMAIN_ID]).to be_nil
+            end
+
+            it "is not included if it would be but the user might be a minor" do
+              allow(BrandConfig).to receive(:k12_config)
+              Account.default.enable_feature!(:send_usage_metrics_after_consent)
+              Account.default.enable_feature!(:cookie_consent_necessary)
+              Account.default.enable_feature!(:k12)
+              mock_dynamic_settings_for_pendo_cc(nil, "pendos!", "io", "cookie!")
+              expect(controller.js_env[:ONETRUST_CONSENT_DOMAIN_ID]).to be_nil
+            end
+          end
+
+          describe "when both SUMAC and CCN are enabled and settings exist" do
+            before do
+              Account.default.enable_feature!(:send_usage_metrics_after_consent)
+              Account.default.enable_feature!(:cookie_consent_necessary)
+            end
+
+            it "is included in js_env" do
+              mock_dynamic_settings_for_pendo_cc(nil, "pendos!", "io", "cookie!")
+              expect(controller.js_env[:ONETRUST_CONSENT_DOMAIN_ID]).to eq "cookie!"
+            end
+
+            it "is not included in js_env if the user might be a minor" do
+              allow(BrandConfig).to receive(:k12_config)
+              Account.default.enable_feature!(:k12)
+              mock_dynamic_settings_for_pendo_cc(nil, "pendos!", "io", "cookie!")
+              expect(controller.js_env[:ONETRUST_CONSENT_DOMAIN_ID]).to be_nil
+            end
+
+            it "is not included in js_env if in a mobile webview" do
+              mock_dynamic_settings_for_pendo_cc(nil, "pendos!", "io", "cookie!")
+              mock_session_for_webview(mobile_cookie_consent: true)
+              expect(controller.js_env[:ONETRUST_CONSENT_DOMAIN_ID]).to be_nil
+            end
+
+            it "is included with the vanity domain ID if used from a vanity domain" do
+              mock_dynamic_settings_for_pendo_cc(nil, "pendos!", "io", "cookie!", "vanity_cookie!")
+              request.host = "its.a.vanity.domain.com"
+              expect(controller.js_env[:ONETRUST_CONSENT_DOMAIN_ID]).to eq "vanity_cookie!"
+            end
+
+            it "is included with the beta domain ID if used from a beta domain" do
+              mock_dynamic_settings_for_pendo_cc(nil, "pendos!", "io", "cookie!", "vanity_cookie!", "beta_cookie!")
+              request.host = "rare.beta.instructure.com"
+              expect(controller.js_env[:ONETRUST_CONSENT_DOMAIN_ID]).to eq "beta_cookie!"
+            end
+          end
+
+          describe "account-level override" do
+            before do
+              Account.default.settings[:onetrust_consent_domain_id] = "account_cookie!"
+            end
+
+            it "respects account-level override" do
+              Account.default.enable_feature!(:send_usage_metrics_after_consent)
+              Account.default.enable_feature!(:cookie_consent_necessary)
+              mock_dynamic_settings_for_pendo_cc(nil, "pendos!", "io", "cookie!")
+              expect(controller.js_env[:ONETRUST_CONSENT_DOMAIN_ID]).to eq "account_cookie!"
+            end
+          end
+        end
+      end
     end
 
     describe "clean_return_to" do
@@ -982,7 +1362,7 @@ RSpec.describe ApplicationController do
         ctrl = ApplicationController.new
         ctrl.send(:assign_localizer)
         locale = nil
-        expect { locale = I18n.localizer.call }.to_not raise_error
+        expect { locale = I18n.localizer.call }.not_to raise_error
         expect(locale).to eq("en") # default locale
       end
 
@@ -1389,13 +1769,13 @@ RSpec.describe ApplicationController do
 
             it "does not display the assignment edit sidebar" do
               controller.send(:content_tag_redirect, course, content_tag, nil)
-              expect(assigns[:append_template]).to_not be_present
+              expect(assigns[:append_template]).not_to be_present
             end
 
             context "ENV.LTI_TOOL_FORM_ID" do
               it "sets a random id" do
                 expect(controller).to receive(:random_lti_tool_form_id).and_return("1")
-                expect(controller).to receive(:js_env).with(LTI_TOOL_FORM_ID: "1")
+                expect(controller).to receive(:js_env).with({ LTI_TOOL_FORM_ID: "1" })
                 controller.send(:content_tag_redirect, course, content_tag, nil)
               end
             end
@@ -1507,28 +1887,6 @@ RSpec.describe ApplicationController do
                   lti_deployment_id
                   lti_storage_target
                 ]
-              end
-
-              context "with lti_deployment_id_in_login_request FF off" do
-                before do
-                  @course.root_account.disable_feature!(:lti_deployment_id_in_login_request)
-                end
-
-                it "creates a login message that includes deployment_id" do
-                  subject
-                  expect(assigns[:lti_launch].params.keys).to match_array %w[
-                    iss
-                    login_hint
-                    target_link_uri
-                    lti_message_hint
-                    canvas_region
-                    canvas_environment
-                    client_id
-                    deployment_id
-                    lti_deployment_id
-                    lti_storage_target
-                  ]
-                end
               end
 
               it 'sets the "login_hint" to the current user lti id' do
@@ -2100,7 +2458,7 @@ RSpec.describe ApplicationController do
     end
 
     describe "external_tool_display_hash" do
-      def tool_settings(setting, include_class = false)
+      def tool_settings(setting, include_class: false)
         settings_hash = {
           url: "http://example.com/?#{setting}",
           icon_url: "http://example.com/icon.png?#{setting}",
@@ -2176,7 +2534,7 @@ RSpec.describe ApplicationController do
 
       it "all settings return canvas_icon_class if set" do
         @tool_settings.each do |setting|
-          @tool.send(:"#{setting}=", tool_settings(setting, true))
+          @tool.send(:"#{setting}=", tool_settings(setting, include_class: true))
           @tool.save!
 
           hash = controller.external_tool_display_hash(@tool, setting)
@@ -2281,7 +2639,7 @@ RSpec.describe ApplicationController do
 
       it "includes launch_method if set" do
         @tool_settings.each do |setting|
-          setting_hash = tool_settings(setting, true).merge(launch_method: "tray")
+          setting_hash = tool_settings(setting, include_class: true).merge(launch_method: "tray")
           @tool.send(:"#{setting}=", setting_hash)
           @tool.save!
 
@@ -2445,6 +2803,86 @@ RSpec.describe ApplicationController do
     end
   end
 
+  describe "#initiate_session_from_token" do
+    describe "mobile webview session keys" do
+      let(:user) { user_factory }
+      let(:pseudonym) { user.pseudonyms.create!(unique_id: "testuser") }
+      let(:token_true) { SessionToken.new(pseudonym.global_id, consent_from_mobile: true).to_s }
+      let(:token_false) { SessionToken.new(pseudonym.global_id, consent_from_mobile: false).to_s }
+      let(:token_nil) { SessionToken.new(pseudonym.global_id).to_s }
+
+      before do
+        allow_any_instantiation_of(pseudonym).to receive(:works_for_account?).and_return(true)
+        allow(controller).to receive(:redirect_to).and_return(true)
+      end
+
+      it "has a session that contains the mobile webview keys for a consented webview" do
+        controller.params[:session_token] = token_true
+        controller.instance_variable_set(:@current_pseudonym, pseudonym)
+        controller.send(:initiate_session_from_token)
+        expect(session).to have_key(:is_mobile_webview)
+        expect(session).to have_key(:mobile_cookie_consent)
+        expect(session[:is_mobile_webview]).to be true
+        expect(session[:mobile_cookie_consent]).to be true
+      end
+
+      it "has a session that contains the mobile webview keys for an unconsented webview" do
+        controller.params[:session_token] = token_false
+        controller.instance_variable_set(:@current_pseudonym, pseudonym)
+        controller.send(:initiate_session_from_token)
+        expect(session).to have_key(:is_mobile_webview)
+        expect(session).to have_key(:mobile_cookie_consent)
+        expect(session[:is_mobile_webview]).to be true
+        expect(session[:mobile_cookie_consent]).to be false
+      end
+
+      it "has a session that does not contain the mobile webview keys for a non-webview session token" do
+        controller.params[:session_token] = token_nil
+        controller.instance_variable_set(:@current_pseudonym, pseudonym)
+        controller.send(:initiate_session_from_token)
+        expect(session).not_to have_key(:is_mobile_webview)
+        expect(session).not_to have_key(:mobile_cookie_consent)
+      end
+    end
+
+    describe "error reporting" do
+      let(:user) { user_factory }
+      let(:pseudonym) { user.pseudonyms.create!(unique_id: "testuser") }
+
+      before do
+        allow(controller).to receive(:redirect_to).and_return(true)
+      end
+
+      context "when the session token string cannot be parsed" do
+        it "calls report_error with :parsing_error" do
+          controller.params[:session_token] = "totally-invalid-token"
+          expect(SessionToken).to receive(:report_error).with(reason: :parsing_error)
+          controller.send(:initiate_session_from_token)
+        end
+      end
+
+      context "when the session token parses but fails validation" do
+        it "calls report_error with :token_invalid" do
+          token = SessionToken.new(pseudonym.global_id)
+          token.created_at -= (SessionToken::VALIDITY_PERIOD + 5).seconds
+          controller.params[:session_token] = token.to_s
+          expect(SessionToken).to receive(:report_error).with(reason: :token_invalid)
+          controller.send(:initiate_session_from_token)
+        end
+      end
+
+      context "when the session token is valid" do
+        it "does not call report_error" do
+          allow_any_instantiation_of(pseudonym).to receive(:works_for_account?).and_return(true)
+          controller.instance_variable_set(:@current_pseudonym, pseudonym)
+          controller.params[:session_token] = SessionToken.new(pseudonym.global_id).to_s
+          expect(SessionToken).not_to receive(:report_error)
+          controller.send(:initiate_session_from_token)
+        end
+      end
+    end
+  end
+
   describe "#native_app?" do
     context "with iOS Canvas apps" do
       it "detects Canvas iOS Teacher app" do
@@ -2571,7 +3009,7 @@ RSpec.describe ApplicationController do
 
       controller.instance_variable_set(:@context, student)
       controller.send(:get_all_pertinent_contexts)
-      expect(controller.instance_variable_get(:@contexts).select { |c| c.is_a?(Course) }).to eq [c2]
+      expect(controller.instance_variable_get(:@contexts).grep(Course)).to eq [c2]
     end
 
     it "doesn't touch the database if there are no valid courses" do
@@ -2605,7 +3043,7 @@ RSpec.describe ApplicationController do
           @group.add_user(@user)
         end
         controller.send(:get_all_pertinent_contexts, include_groups: true, only_contexts: "group_#{@other_group.id},group_#{@group.id}")
-        expect(controller.instance_variable_get(:@contexts).select { |c| c.is_a?(Group) }).to eq [@group]
+        expect(controller.instance_variable_get(:@contexts).grep(Group)).to eq [@group]
       end
 
       it "does not include groups in courses the user doesn't have the ability to view yet" do
@@ -2614,14 +3052,14 @@ RSpec.describe ApplicationController do
 
         course_factory
         student_in_course(user: @user, course: @course)
-        expect(@course).to_not be_available
+        expect(@course).not_to be_available
         expect(@user.cached_currentish_enrollments).to be_empty
         @other_group = group_model(context: @course)
         group_model(context: @course)
         @group.add_user(@user)
 
         controller.send(:get_all_pertinent_contexts, include_groups: true)
-        expect(controller.instance_variable_get(:@contexts).select { |c| c.is_a?(Group) }).to be_empty
+        expect(controller.instance_variable_get(:@contexts).grep(Group)).to be_empty
       end
 
       it "must select all cross-shard courses the user belongs to" do
@@ -2662,7 +3100,7 @@ RSpec.describe ApplicationController do
                           only_contexts: "Course_#{course2.id}",
                         })
         contexts = controller.instance_variable_get(:@contexts)
-        expect(contexts).to_not include course1
+        expect(contexts).not_to include course1
         expect(contexts).to include course2
       end
     end
@@ -3081,6 +3519,57 @@ RSpec.describe ApplicationController do
         controller.params[:action] = "syllabus"
         expect(controller.send(:show_student_view_button?)).to be_falsey
       end
+    end
+  end
+
+  describe "show_learning_agent_button? helper" do
+    before(:once) do
+      course_with_student(active_all: true)
+    end
+
+    before do
+      user_session(@student)
+      controller.instance_variable_set(:@context, @course)
+      controller.instance_variable_set(:@context_enrollment, @enrollment)
+      controller.instance_variable_set(:@current_user, @student)
+    end
+
+    it "returns false when context is not a Course" do
+      controller.instance_variable_set(:@context, Account.default)
+      expect(controller.send(:show_learning_agent_button?)).to be false
+    end
+
+    it "returns false when enrollment is not a StudentEnrollment" do
+      controller.instance_variable_set(:@context_enrollment, nil)
+      expect(controller.send(:show_learning_agent_button?)).to be false
+    end
+
+    it "returns false when feature flag is off" do
+      @course.disable_feature!(:athena_learning_agent_button)
+      expect(controller.send(:show_learning_agent_button?)).to be false
+    end
+
+    it "returns true when all conditions are met" do
+      @course.enable_feature!(:athena_learning_agent_button)
+      expect(controller.send(:show_learning_agent_button?)).to be true
+    end
+  end
+
+  describe "load_learning_agent_env helper" do
+    before(:once) do
+      course_with_student(active_all: true)
+    end
+
+    before do
+      user_session(@student)
+      controller.instance_variable_set(:@current_user, @student)
+    end
+
+    it "sets ATHENA in js_env via public_app_config" do
+      config = { authenticated: true, launch_domain: "athena.example.com", launch_path: "/agent" }
+      allow(Services::Athena).to receive(:public_app_config).with(@student).and_return(config)
+      expect(controller).to receive(:js_env).with({ ATHENA: config })
+      controller.send(:load_learning_agent_env)
     end
   end
 
@@ -3912,6 +4401,8 @@ RSpec.describe ApplicationController, "#compute_http_cost" do
   include WebMock::API
 
   controller do
+    skip_before_action :require_user
+
     def index
       if params[:do_http].to_i > 0
         CanvasHttp.get("http://www.example.com/test")

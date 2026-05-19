@@ -26,7 +26,7 @@ module Canvas::OAuth
       def generate_token
         @_token.access_token.regenerate_access_token
 
-        if provider.key.public_client? && Account.site_admin.feature_enabled?(:pkce)
+        if provider.key.public_client?
           # Access tokens for public clients have a (default) two-hour rolling window
           # in which tokens are eligible for refresh. When a refresh action is take for
           # a public client, extend that window by another two hours.

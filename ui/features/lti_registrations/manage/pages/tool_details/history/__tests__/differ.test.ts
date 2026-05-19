@@ -24,18 +24,11 @@ import {
   diffConfigChangeEntry,
   diffHistoryEntry,
 } from '../differ'
-import type {
-  ConfigChangeHistoryEntry,
-  AvailabilityChangeHistoryEntry,
-} from '../../../../model/LtiRegistrationHistoryEntry'
 import type {AvailabilityChangeEntryWithDiff} from '../differ'
-import {ZLtiRegistrationHistoryEntryId} from '../../../../model/LtiRegistrationHistoryEntry'
 import {ZAccountId} from '../../../../model/AccountId'
-import {ZLtiRegistrationId} from '../../../../model/LtiRegistrationId'
 import {ZLtiContextControlId} from '../../../../model/LtiContextControl'
 import {ZCourseId} from '../../../../model/CourseId'
 import {ZLtiDeploymentId} from '../../../../model/LtiDeploymentId'
-import type {LtiDeployment} from '../../../../model/LtiDeployment'
 import type {InternalLtiConfiguration} from '../../../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {LtiPlacements} from '../../../../model/LtiPlacement'
 import {mockContextControl} from '../../availability/__tests__/helpers'
@@ -1108,6 +1101,92 @@ describe('diffConfigChangeEntry', () => {
           }
           expect(naming).toEqual(expected)
         })
+      })
+    })
+
+    describe('Locked', () => {
+      it('detects when the registration is locked', () => {
+        const entry = createMockConfigEntry({}, {})
+        entry.old_configuration.registration.lock_deploying = false
+        entry.new_configuration.registration.lock_deploying = true
+
+        const result = diffConfigChangeEntry(entry)
+
+        expect(result.internalConfig!.locked).toEqual(createDiffValue(false, true))
+      })
+
+      it('detects when the registration is unlocked', () => {
+        const entry = createMockConfigEntry({}, {})
+        entry.old_configuration.registration.lock_deploying = true
+        entry.new_configuration.registration.lock_deploying = false
+
+        const result = diffConfigChangeEntry(entry)
+
+        expect(result.internalConfig!.locked).toEqual(createDiffValue(true, false))
+      })
+
+      it('returns null when locked state is unchanged', () => {
+        const entry = createMockConfigEntry({}, {})
+        entry.old_configuration.registration.lock_deploying = false
+        entry.new_configuration.registration.lock_deploying = false
+
+        const result = diffConfigChangeEntry(entry)
+
+        expect(result.internalConfig).toBeNull()
+      })
+
+      it('counts a lock change as 1 addition and 1 removal', () => {
+        const entry = createMockConfigEntry({}, {})
+        entry.old_configuration.registration.lock_deploying = false
+        entry.new_configuration.registration.lock_deploying = true
+
+        const result = diffConfigChangeEntry(entry)
+
+        expect(result.totalAdditions).toBe(1)
+        expect(result.totalRemovals).toBe(1)
+      })
+    })
+
+    describe('Workflow State', () => {
+      it('detects when a registration is deactivated', () => {
+        const entry = createMockConfigEntry({}, {})
+        entry.old_configuration.registration.workflow_state = 'active'
+        entry.new_configuration.registration.workflow_state = 'inactive'
+
+        const result = diffConfigChangeEntry(entry)
+
+        expect(result.internalConfig!.workflowState).toEqual(createDiffValue('active', 'inactive'))
+      })
+
+      it('detects when a registration is activated', () => {
+        const entry = createMockConfigEntry({}, {})
+        entry.old_configuration.registration.workflow_state = 'inactive'
+        entry.new_configuration.registration.workflow_state = 'active'
+
+        const result = diffConfigChangeEntry(entry)
+
+        expect(result.internalConfig!.workflowState).toEqual(createDiffValue('inactive', 'active'))
+      })
+
+      it('returns null internalConfig when workflow_state is unchanged', () => {
+        const entry = createMockConfigEntry({}, {})
+        entry.old_configuration.registration.workflow_state = 'active'
+        entry.new_configuration.registration.workflow_state = 'active'
+
+        const result = diffConfigChangeEntry(entry)
+
+        expect(result.internalConfig).toBeNull()
+      })
+
+      it('counts a state change as 1 addition and 1 removal', () => {
+        const entry = createMockConfigEntry({}, {})
+        entry.old_configuration.registration.workflow_state = 'active'
+        entry.new_configuration.registration.workflow_state = 'inactive'
+
+        const result = diffConfigChangeEntry(entry)
+
+        expect(result.totalAdditions).toBe(1)
+        expect(result.totalRemovals).toBe(1)
       })
     })
 

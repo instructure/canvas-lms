@@ -18,7 +18,7 @@
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import IndividualStudentMastery from '@canvas/grade-summary/react/IndividualStudentMastery/index'
 import template from '../../jst/individual_student_view.handlebars'
 
@@ -38,16 +38,18 @@ export default class IndividualStudentView extends Backbone.View {
   show() {
     super.show(...arguments)
     this.render()
+    const masteryRef = React.createRef()
     const masteryElement = (
       <IndividualStudentMastery
+        ref={masteryRef}
         courseId={this.course_id}
         studentId={this.student_id}
         onExpansionChange={this.updateToggles}
         outcomeProficiency={ENV.outcome_proficiency}
       />
     )
-    // eslint-disable-next-line react/no-render-return-value
-    return (this.reactView = ReactDOM.render(masteryElement, $('.individualStudentView').get(0)))
+    legacyRender(masteryElement, $('.individualStudentView').get(0), {sync: true})
+    return (this.reactView = masteryRef.current)
   }
 
   updateToggles(anyExpanded, anyContracted) {

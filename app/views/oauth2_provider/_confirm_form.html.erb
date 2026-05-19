@@ -35,11 +35,19 @@
 <% if @special_confirm_message %>
   <p><%= @special_confirm_message %></p>
 <% end %>
+<% if @domain_root_account&.feature_enabled?(:oauth2_deny_post) %>
+  <%= form_tag oauth2_auth_deny_post_path, id: "oauth2_deny_form", style: "display:none" do %>
+  <% end %>
+<% end %>
 <%= form_tag oauth2_auth_accept_path, id: "oauth2_accept_form" do %>
   <%= hidden_field_tag :custom_csrf_token, @custom_csrf_token %>
   <div class="button_box ic-Login-confirmation__actions">
-    <%= link_to(t(:cancel, "Cancel"), oauth2_auth_deny_path, :class => "Button Button--block") %>
-    <%=  submit_tag(t("Authorize"),  class: "Button Button--primary Button--block", data: {disable_with: t('Please wait...')}) %>
+    <% if @domain_root_account&.feature_enabled?(:oauth2_deny_post) %>
+      <button type="submit" form="oauth2_deny_form" class="Button Button--block"><%= t(:cancel, "Cancel") %></button>
+    <% else %>
+      <%= link_to(t(:cancel, "Cancel"), oauth2_auth_deny_path, :class => "Button Button--block") %>
+    <% end %>
+    <%= submit_tag(t("Authorize"), class: "Button Button--primary Button--block", data: {disable_with: t('Please wait...')}) %>
   </div>
   <% if @provider.scopes == ["/auth/userinfo"] %>
     <div class="control-group">

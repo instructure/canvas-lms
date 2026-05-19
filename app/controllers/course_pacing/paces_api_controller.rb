@@ -66,7 +66,7 @@ class CoursePacing::PacesApiController < ApplicationController
         }
       )
     else
-      render json: { success: false, errors: pace.errors.full_messages }, status: :unprocessable_entity
+      render json: { success: false, errors: pace.errors.full_messages }, status: :unprocessable_content
     end
   end
 

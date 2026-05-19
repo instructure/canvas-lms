@@ -33,7 +33,7 @@ module VeriCite
   class Client
     attr_accessor :account_id, :shared_secret, :host, :testing, :show_preliminary_score
 
-    def initialize(testing = false)
+    def initialize(testing: false)
       @host = Canvas::Plugin.find(:vericite).settings[:host] || "api.vericite.com"
       account_id = Canvas::Plugin.find(:vericite).settings[:account_id]
       shared_secret = Canvas::Plugin.find(:vericite).settings[:shared_secret]

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% js_env :crowdsourced_locales => crowdsourced_locales %>
+<% js_env({ crowdsourced_locales: crowdsourced_locales }) %>
 <% css_bundle :locale %>
 <% js_bundle :locale %>
 <i style="<%= hidden %>" class="locale-warning icon-warning" data-tooltip='{"tooltipClass":"popover", "position":"right"}'

@@ -32,14 +32,15 @@
 #
 class SecurityController < ApplicationController
   skip_before_action :load_user
+  skip_before_action :require_user
 
   def self.messages_supported(account)
     Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE.keys
                                                       .map do |message_type|
-                                                        {
-                                                          type: message_type,
-                                                          placements: placements_supported(message_type, account)
-                                                        }.with_indifferent_access
+      {
+        type: message_type,
+        placements: placements_supported(message_type, account)
+      }.with_indifferent_access
     end + Lti::ResourcePlacement::PLACEMENTLESS_MESSAGE_TYPES.map do |message_type|
       { type: message_type }.with_indifferent_access
     end

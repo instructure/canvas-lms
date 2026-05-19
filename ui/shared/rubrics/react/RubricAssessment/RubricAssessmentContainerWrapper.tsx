@@ -17,7 +17,7 @@
  */
 
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {
   RubricAssessmentContainerProps,
   RubricAssessmentContainer,

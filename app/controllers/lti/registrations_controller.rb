@@ -71,10 +71,20 @@
 #           "example": false,
 #           "type": "boolean"
 #         },
+#         "lock_deploying": {
+#           "description": "Flag indicating if registration is locked for deployment",
+#           "example": false,
+#           "type": "boolean"
+#         },
 #         "inherited": {
 #           "description": "Flag indicating if registration is owned by this account, or inherited from Site Admin",
 #           "example": false,
 #           "type": "boolean"
+#         },
+#         "template_registration_id": {
+#           "description": "The Canvas ID of the template registration, if this registration is inherited from a template",
+#           "example": 1,
+#           "type": "integer"
 #         },
 #         "lti_version": {
 #           "description": "LTI version of the registration, either 1.1 or 1.3",
@@ -1103,15 +1113,16 @@ class Lti::RegistrationsController < ApplicationController
   before_action :require_root_account_instrumented_or_sub_account_and_feature_flag
   before_action :require_lti_registrations_next_feature_flag, only: %i[reset context_search overlay_history]
   before_action :require_lti_registrations_history_feature_flag, only: [:history]
+  before_action :require_lti_deactivate_registrations_flag, only: :unbind
   before_action :require_manage_lti_registrations
   before_action :require_manage_lti_registrations_in_registrations_account, only: %i[reset update destroy]
-  before_action :restrict_sub_account_to_read_only, except: %i[index list show show_by_client_id context_search overlay_history history]
+  before_action :restrict_sub_account_to_read_only, except: %i[index list show show_by_client_id context_search overlay_history history check_domain_duplicates]
   before_action :validate_workflow_state, only: %i[bind create update]
   before_action :validate_list_params, only: :list
   before_action :validate_registration_params, only: %i[create update]
   before_action :restrict_dynamic_registration_updates, only: %i[update]
   before_action :require_registration_params, only: :create
-  before_action :require_in_account_or_site_admin, only: %i[show bind update reset overlay_history history]
+  before_action :require_in_account_or_site_admin, only: %i[show bind unbind update reset overlay_history history]
 
   include Api::V1::Lti::Registration
   include Api::V1::Lti::RegistrationHistoryEntry
@@ -1144,7 +1155,9 @@ class Lti::RegistrationsController < ApplicationController
     js_env({
              LTI_REGISTRATIONS_HISTORY: @account.root_account.feature_enabled?(:lti_registrations_history),
              LTI_DR_REGISTRATIONS_UPDATE: @account.root_account.feature_enabled?(:lti_dr_registrations_update),
-             ACCOUNT_GLOBAL_ID: @account.global_id
+             LTI_EDIT_JSON: @account.root_account.feature_enabled?(:lti_edit_json),
+             ACCOUNT_GLOBAL_ID: @account.global_id,
+             ACCOUNT_IS_SITE_ADMIN: @account.site_admin?,
            })
     render :index
   end
@@ -1188,7 +1201,7 @@ class Lti::RegistrationsController < ApplicationController
       search_terms: params[:query]&.downcase&.split,
       sort_field: params[:sort]&.to_sym || :installed,
       sort_direction: params[:dir]&.to_sym || :desc,
-      preload_overlays: includes.include?(:overlay)
+      preload_overlays: true # Always preload to avoid n+1 when computing icon_url
     }
 
     registrations, preloads = Lti::ListRegistrationService
@@ -1279,6 +1292,30 @@ class Lti::RegistrationsController < ApplicationController
     render json: { configuration: }
   end
 
+  # @internal
+  # @API Check for Duplicate Domains
+  # Checks if any existing LTI registrations in the account have the same domain
+  # as the provided domain. This includes registrations owned by the account,
+  # Site Admin registrations forced on, and inherited registrations that are enabled.
+  # This is a utility endpoint for the LTI registration UI to warn administrators
+  # about potential conflicts.
+  #
+  # @argument domain [Required, String] The domain to check for duplicates.
+  #
+  # @returns { duplicates: [{ id: String, name: String, admin_nickname: String | null }] }
+  #
+  # @example_request
+  #
+  #   This would check for duplicate domains
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/check_domain_duplicates?domain=example.com' \
+  #        -H "Authorization: Bearer <token>"
+  def check_domain_duplicates
+    domain = params[:domain]
+    duplicates = Lti::CheckDomainDuplicatesService.call(account: @account, domain:)
+
+    render json: { duplicates: }
+  end
+
   # @API Show an LTI Registration
   # Return details about the specified LTI registration, including the
   # configuration and account binding.
@@ -1308,12 +1345,13 @@ class Lti::RegistrationsController < ApplicationController
       overlay = registration.overlay_for(@context) if includes.include?(:overlay)
 
       # Load pending update information if feature flag is enabled
+      # Only show the most recent update request if it's still pending
       pending_update = nil
-      if Account.site_admin.feature_enabled?(:lti_dr_registrations_update)
-        pending_update = Lti::RegistrationUpdateRequest.where(lti_registration: registration)
-                                                       .pending
-                                                       .order(created_at: :desc)
-                                                       .first
+      if @account.root_account.feature_enabled?(:lti_dr_registrations_update)
+        most_recent = Lti::RegistrationUpdateRequest.where(lti_registration: registration)
+                                                    .order(created_at: :desc)
+                                                    .first
+        pending_update = most_recent if most_recent&.pending?
       end
 
       render json: lti_registration_json(registration,
@@ -1343,9 +1381,12 @@ class Lti::RegistrationsController < ApplicationController
   # @argument configuration [Required, Lti::ToolConfiguration | Lti::LegacyConfiguration] The LTI 1.3 configuration for the tool
   # @argument overlay [Lti::Overlay] The overlay configuration for the tool. Overrides values in the base configuration.
   # @argument unified_tool_id [String] The unique identifier for the tool, used for analytics. If not provided, one will be generated.
-  # @argument workflow_state [String, "on" | "off" | "allow"]
-  #   The desired state for this registration/account binding. "allow" is only valid for Site Admin registrations.
-  #   Defaults to "off".
+  # @argument lock_deploying [Boolean] When true, no new deployments of this registration can be created.
+  # @argument workflow_state [String, "on" | "off" | "allow" | "active" | "inactive"]
+  #   "on"/"off"/"allow" set the account binding state directly (binding vocabulary).
+  #   "active"/"inactive" set the registration state directly (registration vocabulary).
+  #   All five values update both the binding and the registration to equivalent states.
+  #   "allow" is only valid for Site Admin registrations. Defaults to "off".
   #
   # @example_request
   #
@@ -1378,9 +1419,15 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @returns Lti::Registration
   def create
+    permitted_params = %i[vendor name admin_nickname description workflow_state]
+    if @context.root_account.feature_enabled?(:lock_lti_registrations)
+      permitted_params << :lock_deploying
+    end
+
     registration_params = {
       name: configuration_params[:title],
-    }.with_indifferent_access.merge(params.permit(:vendor, :name, :admin_nickname, :description))
+    }.with_indifferent_access.merge(params.permit(permitted_params))
+
     create_params = {
       account: @context,
       created_by: @current_user,
@@ -1388,9 +1435,6 @@ class Lti::RegistrationsController < ApplicationController
       registration_params:,
       configuration_params:,
       overlay_params:,
-      binding_params: {
-        workflow_state:,
-      }
     }
 
     registration = Lti::CreateRegistrationService.call(**create_params)
@@ -1443,6 +1487,105 @@ class Lti::RegistrationsController < ApplicationController
     raise e
   end
 
+  # @API Get LTI Registration by Unified Tool ID
+  # Returns an LTI registration by looking up its unified_tool_id.
+  # Searches both manual configurations and IMS registrations.
+  # Only returns registrations that are active and accessible from the
+  # current account (owned by account, Site Admin, or has binding).
+  #
+  # @returns Lti::Registration
+  #
+  # @example_request
+  #
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/by_utid/<utid>' \
+  #        -H "Authorization: Bearer <token>"
+  def show_by_utid
+    unless @context.feature_enabled?(:lti_registrations_templates)
+      return render json: { errors: "Not found" }, status: :not_found
+    end
+
+    GuardRail.activate(:secondary) do
+      utid = params[:utid]
+
+      manual_config = Lti::ToolConfiguration.find_by(unified_tool_id: utid)
+      ims_registration = manual_config.nil? ? Lti::IMS::Registration.find_by(unified_tool_id: utid) : nil
+
+      registration = manual_config&.lti_registration || ims_registration&.lti_registration
+
+      unless registration.present? && registration.active? && registration.account == @context
+        return render json: { errors: "LTI registration not found" }, status: :not_found
+      end
+
+      render json: lti_registration_json(
+        registration,
+        @current_user,
+        session,
+        @context
+      )
+    end
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
+  # @API Check LTI Registration Install Status
+  # Returns the local installation status for a Site Admin LTI registration.
+  # If the developer key's registration is in Site Admin, returns the local copy
+  # in the current account (if installed). If the registration is already in the
+  # current account, returns it directly.
+  #
+  # @returns Lti::Registration
+  #
+  # @example_request
+  #
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/install_status/<client_id>' \
+  #        -H "Authorization: Bearer <token>"
+  def install_status
+    unless @context.feature_enabled?(:lti_registrations_templates)
+      return render json: { errors: "Not found" }, status: :not_found
+    end
+
+    GuardRail.activate(:secondary) do
+      developer_key = DeveloperKey.find(params[:client_id])
+      unless developer_key&.lti_registration.present?
+        return render json: { errors: "LTI registration not found" }, status: :not_found
+      end
+
+      template_registration = developer_key.lti_registration
+
+      # If the template registration is in Site Admin, look for a local copy in the current account
+      if template_registration.account == Account.site_admin
+        local_copy = template_registration.local_copies.active.find_by(account: @context)
+        unless local_copy.present?
+          return render json: { errors: "LTI registration not found" }, status: :not_found
+        end
+
+        registration = local_copy
+      elsif template_registration.account == @context
+        # If the registration is already in the current account, return it
+        registration = template_registration
+      else
+        # Registration is in a different account
+        return render json: { errors: "LTI registration not found" }, status: :not_found
+      end
+
+      # Ensure the registration is active
+      unless registration.active?
+        return render json: { errors: "LTI registration not found" }, status: :not_found
+      end
+
+      render json: lti_registration_json(
+        registration,
+        @current_user,
+        session,
+        @context
+      )
+    end
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
   # @API Update an LTI Registration
   # Update the specified LTI registration with the provided parameters. Note that updating the base tool configuration
   # of a registration that is associated with a Dynamic Registration will return a 422. All other fields can be updated
@@ -1453,9 +1596,13 @@ class Lti::RegistrationsController < ApplicationController
   # @argument description [String] A description of the tool. Cannot exceed 2048 bytes.
   # @argument configuration [Lti::ToolConfiguration | Lti::LegacyConfiguration] The LTI 1.3 configuration for the tool. Note that updating the base tool configuration of a registration associated with a Dynamic Registration is not allowed.
   # @argument overlay [Lti::Overlay] The overlay configuration for the tool. Overrides values in the base configuration. Note that updating the overlay of a registration associated with a Dynamic Registration IS allowed.
-  # @argument workflow_state [String, "on" | "off" | "allow"]
-  #  The desired state for this registration/account binding. "allow" is only valid for Site Admin registrations.
+  # @argument workflow_state [String, "on" | "off" | "allow" | "active" | "inactive"]
+  #   "on"/"off"/"allow" set the account binding state directly (binding vocabulary) and will be deprecated soon.
+  #   "active"/"inactive" set the registration state directly (registration vocabulary).
+  #   All five values update both the binding and the registration to equivalent states.
+  #   "allow" is only valid for Site Admin registrations.
   # @argument comment [String | nil] A comment explaining why this change was made. Cannot exceed 2000 characters.
+  # @argument lock_deploying [Boolean] When true, no new deployments of this registration can be created.
   #
   # @example_request
   #
@@ -1488,11 +1635,13 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @returns Lti::Registration
   def update
-    registration_params = params.permit(:admin_nickname, :vendor, :name, :description).to_h
+    permitted_params = %i[admin_nickname vendor name description workflow_state]
 
-    binding_params = {
-      workflow_state: params[:workflow_state],
-    }.compact
+    if @context.feature_enabled?(:lock_lti_registrations)
+      permitted_params << :lock_deploying
+    end
+
+    registration_params = params.permit(*permitted_params).to_h
 
     update_params = {
       id: params[:id],
@@ -1500,7 +1649,6 @@ class Lti::RegistrationsController < ApplicationController
       registration_params:,
       configuration_params:,
       overlay_params:,
-      binding_params:,
       updated_by: @current_user,
       comment: params[:comment]&.to_s
     }
@@ -1575,23 +1723,17 @@ class Lti::RegistrationsController < ApplicationController
     raise e
   end
 
-  # @API Bind an LTI Registration to an Account
-  # Enable or disable the specified LTI registration for the specified account.
+  # @API Bind an LTI Registration to a Root Account
+  # Enable or disable the specified LTI registration for the specified root account.
   # To enable an inherited registration (eg from Site Admin), pass the registration's global ID.
   #
   # Only allowed for root accounts.
   #
-  # <b>Specifics for Site Admin:</b>
-  # "on" enables and locks the registration on for all root accounts.
-  # "off" disables and hides the registration for all root accounts.
-  # "allow" makes the registration visible to all root accounts, but accounts must bind it to use it.
-  #
   # <b>Specifics for centrally-managed/federated consortia:</b>
-  # Child root accounts may only bind registrations created in the same account.
+  # Child root accounts may not bind inherited registrations.
   # For parent root account, binding also applies to all child root accounts.
   #
-  # @argument workflow_state [Required, String, "on"|"off"|"allow"]
-  #   The desired state for this registration/account binding. "allow" is only valid for Site Admin registrations.
+  # @argument workflow_state [Required, String, "on"|"off"] The desired state for this registration/account binding.
   #
   # @returns Lti::RegistrationAccountBinding
   #
@@ -1603,27 +1745,64 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Content-Type: application/json" \
   #        -d '{"workflow_state": "on"}'
   def bind
-    workflow_state = params.require(:workflow_state).to_sym
-    to_bind = if @context.feature_enabled?(:lti_registrations_templates)
-                # for backwards compatibility with UI until template flag is fully on.
-                # use the local copy to bind
-                Lti::InstallTemplateRegistrationService.call(
-                  template: registration,
-                  account: @context,
-                  user: @current_user
-                )
-              else
-                registration
-              end
+    if context.site_admin?
+      render_error(:invalid_context, "site admin local bindings are not allowed")
+    end
 
-    Lti::AccountBindingService.call(
-      registration: to_bind,
-      account: @context,
-      workflow_state:,
-      user: @current_user
-    ) => { lti_registration_account_binding: }
+    if workflow_state.nil? || !%w[on off].include?(workflow_state)
+      render_error(:invalid_workflow_state, "workflow_state must be one of 'on', 'off'")
+    end
 
-    render json: lti_registration_account_binding_json(lti_registration_account_binding, @current_user, session, @context)
+    begin
+      binding_state = params.require(:workflow_state).to_sym
+      result = Lti::InstallTemplateRegistrationService.call(
+        template: registration,
+        account: @context,
+        user: @current_user,
+        binding_state:
+      )
+    rescue ArgumentError => e
+      return render_error(:invalid_template, e.message)
+    end
+
+    rab = result.dig(:bindings, :lti_registration_account_binding)
+
+    render json: lti_registration_account_binding_json(rab, @current_user, session, @context)
+  rescue ArgumentError => e
+    render_error(:invalid_template, e.message)
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
+  # @API Remove an Inherited LTI Registration
+  #
+  # Deletes the account binding for this registration, effectively removing it from the account.
+  #
+  # Only available when the lti_deactivate_registrations feature flag is enabled.
+  # Only valid for inherited (Site Admin) registrations — use destroy for registrations owned by this account.
+  #
+  # @returns Lti::RegistrationAccountBinding
+  def unbind
+    return render_error(:invalid_context, "site admin local bindings are not allowed") if context.site_admin?
+    return render_error(:invalid_registration, "use destroy to delete local registrations") if registration.account == @context
+
+    rab = Lti::RegistrationAccountBinding.active.find_by(account: @context, registration:)
+    return render_error(:not_found, "No binding found for this registration in this account.", status: :not_found) unless rab
+
+    dkab = rab.developer_key_account_binding
+    local_copy = registration.local_copy_for(@context)
+
+    Lti::Registration.transaction do
+      rab.destroy
+      dkab&.destroy
+      local_copy&.destroy
+    end
+
+    render json: lti_registration_account_binding_json(rab, @current_user, session, @context)
+  rescue => e
+    report_error(e)
+    raise e
   end
 
   # @API Install an LTI Registration from a Template
@@ -1641,23 +1820,26 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Authorization: Bearer <token>" \
   #        -H "Content-Type: application/json"
   def install_from_template
-    unless @context.feature_enabled?(:lti_registrations_templates)
-      return head :not_found
+    begin
+      result = Lti::InstallTemplateRegistrationService.call(
+        template: registration,
+        account: @context,
+        user: @current_user
+      )
+    rescue ArgumentError => e
+      return render_error(:invalid_template, e.message)
     end
 
-    local_registration = Lti::InstallTemplateRegistrationService.call(
-      template: registration,
-      account: @context,
-      user: @current_user,
-      create_binding: true
-    )
-
-    account_binding = local_registration.account_binding_for(@context)
+    local_registration = result[:local_copy]
+    account_binding = result.dig(:bindings, :lti_registration_account_binding)
     overlay = local_registration.overlay_for(@context)
     includes = %i[account_binding configuration overlay]
     json = lti_registration_json(local_registration, @current_user, session, @context, includes:, account_binding:, overlay:)
 
     render json:
+  rescue => e
+    report_error(e)
+    raise e
   end
 
   # @API Search for Accounts and Courses
@@ -1685,7 +1867,9 @@ class Lti::RegistrationsController < ApplicationController
     raise ActiveRecord::RecordNotFound unless registration
 
     # must always be in the root account on current shard
-    deployment = ContextExternalTool.active.find_by(id: params[:deployment_id], lti_registration: registration, root_account_id: @context.id)
+    deployment = ContextExternalTool.active
+                                    .for_lti_registration(registration, @context)
+                                    .find_by(id: params[:deployment_id], root_account_id: @context.id)
     raise ActiveRecord::RecordNotFound unless deployment
 
     if deployment.context_type != "Account"
@@ -1815,7 +1999,8 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def history
     GuardRail.activate(:secondary) do
-      base_scope = Lti::RegistrationHistoryEntry.where(lti_registration: registration, root_account: @account)
+      base_scope = Lti::RegistrationHistoryEntry.for_lti_registration(registration, @account)
+                                                .where(root_account: @account)
                                                 .order(created_at: :desc, id: :desc).preload(:created_by)
       bookmarker = BookmarkedCollection::SimpleBookmarker.new(Lti::RegistrationHistoryEntry, :created_at, :id)
       bookmarked_collection = BookmarkedCollection.wrap(bookmarker, base_scope)
@@ -1859,6 +2044,37 @@ class Lti::RegistrationsController < ApplicationController
     )
   end
 
+  # @API Get Latest LTI Registration Update Request
+  # Retrieves the most recent update request for a registration, regardless of its status.
+  # Returns 404 if there are no update requests for this registration.
+  #
+  # @argument id [Integer] The id of the registration.
+  # @returns Lti::RegistrationUpdateRequest
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<id>/latest_update_request' \
+  #        -H "Authorization: Bearer <token>"
+  def latest_registration_update_request
+    unless registration.account == @context
+      return render json: { errors: "registration does not belong to account" }, status: :bad_request
+    end
+
+    # Get the most recent update request regardless of status
+    most_recent = Lti::RegistrationUpdateRequest.where(lti_registration: registration)
+                                                .order(created_at: :desc)
+                                                .first
+
+    raise ActiveRecord::RecordNotFound unless most_recent
+
+    render json: lti_registration_update_request_json(
+      most_recent,
+      @current_user,
+      session,
+      @context
+    )
+  end
+
   # @API Apply LTI Registration Update Requst
   # Applies a registration update request to an existing registration,
   # replacing the existing configuration and overlay with the new values.
@@ -1888,6 +2104,10 @@ class Lti::RegistrationsController < ApplicationController
 
     unless params.key?(:accepted)
       return render json: { errors: "accepted parameter is required" }, status: :bad_request
+    end
+
+    unless registration_update_request.most_recent?
+      return render json: { errors: "Cannot apply an outdated registration update request. A newer update request exists." }, status: :bad_request
     end
 
     accepted = params[:accepted]
@@ -1980,14 +2200,14 @@ class Lti::RegistrationsController < ApplicationController
   # At the model level, setting an invalid workflow_state will silently change it to the
   # initial state ("off") without complaining, so enforce this here as part of the API contract.
   def validate_workflow_state
-    return if workflow_state.nil? || %w[on off].include?(workflow_state)
-
+    return if workflow_state.nil?
+    return if Lti::AccountBindingService.resolve_workflow_state(workflow_state) && workflow_state != "allow"
     return if workflow_state == "allow" && context.site_admin?
 
     if workflow_state == "allow" && !context.site_admin?
       render_error(:invalid_workflow_state, "only site admin registrations can have a state of 'allow'")
     else
-      render_error(:invalid_workflow_state, "workflow_state must be one of 'on', 'off', or 'allow'")
+      render_error(:invalid_workflow_state, "workflow_state must be one of 'on', 'off', 'allow', 'active', or 'inactive'")
     end
   end
 
@@ -2070,6 +2290,12 @@ class Lti::RegistrationsController < ApplicationController
     end
   end
 
+  def require_lti_deactivate_registrations_flag
+    unless @context.root_account.feature_enabled?(:lti_deactivate_registrations)
+      render_error(:not_found, "The specified resource does not exist.", status: :not_found)
+    end
+  end
+
   def require_in_account_or_site_admin
     unless registration.account == @context || registration.account == Account.site_admin
       render json: { errors: "registration does not belong to account" }, status: :bad_request
@@ -2081,6 +2307,10 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   def require_manage_lti_registrations_in_registrations_account
+    unless registration.account == @account
+      return render json: { errors: "registration does not belong to account" }, status: :bad_request
+    end
+
     require_context_with_permission(registration.account, :manage_lti_registrations)
   end
 

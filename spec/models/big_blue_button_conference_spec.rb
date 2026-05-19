@@ -358,7 +358,7 @@ describe BigBlueButtonConference do
         allow(BigBlueButtonConference).to receive(:send_request).and_return(response)
 
         BigBlueButtonConference.preload_recordings([@bbb, @bbb2])
-        [@bbb, @bbb2].each { |c| expect(c).to_not receive(:send_request) } # shouldn't need to send individual requests anymore
+        [@bbb, @bbb2].each { |c| expect(c).not_to receive(:send_request) } # shouldn't need to send individual requests anymore
         expect(@bbb.recordings.pluck(:recording_id)).to match_array(["somerecordingidformeeting1a", "somerecordingidformeeting1b"])
         expect(@bbb2.recordings.pluck(:recording_id)).to match_array(["somerecordingidformeeting2"])
       end
@@ -384,7 +384,7 @@ describe BigBlueButtonConference do
           .and_return(response)
 
         BigBlueButtonConference.preload_recordings([@bbb, @bbb2])
-        [@bbb, @bbb2].each { |c| expect(c).to_not receive(:send_request) } # shouldn't need to send individual requests anymore
+        [@bbb, @bbb2].each { |c| expect(c).not_to receive(:send_request) } # shouldn't need to send individual requests anymore
         expect(@bbb.recordings.pluck(:recording_id)).to match_array(["somerecordingidformeeting1a", "somerecordingidformeeting1b"])
         expect(@bbb2.recordings.pluck(:recording_id)).to match_array(["somerecordingidformeeting2"])
       end
@@ -415,7 +415,7 @@ describe BigBlueButtonConference do
           .and_return(response)
 
         BigBlueButtonConference.preload_recordings([@bbb, @bbb2])
-        expect(@bbb2).to_not receive(:send_request)
+        expect(@bbb2).not_to receive(:send_request)
         expect(@bbb2.recordings.pluck(:recording_id)).to match_array(["somerecordingidformeeting2"])
       end
     end

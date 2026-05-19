@@ -26,6 +26,7 @@ declare module '*.svg' {
   const value: string
   export default value
 }
+declare module '*.css'
 declare module '*.module.css' {
   const classes: {readonly [key: string]: string}
   export default classes
@@ -67,6 +68,25 @@ declare module '@instructure/ui-media-player' {
     tracks?: Array<{src?: string; label?: string; type?: string; language?: string}>
   }
   export const MediaPlayer: ComponentType<MediaPlayerProps & Record<string, any>>
+}
+
+declare module 'highcharts' {
+  const Highcharts: any
+  export default Highcharts
+  export = Highcharts
+  namespace Highcharts {
+    type Options = any
+    type PointOptionsObject = any
+    type Chart = any
+    type SVGElement = any
+    type Point = any
+  }
+}
+declare module 'highcharts/modules/accessibility'
+declare module 'highcharts-react-official' {
+  import type {ComponentType} from 'react'
+  const HighchartsReact: ComponentType<any>
+  export default HighchartsReact
 }
 
 // Auto-generated plugin bundles module (created at build time by webpack)

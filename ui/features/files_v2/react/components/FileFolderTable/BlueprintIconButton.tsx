@@ -22,7 +22,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconBlueprintLine, IconBlueprintLockLine} from '@instructure/ui-icons'
 import {type File, type Folder} from '../../../interfaces/File'
 import {doFetchApiWithAuthCheck, UnauthorizedError} from '../../../utils/apiUtils'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {useRows} from '../../contexts/RowsContext'
 

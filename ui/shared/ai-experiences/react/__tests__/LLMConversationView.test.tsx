@@ -78,38 +78,36 @@ describe('LLMConversationView', () => {
 
   it('renders collapsed state when not expanded (teacher preview)', () => {
     render(<LLMConversationView {...defaultProps} isExpanded={false} isTeacherPreview={true} />)
-    expect(screen.getByText('Preview')).toBeInTheDocument()
-    expect(
-      screen.getByText('Here, you can have a chat with the AI just like a student would.'),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Knowledge Chat/)).toBeInTheDocument()
+    expect(screen.getByText('Preview the chat')).toBeInTheDocument()
+    expect(screen.getByText('Chat with the AI just like a learner')).toBeInTheDocument()
+    expect(screen.getByTestId('llm-conversation-start-button')).toHaveTextContent('Test as learner')
   })
 
   it('renders collapsed state when not expanded (student view)', () => {
     render(<LLMConversationView {...defaultProps} isExpanded={false} isTeacherPreview={false} />)
-    expect(screen.getByText('Conversation')).toBeInTheDocument()
-    expect(
-      screen.getByText('Start the experience by having a conversation with the AI. Good luck!'),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Knowledge Chat/)).toBeInTheDocument()
+    expect(screen.getByText(/Show what you know\./)).toBeInTheDocument()
   })
 
   it('renders expanded state when expanded (teacher preview)', () => {
     render(<LLMConversationView {...defaultProps} isTeacherPreview={true} />)
-    expect(screen.getByText('Preview')).toBeInTheDocument()
-    expect(screen.getByText('Restart')).toBeInTheDocument()
+    expect(screen.getByText(/Knowledge Chat/)).toBeInTheDocument()
+    expect(screen.getByText('Reset')).toBeInTheDocument()
   })
 
   it('renders expanded state when expanded (student view)', () => {
     render(<LLMConversationView {...defaultProps} isTeacherPreview={false} />)
-    expect(screen.getByText('Conversation')).toBeInTheDocument()
-    expect(screen.getByText('Restart')).toBeInTheDocument()
+    expect(screen.getByText(/Knowledge Chat/)).toBeInTheDocument()
+    expect(screen.getByText('Reset')).toBeInTheDocument()
   })
 
   it('renders restart button', () => {
     render(<LLMConversationView {...defaultProps} />)
-    expect(screen.getByText('Restart')).toBeInTheDocument()
+    expect(screen.getByText('Reset')).toBeInTheDocument()
   })
 
-  it('calls onToggleExpanded when collapsed card is clicked', () => {
+  it('calls onToggleExpanded when start button is clicked', () => {
     const onToggleExpanded = vi.fn()
     render(
       <LLMConversationView
@@ -120,18 +118,8 @@ describe('LLMConversationView', () => {
       />,
     )
 
-    const previewCard = screen.getByText('Preview').closest('[role="button"]')
-    fireEvent.click(previewCard!)
-
-    expect(onToggleExpanded).toHaveBeenCalled()
-  })
-
-  it('calls onToggleExpanded when close button is clicked', () => {
-    const onToggleExpanded = vi.fn()
-    render(<LLMConversationView {...defaultProps} onToggleExpanded={onToggleExpanded} />)
-
-    const closeButton = screen.getAllByText('Close preview')[0].closest('button')
-    fireEvent.click(closeButton!)
+    const startButton = screen.getByTestId('llm-conversation-start-button')
+    fireEvent.click(startButton)
 
     expect(onToggleExpanded).toHaveBeenCalled()
   })
@@ -325,7 +313,7 @@ describe('LLMConversationView', () => {
       expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
     })
 
-    const restartButton = screen.getByText('Restart')
+    const restartButton = screen.getByText('Reset')
     fireEvent.click(restartButton)
 
     // Should re-initialize conversation
@@ -554,47 +542,39 @@ describe('LLMConversationView', () => {
       expect(screen.queryByText('Test message')).not.toBeInTheDocument()
     })
 
-    it(
-      'displays error alert when restart fails',
-      async () => {
-        const initialMessages = [
-          {role: 'User', text: 'Start', timestamp: new Date()},
-          {role: 'Assistant', text: 'Hello', timestamp: new Date()},
-        ]
+    it('displays error alert when restart fails', async () => {
+      const initialMessages = [
+        {role: 'User', text: 'Start', timestamp: new Date()},
+        {role: 'Assistant', text: 'Hello', timestamp: new Date()},
+      ]
 
-        let callCount = 0
+      server.resetHandlers()
+      server.use(
+        // Return an existing conversation so no init POST is needed
+        http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({id: '1', messages: initialMessages})
+        }),
+        // Restart POST always fails
+        http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
+          return HttpResponse.json({error: 'Failed to restart'}, {status: 503})
+        }),
+      )
 
-        server.resetHandlers()
-        server.use(
-          http.get('/api/v1/courses/123/ai_experiences/1/conversations', () => {
-            return HttpResponse.json({})
-          }),
-          http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
-            callCount++
-            if (callCount === 1) {
-              return HttpResponse.json({id: '1', messages: initialMessages})
-            }
-            return HttpResponse.json({error: 'Failed to restart'}, {status: 503})
-          }),
-        )
+      render(<LLMConversationView {...defaultProps} />)
 
-        render(<LLMConversationView {...defaultProps} />)
+      await waitFor(() => {
+        expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
+      })
 
-        await waitFor(() => {
-          expect(screen.getAllByText(/Hello/i)[0]).toBeInTheDocument()
-        })
+      const restartButton = screen.getByTestId('llm-conversation-restart-button')
+      fireEvent.click(restartButton)
 
-        const restartButton = screen.getByText('Restart')
-        fireEvent.click(restartButton)
-
-        await waitFor(() => {
-          expect(
-            screen.getByText('Failed to restart conversation. Please try again.'),
-          ).toBeInTheDocument()
-        })
-      },
-      30000,
-    )
+      await waitFor(() => {
+        expect(
+          screen.getByText('Failed to restart conversation. Please try again.'),
+        ).toBeInTheDocument()
+      })
+    })
 
     it('allows dismissing error alerts', async () => {
       // Override with error response
@@ -659,7 +639,7 @@ describe('LLMConversationView', () => {
 
       shouldSucceed = true
 
-      const restartButton = screen.getByText('Restart')
+      const restartButton = screen.getByText('Reset')
       fireEvent.click(restartButton)
 
       await waitFor(() => {

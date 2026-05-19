@@ -52,6 +52,7 @@ export const ExpandedGradeView: React.FC<ExpandedGradeViewProps> = ({
 
   const courseData = sharedCourseData.find(course => course.courseId === courseId)
   const courseGrade = courseData?.currentGrade ?? null
+  const gradingScheme = courseData?.gradingScheme ?? 'percentage'
 
   const {data: submissionDetails, isLoading, error} = useSubmissionDetails(submission._id)
 
@@ -74,6 +75,7 @@ export const ExpandedGradeView: React.FC<ExpandedGradeViewProps> = ({
             excused={submission.excused}
             gradingType={submission.assignment.gradingType}
             courseGrade={courseGrade}
+            gradingScheme={gradingScheme}
             submissionId={submission._id}
           />
         </Flex.Item>

@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative "../../spec_helper"
 
 describe Validators::AccountSettingsValidator do
   let(:account) { Account.default }
@@ -70,35 +69,26 @@ describe Validators::AccountSettingsValidator do
       expect(account.errors[:settings]).to include("discovery_page.primary[0].label is required")
     end
 
-    it "fails with invalid icon_url (not a URL)" do
+    it "fails with invalid icon value" do
       account.settings[:discovery_page] = {
-        primary: [valid_discovery_page_entry.merge(icon_url: "not-a-url")],
+        primary: [valid_discovery_page_entry.merge(icon: "invalid-icon")],
         secondary: []
       }
       expect(account).not_to be_valid
-      expect(account.errors[:settings]).to include("discovery_page.primary[0].icon_url must be a valid URL")
+      expect(account.errors[:settings].first).to include("discovery_page.primary[0].icon must be one of:")
     end
 
-    it "fails with invalid icon_url (ftp protocol)" do
+    it "passes with valid icon value" do
       account.settings[:discovery_page] = {
-        primary: [valid_discovery_page_entry.merge(icon_url: "ftp://example.com/icon.png")],
-        secondary: []
-      }
-      expect(account).not_to be_valid
-      expect(account.errors[:settings]).to include("discovery_page.primary[0].icon_url must be a valid URL")
-    end
-
-    it "passes with valid http icon_url" do
-      account.settings[:discovery_page] = {
-        primary: [valid_discovery_page_entry.merge(icon_url: "http://example.com/icon.png")],
+        primary: [valid_discovery_page_entry.merge(icon: "google")],
         secondary: []
       }
       expect(account).to be_valid
     end
 
-    it "passes with valid https icon_url" do
+    it "allows icon to be omitted" do
       account.settings[:discovery_page] = {
-        primary: [valid_discovery_page_entry.merge(icon_url: "https://example.com/icon.png")],
+        primary: [valid_discovery_page_entry],
         secondary: []
       }
       expect(account).to be_valid
@@ -139,6 +129,26 @@ describe Validators::AccountSettingsValidator do
       expect(account.errors[:settings]).to include("discovery_page.primary[0].authentication_provider_id is invalid or inactive")
     end
 
+    it "does not attempt STI resolution on deleted legacy twitter providers" do
+      # create a provider with a valid auth_type, then directly update the database
+      # to have auth_type: “twitter” (simulating a legacy deleted provider that still
+      # exists in the database but now has an invalid STI type)
+      valid_provider = account.authentication_providers.create!(auth_type: "saml")
+      provider_id = valid_provider.id
+
+      # directly update the database to have an invalid auth_type (bypassing STI in creation)
+      AuthenticationProvider.where(id: provider_id).update_all(auth_type: "twitter", workflow_state: "deleted")
+
+      # validation should not raise ActiveRecord::SubclassNotFound
+      # the validator should handle the deleted provider gracefully without attempting STI resolution
+      account.settings[:discovery_page] = {
+        primary: [valid_discovery_page_entry(authentication_provider_id: provider_id)],
+        secondary: []
+      }
+      expect(account).not_to be_valid
+      expect(account.errors[:settings]).to include("discovery_page.primary[0].authentication_provider_id is invalid or inactive")
+    end
+
     it "fails when authentication_provider belongs to a different account" do
       other_account = Account.create!(name: "Other Account")
       other_provider = other_account.authentication_providers.create!(auth_type: "saml")
@@ -149,6 +159,117 @@ describe Validators::AccountSettingsValidator do
       }
       expect(account).not_to be_valid
       expect(account.errors[:settings]).to include("discovery_page.primary[0].authentication_provider_id is invalid or inactive")
+    end
+
+    context "item count validation" do
+      def build_entries(count)
+        Array.new(count) do
+          provider = account.authentication_providers.create!(auth_type: "saml")
+          valid_discovery_page_entry(authentication_provider_id: provider.id)
+        end
+      end
+
+      it "passes with exactly 10 total items across both sections" do
+        account.settings[:discovery_page] = {
+          primary: build_entries(5),
+          secondary: build_entries(5)
+        }
+        expect(account).to be_valid
+      end
+
+      it "passes with 10 items all in primary" do
+        account.settings[:discovery_page] = {
+          primary: build_entries(10),
+          secondary: []
+        }
+        expect(account).to be_valid
+      end
+
+      it "fails with 11 total items" do
+        account.settings[:discovery_page] = {
+          primary: build_entries(6),
+          secondary: build_entries(5)
+        }
+        expect(account).not_to be_valid
+        expect(account.errors[:settings]).to include("discovery_page total items cannot exceed 10 (11 given)")
+      end
+
+      it "fails with 11 items all in primary" do
+        account.settings[:discovery_page] = {
+          primary: build_entries(11),
+          secondary: []
+        }
+        expect(account).not_to be_valid
+        expect(account.errors[:settings]).to include("discovery_page total items cannot exceed 10 (11 given)")
+      end
+
+      it "fails with 11 items all in secondary" do
+        account.settings[:discovery_page] = {
+          primary: [],
+          secondary: build_entries(11)
+        }
+        expect(account).not_to be_valid
+        expect(account.errors[:settings]).to include("discovery_page total items cannot exceed 10 (11 given)")
+      end
+
+      it "fails when one section key is absent and the other exceeds the limit" do
+        account.settings[:discovery_page] = { primary: build_entries(11) }
+        expect(account).not_to be_valid
+        expect(account.errors[:settings]).to include("discovery_page total items cannot exceed 10 (11 given)")
+      end
+
+      it "does not validate per-entry fields when over the item limit" do
+        account.settings[:discovery_page] = {
+          primary: build_entries(11),
+          secondary: []
+        }
+        expect(account).not_to be_valid
+        # should not also include per-entry errors when the count itself is invalid
+        expect(account.errors[:settings]).not_to include(match(/primary\[0\]/))
+      end
+    end
+
+    context "label validation" do
+      it "fails when label exceeds max length" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(label: "a" * 256)],
+          secondary: []
+        }
+        expect(account).not_to be_valid
+        expect(account.errors[:settings]).to include("discovery_page.primary[0].label must be 255 characters or fewer")
+      end
+
+      it "passes when label is exactly at max length" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(label: "a" * 255)],
+          secondary: []
+        }
+        expect(account).to be_valid
+      end
+
+      it "passes with plain text label" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(label: "Students")],
+          secondary: []
+        }
+        expect(account).to be_valid
+      end
+
+      it "passes with label containing single quotes" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(label: "Students' Portal")],
+          secondary: []
+        }
+        expect(account).to be_valid
+      end
+
+      it "passes with label containing ampersand" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(label: "Arts & Sciences")],
+          secondary: []
+        }
+        expect(account).to be_valid
+      end
     end
   end
 end

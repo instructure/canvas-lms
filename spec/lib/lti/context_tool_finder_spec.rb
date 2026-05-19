@@ -227,7 +227,7 @@ describe Lti::ContextToolFinder do
 
       context "with an unavailable context control" do
         let(:registration) do
-          lti_registration_with_tool(account: @course.root_account, binding_params: { workflow_state: "on" })
+          lti_registration_with_tool(account: @course.root_account)
         end
 
         let!(:registration_tool1) { registration.deployments.first }
@@ -298,11 +298,11 @@ describe Lti::ContextToolFinder do
           # workflow_state. In practice, this will happen in a delayed job when the
           # developer_key_account_binding is created or updated. There are also tests
           # for this in create_registration_service_spec.rb.
-          tool.update(workflow_state: binding_workflow_state ? "public" : "disabled")
+          tool.update(workflow_state: (binding_workflow_state == :on) ? "public" : "disabled")
         end
 
         let(:registration) do
-          lti_registration_with_tool(account: @root_account, binding_params: { workflow_state: binding_workflow_state })
+          lti_registration_with_tool(account: @root_account, registration_params: { workflow_state: binding_workflow_state })
         end
 
         let(:tool) { registration.deployments.first }
@@ -317,7 +317,7 @@ describe Lti::ContextToolFinder do
         end
 
         context "with an 'on' binding" do
-          let(:binding_workflow_state) { true }
+          let(:binding_workflow_state) { :on }
 
           context "and an 'on' context control" do
             let(:context_control_availability) { true }
@@ -337,7 +337,7 @@ describe Lti::ContextToolFinder do
         end
 
         context "with an 'off' binding" do
-          let(:binding_workflow_state) { false }
+          let(:binding_workflow_state) { :off }
 
           context "and an 'on' context control" do
             let(:context_control_availability) { true }

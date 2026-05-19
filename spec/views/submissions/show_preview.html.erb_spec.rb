@@ -42,6 +42,20 @@ describe "submissions/show_preview" do
     expect(response.body).to match(/.*www\.example\.com.*/)
   end
 
+  it "renders a visible 'click here to view' link for media recording submissions" do
+    course_with_student
+    view_context
+    a = @course.assignments.create!(title: "media assignment", submission_types: "media_recording")
+    MediaObject.create!(media_id: "1_abc12345", media_type: "video", context: @user)
+    sub = a.submit_homework(@user, submission_type: "media_recording", media_comment_id: "1_abc12345", media_comment_type: "video")
+    assign(:assignment, a)
+    assign(:submission, sub)
+    render "submissions/show_preview"
+    link = Nokogiri::HTML5.fragment(response.body).at_css("a.play_media_recording_link")
+    expect(link).not_to be_nil
+    expect(link.text).to eq("click here to view.")
+  end
+
   it "gives a user-friendly explanation why there's no preview" do
     course_with_student
     view_context
@@ -113,6 +127,25 @@ describe "submissions/show_preview" do
         expect(element).not_to be_nil
         expect(element["src"]).to match(%r{/api/v1/canvadoc_session?})
       end
+    end
+  end
+
+  describe "media recording submissions" do
+    it "renders data attributes with underscores for JavaScript compatibility" do
+      course_with_student
+      view_context
+      assignment = @course.assignments.create!(title: "media assignment", submission_types: "media_recording")
+      submission = assignment.submit_homework(@user, submission_type: "media_recording", media_comment_id: "test_media_id", media_comment_type: "video")
+      assign(:assignment, assignment)
+      assign(:submission, submission)
+
+      render "submissions/show_preview"
+
+      # Verify data attributes use underscores (data-media_comment_id) not hyphens (data-media-comment-id)
+      # This is required for the JavaScript thumbnail generation to find the media ID
+      expect(response.body).to include('data-media_comment_id="test_media_id"')
+      expect(response.body).to include('data-media_comment_type="video"')
+      expect(response.body).to include('class="play_media_recording_link"')
     end
   end
 

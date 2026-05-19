@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 const I18n = createI18nScope('files_v2')
 
@@ -26,6 +27,8 @@ export const FilesGenericErrorPage = () => {
   return (
     <GenericErrorPage
       imageUrl={errorShipUrl}
+      onReportError={reportError}
+      translations={canvasErrorPageTranslations}
       errorSubject={I18n.t('Files Index initial query error')}
       errorCategory={I18n.t('Files Index Error Page')}
     />

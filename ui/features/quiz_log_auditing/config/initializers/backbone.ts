@@ -20,6 +20,7 @@ import Backbone from '@canvas/backbone'
 import config from '../../config'
 import CoreAdapter from '@canvas/quiz-legacy-client-apps/adapter'
 
+// @ts-expect-error TS7 migration
 const Adapter = new CoreAdapter(config)
 
 Backbone.ajax = function (options: any) {

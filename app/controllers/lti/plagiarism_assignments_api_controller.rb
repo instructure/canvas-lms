@@ -64,7 +64,7 @@ module Lti
   class PlagiarismAssignmentsApiController < ApplicationController
     include Lti::IMS::AccessTokenHelper
 
-    skip_before_action :load_user
+    skip_before_action :load_user, :require_user
     before_action :authorized_lti2_tool, :tool_proxy_related_to_assignment?, :user_related_to_assignment?
 
     ASSIGNMENT_SERVICE = "vnd.Canvas.Assignment"

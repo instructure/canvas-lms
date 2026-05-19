@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../../spec_helper"
-
 # rubocop:disable Style/RedundantFetchBlock -- it's a cachestore, not a Hash
 describe ActiveSupport::Cache::SafeRedisRaceCondition do
   before do

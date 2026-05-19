@@ -20,8 +20,6 @@
 
 class GradebookCsvsController < ApplicationController
   before_action :require_context
-  before_action :require_user
-
   def create
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       current_time = Time.zone.now.strftime("%FT%H%M")

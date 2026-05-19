@@ -280,6 +280,35 @@ describe Accessibility::ResourceScannerService do
         expect(scan.reload.workflow_state).to eq("completed")
       end
 
+      context "when the resource is modified after the scan is queued" do
+        before do
+          scan.update_columns(
+            resource_name: "Old Title",
+            resource_workflow_state: "published",
+            resource_updated_at: 1.day.ago
+          )
+          wiki_page.update!(title: "New Title", workflow_state: "unpublished")
+        end
+
+        it "refreshes resource_name with the current title" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.resource_name).to eql("New Title")
+        end
+
+        it "refreshes resource_workflow_state with the current state" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.resource_workflow_state).to eql("unpublished")
+        end
+
+        it "refreshes resource_updated_at with the current updated_at" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.resource_updated_at).to eql(wiki_page.reload.updated_at)
+        end
+      end
+
       it "logs the correct Datadog metrics for a completed scan" do
         subject.scan_resource(scan:)
 
@@ -310,6 +339,115 @@ describe Accessibility::ResourceScannerService do
           expect(Accessibility::CourseStatisticCalculatorService).not_to receive(:queue_calculation)
           subject.scan_resource(scan:)
         end
+      end
+    end
+
+    context "when a11y_checker_ga2_features feature flag is enabled" do
+      let(:html_with_issues) do
+        <<~HTML
+          <div>
+            <h1>H1 Title</h1>
+            <h2>H2 Title</h2>
+            <h4>H4 Title</h4>
+          </div>
+        HTML
+      end
+
+      before do
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+        wiki_page.update!(body: html_with_issues)
+      end
+
+      context "when adding new issues would exceed the limit" do
+        before do
+          Setting.set("a11y_checker_course_issue_limit", "1")
+        end
+
+        it "marks the scan as failed" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.workflow_state).to eq("failed")
+        end
+
+        it "sets the error_message to issue_limit_reached" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.error_message).to eq("issue_limit_reached")
+        end
+
+        it "sets issue_count to 0" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.issue_count).to eq(0)
+        end
+
+        it "does not create new accessibility issues" do
+          subject.scan_resource(scan:)
+
+          expect(AccessibilityIssue.where(context: wiki_page).active.count).to eq(0)
+        end
+
+        it "does not queue course statistics" do
+          expect(Accessibility::CourseStatisticCalculatorService).not_to receive(:queue_calculation)
+          subject.scan_resource(scan:)
+        end
+      end
+
+      context "when adding new issues stays within the limit" do
+        before do
+          Setting.set("a11y_checker_course_issue_limit", "2500")
+        end
+
+        it "completes the scan normally" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.workflow_state).to eq("completed")
+        end
+
+        it "creates the accessibility issues" do
+          subject.scan_resource(scan:)
+
+          expect(AccessibilityIssue.where(context: wiki_page).active.count).to eq(2)
+        end
+      end
+
+      context "when there are existing active issues from other scans in the same course" do
+        before do
+          Setting.set("a11y_checker_course_issue_limit", "1")
+          other_page = wiki_page_model(course:)
+          other_scan = accessibility_resource_scan_model(course:, context: other_page, workflow_state: "completed")
+          accessibility_issue_model(course:, context: other_page, accessibility_resource_scan: other_scan, workflow_state: "active")
+        end
+
+        it "counts existing course issues toward the limit" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.workflow_state).to eq("failed")
+          expect(scan.reload.error_message).to eq("issue_limit_reached")
+        end
+      end
+    end
+
+    context "when a11y_checker_ga2_features feature flag is disabled" do
+      let(:html_with_issues) do
+        <<~HTML
+          <div>
+            <h1>H1 Title</h1>
+            <h2>H2 Title</h2>
+            <h4>H4 Title</h4>
+          </div>
+        HTML
+      end
+
+      before do
+        Setting.set("a11y_checker_course_issue_limit", "1")
+        wiki_page.update!(body: html_with_issues)
+      end
+
+      it "ignores the issue limit and completes the scan" do
+        subject.scan_resource(scan:)
+
+        expect(scan.reload.workflow_state).to eq("completed")
       end
     end
 
@@ -599,6 +737,126 @@ describe Accessibility::ResourceScannerService do
           "accessibility.syllabus_scanned",
           tags: { cluster: scan.course.shard.database_server&.id }
         )
+      end
+    end
+  end
+
+  describe "#report_exception (via HtmlChecker)" do
+    let!(:scan) { accessibility_resource_scan_model(course:, context: wiki_page, workflow_state: "queued") }
+
+    before { allow(InstStatsd::Statsd).to receive(:distributed_increment) }
+
+    context "when a rule raises during element traversal" do
+      before do
+        bad_rule = instance_double(Accessibility::Rules::HeadingsStartAtH2Rule)
+        allow(bad_rule).to receive(:test).and_raise(StandardError, "rule error")
+        allow(bad_rule).to receive(:class).and_return(Accessibility::Rules::HeadingsStartAtH2Rule)
+        allow(Accessibility::Rule).to receive(:registry).and_return({ "bad_rule" => bad_rule })
+        wiki_page.update!(body: "<p>content</p>")
+      end
+
+      it "calls Sentry.capture_exception with the rule error tag and contextual info" do
+        expect(Sentry).to receive(:with_scope).and_yield(instance_double(Sentry::Scope, set_context: nil))
+        expect(Sentry).to receive(:capture_exception).with(instance_of(StandardError), level: :error)
+
+        subject.scan_resource(scan:)
+      end
+
+      it "sets the Sentry scope context with the rule error tag and contextual info" do
+        scope = instance_double(Sentry::Scope)
+        allow(Sentry).to receive(:with_scope).and_yield(scope)
+        allow(Sentry).to receive(:capture_exception)
+
+        expect(scope).to receive(:set_context).with(
+          "accessibility_rule_error",
+          hash_including(
+            rule_id: Accessibility::Rules::HeadingsStartAtH2Rule.id,
+            resource_type: "WikiPage",
+            resource_id: wiki_page.global_id,
+            context_type: "Course",
+            context_id: course.global_id,
+            account_id: course.account.global_id
+          )
+        )
+
+        subject.scan_resource(scan:)
+      end
+
+      it "completes the scan successfully despite the rule error" do
+        allow(Sentry).to receive(:with_scope).and_yield(instance_double(Sentry::Scope, set_context: nil))
+        allow(Sentry).to receive(:capture_exception)
+
+        subject.scan_resource(scan:)
+
+        expect(scan.reload.workflow_state).to eq("completed")
+      end
+    end
+
+    context "when HTML parsing fails" do
+      before do
+        allow_any_instance_of(described_class).to receive(:parse_html_content).and_raise(StandardError, "parse error")
+        wiki_page.update!(body: "<p>content</p>")
+      end
+
+      it "calls Sentry.capture_exception with the parse error" do
+        expect(Sentry).to receive(:with_scope).and_yield(instance_double(Sentry::Scope, set_context: nil))
+        expect(Sentry).to receive(:capture_exception).with(instance_of(StandardError), level: :error)
+
+        subject.scan_resource(scan:)
+      end
+
+      it "sets the Sentry scope context with the parse error tag and contextual info" do
+        scope = instance_double(Sentry::Scope)
+        allow(Sentry).to receive(:with_scope).and_yield(scope)
+        allow(Sentry).to receive(:capture_exception)
+
+        expect(scope).to receive(:set_context).with(
+          "accessibility_html_parse_error",
+          hash_including(
+            resource_type: "WikiPage",
+            resource_id: wiki_page.global_id,
+            context_type: "Course",
+            context_id: course.global_id,
+            account_id: course.account.global_id
+          )
+        )
+
+        subject.scan_resource(scan:)
+      end
+
+      it "completes the scan with issue_count of 0" do
+        allow(Sentry).to receive(:with_scope).and_yield(instance_double(Sentry::Scope, set_context: nil))
+        allow(Sentry).to receive(:capture_exception)
+
+        subject.scan_resource(scan:)
+
+        expect(scan.reload.issue_count).to eq(0)
+      end
+    end
+
+    context "for a syllabus resource" do
+      subject { described_class.new(resource: Accessibility::SyllabusResource.new(course)) }
+
+      let!(:scan) { accessibility_resource_scan_model(course:, is_syllabus: true) }
+
+      before do
+        course.update!(syllabus_body: "<p>content</p>")
+        allow_any_instance_of(described_class).to receive(:parse_html_content).and_raise(StandardError, "parse error")
+      end
+
+      it "sets the Sentry scope context with context_type of Course" do
+        scope = instance_double(Sentry::Scope)
+        allow(Sentry).to receive(:with_scope).and_yield(scope)
+        allow(Sentry).to receive(:capture_exception)
+
+        expect(scope).to receive(:set_context).with(
+          "accessibility_html_parse_error",
+          hash_including(
+            context_type: "Course"
+          )
+        )
+
+        subject.scan_resource(scan:)
       end
     end
   end

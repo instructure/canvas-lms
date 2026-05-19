@@ -36,6 +36,8 @@ RSpec.describe CanvasOperations::BaseOperation do
   shared_context "result setting operation" do
     before do
       stub_const("MyOperation", Class.new(described_class) do
+        self.progress_tracking = true
+
         def execute
           results[:custom_result] = "banana"
         end
@@ -86,6 +88,18 @@ RSpec.describe CanvasOperations::BaseOperation do
 
         def execute
           log_message("Executing SettingOperation")
+        end
+      end)
+    end
+  end
+
+  shared_context "progress operation" do
+    before do
+      stub_const("MyOperation", Class.new(described_class) do
+        self.progress_tracking = true
+
+        def execute
+          log_message("Executing MyOperation")
         end
       end)
     end
@@ -312,7 +326,7 @@ RSpec.describe CanvasOperations::BaseOperation do
     subject(:run_later) { operation_instance.run_later }
 
     context "when progress tracking is enabled" do
-      include_context "simple operation"
+      include_context "progress operation"
 
       let(:operation_instance) { MyOperation.new }
 
@@ -337,7 +351,10 @@ RSpec.describe CanvasOperations::BaseOperation do
       let(:operation_instance) { NoProgressOperation.new }
 
       # Testing production-like behavior with `delay_if_production`
-      before { allow(Rails.env).to receive(:production?).and_return(true) }
+      before do
+        allow(Rails.env).to receive(:production?).and_return(true)
+        allow(operation_instance).to receive(:log_message)
+      end
 
       it "enqueues the operation without Progress tracking" do
         expect(operation_instance).to receive(:log_message).with("Progress tracking is disabled; running operation without Progress tracking.", level: :debug).once
@@ -385,7 +402,7 @@ RSpec.describe CanvasOperations::BaseOperation do
 
   describe "#job_options" do
     context "when progress tracking is enabled" do
-      include_context "simple operation"
+      include_context "progress operation"
 
       let(:operation_instance) { MyOperation.new }
 
@@ -420,7 +437,7 @@ RSpec.describe CanvasOperations::BaseOperation do
   describe "#fail_with_error!" do
     subject(:fail_operation) { operation_instance.fail_with_error! }
 
-    include_context "simple operation"
+    include_context "progress operation"
 
     let(:operation_instance) { MyOperation.new }
 

@@ -25,7 +25,7 @@ import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 
 const I18n = createI18nScope('theme_editor')
 
@@ -175,10 +175,9 @@ export default function ThemeCard(props: ThemeCardProps) {
         <Modal
           open={true}
           onDismiss={props.cancelDeleting}
-          onSubmit={props.onDelete}
           label={I18n.t('Delete Theme?')}
         >
-          <form style={{margin: '0'}}>
+          <form style={{margin: '0'}} onSubmit={props.onDelete}>
             <Modal.Body>{I18n.t('Delete %{themeName}?', {themeName: props.name})}</Modal.Body>
             <Modal.Footer>
               <Button onClick={props.cancelDeleting}>{I18n.t('Cancel')}</Button>

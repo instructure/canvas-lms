@@ -73,8 +73,6 @@
 class AiExperiencesController < ApplicationController
   include Api::V1::AiExperience
 
-  protect_from_forgery except: %i[create update destroy], with: :exception
-
   before_action :require_context
   before_action :check_ai_experiences_feature_flag
   before_action :require_access_right, only: [:index, :show]
@@ -98,6 +96,12 @@ class AiExperiencesController < ApplicationController
     # Students (non-managers) should only see published experiences
     @experiences = @experiences.where(workflow_state: "published") unless can_manage
     @experiences = @experiences.where(workflow_state: params[:workflow_state]) if params[:workflow_state].present?
+
+    # Sync index status for actively indexing experiences
+    if @context.feature_enabled?(:ai_experiences_context_file_upload)
+      sync_in_progress_index_statuses(@experiences, @context.account)
+    end
+
     set_active_tab "ai_experiences"
     add_crumb t("#crumbs.ai_experiences", "AI Experiences")
     respond_to do |format|
@@ -132,15 +136,27 @@ class AiExperiencesController < ApplicationController
     set_active_tab "ai_experiences"
     add_crumb t("#crumbs.ai_experiences", "AI Experiences"), course_ai_experiences_path(@context)
     add_crumb @ai_experience.title
+
     respond_to do |format|
       format.html do
         @page_title = @ai_experience.title
         js_bundle :ai_experiences_show
-        js_env(AI_EXPERIENCE: ai_experience_json(@ai_experience, @current_user, session, can_manage:))
+        js_env({ COURSE_ID: @context.id, AI_EXPERIENCE_ID: @ai_experience.id })
+        js_env[:FEATURES] ||= {}
+        js_env[:FEATURES][:ai_experiences_context_file_upload] =
+          @context.feature_enabled?(:ai_experiences_context_file_upload)
         render html: view_context.content_tag(:div, nil, id: "ai_experiences_show"),
                layout: true
       end
-      format.json { render json: ai_experience_json(@experience, @current_user, session, can_manage:) }
+      format.json do
+        failed_file_names = []
+        if @context.feature_enabled?(:ai_experiences_context_file_upload) &&
+           @ai_experience.llm_conversation_context_id.present?
+          result = AiExperiences::ConversationContextDocumentsService.new(account: @context.account).sync_index_status(ai_experience: @ai_experience)
+          failed_file_names = result&.dig(:failed_file_names) || []
+        end
+        render json: ai_experience_json(@ai_experience, @current_user, session, can_manage:, failed_context_file_names: failed_file_names)
+      end
     end
   end
 
@@ -157,6 +173,7 @@ class AiExperiencesController < ApplicationController
     js_env({ COURSE_ID: @context.id })
     js_env[:FEATURES] ||= {}
     js_env[:FEATURES][:ai_experiences_context_file_upload] = @context.feature_enabled?(:ai_experiences_context_file_upload)
+    js_env[:CONTEXT_FILE_MAX_SIZE_MB] = AiExperienceContextFile::MAX_FILE_SIZE / 1.megabyte
   end
 
   # @API Show edit AI experience form
@@ -170,6 +187,7 @@ class AiExperiencesController < ApplicationController
     js_env({ COURSE_ID: @context.id, AI_EXPERIENCE_ID: params[:id] })
     js_env[:FEATURES] ||= {}
     js_env[:FEATURES][:ai_experiences_context_file_upload] = @context.feature_enabled?(:ai_experiences_context_file_upload)
+    js_env[:CONTEXT_FILE_MAX_SIZE_MB] = AiExperienceContextFile::MAX_FILE_SIZE / 1.megabyte
   end
 
   # @API Create an AI experience
@@ -197,6 +215,7 @@ class AiExperiencesController < ApplicationController
     @experience.account = @context.account
 
     if @experience.save
+      track_experience_metrics(:create, @experience, new_publish_state: @experience.workflow_state)
       respond_to do |format|
         format.json { render json: ai_experience_json(@experience, @current_user, session), status: :created }
       end
@@ -227,7 +246,12 @@ class AiExperiencesController < ApplicationController
   #
   # @returns AiExperience
   def update
+    initial_publish_state = @experience.workflow_state
+
     if @experience.update(experience_params)
+      new_publish_state = @experience.workflow_state
+      track_experience_metrics(:update, @experience, initial_publish_state:, new_publish_state:)
+
       respond_to do |format|
         format.json { render json: ai_experience_json(@experience, @current_user, session), status: :ok }
       end
@@ -244,7 +268,11 @@ class AiExperiencesController < ApplicationController
   #
   # @returns AiExperience
   def destroy
+    initial_publish_state = @experience.workflow_state
+
     if @experience.delete
+      track_experience_metrics(:destroy, @experience, initial_publish_state:)
+
       respond_to do |format|
         format.json { render json: ai_experience_json(@experience, @current_user, session), status: :ok }
       end
@@ -275,7 +303,7 @@ class AiExperiencesController < ApplicationController
     ActiveRecord::Associations.preload(students, enrollments: :sis_pseudonym)
 
     # Preload user associations for user_json
-    user_json_preloads(students, false, accounts: true, pseudonyms: true, profile: true)
+    user_json_preloads(students, accounts: true, pseudonyms: true, profile: true)
 
     # Build enrollment lookup hash: user_id => enrollment
     enrollments_by_user = students.flat_map(&:enrollments)
@@ -350,20 +378,10 @@ class AiExperiencesController < ApplicationController
       return render json: { error: "Conversation not found" }, status: :not_found
     end
 
-    # Initialize LLM client to fetch message history from the llm-conversation service.
-    # We use the student's user context to ensure proper authorization and conversation continuity.
-    # The client handles communication with the external LLM service that stores the actual messages.
-    client = LLMConversationClient.new(
-      current_user: @conversation.user,
-      root_account_uuid: @context.root_account.uuid,
-      conversation_context_id: @experience.llm_conversation_context_id,
-      facts: @experience.facts,
-      learning_objectives: @experience.learning_objective,
-      scenario: @experience.pedagogical_guidance,
-      conversation_id: @conversation.llm_conversation_id
+    messages_and_progress = AiExperiences::ConversationMessagesService.new(account: @context.account).fetch_with_progress(
+      conversation_id: @conversation.llm_conversation_id,
+      requesting_user: @current_user
     )
-
-    messages_and_progress = client.messages_with_conversation_progress
 
     render json: ai_conversation_json(
       @conversation,
@@ -451,6 +469,44 @@ class AiExperiencesController < ApplicationController
                           end
 
       ai_experience_json(experience, @current_user, session, { submission_status:, can_manage: })
+    end
+  end
+
+  def sync_in_progress_index_statuses(experiences, account)
+    # Only sync experiences that are actively indexing to minimize API calls
+    experiences_to_sync = experiences.select do |exp|
+      exp.llm_conversation_context_id.present? &&
+        exp.context_index_status == "in_progress"
+    end
+
+    return if experiences_to_sync.empty?
+
+    service = AiExperiences::ConversationContextDocumentsService.new(account:)
+    experiences_to_sync.each do |experience|
+      service.sync_index_status(ai_experience: experience)
+    end
+  end
+
+  def track_experience_metrics(action, experience, initial_publish_state: nil, new_publish_state: nil)
+    return unless @context.is_a?(Course)
+
+    tags = { aws_region: Canvas.region, root_account_id: @context.root_account.uuid, course_id: @context.id }
+
+    case action
+    when :create
+      InstStatsd::Statsd.increment("ai_experiences.total_created", tags:)
+      InstStatsd::Statsd.increment("ai_experiences.total_with_source_files", tags:) if experience.ai_experience_context_files.exists?
+      InstStatsd::Statsd.increment("ai_experiences.total_published", tags:) if new_publish_state == "published"
+    when :destroy
+      InstStatsd::Statsd.decrement("ai_experiences.total_created", tags:)
+      InstStatsd::Statsd.decrement("ai_experiences.total_with_source_files", tags:) if experience.ai_experience_context_files.exists?
+      InstStatsd::Statsd.decrement("ai_experiences.total_published", tags:) if initial_publish_state == "published"
+    when :update
+      if initial_publish_state == "unpublished" && new_publish_state == "published" # Experience was just published
+        InstStatsd::Statsd.increment("ai_experiences.total_published", tags:)
+      elsif initial_publish_state == "published" && new_publish_state == "unpublished" # Experience was just unpublished
+        InstStatsd::Statsd.decrement("ai_experiences.total_published", tags:)
+      end
     end
   end
 end

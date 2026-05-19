@@ -19,7 +19,7 @@
 #
 
 class DocviewerAuditEventsController < ApplicationController
-  skip_before_action :verify_authenticity_token
+  skip_before_action :verify_authenticity_token, :require_user
   before_action :check_jwt_token
 
   def create
@@ -59,7 +59,7 @@ class DocviewerAuditEventsController < ApplicationController
       if event.save
         format.json { render json: event.as_json, status: :ok }
       else
-        format.json { render json: event.errors, status: :unprocessable_entity }
+        format.json { render json: event.errors, status: :unprocessable_content }
       end
     end
   end

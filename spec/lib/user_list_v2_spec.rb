@@ -190,7 +190,7 @@ describe UserListV2 do
     expect(dups.pluck(:account_id)).to match_array([account1.id, account2.id])
     expect(dups.pluck(:login_id)).to match_array(["jt@instructure.com", "jt@instructure.com"])
     dups.each do |h|
-      expect(h).to_not have_key(:sis_user_id) # only includes if can_read_sis is true
+      expect(h).not_to have_key(:sis_user_id) # only includes if can_read_sis is true
     end
   end
 

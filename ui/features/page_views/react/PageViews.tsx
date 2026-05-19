@@ -144,6 +144,8 @@ export default function PageViews({userId}: PageViewsProps): React.JSX.Element {
     })
   }
 
+  const pv5Enabled = window.ENV.PV5_ENABLED
+
   return (
     <Tabs onRequestTabChange={(_, {index}) => setSelectedIndex(index)} variant="secondary">
       <Tabs.Panel renderTitle={I18n.t('30-day activity')} isSelected={selectedIndex === 0}>
@@ -188,9 +190,11 @@ export default function PageViews({userId}: PageViewsProps): React.JSX.Element {
           </Flex.Item>
         </Flex>
       </Tabs.Panel>
-      <Tabs.Panel renderTitle={I18n.t('1-year activity')} isSelected={selectedIndex === 1}>
-        <PageViewsDownload userId={userId} />
-      </Tabs.Panel>
+      {pv5Enabled && (
+        <Tabs.Panel renderTitle={I18n.t('1-year activity')} isSelected={selectedIndex === 1}>
+          <PageViewsDownload userId={userId} />
+        </Tabs.Panel>
+      )}
     </Tabs>
   )
 }

@@ -1,0 +1,306 @@
+{
+    "ConfirmationDialog": {
+        "Cancel": "Prekliči",
+        "Confirm": "Potrdi"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "Označi kot pomemben datum in prikaži v stranski vrstici matičnega razreda"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "Privzeta ocenjevalna shema računa",
+        "Account default grading scheme was successfully saved.": "Privzeta ocenjevalna shema računa je bila uspešno shranjena.",
+        "Active Grading Schemes": "Aktivne ocenjevalne sheme",
+        "Applied": "Uporabljeno",
+        "Apply": "Uporabi",
+        "Archive Grading Scheme": "Arhivirane ocenjevalne sheme",
+        "Archived": "Arhivirano",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Arhivirane ocenjevalne sheme, ki so v uporabi, je še vedno mogoče uporabiti, vendar jih ni mogoče dodati novim predmetom ali dodelitvam.",
+        "Are you sure you want to delete this grading scheme?": "Ali ste prepričani, da želite izbrisati to ocenjevalno shemo?",
+        "Cancel": "Prekliči",
+        "Canvas Default": "Privzeto za sistem Canvas",
+        "Close": "Zapri",
+        "Confirm": "Potrdi",
+        "Confirm Default Grading Scheme Change": "Potrdi spremembo privzete ocenjevalne sheme",
+        "Delete Grading Scheme": "Izbriši ocenjevalno shemo",
+        "Duplicate Grading Scheme": "Podvojena ocenjevalna shema",
+        "Edit Grading Scheme": "Uredi ocenjevalno shemo",
+        "Grading Scheme Name": "Ime ocenjevalne sheme",
+        "Grading scheme was successfully archived.": "Ocenjevalna shema je bila uspešno arhivirana.",
+        "Grading scheme was successfully created.": "Ocenjevalna shema je bila uspešno ustvarjena.",
+        "Grading scheme was successfully removed.": "Ocenjevalna shema je bila uspešno odstranjena.",
+        "Grading scheme was successfully saved.": "Ocenjevalna shema je bila uspešno shranjena.",
+        "Grading scheme was successfully unarchived.": "Arhiviranje ocenjevalne shema je bilo uspešno razveljavljeno.",
+        "Locations Used": "Uporabljene lokacije",
+        "Lower limit of range": "Znižaj omejitev razpona",
+        "New Grading Scheme": "Nova ocenjevalna shema",
+        "Next Page": "Naslednja stran",
+        "No account default": "Ni privzete vrednosti za račun",
+        "Previous Page": "Prejšnja stran",
+        "Save": "Shrani",
+        "Search": "Iskanje",
+        "Search...": "Iščem ...",
+        "Show courses and assignments": "Prikaži predmete in naloge",
+        "Show locations used": "Prikaži uporabljene lokacije",
+        "Sort by": "Razvrsti glede na",
+        "There was an error while archiving the grading scheme": "Pri arhiviranju ocenjevalne sheme je prišlo do napake",
+        "There was an error while creating the grading scheme": "Pri ustvarjanju ocenjevalne sheme je prišlo do napake",
+        "There was an error while loading grading schemes": "Pri nalaganju ocenjevalne sheme je prišlo do napake",
+        "There was an error while loading the default canvas grading scheme": "Pri nalaganju privzete ocenjevalne sheme Canvas je prišlo do napake",
+        "There was an error while loading the default grading scheme": "Pri nalaganju privzete ocenjevalne sheme je prišlo do napake",
+        "There was an error while removing the grading scheme": "Pri odstranjevanju ocenjevalne sheme je prišlo do napake",
+        "There was an error while unarchiving the grading scheme": "Pri razveljavljanju arhiviranja ocenjevalne sheme je prišlo do napake",
+        "There was an error while updating the default grading scheme": "Pri posodabljanju privzete ocenjevalne sheme je prišlo do napake",
+        "There was an error while updating the grading scheme": "Pri posodabljanju ocenjevalne sheme je prišlo do napake",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Ta sprememba bo vplivala na vse aktivne predmete in naloge, ki trenutno podedujejo privzeto nastavitev računa. Dokončanje te spremembe bo trajala nekaj časa, saj se vse ocene predmetov in nalog preračunajo glede na novo privzeto ocenjevalno shemo računa.",
+        "Unarchive Grading Scheme": "Razveljavi arhiviranje ocenjevalne sheme",
+        "Upper limit of range": "Zgornja omejitev razpona",
+        "View Grading Scheme": "Ogled ocenjevalne sheme",
+        "View/Copy Grading Scheme": "Ogled/kopiranje ocenjevalne sheme",
+        "View/Edit Grading Scheme": "Ogled/urejanje ocenjevalne sheme",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "Te ocenjevalne sheme ne morete arhivirati, ker je nastavljena kot privzeta za predmet ali račun.",
+        "You can't delete this grading scheme because it is in use.": "Te ocenjevalne sheme ni mogoče odstraniti, ker je v uporabi.",
+        "You have no active grading schemes.": "Nimate aktivnih ocenjevalnih shem.",
+        "You have no archived grading schemes.": "Nimate arhiviranih ocenjevalnih shem.",
+        "to": "naslovnik"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "Ali ste prepričani, da želite izbrisati to ocenjevalno shemo?",
+        "Are you sure you want to duplicate this grading scheme?": "Ali ste prepričani, da želite to ocenjevalno shemo podvojiti?",
+        "Cancel": "Prekliči",
+        "Close": "Zapri",
+        "Delete": "Odstrani",
+        "Delete ": "Izbriši ",
+        "Duplicate": "Podvoji",
+        "Duplicate ": "Podvoji ",
+        "Edit Grading Scheme": "Uredi ocenjevalno shemo",
+        "New Grading Scheme": "Nova ocenjevalna shema",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "Odstotkov in točk ni mogoče urejati, ker gre za ocenjevalno shemo na ravni računa.",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "Odstotkov in točk ni mogoče urejati, ker so uporabljeni kot privzeta ocenjevalna shema.",
+        "Percentages and points can't be edited because it is currently being used.": "Odstotkov in točk ni mogoče urejati, ker so trenutno v uporabi.",
+        "Save": "Shrani"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Preglednica, ki vsebuje podatke o ocenjevalni shemi Canvas.  V vsaki vrstici so ime ter največji in najmanjši odstotek.",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Preglednica, ki vsebuje podatke o ocenjevalni shemi.  V vsaki vrstici so ime ter največji in najmanjši odstotek.",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Imena vrstic ne smejo biti podvojena ali prazna. Popravite imena in poskusite znova klikniti »Shrani«.",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Ne sme imeti prekrivajočih se ali praznih razponov. Popravite razpone in poskusite znova klikniti »Shrani«.",
+        "Delete grading scheme": "Odstrani ocenjevalno shemo",
+        "Edit Grading Scheme": "Uredi ocenjevalno shemo",
+        "Edit a copy of this grading scheme": "Uredite kopijo te ocenjevalne sheme",
+        "Edit grading scheme": "Uredi ocenjevalno shemo",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Ime ocenjevalne sheme je obvezno Popravite ime in poskusite znova klikniti »Shrani«.",
+        "Grading scheme title": "Naslov ocenjevalne sheme",
+        "Invalid grading scheme": "Neveljavna ocenjevalna shema",
+        "Letter Grade": "Črkovna ocena",
+        "Looks great!": "Videti je dobro.",
+        "Percentage": "Odstotek",
+        "Points": "Točke",
+        "Range": "Razpon",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Razpon mora biti veljavno število. Ne sme imeti negativnih števil ali števil, večjih od 100. Popravite razpone in poskusite znova klikniti »Shrani«.",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Razpon mora biti veljavno število. Ne sme imeti negativnih števil ali števil, večjih od zgornjega razpona točk. Popravite razpone in poskusite znova klikniti »Shrani«.",
+        "edit a copy": "Uredi kopijo"
+    },
+    "OutcomeManagement": {
+        "Course": "Predmet",
+        "Institution": "Ustanova"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "Računi",
+        "Close": "Zapri",
+        "Concluded": "Zaključeno",
+        "Courses": "Predmeti",
+        "Failed to load account used locations": "Uporabljenih lokacij računa ni bilo mogoče naložiti",
+        "Failed to load assignments used locations": "Uporabljenih lokacij nalog ni bilo mogoče naložiti",
+        "Failed to load used locations": "Uporabljenih lokacij ni bilo mogoče naložiti",
+        "Load Assignments ...": "Naloži naloge ...",
+        "Load More Assignments ...": "Naloži več nalog ...",
+        "Loading": "Nalaganje",
+        "Locations Used": "Uporabljene lokacije",
+        "Search": "Iskanje",
+        "Search...": "Iščem ..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "Pravilnik o sprejemljivi rabi",
+        "Close": "Zapri",
+        "Loading page": "Nalagam stran",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Pravilnik o sprejemljivi rabi trenutno ni na voljo. Preverite znova pozneje ali se obrnite na podporo, če potrebujete dodatno pomoč.",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Pravilnika o sprejemljivi rabi ni mogoče naložiti. Poskusite pozneje ali se obrnite na podporo, če težava še vedno obstaja."
+    },
+    "account_reports": {
+        "Close": "Zapri",
+        "Invalid date and time.": "Neveljaven datum in čas.",
+        "Next month": "Naslednji mesec",
+        "Previous month": "Prejšnji mesec",
+        "Time": "Čas"
+    },
+    "admin_split": {
+        "Cancel": "Prekliči",
+        "Failed to split users.": "Razdelitev uporabnikov ni uspela.",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "OPOMBA: S tem bomo poskušali združitev razveljaviti v čim večji meri; kljub temu združeni uporabniki morda ne bodo popolnoma povrnjeni v predhodno stanje.",
+        "OK": "V redu",
+        "Split": "Porazdeljeno",
+        "The following users will be split into separate user accounts:": "Naslednji uporabniki bodo razdeljeni na ločene uporabniške račune:",
+        "There are no user accounts to split from this user.": "Ni uporabniških računov, ki bi jih bilo mogoče razdeliti za tega uporabnika.",
+        "User split complete. Links to split user accounts follow:": "Razdelitev uporabnikov je zaključena. Povezave do razdeljenih uporabniških računov sledijo:"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "Opis"
+    },
+    "assignment_footer": {
+        "Next": "Naprej",
+        "Previous": "Nazaj"
+    },
+    "assignment_tabs": {
+        "Assignment": "Naloga",
+        "Peer Review": "Ocenjevanje kolegov"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "(privzeto za predmet)",
+        "Account Level": "Raven računa",
+        "Canvas Grading Scheme (course default)": "Ocenjevalna shema Canvas (privzeto za predmet)",
+        "Close": "Zapri",
+        "Course Level": "Raven predmeta",
+        "Default Canvas Grading Scheme": "Privzeta ocenjevalna shema Canvas",
+        "Grading scheme was successfully removed.": "Ocenjevalna shema je bila uspešno odstranjena.",
+        "Grading scheme was successfully updated.": "Ocenjevalna shema je bila uspešno posodobljena.",
+        "Manage All Grading Schemes": "Upravljaj vse ocenjevalne sheme",
+        "New Grading Scheme": "Nova ocenjevalna shema",
+        "Select a grading scheme": "Izberite ocenjevalno shemo",
+        "There was an error while loading grading schemes": "Pri nalaganju ocenjevalne sheme je prišlo do napake",
+        "There was an error while loading the grading scheme": "Pri nalaganju ocenjevalne sheme je prišlo do napake",
+        "There was an error while refreshing grading schemes": "Pri osveževanju ocenjevalnih shem je prišlo do napake",
+        "There was an error while removing the grading scheme": "Pri odstranjevanju ocenjevalne sheme je prišlo do napake",
+        "View": "Ogled"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "Stran z napako izvajalca Naloge 2",
+        "Assignments 2 Teacher initial query error": "Napaka pri prvi poizvedbi izvajalca Naloge 2",
+        "Loading": "Nalaganje"
+    },
+    "catalog": {
+        "Course Catalog": "Katalog predmeta"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "Odlično! Od razvijalcev sistema Canvas"
+    },
+    "content_copy_redesign": {
+        "Cancel": "Prekliči",
+        "Copy course": "Kopiraj predmet",
+        "Course code": "Šifra predmeta",
+        "Course code must be 255 characters or less": "Šifra predmeta mora vsebovati največ 255 znakov",
+        "Course name must be 255 characters or less": "Ime predmeta mora vsebovati največ 255 znakov",
+        "Create course": "Ustvari predmet",
+        "Creating...": "Ustvarjam ...",
+        "End date": "Končni datum",
+        "End date must be after start date": "Datum konca mora biti po datumu začetka.",
+        "Name": "Ime",
+        "No results": "Ni rezultatov",
+        "Please enter the details for the new course.": "Vnesite podrobnosti o novem predmetu.",
+        "Select a new beginning date": "Izberite nov datum začetka",
+        "Select a new end date": "Izberite nov končni datum",
+        "Select end date": "Izbira končnega datuma",
+        "Select start date": "Izbira začetnega datuma",
+        "Start date": "Datum začetka",
+        "Start date must be before end date": "Datum začetka mora biti pred datumom konca",
+        "Start typing to search...": "Za iskanje začnite vnašati besedilo ...",
+        "Term": "Semester",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Začetnega in končnega datuma semestra ni mogoče spreminjati tukaj, samo na strani s podrobnostmi semestra pod Skrbnik.",
+        "Use arrow keys to navigate options.": "Po možnostih se premikajte s puščičnima tipkama."
+    },
+    "content_share_preview_overlay": {
+        "Close": "Zapri",
+        "Content Share Preview": "Predogled vsebin v skupni rabi",
+        "Preview": "Predogled"
+    },
+    "copy_warnings_modal": {
+        "Attention": "Naslovnik"
+    },
+    "course_logging_content": {
+        "No results": "Ni rezultatov",
+        "Type to search": "Vnesi za iskanje"
+    },
+    "create_course_modal": {
+        "Cancel": "Prekliči",
+        "Course Details": "Podrobnosti o predmetu",
+        "Course Name": "Ime predmeta",
+        "Create": "Ustvari",
+        "Create Course": "Ustvari predmet",
+        "Create Subject": "Ustvari predmet",
+        "Creating new course...": "Ustvari nov predmet ...",
+        "Creating new subject...": "Ustvarjam nov predmet ...",
+        "Error creating new course": "Napaka pri ustvarjanju novega predmeta",
+        "Error creating new subject": "Napaka pri ustvarjanju novega predmeta",
+        "Loading accounts...": "Nalaganje računov ...",
+        "Name...": "Ime ...",
+        "No Results": "Ni rezultatov",
+        "Select a homeroom": "Izberite matični razred",
+        "Subject Name": "Ime predmeta",
+        "Unable to get accounts": "Računov ni bilo mogoče pridobiti",
+        "Unable to get homerooms": "Matičnih razredov ni mogoče pridobiti",
+        "Use arrow keys to navigate options.": "Po možnostih se premikajte s puščičnima tipkama.",
+        "Which account will this course be associated with?": "S katerim računom je treba povezati ta predmet?",
+        "Which account will this subject be associated with?": "S katerim računom je treba povezati ta predmet?"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "Preglasitev končne ocene"
+    },
+    "feature_flags": {
+        "Accept": "Sprejmi",
+        "Cancel": "Prekliči"
+    },
+    "filter_bar": {
+        "All": "Vse",
+        "Clear": "Počisti",
+        "Filter by": "Filtriraj glede na",
+        "Search": "Iskanje",
+        "Use arrow keys to navigate options.": "Po možnostih se premikajte s puščičnima tipkama."
+    },
+    "groupNavigationSelector": {
+        "Select Group": "Izberite skupino",
+        "Use arrow keys to navigate options.": "Po možnostih se premikajte s puščičnima tipkama."
+    },
+    "jobs": {
+        "Close": "Zapri"
+    },
+    "modules_home_page": {
+        "Create a new Module": "Ustvari nov modul"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "Panda učenjak",
+        "Moves:": "Premiki:"
+    },
+    "overview_page": {
+        "Edit home page": "Domača stran za urejanje",
+        "Subject Home Page": "Domača stran predmeta"
+    },
+    "pages_edit_title": {
+        "Page Title": "Naslov strani"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "Prekliči",
+        "Close": "Zapri"
+    },
+    "study_assist": {
+        "Back": "Nazaj",
+        "Close": "Zapri",
+        "Page": "Stran"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "Zahtevan je veljaven URL",
+        "Website URL": "URL spletnega mesta"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "Pravilnik o sprejemljivi rabi",
+        "Loading...": "Nalaganje ...",
+        "Preview": "Predogled"
+    },
+    "todos_page": {
+        "Failed to load todos": "Nalaganje seznamov opravil ni uspelo",
+        "Loading Additional Todo Details": "Nalaganje dodatnih podrobnosti o seznamu opravil",
+        "Loading Todo Course Name": "Nalagam ime predmeta s seznamom opravil",
+        "Loading Todo Title": "Nalagam naslov seznama opravil"
+    },
+    "tray": {
+        "Close": "Zapri"
+    }
+}

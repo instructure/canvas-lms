@@ -16,22 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {trackPendoEvent} from '@instructure/canvas-media'
 import tinymce, {Editor} from 'tinymce'
 import bridge from '../../../bridge'
-import configureStore from '../../../sidebar/store/configureStore'
+import {showFlashAlert} from '../../../common/FlashAlert'
+import formatMessage from '../../../format-message'
 import {get as getSession} from '../../../sidebar/actions/session'
 import {uploadToMediaFolder} from '../../../sidebar/actions/upload'
-import doFileUpload, {DoFileUploadResult} from '../shared/Upload/doFileUpload'
-import formatMessage from '../../../format-message'
-import {isAudioOrVideo, isImage} from '../shared/fileTypeUtils'
-import {showFlashAlert} from '../../../common/FlashAlert'
+import configureStore from '../../../sidebar/store/configureStore'
+import RCEGlobals from '../../RCEGlobals'
+import RCEWrapper from '../../RCEWrapper'
 import {
   isMicrosoftWordContentInEvent,
   RCEClipOrDragEvent,
   TinyClipboardEvent,
   TinyDragEvent,
 } from '../shared/EventUtils'
-import RCEWrapper from '../../RCEWrapper'
+import {isAudioOrVideo} from '../shared/fileTypeUtils'
+import doFileUpload, {DoFileUploadResult} from '../shared/Upload/doFileUpload'
 
 // assume that if there are multiple RCEs on the page,
 // they all talk to the same canvas
@@ -176,6 +178,19 @@ tinymce.PluginManager.add(
         if (isAudioVideoDisabled && isAudioOrVideo(file.type)) {
           // Skip audio and video files when disabled
           continue
+        }
+
+        if (
+          isAudioOrVideo(file.type) &&
+          RCEGlobals.getFeatures()?.rce_asr_captioning_improvements
+        ) {
+          const trayProps = bridge.trayProps.get(editor)
+          trackPendoEvent('canvas_native_media_embedded', {
+            insertion_method: isPaste ? 'paste_file' : 'drag_drop',
+            media_kind: file.type.startsWith('audio/') ? 'audio' : 'video',
+            resourceType: trayProps?.contextType,
+            resourceId: trayProps?.contextId,
+          })
         }
 
         // This will finish once the dialog is closed, if one was created, putting this in a loop allows us

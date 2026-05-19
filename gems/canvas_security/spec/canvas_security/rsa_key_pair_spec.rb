@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe CanvasSecurity::RSAKeyPair do
   describe "initialize" do
     it "generates a public key of default size 2048" do

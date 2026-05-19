@@ -26,7 +26,7 @@ import {View} from '@instructure/ui-view'
 import {usePublishing} from './publishing/publishingContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 import {
   batchUpdateAllModulesApiCall,

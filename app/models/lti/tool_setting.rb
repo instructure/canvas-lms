@@ -19,7 +19,7 @@
 #
 
 module Lti
-  class ToolSetting < ActiveRecord::Base
+  class ToolSetting < ApplicationRecord
     belongs_to :tool_proxy
     belongs_to :context, polymorphic: %i[course account attachment_association]
 

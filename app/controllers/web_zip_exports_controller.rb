@@ -95,7 +95,6 @@ class WebZipExportsController < ApplicationController
   include Api::V1::WebZipExport
   include WebZipExportHelper
 
-  before_action :require_user
   before_action :require_context
   before_action :check_feature_enabled
 

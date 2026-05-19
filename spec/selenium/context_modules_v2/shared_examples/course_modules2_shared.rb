@@ -383,7 +383,7 @@ shared_examples_for "course_module2 module tray requirements" do |context|
 
     module_action_menu(@module2.id).click
     module_item_action_menu_link("Edit").click
-    expect(element_exists?(sequential_order_checkbox_selector, true)).to be true
+    expect(element_exists?(sequential_order_checkbox_selector, xpath: true)).to be true
   end
 
   it "adds a requirement and validates complete one requirement pill", :ignore_js_errors do

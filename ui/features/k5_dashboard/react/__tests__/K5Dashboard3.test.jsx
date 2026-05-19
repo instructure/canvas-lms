@@ -34,11 +34,11 @@ import {
   defaultK5DashboardProps as defaultProps,
 } from './mocks'
 
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer} from '@instructure/platform-alerts'
 import K5Dashboard from '../K5Dashboard'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import * as ReactQuery from '@tanstack/react-query'
 

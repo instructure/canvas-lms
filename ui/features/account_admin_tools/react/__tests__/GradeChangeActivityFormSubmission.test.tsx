@@ -27,9 +27,38 @@ describe('GradeChangeActivityForm Submission', () => {
   const props: GradeChangeActivityFormProps = {
     accountId: '1',
     onSubmit: vi.fn(),
+    searchAsSubaccount: false,
   }
 
   afterEach(() => vi.resetAllMocks())
+
+  it.each([
+    {inputLabel: 'Course', fieldName: 'course_id'},
+    {inputLabel: 'Assignment ID', fieldName: 'assignment_id'},
+  ])(
+    'should be able to submit the form if only "$inputLabel" is provided as subaccount',
+    async ({inputLabel, fieldName}) => {
+      render(<GradeChangeActivityForm {...props} searchAsSubaccount={true} />)
+      const inputValue = '1'
+      const input = screen.getByLabelText(inputLabel)
+      const submit = screen.getByLabelText('Search Logs')
+
+      fireEvent.change(input, {target: {value: inputValue}})
+      fireEvent.click(submit)
+
+      await waitFor(() => {
+        expect(props.onSubmit).toHaveBeenCalledWith({
+          grader_id: '',
+          student_id: '',
+          course_id: '',
+          assignment_id: '',
+          start_time: undefined,
+          end_time: undefined,
+          [fieldName]: inputValue,
+        })
+      })
+    },
+  )
 
   it.each([
     {inputLabel: 'Grader', fieldName: 'grader_id'},

@@ -88,10 +88,10 @@ describe('MasteryDistributionChart', () => {
     render(<MasteryDistributionChart {...defaultProps()} />)
     const labels = JSON.parse(screen.getByTestId('chart-labels').textContent || '[]')
 
-    expect(labels[0]).toBe('great!')
-    expect(labels[1]).toBe('mastery!')
-    expect(labels[2]).toBe('rating description!')
-    expect(labels[3]).toBe('not great')
+    expect(labels[0]).toBe('5')
+    expect(labels[1]).toBe('3')
+    expect(labels[2]).toBe('2')
+    expect(labels[3]).toBe('0')
   })
 
   it('prepends # to color values that do not start with #', () => {
@@ -294,7 +294,7 @@ describe('MasteryDistributionChart', () => {
     render(<MasteryDistributionChart {...propsWithoutDescriptions} />)
     const labels = JSON.parse(screen.getByTestId('chart-labels').textContent || '[]')
 
-    expect(labels[0]).toBe('3 pts')
+    expect(labels[0]).toBe('3')
   })
 
   it('handles various rating point values', () => {

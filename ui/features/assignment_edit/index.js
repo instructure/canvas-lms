@@ -61,7 +61,11 @@ function loadBackboneComponents() {
 
     if (ENV.ASSIGNMENT) {
       let assignmentOverrides = ENV.ASSIGNMENT_OVERRIDES
-      if (ENV.ASSIGNMENT.peer_reviews && ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
+      if (
+        ENV.ASSIGNMENT.peer_reviews &&
+        ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED &&
+        ENV.ASSIGNMENT.peer_review_sub_assignment
+      ) {
         // Flatten nested peer_review_dates to flat fields at entry point
         assignmentOverrides = flattenPeerReviewDates(ENV.ASSIGNMENT_OVERRIDES)
       }

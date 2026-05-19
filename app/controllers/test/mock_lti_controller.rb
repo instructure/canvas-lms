@@ -21,7 +21,7 @@
 require "json/jwt"
 
 class Test::MockLtiController < ApplicationController
-  skip_before_action :load_user
+  skip_before_action :load_user, :require_user
   skip_before_action :verify_authenticity_token
 
   # Defines a login endpoint for a mini LTI tool for testing purposes

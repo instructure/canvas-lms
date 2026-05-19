@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class SharedBrandConfig < ActiveRecord::Base
+class SharedBrandConfig < ApplicationRecord
   belongs_to :brand_config, foreign_key: "brand_config_md5", inverse_of: :shared_brand_configs
   belongs_to :account
 

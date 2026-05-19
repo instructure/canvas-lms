@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ContentParticipationCount < ActiveRecord::Base
+class ContentParticipationCount < ApplicationRecord
   ACCESSIBLE_ATTRIBUTES = %i[context user content_type unread_count].freeze
 
   belongs_to :context, polymorphic: [:course]

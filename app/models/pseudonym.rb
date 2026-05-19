@@ -19,7 +19,7 @@
 #
 class ImpossibleCredentialsError < ArgumentError; end
 
-class Pseudonym < ActiveRecord::Base
+class Pseudonym < ApplicationRecord
   # this field is used for audit logging.
   # if a request is deleting a pseudonym, it should set this value
   # before persisting the change.
@@ -219,6 +219,10 @@ class Pseudonym < ActiveRecord::Base
     p.dispatch :pseudonym_registration_done
     p.to { communication_channel || user.communication_channel }
     p.whenever { @send_registration_done_notification }
+
+    p.dispatch :pseudonym_suspended_after_failed_login
+    p.to { communication_channel || user.communication_channel }
+    p.whenever { @send_failed_login_notification }
   end
 
   def update_account_associations_if_account_changed
@@ -231,6 +235,14 @@ class Pseudonym < ActiveRecord::Base
     elsif saved_change_to_account_id?
       user.update_account_associations_later
     end
+  end
+
+  def suspend_with_notification!
+    self.workflow_state = "suspended"
+    @send_failed_login_notification = true
+    save!
+  ensure
+    @send_failed_login_notification = false
   end
 
   def must_be_root_account
@@ -383,7 +395,7 @@ class Pseudonym < ActiveRecord::Base
     :email_login
   end
 
-  def works_for_account?(_account, _allow_implicit = false, ignore_types: [:implicit])
+  def works_for_account?(_account, allow_implicit: false, ignore_types: [:implicit])
     true
   end
 
@@ -405,7 +417,11 @@ class Pseudonym < ActiveRecord::Base
 
     return unless unique_id
 
-    self.unique_id_normalized = self.class.normalize(unique_id) if unique_id_changed?
+    # Always ensure unique_id_normalized is correct, even if unique_id hasn't changed.
+    # This fixes cases where unique_id_normalized was corrupted (e.g., callbacks not running
+    # because update_all or save(validate: false), ect.)
+    normalized = self.class.normalize(unique_id)
+    self.unique_id_normalized = normalized if unique_id_changed? || unique_id_normalized != normalized
     if invalid_email?
       errors.add(:unique_id, "not_email")
       throw :abort

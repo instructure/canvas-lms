@@ -22,7 +22,19 @@ module UsageMetricsHelper
     js_env&.dig(:FEATURES, :send_usage_metrics) == true && usage_metrics_api_key.present?
   end
 
+  def load_consented_usage_metrics?
+    js_env&.dig(:FEATURES, :send_usage_metrics_after_consent) == true && usage_metrics_regional_api_key.present? && usage_metrics_regional_api_env.present?
+  end
+
   def usage_metrics_api_key
     DynamicSettings.find(tree: :private)[:pendo_app_id, failsafe: nil]
+  end
+
+  def usage_metrics_regional_api_key
+    DynamicSettings.find(tree: :private)[:pendo_regional_app_id, failsafe: nil]
+  end
+
+  def usage_metrics_regional_api_env
+    DynamicSettings.find(tree: :private)[:pendo_regional_app_env, failsafe: "io"]
   end
 end

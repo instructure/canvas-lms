@@ -84,17 +84,19 @@ export default class StudentColumnHeader extends ColumnHeader<Props, State> {
     selectedEnrollmentFilters: arrayOf(oneOf(studentRowHeaderConstants.enrollmentFilterKeys))
       .isRequired,
     onToggleEnrollmentFilter: func.isRequired,
-    // @ts-expect-error
-    disabled: Menu.propTypes.disabled.isRequired,
-    // @ts-expect-error
-    onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
-    ...ColumnHeader.propTypes,
+    disabled: bool.isRequired,
+    onMenuDismiss: func.isRequired,
+    addGradebookElement: func,
+    removeGradebookElement: func,
+    onHeaderKeyDown: func,
   }
 
   static defaultProps = {
     loginHandleName: null,
     sisName: null,
-    ...ColumnHeader.defaultProps,
+    addGradebookElement() {},
+    removeGradebookElement() {},
+    onHeaderKeyDown() {},
   }
 
   getColumnHeaderName() {

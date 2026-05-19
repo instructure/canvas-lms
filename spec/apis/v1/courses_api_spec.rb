@@ -67,11 +67,11 @@ describe Api::V1::Course do
       expect(@test_api.course_json(@course1, @me, {}, ["html_url"], [])).to include({
                                                                                       "html_url" => "course_url(Course.find(#{@course1.id}), :host => #{HostUrl.context_host(@course1)})"
                                                                                     })
-      expect(@test_api.course_json(@course1, @me, {}, [], [])).to_not include "html_url"
+      expect(@test_api.course_json(@course1, @me, {}, [], [])).not_to include "html_url"
     end
 
     it "only includes needs_grading_count if requested" do
-      expect(@test_api.course_json(@course1, @me, {}, [], [teacher_enrollment])).to_not include "needs_grading_count"
+      expect(@test_api.course_json(@course1, @me, {}, [], [teacher_enrollment])).not_to include "needs_grading_count"
     end
 
     it "only includes is_favorite if requested" do
@@ -94,7 +94,7 @@ describe Api::V1::Course do
     it "does not honor needs_grading_count for designers" do
       @designer_enrollment = @course1.enroll_designer(@me)
       @designer_enrollment.accept!
-      expect(@test_api.course_json(@course1, @me, {}, ["needs_grading_count"], [@designer_enrollment])).to_not include "needs_grading_count"
+      expect(@test_api.course_json(@course1, @me, {}, ["needs_grading_count"], [@designer_enrollment])).not_to include "needs_grading_count"
     end
 
     it "includes apply_assignment_group_weights" do
@@ -2142,7 +2142,7 @@ describe CoursesController, type: :request do
           expect do
             api_call(:put, @path, @params, course: { grading_standard_id: 123 })
             @course.reload
-          end.to_not change { @course.grading_standard_id }
+          end.not_to change { @course.grading_standard_id }
         end
 
         context "when an assignment is due in a closed grading period" do
@@ -3061,7 +3061,7 @@ describe CoursesController, type: :request do
            "not requested, even if 'current_grading_period_scores' are requested" do
           json_response = courses_api_index_call(includes: ["current_grading_period_scores"])
           enrollment_json = enrollment(json_response)
-          expect(enrollment_json).to_not include(*grading_period_score_keys)
+          expect(enrollment_json).not_to include(*grading_period_score_keys)
         end
 
         it "does not include current grading period scores if final grades are hidden, even if 'total_scores' and 'current_grading_period_scores' are requested" do
@@ -3153,13 +3153,13 @@ describe CoursesController, type: :request do
               json_response = courses_api_index_call(includes: ["total_scores", "current_grading_period_scores"])
               enrollment_json = enrollment(json_response)
               expect(enrollment_json["current_period_computed_current_score"])
-                .to_not eq(enrollment_json["computed_current_score"])
+                .not_to eq(enrollment_json["computed_current_score"])
               expect(enrollment_json["current_period_computed_final_score"])
-                .to_not eq(enrollment_json["computed_final_score"])
+                .not_to eq(enrollment_json["computed_final_score"])
               expect(enrollment_json["current_period_computed_current_grade"])
-                .to_not eq(enrollment_json["computed_current_grade"])
+                .not_to eq(enrollment_json["computed_current_grade"])
               expect(enrollment_json["current_period_computed_final_grade"])
-                .to_not eq(enrollment_json["computed_final_grade"])
+                .not_to eq(enrollment_json["computed_final_grade"])
             end
 
             it "current grading period scores are correct" do
@@ -3403,28 +3403,150 @@ describe CoursesController, type: :request do
         expect(json.pluck("workflow_state")).to all(eql "unpublished")
       end
 
-      it "does not return courses with invited StudentEnrollment or ObserverEnrollment when state[]=unpublished" do
-        @course4.enrollments.each do |e|
-          e.type = "StudentEnrollment"
-          e.role_id = student_role.id
-          e.save!
-        end
+      it "returns courses with invited StudentEnrollment or ObserverEnrollment when state[]=unpublished" do
+        @course4.enrollments.each { |e| e.update!(type: "StudentEnrollment", role_id: student_role.id) }
         json = api_call(:get,
                         "/api/v1/courses.json",
                         { controller: "courses", action: "index", format: "json" },
                         { state: ["unpublished"] })
-        expect(json.collect { |c| c["id"].to_i }.sort).to eq [@course3.id]
+        expect(json.pluck("id").sort).to eq [@course3.id, @course4.id].sort
 
-        @course3.enrollments.each do |e|
-          e.type = "ObserverEnrollment"
-          e.role_id = observer_role.id
-          e.save!
-        end
+        @course3.enrollments.each { |e| e.update!(type: "ObserverEnrollment", role_id: observer_role.id) }
         json = api_call(:get,
                         "/api/v1/courses.json",
                         { controller: "courses", action: "index", format: "json" },
                         { state: ["unpublished"] })
-        expect(json.collect { |c| c["id"].to_i }).to eq []
+        expect(json.pluck("id").sort).to eq [@course3.id, @course4.id].sort
+      end
+
+      it "returns unpublished courses with invited_or_pending enrollment_state for students" do
+        @course4.enrollments.each { |e| e.update!(type: "StudentEnrollment", role_id: student_role.id) }
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["unpublished"], enrollment_state: "invited_or_pending" })
+        expect(json.pluck("id")).to include(@course4.id)
+      end
+
+      it "returns available and completed courses on ?state[]=current_and_concluded" do
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["current_and_concluded"] })
+        expect(json.pluck("id").sort).to eq [@course1.id, @course2.id].sort
+        expect(json.pluck("workflow_state")).to all(be_in(%w[available completed]))
+      end
+
+      it "excludes student invited enrollments in future unpublished courses when restrict_student_future_listing is enabled" do
+        @course4.enrollments.each { |e| e.update!(type: "StudentEnrollment", role_id: student_role.id) }
+        @course4.update!(restrict_enrollments_to_course_dates: true, start_at: 1.month.from_now)
+        @course4.enrollments.reload.each do |e|
+          e.enrollment_state.update!(state_is_current: false)
+          e.enrollment_state.ensure_current_state
+        end
+        @course4.account.settings[:restrict_student_future_listing] = { value: true, locked: false }
+        @course4.account.save!
+
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["unpublished"] })
+        expect(json.pluck("id")).not_to include(@course4.id)
+        expect(json.pluck("id")).to include(@course3.id)
+      end
+
+      it "includes student invited enrollments in future unpublished courses when restrict_student_future_listing is disabled" do
+        @course4.enrollments.each { |e| e.update!(type: "StudentEnrollment", role_id: student_role.id) }
+        @course4.update!(restrict_enrollments_to_course_dates: true, start_at: 1.month.from_now)
+        @course4.enrollments.reload.each do |e|
+          e.enrollment_state.update!(state_is_current: false)
+          e.enrollment_state.ensure_current_state
+        end
+        @course4.account.settings[:restrict_student_future_listing] = { value: false, locked: false }
+        @course4.account.save!
+
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["unpublished"] })
+        expect(json.pluck("id")).to include(@course4.id)
+      end
+
+      it "includes both unpublished and available courses on ?state[]=unpublished&state[]=available" do
+        @course4.enrollments.each { |e| e.update!(type: "StudentEnrollment", role_id: student_role.id) }
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["unpublished", "available"] })
+        course_ids = json.pluck("id")
+        expect(course_ids).to include(@course1.id, @course2.id, @course3.id, @course4.id)
+        expect(json.pluck("workflow_state")).to all(be_in(%w[available unpublished]))
+      end
+
+      it "includes unpublished student enrollments on ?state[]=current_and_concluded&state[]=unpublished" do
+        @course4.enrollments.each { |e| e.update!(type: "StudentEnrollment", role_id: student_role.id) }
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["current_and_concluded", "unpublished"] })
+        course_ids = json.pluck("id")
+        expect(course_ids).to include(@course1.id, @course2.id, @course3.id, @course4.id)
+      end
+
+      it "returns concluded courses where student accepted before course concluded on ?state[]=current_and_concluded" do
+        concluded_course = course_factory(active_all: true)
+        concluded_course.enroll_user(@me, "StudentEnrollment", enrollment_state: "active")
+        concluded_course.complete!
+
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["current_and_concluded"] })
+        expect(json.pluck("id")).to include(concluded_course.id)
+      end
+
+      it "returns concluded courses where student accepted before course concluded when enrollment_state=completed" do
+        concluded_course = course_factory(active_all: true)
+        concluded_course.enroll_user(@me, "StudentEnrollment", enrollment_state: "active")
+        concluded_course.complete!
+
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["current_and_concluded"], enrollment_state: "completed" })
+        expect(json.pluck("id")).to include(concluded_course.id)
+      end
+
+      it "returns concluded courses when restrict_past_view is enabled" do
+        concluded_course = course_factory(active_all: true)
+        concluded_course.enroll_user(@me, "StudentEnrollment", enrollment_state: "active")
+        concluded_course.complete!
+        concluded_course.account.settings[:restrict_student_past_view] = { value: true, locked: false }
+        concluded_course.account.save!
+
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["current_and_concluded"], enrollment_state: "completed" })
+        expect(json.pluck("id")).to include(concluded_course.id)
+      end
+
+      it "returns pending enrollments in unpublished courses when restrict_future_view is enabled but restrict_future_listing is disabled" do
+        @course4.enrollments.each { |e| e.update!(type: "StudentEnrollment", role_id: student_role.id) }
+        @course4.update!(restrict_enrollments_to_course_dates: true, start_at: 1.month.from_now)
+        @course4.enrollments.reload.each do |e|
+          e.enrollment_state.update!(state_is_current: false)
+          e.enrollment_state.ensure_current_state
+        end
+        @course4.account.settings[:restrict_student_future_view] = { value: true, locked: false }
+        @course4.account.settings[:restrict_student_future_listing] = { value: false, locked: false }
+        @course4.account.save!
+
+        json = api_call(:get,
+                        "/api/v1/courses.json",
+                        { controller: "courses", action: "index", format: "json" },
+                        { state: ["unpublished"], enrollment_state: "invited_or_pending" })
+        expect(json.pluck("id")).to include(@course4.id)
       end
 
       it "returns courses with active StudentEnrollment or ObserverEnrollment when state[]=unpublished" do
@@ -4011,6 +4133,71 @@ describe CoursesController, type: :request do
           check_json.call(@student2, @student2_enroll)
         end
 
+        it "does not make N+1 role, user, or pseudonym queries when including enrollments" do
+          teacher = @user
+          admin = account_admin_user(account: @course1.account)
+          role_query = /FROM.*roles.*WHERE.*roles.*id.*=.*LIMIT/
+          user_query = /SELECT "users".\* FROM .* "users" WHERE "users"."id" = \d+ LIMIT/
+          pseudonym_query = /SELECT "pseudonyms".\* FROM .* "pseudonyms" WHERE .* "pseudonyms"."user_id" = \d+/
+          count_queries = lambda do |caller_user|
+            counts = { role: 0, user: 0, pseudonym: 0 }
+            counter = lambda do |_name, _start, _finish, _id, payload|
+              sql = payload[:sql]
+              counts[:role] += 1 if sql&.match?(role_query)
+              counts[:user] += 1 if sql&.match?(user_query)
+              counts[:pseudonym] += 1 if sql&.match?(pseudonym_query)
+            end
+            ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
+              api_call_as_user(caller_user, :get, api_url, api_route, include: ["enrollments"])
+            end
+            counts
+          end
+
+          # baseline with existing enrollments
+          teacher_baseline = count_queries.call(teacher)
+          admin_baseline = count_queries.call(admin)
+
+          section3 = @course1.course_sections.create!(name: "Section C")
+          student3 = user_with_pseudonym(name: "SSS3")
+          student4 = user_with_pseudonym(name: "SSS4")
+          @course1.enroll_user(student3, "StudentEnrollment", section: section3)
+          @course1.enroll_user(student4, "StudentEnrollment", section: section3)
+
+          # query counts must stay constant as enrollments grow
+          expect(count_queries.call(teacher)).to eq(teacher_baseline)
+          # admin exercises the SIS pseudonym lookup path (enrollment.user)
+          expect(count_queries.call(admin)).to eq(admin_baseline)
+        end
+
+        it "does not make N+1 user_profile queries when profiles are enabled" do
+          @course1.root_account.settings[:enable_profiles] = true
+          @course1.root_account.save!
+
+          profile_query = /SELECT "user_profiles".\* FROM .* "user_profiles" WHERE "user_profiles"."user_id" = \d+ LIMIT/
+          count_profile_queries = lambda do
+            count = 0
+            counter = lambda do |_name, _start, _finish, _id, payload|
+              count += 1 if payload[:sql]&.match?(profile_query)
+            end
+            ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
+              api_call(:get, api_url, api_route, include: ["bio"])
+            end
+            count
+          end
+
+          # baseline with existing users
+          baseline = count_profile_queries.call
+
+          section3 = @course1.course_sections.create!(name: "Section C")
+          student3 = user_with_pseudonym(name: "SSS3")
+          student4 = user_with_pseudonym(name: "SSS4")
+          @course1.enroll_user(student3, "StudentEnrollment", section: section3)
+          @course1.enroll_user(student4, "StudentEnrollment", section: section3)
+
+          # query count must stay constant as users grow
+          expect(count_profile_queries.call).to eq(baseline)
+        end
+
         it "doesn't return enrollments from another course" do
           @course2.enroll_user(@student1, "StudentEnrollment")
           json = api_call(:get,
@@ -4445,6 +4632,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns the course syllabus" do
+      @course1.root_account.disable_feature!(:disable_file_verifiers_in_public_syllabus)
       should_translate_user_content(@course1) do |content|
         @course1.syllabus_body = content
         @course1.saving_user = @me
@@ -4457,7 +4645,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns the course syllabus without verifiers" do
-      should_translate_user_content(@course1, false) do |content|
+      should_translate_user_content(@course1, location: "course_syllabus_#{@course1.id}") do |content|
         @course1.syllabus_body = content
         @course1.saving_user = @me
         @course1.save!
@@ -4468,8 +4656,26 @@ describe CoursesController, type: :request do
       end
     end
 
+    context "with disable_file_verifiers_in_public_syllabus enabled" do
+      before do
+        @course1.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+      end
+
+      it "returns the course syllabus with location tags and without verifiers" do
+        attachment = @course1.attachments.create!(uploaded_data: stub_png_data("my-pic.png"))
+        @course1.syllabus_body = "<img src='/courses/#{@course1.id}/files/#{attachment.id}'/>"
+        @course1.updating_user = @me
+        @course1.save!
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course1.id}.json?include[]=syllabus_body",
+                        { controller: "courses", action: "show", id: @course1.to_param, format: "json", include: ["syllabus_body"] })
+        expect(json["syllabus_body"]).to include("location=course_syllabus_#{@course1.id}")
+        expect(json["syllabus_body"]).not_to include("verifier=")
+      end
+    end
+
     it "does not return syllabus_versions when feature flag is disabled" do
-      Account.site_admin.disable_feature!(:syllabus_versioning)
+      @course1.account.disable_feature!(:syllabus_versioning)
       6.times do |i|
         @course1.update(syllabus_body: "Version #{i + 1}")
       end
@@ -4481,7 +4687,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns syllabus_versions when feature flag is enabled and param is present" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       6.times do |i|
         @course1.update(syllabus_body: "Version #{i + 1}")
       end
@@ -4496,7 +4702,7 @@ describe CoursesController, type: :request do
     end
 
     it "does not return syllabus_versions when param is not present" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       json = api_call(:get,
                       "/api/v1/courses/#{@course1.id}.json",
                       { controller: "courses", action: "show", id: @course1.to_param, format: "json" })
@@ -4504,7 +4710,7 @@ describe CoursesController, type: :request do
     end
 
     it "does not return syllabus_versions when user lacks manage_course_content_edit permission" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       student_in_course(active_all: true, course: @course1)
       SimplyVersioned::Version.create!(
         versionable: @course1,
@@ -4521,7 +4727,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns syllabus_versions when blank child receives syllabus from master" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
 
       master_course = course_factory
       template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
@@ -4544,7 +4750,7 @@ describe CoursesController, type: :request do
     end
 
     it "protects downstream syllabus changes from being overwritten by blueprint sync" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
 
       master_course = course_factory
       template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
@@ -4571,7 +4777,7 @@ describe CoursesController, type: :request do
     end
 
     it "does not create syllabus versions during blueprint sync when flag is disabled" do
-      Account.site_admin.disable_feature!(:syllabus_versioning)
+      @course1.account.disable_feature!(:syllabus_versioning)
 
       master_course = course_factory
       template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
@@ -4591,7 +4797,7 @@ describe CoursesController, type: :request do
     end
 
     it "creates syllabus versions during blueprint sync when flag is enabled" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
 
       master_course = course_factory
       template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
@@ -4611,7 +4817,7 @@ describe CoursesController, type: :request do
     end
 
     it "returns syllabus_versions after blueprint association is removed" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       6.times do |i|
         @course1.update(syllabus_body: "Version #{i + 1}")
       end
@@ -4634,7 +4840,7 @@ describe CoursesController, type: :request do
     end
 
     it "includes edited_by user information in syllabus_versions when saving_user is set" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       @course1.saving_user = @me
       @course1.update(syllabus_body: "Version with user")
 
@@ -4648,7 +4854,7 @@ describe CoursesController, type: :request do
     end
 
     it "does not include edited_by when saving_user is not set" do
-      Account.site_admin.enable_feature!(:syllabus_versioning)
+      @course1.account.enable_feature!(:syllabus_versioning)
       @course1.update(syllabus_body: "Version without user")
 
       json = api_call(:get,
@@ -4660,7 +4866,7 @@ describe CoursesController, type: :request do
 
     describe "#restore_version" do
       before do
-        Account.site_admin.enable_feature!(:syllabus_versioning)
+        @course1.account.enable_feature!(:syllabus_versioning)
         @course1.update!(syllabus_body: "Previous content")
         @version = @course1.versions.last
         @course1.update!(syllabus_body: "Current content")
@@ -4705,7 +4911,7 @@ describe CoursesController, type: :request do
       end
 
       it "requires feature flag to be enabled" do
-        Account.site_admin.disable_feature!(:syllabus_versioning)
+        @course1.account.disable_feature!(:syllabus_versioning)
         api_call(:post,
                  "/api/v1/courses/#{@course1.id}/restore/#{@version.number}",
                  { controller: "courses", action: "restore_version", course_id: @course1.to_param, version_id: @version.number.to_s, format: "json" },
@@ -4811,7 +5017,7 @@ describe CoursesController, type: :request do
       it "includes permissions" do
         # Make sure it only returns permissions when asked
         json = api_call(:get, "/api/v1/courses/#{@course1.id}.json", { controller: "courses", action: "show", id: @course1.to_param, format: "json" })
-        expect(json).to_not include "permissions"
+        expect(json).not_to include "permissions"
 
         # When its asked to return permissions make sure they are there
         json = api_call(:get, "/api/v1/courses/#{@course1.id}.json?include[]=permissions", { controller: "courses", action: "show", id: @course1.to_param, format: "json", include: ["permissions"] })
@@ -5142,7 +5348,9 @@ describe CoursesController, type: :request do
                                "image" => nil,
                                "default_due_time" => "23:59:59",
                                "default_student_gradebook_view" => false,
-                               "conditional_release" => false
+                               "conditional_release" => false,
+                               "use_default_discussion_settings" => false,
+                               "default_discussion_settings" => {}
                              })
         end
 
@@ -5223,7 +5431,9 @@ describe CoursesController, type: :request do
                                "image" => nil,
                                "default_due_time" => "09:00:00",
                                "default_student_gradebook_view" => false,
-                               "conditional_release" => false
+                               "conditional_release" => false,
+                               "use_default_discussion_settings" => false,
+                               "default_discussion_settings" => {}
                              })
           @course.reload
           expect(@course.allow_final_grade_override?).to be true
@@ -5366,7 +5576,9 @@ describe CoursesController, type: :request do
                                "image" => nil,
                                "default_due_time" => "23:59:59",
                                "default_student_gradebook_view" => false,
-                               "conditional_release" => false
+                               "conditional_release" => false,
+                               "use_default_discussion_settings" => false,
+                               "default_discussion_settings" => {}
                              })
         end
 
@@ -5378,6 +5590,33 @@ describe CoursesController, type: :request do
                    {},
                    expected_status: 403)
           expect(@course.reload.allow_student_discussion_topics).to be true
+        end
+      end
+
+      context "when course_navigation_and_feature_options_permissions is enabled" do
+        before :once do
+          @course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions)
+        end
+
+        it "allows teacher with manage_course_details even when manage_course_content_edit is revoked" do
+          @course.root_account.role_overrides.create!(permission: :manage_course_content_edit, role: teacher_role, enabled: false)
+          api_call(:put,
+                   "/api/v1/courses/#{@course.id}/settings",
+                   { controller: "courses", action: "update_settings", course_id: @course.to_param, format: "json" },
+                   { lock_all_announcements: true })
+          expect(response).to be_successful
+          expect(@course.reload.lock_all_announcements).to be true
+        end
+
+        it "denies update when manage_course_details is revoked" do
+          @course.root_account.role_overrides.create!(permission: :manage_course_details, role: teacher_role, enabled: false)
+          api_call(:put,
+                   "/api/v1/courses/#{@course.id}/settings",
+                   { controller: "courses", action: "update_settings", course_id: @course.to_param, format: "json" },
+                   { lock_all_announcements: true },
+                   {},
+                   expected_status: 403)
+          expect(@course.reload.lock_all_announcements).to be false
         end
       end
     end

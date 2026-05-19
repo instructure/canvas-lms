@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {Enrollment, FetchedEnrollments, TemporaryEnrollmentPairing} from '../types'
+import type {
+  Enrollment,
+  FetchedEnrollments,
+  TemporaryEnrollmentPairing,
+  TemporaryEnrollmentStatus,
+} from '../types'
 import {ITEMS_PER_PAGE} from '../types'
 import doFetchApi, {FetchApiError} from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -26,6 +31,31 @@ interface TemporaryEnrollmentPairingResponse {
 }
 
 const I18n = createI18nScope('temporary_enrollment')
+
+export type BulkTemporaryEnrollmentStatus = Record<string, TemporaryEnrollmentStatus>
+
+/**
+ * Fetches temporary enrollment statuses for multiple users in bulk
+ */
+export async function fetchBulkTemporaryEnrollmentStatus(
+  userIds: string[],
+  accountId?: string,
+): Promise<BulkTemporaryEnrollmentStatus> {
+  const params: Record<string, string | string[] | number> = {
+    user_ids: userIds,
+    limit: userIds.length,
+  }
+  if (accountId) {
+    params.account_id = accountId
+  }
+
+  const {json} = await doFetchApi<BulkTemporaryEnrollmentStatus>({
+    path: '/api/v1/temporary_enrollment_status',
+    params,
+  })
+
+  return json ?? {}
+}
 
 /**
  * Fetches temporary enrollment data for a user

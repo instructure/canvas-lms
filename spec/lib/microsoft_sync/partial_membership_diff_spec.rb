@@ -163,7 +163,7 @@ describe MicrosoftSync::PartialMembershipDiff do
 
   it "dedupes aads" do
     subject.set_member_mapping(111, "mo_MO")
-    expect(actions_by_aad["mo_O"]).to_not be_present
+    expect(actions_by_aad["mo_O"]).not_to be_present
     expect(actions_by_aad["mo_MO"]).to match_array(%i[add_member add_owner])
   end
 

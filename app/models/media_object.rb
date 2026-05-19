@@ -18,11 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class MediaObject < ActiveRecord::Base
+class MediaObject < ApplicationRecord
   include Workflow
   include SearchTermHelper
 
   class VideoCaptionServiceError < Delayed::RetriableError; end
+
+  VIEWER_RESTRICTION_KEYS = %w[show_rolling_transcript].freeze
 
   AUTO_CAPTION_STATUSES = {
     processing: -> { I18n.t("Processing") },
@@ -53,6 +55,7 @@ class MediaObject < ActiveRecord::Base
 
   validates :media_id, :workflow_state, presence: true
   validates :auto_caption_status, inclusion: { in: AUTO_CAPTION_STATUSES.keys.map(&:to_s) }, allow_nil: true
+  validate :validate_viewer_restrictions
   has_many :media_tracks, ->(media_object) { where(attachment_id: [nil, media_object.attachment_id]).order(:locale) }, dependent: :destroy, inverse_of: :media_object
   has_many :attachments_by_media_id, class_name: "Attachment", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :media_object_by_media_id
   before_create :create_attachment
@@ -96,12 +99,12 @@ class MediaObject < ActiveRecord::Base
 
   set_policy do
     given do |user|
-      (attachment.present? ? attachment.grants_right?(user, :update) : (context&.grants_right?(user, :manage_course_content_add) || (self.user && self.user == user)))
+      attachment.present? ? attachment.grants_right?(user, :update) : (context&.grants_right?(user, :manage_course_content_add) || (self.user && self.user == user))
     end
     can :add_captions
 
     given do |user|
-      (attachment.present? ? attachment.grants_right?(user, :update) : (context&.grants_right?(user, :manage_course_content_delete) || (self.user && self.user == user)))
+      attachment.present? ? attachment.grants_right?(user, :update) : (context&.grants_right?(user, :manage_course_content_delete) || (self.user && self.user == user))
     end
     can :delete_captions
   end
@@ -262,6 +265,7 @@ class MediaObject < ActiveRecord::Base
       self.duration = entry[:duration].to_i
       data[:plays] = entry[:plays].to_i
       data[:download_url] = entry[:downloadUrl]
+      data[:status] = CanvasKaltura::ClientV3::Enums::KalturaEntryStatus[entry[:status]].to_s
       tags = (entry[:tags] || "").split(",").map(&:strip)
       old_id = tags.detect { |t| t.include?("old_id_") }
       self.old_media_id = old_id.sub("old_id_", "") if old_id
@@ -354,7 +358,7 @@ class MediaObject < ActiveRecord::Base
     self["data"] ||= {}
   end
 
-  def viewed!
+  def viewed! # rubocop:disable Naming/PredicateMethod
     # in the delayed job, current_attachment gets reset
     # so we pass it in here and then set it again in the next method
     delay.updated_viewed_at_and_retrieve_details(Time.zone.now, current_attachment) if !self.data[:last_viewed_at] || self.data[:last_viewed_at] > 1.hour.ago
@@ -443,5 +447,25 @@ class MediaObject < ActiveRecord::Base
   workflow do
     state :active
     state :deleted
+  end
+
+  private
+
+  def validate_viewer_restrictions
+    unless viewer_restrictions.is_a?(Hash)
+      errors.add(:viewer_restrictions, "must be a hash")
+      return
+    end
+
+    viewer_restrictions.each do |key, value|
+      unless VIEWER_RESTRICTION_KEYS.include?(key.to_s)
+        errors.add(:viewer_restrictions, "invalid key #{key}")
+        next
+      end
+
+      unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
+        errors.add(:viewer_restrictions, "value for #{key} must be a boolean")
+      end
+    end
   end
 end

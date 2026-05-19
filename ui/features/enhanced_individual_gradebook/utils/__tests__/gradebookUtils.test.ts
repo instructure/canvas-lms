@@ -20,6 +20,7 @@ import {
   mapAssignmentGroupQueryResults,
   sortAssignments,
   filterAssignmentsByStudent,
+  getLetterGrade,
 } from '../gradebookUtils'
 import type {
   AssignmentConnection,
@@ -533,11 +534,7 @@ describe('gradebookUtils', () => {
 
       const assignment3 = createAssignment('3', 'Assignment 3')
 
-      const assignmentGroup = createAssignmentGroup('1', [
-        assignment1,
-        assignment2,
-        assignment3,
-      ])
+      const assignmentGroup = createAssignmentGroup('1', [assignment1, assignment2, assignment3])
       const {mappedAssignments} = mapAssignmentGroupQueryResults(
         [assignmentGroup],
         emptyGradingPeriodMap,
@@ -576,6 +573,44 @@ describe('gradebookUtils', () => {
       expect(() => {
         filterAssignmentsByStudent(corruptedAssignments, submissions)
       }).toThrow('Peer review sub assignment 1-peer is missing parentAssignmentId')
+    })
+  })
+
+  describe('getLetterGrade', () => {
+    const gradingStandards: [string, number][] = [
+      ['A', 0.9],
+      ['B', 0.8],
+      ['C', 0.7],
+      ['D', 0.6],
+      ['F', 0.0],
+    ]
+
+    it('returns the correct letter grade for a non-zero score', () => {
+      expect(getLetterGrade(100, 95, gradingStandards)).toBe('A')
+    })
+
+    it('returns the correct letter grade when score is 0', () => {
+      expect(getLetterGrade(100, 0, gradingStandards)).toBe('F')
+    })
+
+    it('returns - when score is null', () => {
+      expect(getLetterGrade(100, null, gradingStandards)).toBe('-')
+    })
+
+    it('returns - when score is undefined', () => {
+      expect(getLetterGrade(100, undefined, gradingStandards)).toBe('-')
+    })
+
+    it('returns - when gradingStandards is empty', () => {
+      expect(getLetterGrade(100, 0, [])).toBe('-')
+    })
+
+    it('returns - when gradingStandards is null', () => {
+      expect(getLetterGrade(100, 0, null)).toBe('-')
+    })
+
+    it('returns - when possible is 0', () => {
+      expect(getLetterGrade(0, 0, gradingStandards)).toBe('-')
     })
   })
 })

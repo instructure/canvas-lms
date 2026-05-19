@@ -41,7 +41,7 @@ import {
 import {useMutation} from '@apollo/client'
 import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {useUpdateDiscussionThread} from '../../hooks/useUpdateDiscussionThread'
 import {useEventHandler, KeyboardShortcuts} from '../../KeyboardShortcuts/useKeyboardShortcut'
 
@@ -209,7 +209,6 @@ export const SplitScreenParent = ({isEditing, setIsEditing, ...props}) => {
   return (
     <Responsive
       match="media"
-      // @ts-expect-error TS2769 (typescriptify)
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 RSpec.describe Submissions::AnonymousPreviewsController do
   describe "GET :show" do
     before do

@@ -25,7 +25,7 @@ import {graphql, HttpResponse} from 'msw'
 import {useTabState} from '../useTabState'
 import {TAB_IDS} from '../../constants'
 import type {TabId} from '../../types'
-import {clearWidgetDashboardCache} from '../../__tests__/testHelpers'
+import {clearWidgetDashboardCache, PlatformTestWrapper} from '../../__tests__/testHelpers'
 import {WidgetLayoutProvider} from '../useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../useWidgetDashboardEdit'
 
@@ -54,11 +54,13 @@ const createWrapper = () => {
     },
   })
   return ({children}: {children: React.ReactNode}) => (
-    <QueryClientProvider client={queryClient}>
-      <WidgetDashboardEditProvider>
-        <WidgetLayoutProvider>{children}</WidgetLayoutProvider>
-      </WidgetDashboardEditProvider>
-    </QueryClientProvider>
+    <PlatformTestWrapper>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardEditProvider>
+          <WidgetLayoutProvider>{children}</WidgetLayoutProvider>
+        </WidgetDashboardEditProvider>
+      </QueryClientProvider>
+    </PlatformTestWrapper>
   )
 }
 

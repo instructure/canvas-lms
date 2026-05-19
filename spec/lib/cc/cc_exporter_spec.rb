@@ -82,7 +82,7 @@ describe "Common Cartridge exporting" do
       CC::CCHelper.create_key(obj, global: true)
     end
 
-    def check_resource_node(obj, type, selected = true)
+    def check_resource_node(obj, type, selected: true)
       res = @manifest_doc.at_css("resource[identifier=#{mig_id(obj)}][type=\"#{type}\"]")
       if selected
         expect(res).not_to be_nil
@@ -168,20 +168,20 @@ describe "Common Cartridge exporting" do
 
       # make sure only the selected one is exported by looking at export data
       check_resource_node(@dt1, CC::CCHelper::DISCUSSION_TOPIC)
-      check_resource_node(@dt2, CC::CCHelper::DISCUSSION_TOPIC, false)
+      check_resource_node(@dt2, CC::CCHelper::DISCUSSION_TOPIC, selected: false)
       check_resource_node(@dt3, CC::CCHelper::DISCUSSION_TOPIC)
       check_resource_node(@et, CC::CCHelper::BASIC_LTI)
-      check_resource_node(@et2, CC::CCHelper::BASIC_LTI, false)
+      check_resource_node(@et2, CC::CCHelper::BASIC_LTI, selected: false)
       check_resource_node(@q1, CC::CCHelper::ASSESSMENT_TYPE)
-      check_resource_node(@q2, CC::CCHelper::ASSESSMENT_TYPE, false)
+      check_resource_node(@q2, CC::CCHelper::ASSESSMENT_TYPE, selected: false)
       check_resource_node(@asmnt, CC::CCHelper::LOR)
-      check_resource_node(@asmnt2, CC::CCHelper::LOR, false)
-      check_resource_node(@att, CC::CCHelper::WEBCONTENT, false)
-      check_resource_node(@att2, CC::CCHelper::WEBCONTENT, false)
-      check_resource_node(@wiki, CC::CCHelper::WEBCONTENT, true)
-      check_resource_node(@wiki2, CC::CCHelper::WEBCONTENT, false)
+      check_resource_node(@asmnt2, CC::CCHelper::LOR, selected: false)
+      check_resource_node(@att, CC::CCHelper::WEBCONTENT, selected: false)
+      check_resource_node(@att2, CC::CCHelper::WEBCONTENT, selected: false)
+      check_resource_node(@wiki, CC::CCHelper::WEBCONTENT)
+      check_resource_node(@wiki2, CC::CCHelper::WEBCONTENT, selected: false)
       check_resource_node(@bank, CC::CCHelper::LOR)
-      check_resource_node(@bank2, CC::CCHelper::LOR, false)
+      check_resource_node(@bank2, CC::CCHelper::LOR, selected: false)
 
       doc = Nokogiri::XML.parse(@zip_file.read("course_settings/learning_outcomes.xml"))
       expect(doc.at_css("learningOutcomeGroup[identifier=#{mig_id(@log)}]")).to be_nil
@@ -314,9 +314,9 @@ describe "Common Cartridge exporting" do
         run_export
 
         # Assignment 1 should still be exported as a resource
-        check_resource_node(@assignment1, CC::CCHelper::LOR, true)
+        check_resource_node(@assignment1, CC::CCHelper::LOR, selected: true)
         # Assignment 2 should NOT be exported (its content tag wasn't selected)
-        check_resource_node(@assignment2, CC::CCHelper::LOR, false)
+        check_resource_node(@assignment2, CC::CCHelper::LOR, selected: false)
       end
     end
 
@@ -369,7 +369,7 @@ describe "Common Cartridge exporting" do
       run_export
 
       check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
-      check_resource_node(@q2, CC::CCHelper::QTI_ASSESSMENT_TYPE, false)
+      check_resource_node(@q2, CC::CCHelper::QTI_ASSESSMENT_TYPE, selected: false)
     end
 
     it "exports quizzes with groups that point to external banks" do
@@ -486,7 +486,7 @@ describe "Common Cartridge exporting" do
       expect(doc.at_css("presentation material mattext").text).to eq exported_text
 
       check_resource_node(att, CC::CCHelper::WEBCONTENT)
-      check_resource_node(att2, CC::CCHelper::WEBCONTENT, false)
+      check_resource_node(att2, CC::CCHelper::WEBCONTENT, selected: false)
       check_resource_node(user_att, CC::CCHelper::WEBCONTENT)
 
       path = @manifest_doc.at_css("resource[identifier=#{mig_id(att)}]")["href"]
@@ -619,7 +619,7 @@ describe "Common Cartridge exporting" do
       expect(@zip_file.read("wiki_content/some-page.html")).to include export_html
       path = "web_resources/Uploaded Media/cn_image.jpg"
       expect(@zip_file.find_entry(path)).not_to be_nil
-      expect(@manifest_doc.at_css("resource[identifier=#{mig_id(att)}]")).to_not be_nil
+      expect(@manifest_doc.at_css("resource[identifier=#{mig_id(att)}]")).not_to be_nil
       expect(@zip_file.read("course_settings/files_meta.xml")).to include "<folder path=\"Uploaded Media\">\n      <hidden>true</hidden>\n    </folder>"
     end
 
@@ -687,7 +687,7 @@ describe "Common Cartridge exporting" do
       expect(doc.at_css("presentation material mattext").text).to match_ignoring_whitespace export_html
 
       resource_node = @manifest_doc.at_css("resource[identifier=#{mig_id(att)}]")
-      expect(resource_node).to_not be_nil
+      expect(resource_node).not_to be_nil
       path = resource_node["href"]
       expect(@zip_file.find_entry(path)).not_to be_nil
     end
@@ -726,8 +726,8 @@ describe "Common Cartridge exporting" do
           content_type: "audio/mpeg"
         }]
       )
-      allow(CanvasHttp).to receive(:get).with(mp3_path).and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", true))))
-      allow(CanvasHttp).to receive(:get).with("#{mp3_path}?filename=292.mp3").and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", true))))
+      allow(CanvasHttp).to receive(:get).with(mp3_path).and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", binary: true))))
+      allow(CanvasHttp).to receive(:get).with("#{mp3_path}?filename=292.mp3").and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", binary: true))))
 
       run_export
 
@@ -780,8 +780,8 @@ describe "Common Cartridge exporting" do
           content_type: "audio/mpeg"
         }]
       )
-      allow(CanvasHttp).to receive(:get).with(media_path).and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", true))))
-      allow(CanvasHttp).to receive(:get).with("#{media_path}?filename=test.mp4").and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", true))))
+      allow(CanvasHttp).to receive(:get).with(media_path).and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", binary: true))))
+      allow(CanvasHttp).to receive(:get).with("#{media_path}?filename=test.mp4").and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", binary: true))))
 
       run_export
 
@@ -1018,13 +1018,14 @@ describe "Common Cartridge exporting" do
       expect(ccc_schema.validate(doc)).to be_empty
     end
 
-    it "filters out nav menu links from tab_configuration during export" do
-      # Nav Menu Links for Course Copy not implemented yet (see INTEROP-9293)
+    it "exports course nav menu links (course- or account-level) in tab_configuration with migration ids" do
       @course.root_account.enable_feature!(:nav_menu_links)
       link = NavMenuLink.create!(context: @course, course_nav: true, label: "Link", url: "https://example.com")
+      account_link = NavMenuLink.create!(context: @course.root_account, course_nav: true, label: "Link2", url: "https://example2.com")
       @course.tab_configuration = [
         { "id" => Course::TAB_HOME },
-        { "id" => "nav_menu_link_#{link.id}" }
+        { "id" => "nav_menu_link_#{link.id}" },
+        { "id" => "nav_menu_link_#{account_link.id}" },
       ]
       @course.save!
 
@@ -1033,8 +1034,79 @@ describe "Common Cartridge exporting" do
       doc = Nokogiri::XML.parse(@zip_file.read("course_settings/course_settings.xml"))
       tab_config = JSON.parse(doc.at_css("tab_configuration").text)
 
-      expect(tab_config.none? { |t| t["id"].to_s.start_with?("nav_menu_link_") }).to be true
-      expect(tab_config.pluck("id")).to include(Course::TAB_HOME)
+      expect(tab_config.pluck("id")).to eq([
+                                             Course::TAB_HOME,
+                                             "nav_menu_link_#{mig_id(link)}",
+                                             "nav_menu_link_#{mig_id(account_link)}",
+                                           ])
+    end
+
+    it "exports nav_menu_links.xml when nav_menu_links feature is enabled" do
+      link = NavMenuLink.create!(context: @course, course_nav: true, label: "My Link", url: "https://example.com/nav")
+
+      run_export
+
+      nav_links_xml = @zip_file.read("course_settings/nav_menu_links.xml")
+      doc = Nokogiri::XML.parse(nav_links_xml)
+      link_node = doc.at_css("navMenuLink")
+      expect(link_node).not_to be_nil
+      expect(link_node["identifier"]).to eq(mig_id(link))
+      expect(link_node.at_css("label").text).to eq("My Link")
+      expect(link_node.at_css("url").text).to eq("https://example.com/nav")
+    end
+
+    it "translates internal nav_menu_link URLs to migration placeholders" do
+      assignment = @course.assignments.create!(title: "Test Assignment")
+
+      link = NavMenuLink.create!(
+        context: @course,
+        course_nav: true,
+        label: "My Assignment Link",
+        url: "/courses/#{@course.id}/assignments/#{assignment.id}"
+      )
+
+      run_export
+
+      # Refresh assignment to get the migration_id that was set during export
+      assignment.reload
+
+      # Verify the exported XML has placeholder, not actual URL
+      nav_links_xml = @zip_file.read("course_settings/nav_menu_links.xml")
+      doc = Nokogiri::XML.parse(nav_links_xml)
+      link_node = doc.at_css("navMenuLink[identifier='#{mig_id(link)}']")
+
+      expect(link_node).not_to be_nil
+      url_text = link_node.at_css("url").text
+      expect(url_text).to include("$CANVAS_OBJECT_REFERENCE$")
+      expect(url_text).to include("assignments/#{assignment.migration_id}")
+      expect(url_text).not_to include(@course.id.to_s)
+    end
+
+    it "does not translate external nav_menu_link URLs" do
+      external_url = "https://example.com/external/path"
+      link = NavMenuLink.create!(
+        context: @course,
+        course_nav: true,
+        label: "External Link",
+        url: external_url
+      )
+
+      run_export
+
+      nav_links_xml = @zip_file.read("course_settings/nav_menu_links.xml")
+      doc = Nokogiri::XML.parse(nav_links_xml)
+      link_node = doc.at_css("navMenuLink[identifier='#{mig_id(link)}']")
+
+      expect(link_node.at_css("url").text).to eq(external_url)
+    end
+
+    it "does not export nav_menu_links.xml when feature is disabled" do
+      @course.root_account.disable_feature!(:nav_menu_links)
+      NavMenuLink.create!(context: @course, course_nav: true, label: "My Link", url: "https://example.com/nav")
+
+      run_export
+
+      expect(@zip_file.find_entry("course_settings/nav_menu_links.xml")).to be_nil
     end
 
     it "does not export syllabus if not selected" do
@@ -1471,16 +1543,16 @@ describe "Common Cartridge exporting" do
 
       describe "custom values" do
         it "exports the custom hash" do
-          exported_hash = assignment_xml_doc.css("tool_setting custom property").each_with_object({}) do |el, hash|
-            hash[el.attr("name")] = el.text
+          exported_hash = assignment_xml_doc.css("tool_setting custom property").to_h do |el|
+            [el.attr("name"), el.text]
           end
 
           expect(exported_hash).to eq(custom)
         end
 
         it "exports the custom parameters hash" do
-          exported_hash = assignment_xml_doc.css("tool_setting custom_parameters property").each_with_object({}) do |el, hash|
-            hash[el.attr("name")] = el.text
+          exported_hash = assignment_xml_doc.css("tool_setting custom_parameters property").to_h do |el|
+            [el.attr("name"), el.text]
           end
 
           expect(exported_hash).to eq(custom_parameters)
@@ -1575,7 +1647,7 @@ describe "Common Cartridge exporting" do
         run_export
 
         check_resource_node(@published, CC::CCHelper::LOR)
-        check_resource_node(@unpublished, CC::CCHelper::LOR, false)
+        check_resource_node(@unpublished, CC::CCHelper::LOR, selected: false)
       end
 
       it "always uses relevant migration ids in anchor tags when exporting for ePub" do
@@ -1626,10 +1698,10 @@ describe "Common Cartridge exporting" do
         @ce.save!
         run_export
 
-        check_resource_node(assignment, CC::CCHelper::LOR, false)
-        check_resource_node(quiz, CC::CCHelper::ASSESSMENT_TYPE, false)
-        check_resource_node(topic, CC::CCHelper::DISCUSSION_TOPIC, false)
-        check_resource_node(page, CC::CCHelper::WEBCONTENT, false)
+        check_resource_node(assignment, CC::CCHelper::LOR, selected: false)
+        check_resource_node(quiz, CC::CCHelper::ASSESSMENT_TYPE, selected: false)
+        check_resource_node(topic, CC::CCHelper::DISCUSSION_TOPIC, selected: false)
+        check_resource_node(page, CC::CCHelper::WEBCONTENT, selected: false)
       end
 
       it "includes wiki page with future availability for teacher" do
@@ -1649,7 +1721,7 @@ describe "Common Cartridge exporting" do
         it "still exports topics that are closed for comments" do
           topic = @course.discussion_topics.create! locked: true
           run_export
-          check_resource_node(topic, CC::CCHelper::DISCUSSION_TOPIC, true)
+          check_resource_node(topic, CC::CCHelper::DISCUSSION_TOPIC)
         end
       end
     end
@@ -1697,8 +1769,8 @@ describe "Common Cartridge exporting" do
         run_export
 
         check_resource_node(@visible, CC::CCHelper::WEBCONTENT)
-        check_resource_node(@hidden, CC::CCHelper::WEBCONTENT, false)
-        check_resource_node(@locked, CC::CCHelper::WEBCONTENT, false)
+        check_resource_node(@hidden, CC::CCHelper::WEBCONTENT, selected: false)
+        check_resource_node(@locked, CC::CCHelper::WEBCONTENT, selected: false)
       end
     end
 
@@ -1733,7 +1805,7 @@ describe "Common Cartridge exporting" do
           assignment_id = @manifest_doc.at_css("resource[href*='newquizzes.html']").attr("href").chomp("/newquizzes.html")
 
           doc = Nokogiri::XML.parse(@zip_file.read("#{assignment_id}/assignment_settings.xml"))
-          expect(doc).to_not be_nil
+          expect(doc).not_to be_nil
         end
       end
 
@@ -1779,7 +1851,7 @@ describe "Common Cartridge exporting" do
             assignment_id = @manifest_doc.at_css("resource[href*='newquizzes.html']").attr("href").chomp("/newquizzes.html")
 
             doc = Nokogiri::XML.parse(@zip_file.read("#{assignment_id}/assignment_settings.xml"))
-            expect(doc).to_not be_nil
+            expect(doc).not_to be_nil
           end
         end
       end

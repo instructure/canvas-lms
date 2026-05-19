@@ -57,7 +57,7 @@ module BasicLTI
 
       tag = assignment.external_tool_tag
       raise Errors::InvalidSourceId.new("Assignment is no longer associated with this tool", :assignment_tool_mismatch) unless tag &&
-                                                                                                                               (tool.matches_url?(tag.url, false) || tool.matches_tool_domain?(tag.url)) &&
+                                                                                                                               (tool.matches_url?(tag.url, match_queries_exactly: false) || tool.matches_tool_domain?(tag.url)) &&
                                                                                                                                tool.workflow_state != "deleted"
     end
 

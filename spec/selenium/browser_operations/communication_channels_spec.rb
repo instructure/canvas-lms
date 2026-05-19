@@ -43,7 +43,7 @@ describe "communication channel selenium tests" do
       error_boxes = ff(".error_box")
       text = error_boxes.map(&:text).join
       expect(text).to include("Must be at least 8 characters")
-      expect(text).to_not include("Doesn't match")
+      expect(text).not_to include("Doesn't match")
     end
 
     it "requires the terms if configured to do so" do

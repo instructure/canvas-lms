@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class GradingPeriod < ActiveRecord::Base
+class GradingPeriod < ApplicationRecord
   include Canvas::SoftDeletable
 
   belongs_to :grading_period_group, inverse_of: :grading_periods

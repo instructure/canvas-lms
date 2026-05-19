@@ -23,6 +23,25 @@ export interface EnvDiscussions {
   discussion_ai_survey_link: string
   DISCUSSION_TOPIC: {
     ATTRIBUTES: Record<string, any>
+    PERMISSIONS?: {
+      CAN_EDIT_DISCUSSION_ANONYMITY?: boolean
+      CAN_EDIT_DISCUSSION_OPTIONS?: boolean
+      CAN_EDIT_DISCUSSION_VIEWS?: boolean
+      [key: string]: boolean | undefined
+    }
+  }
+  DEFAULT_DISCUSSION_SETTINGS?: {
+    anonymous_state?: string
+    disallow_threaded_replies?: boolean
+    require_initial_post?: boolean
+    podcast_enabled?: boolean
+    podcast_has_student_posts?: boolean
+    allow_rating?: boolean
+    only_graders_can_rate?: boolean
+    expanded?: boolean | string
+    expanded_locked?: boolean
+    sort_order?: string
+    sort_order_locked?: boolean
   }
   discussion_pin_post: string
   ASSIGNMENT_SECURE_PARAMS?: string

@@ -135,7 +135,7 @@ describe "BaseOutcomeReport" do
       end
     end
 
-    def write_report(headers, _enable_i18n_features, _replica)
+    def write_report(headers, enable_i18n_features: false, replica: :report)
       csv_mock = []
       csv_mock << headers unless headers.nil?
       yield csv_mock if block_given?
@@ -143,8 +143,8 @@ describe "BaseOutcomeReport" do
     end
 
     before do
-      allow(report).to receive(:write_report) do |headers, enable_i18n_features, replica, &block|
-        csv_mock = write_report(headers, enable_i18n_features, replica, &block)
+      allow(report).to receive(:write_report) do |headers, enable_i18n_features: false, replica: :report, &block|
+        csv_mock = write_report(headers, enable_i18n_features:, replica:, &block)
         csv.concat(csv_mock)
       end
       allow(GuardRail).to receive(:activate).with(:primary).and_yield

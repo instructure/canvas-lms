@@ -38,7 +38,7 @@ import {ContextSearchOption} from './ContextSearchOption'
 import {Spinner} from '@instructure/ui-spinner'
 import {ContextBrowse} from './ContextBrowse'
 import {LtiRegistrationId} from '../../../../model/LtiRegistrationId'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('lti_registrations')
@@ -58,6 +58,7 @@ export type ExceptionModalProps = {
   openState: ExceptionModalOpenState
   onClose: () => void
   onConfirm: (controls: ContextControlParameter[]) => Promise<void>
+  onSettled?: () => void
 }
 
 type ContextControlFormState = Array<{
@@ -71,11 +72,13 @@ export const ExceptionModal = ({
   accountId,
   onConfirm,
   registrationId,
+  onSettled,
 }: ExceptionModalProps) => {
   const [contextControlForm, setContextControlForm] = React.useState<ContextControlFormState>([])
 
   const confirmHandler = useMutation({
     mutationFn: onConfirm,
+    onSettled,
   })
 
   const close = () => {

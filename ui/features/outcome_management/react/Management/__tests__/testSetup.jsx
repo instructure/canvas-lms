@@ -196,5 +196,5 @@ export {
   groupDetailMocks,
   groupMocks,
 } from '@canvas/outcomes/mocks/Management'
-export {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+export {showFlashAlert} from '@instructure/platform-alerts'
 export {clickWithPending} from '@canvas/outcomes/react/helpers/testHelpers'

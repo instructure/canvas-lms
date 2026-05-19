@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import Lti2Iframe from './Lti2Iframe'
 import Lti2ReregistrationUpdateModal from './Lti2ReregistrationUpdateModal'
 import store from '../lib/ExternalAppsStore'

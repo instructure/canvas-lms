@@ -23,7 +23,7 @@ import {Billboard} from '@instructure/ui-billboard'
 
 import {SearchContext} from '../../utils/constants'
 
-import pageNotFound from '@canvas/images/PageNotFoundPanda.svg'
+import pageNotFound from '@instructure/platform-images/assets/PageNotFoundPanda.svg'
 
 const I18n = createI18nScope('discussion_posts')
 

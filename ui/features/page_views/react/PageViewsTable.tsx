@@ -26,7 +26,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Pagination} from '@instructure/ui-pagination'
 import {Flex} from '@instructure/ui-flex'
-import ConfusedPanda from '@canvas/images/ConfusedPanda.svg'
+import ConfusedPanda from '@instructure/platform-images/assets/ConfusedPanda.svg'
 import type {PageView} from './utils'
 import {useQueryPageViewsPaginated} from './hooks/useQueryPageViewsPaginated'
 

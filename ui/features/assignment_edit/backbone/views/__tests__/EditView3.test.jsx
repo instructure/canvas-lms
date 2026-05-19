@@ -45,7 +45,7 @@ vi.mock('@canvas/sections/backbone/collections/SectionCollection', () => {
       add: vi.fn(),
       models: [],
       courseSectionID: '1',
-    }))
+    })),
   }
 })
 
@@ -64,7 +64,7 @@ vi.mock('@canvas/due-dates/backbone/models/DueDateList', () => {
       },
       courseSectionID: '1',
       _addOverrideForDefaultSectionIfNeeded: vi.fn(),
-    }))
+    })),
   }
 })
 
@@ -419,6 +419,28 @@ describe('EditView', () => {
       expect(userSettings.default.contextSet).toHaveBeenCalledWith('new_assignment_settings', {
         invalid_attribute_example: null,
       })
+    })
+  })
+
+  describe('cacheAssignmentSettings does not persist peer review fields', () => {
+    it('excludes peer review fields from cached settings', () => {
+      const fakeView = {
+        settingsToCache: EditView.prototype.settingsToCache,
+        getFormData: vi.fn().mockReturnValue({
+          points_possible: 10,
+          peer_reviews: true,
+          peer_review_count: 2,
+          automatic_peer_reviews: true,
+        }),
+      }
+
+      EditView.prototype.cacheAssignmentSettings.call(fakeView)
+      const savedSettings = vi.mocked(userSettings.default.contextSet).mock.calls[0][1]
+
+      expect(savedSettings).not.toHaveProperty('peer_reviews')
+      expect(savedSettings).not.toHaveProperty('peer_review_count')
+      expect(savedSettings).not.toHaveProperty('automatic_peer_reviews')
+      expect(savedSettings).toHaveProperty('points_possible', 10)
     })
   })
 

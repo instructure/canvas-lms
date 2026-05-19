@@ -20,11 +20,13 @@ import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconAiColoredSolid, IconAiSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('rubrics-criteria-row')
 
@@ -32,6 +34,7 @@ type RegenerateCriteriaProps = {
   buttonColor: 'ai-primary' | 'ai-secondary'
   disabled?: boolean
   isCriterion?: boolean
+  toolTipText?: string
   onRegenerate: (additionalPrompt: string) => void
 }
 
@@ -39,6 +42,7 @@ const RegenerateCriteria = ({
   buttonColor,
   disabled = false,
   isCriterion = false,
+  toolTipText = '',
   onRegenerate,
 }: RegenerateCriteriaProps) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -63,6 +67,8 @@ const RegenerateCriteria = ({
         size="medium"
         label={isCriterion ? I18n.t('Regenerate Criterion') : I18n.t('Regenerate Criteria')}
         shouldCloseOnDocumentClick={false}
+        closeButtonLabel={I18n.t('Close')}
+        errorComponent={canvasErrorComponent()}
         footer={
           <Flex direction="row" gap="small" padding="small">
             <Button onClick={onClose} data-testid="regenerate-criteria-cancel-button">
@@ -115,15 +121,21 @@ const RegenerateCriteria = ({
           />
         </View>
       </CanvasModal>
-      <Button
-        onClick={() => setIsOpen(true)}
-        data-testid="regenerate-criteria-button"
-        color={buttonColor}
-        renderIcon={buttonColor === 'ai-primary' ? <IconAiSolid /> : <IconAiColoredSolid />}
-        disabled={disabled}
+      <Tooltip
+        renderTip={toolTipText}
+        data-testid="regenerate-criteria-tooltip"
+        preventTooltip={!disabled || toolTipText === ''}
       >
-        {I18n.t('Regenerate')}
-      </Button>
+        <Button
+          onClick={() => setIsOpen(true)}
+          data-testid="regenerate-criteria-button"
+          color={buttonColor}
+          renderIcon={buttonColor === 'ai-primary' ? <IconAiSolid /> : <IconAiColoredSolid />}
+          disabled={disabled}
+        >
+          {I18n.t('Regenerate')}
+        </Button>
+      </Tooltip>
     </>
   )
 }

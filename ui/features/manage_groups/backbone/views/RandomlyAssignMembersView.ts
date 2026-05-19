@@ -29,22 +29,23 @@ const I18n = createI18nScope('groups')
 const DEFAULT_DIALOG_HEIGHT = 260
 const DIALOG_EXPANDED_HEIGHT = 330
 
+// @ts-expect-error TS7 migration
 export default class RandomlyAssignMembersView extends DialogFormView {
   static initClass() {
+    // @ts-expect-error TS7 migration
     this.prototype.defaults = {
-      // @ts-expect-error - Legacy Backbone typing
       title: I18n.t('randomly_assigning_members', 'Randomly Assigning Students'),
-      // @ts-expect-error - Legacy Backbone typing
       width: 450,
-      // @ts-expect-error - Legacy Backbone typing
       height: DEFAULT_DIALOG_HEIGHT,
     }
 
     // @ts-expect-error - Backbone View property
     this.prototype.template = template
 
+    // @ts-expect-error TS7 migration
     this.prototype.wrapperTemplate = wrapper
 
+    // @ts-expect-error TS7 migration
     this.prototype.className = 'form-dialog'
 
     // @ts-expect-error - Backbone View property
@@ -59,7 +60,6 @@ export default class RandomlyAssignMembersView extends DialogFormView {
   }
 
   openAgain() {
-    // @ts-expect-error - Legacy Backbone typing
     super.openAgain(...arguments)
     // @ts-expect-error - Backbone View property
     const groups = this.model.groups().models
@@ -86,6 +86,7 @@ export default class RandomlyAssignMembersView extends DialogFormView {
   randomlyAssignMembers(e) {
     e.preventDefault()
     e.stopPropagation()
+    // @ts-expect-error TS7 migration
     this.close()
 
     let groupHasSubmission = false

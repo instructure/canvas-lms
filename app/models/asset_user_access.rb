@@ -21,7 +21,7 @@
 # asset_code is used to specify the 'asset' or idea being accessed
 # asset_group_code is for the group
 # so, for example, the asset could be an assignment, the group would be the assignment_group
-class AssetUserAccess < ActiveRecord::Base
+class AssetUserAccess < ApplicationRecord
   extend RootAccountResolver
 
   belongs_to :context, polymorphic: %i[account course group user], polymorphic_prefix: true

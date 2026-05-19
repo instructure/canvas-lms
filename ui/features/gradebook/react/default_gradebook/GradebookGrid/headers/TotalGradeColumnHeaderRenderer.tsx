@@ -19,7 +19,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import TotalGradeColumnHeader from './TotalGradeColumnHeader'
 import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
 import type Gradebook from '../../Gradebook'
@@ -145,10 +145,10 @@ export default class TotalGradeColumnHeaderRenderer {
   render(column, $container: HTMLElement, gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, gridSupport, options)
 
-    ReactDOM.render(<TotalGradeColumnHeader {...props} />, $container)
+    legacyRender(<TotalGradeColumnHeader {...props} />, $container)
   }
 
   destroy(_column, $container: HTMLElement, _gridSupport: GridSupport) {
-    ReactDOM.unmountComponentAtNode($container)
+    legacyUnmountComponentAtNode($container)
   }
 }

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Canvas LMS Mailing List
+    url: https://groups.google.com/g/canvas-lms-users
+    about: Mailing list for community discussion of Canvas LMS
+  - name: Canvas Collaborative Roadmap
+    url: https://community.instructure.com/en/categories/canvas-collaborative-roadmap
+    about: Submit feature requests, vote on existing requests, and view the roadmap for Canvas LMS

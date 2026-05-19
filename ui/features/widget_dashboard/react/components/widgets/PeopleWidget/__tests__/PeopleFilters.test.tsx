@@ -24,7 +24,7 @@ import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import PeopleFilters from '../PeopleFilters'
 
-vi.mock('@canvas/query/broadcast', () => ({
+vi.mock('@instructure/platform-query/broadcast', () => ({
   useBroadcastQuery: vi.fn(),
 }))
 

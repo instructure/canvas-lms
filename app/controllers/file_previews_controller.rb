@@ -20,6 +20,7 @@
 class FilePreviewsController < ApplicationController
   include AttachmentHelper
 
+  skip_before_action :require_user, only: [:show]
   before_action :get_context
 
   def token_auth_allowed?
@@ -60,7 +61,7 @@ class FilePreviewsController < ApplicationController
         render template: "file_previews/img_preview", layout: false
       # media files
       elsif %r{\A(audio|video)/}.match?(@file.content_type)
-        js_env NEW_FILES_PREVIEW: 1
+        js_env({ NEW_FILES_PREVIEW: 1 })
         js_bundle :file_preview
         render template: "file_previews/media_preview", layout: false
       # html files

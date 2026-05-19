@@ -182,7 +182,7 @@ describe "teacher k5 course dashboard" do
 
       click_pink_color_button
 
-      wait_for_new_page_load(submit_form("#course_form"))
+      wait_for_new_page_load { submit_form("#course_form") }
       pink_color = "#DF6B91"
 
       expect(element_value_for_attr(selected_color_input, "value")).to eq(pink_color)
@@ -194,7 +194,7 @@ describe "teacher k5 course dashboard" do
 
       new_color = "#07AB99"
       input_color_hex_value(new_color)
-      wait_for_new_page_load(submit_form("#course_form"))
+      wait_for_new_page_load { submit_form("#course_form") }
 
       expect(hex_value_for_color(course_color_preview, "background-color")).to eq(new_color)
     end

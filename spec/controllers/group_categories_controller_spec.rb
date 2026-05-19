@@ -1321,4 +1321,69 @@ describe GroupCategoriesController do
       end
     end
   end
+
+  describe "GET export" do
+    before :once do
+      @student2 = student_in_course(active_all: true).user
+      @group = @collaborative_category.groups.create!(name: "Test Group", context: @course)
+      @group.add_user(@student)
+      @group.add_user(@student2)
+    end
+
+    before do
+      @teacher.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
+      user_session(@teacher)
+    end
+
+    it "respects user's semicolon field separator preference" do
+      get :export, params: { course_id: @course.id, group_category_id: @collaborative_category.id }, format: :csv
+
+      expect(response).to be_successful
+      expect(response.content_type).to eq "text/csv"
+
+      csv_data = CSV.parse(response.body, col_sep: ";", headers: true)
+      expect(csv_data.length).to eq 2
+      expect(csv_data.headers).to include("name", "canvas_user_id", "login_id", "sections", "group_name")
+
+      group_names = csv_data.filter_map { |row| row["group_name"] }
+      expect(group_names).to include("Test Group")
+    end
+
+    # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+    # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+    it "passes current_user to SisPseudonym.for when building CSV rows" do
+      allow(SisPseudonym).to receive(:for).and_call_original
+      expect(SisPseudonym).to receive(:for)
+        .with(anything, anything, hash_including(current_user: @teacher))
+        .at_least(:once)
+        .and_call_original
+      get :export, params: { course_id: @course.id, group_category_id: @collaborative_category.id }, format: :csv
+    end
+  end
+
+  describe "GET export_tags" do
+    before :once do
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @tag_category = @course.group_categories.create!(name: "Tags", non_collaborative: true)
+      @tag = @tag_category.groups.create!(name: "Tag 1", context: @course)
+      @tag.add_user(@student)
+    end
+
+    before do
+      @teacher.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
+      user_session(@teacher)
+    end
+
+    it "respects user's semicolon field separator preference" do
+      get :export_tags, params: { course_id: @course.id }, format: :csv
+
+      expect(response).to be_successful
+      expect(response.content_type).to eq "text/csv"
+
+      csv_data = CSV.parse(response.body, col_sep: ";", headers: true)
+      expect(csv_data.length).to be >= 1
+      expect(csv_data.headers).to include("name", "canvas_user_id", "login_id", "tag_name")
+    end
+  end
 end

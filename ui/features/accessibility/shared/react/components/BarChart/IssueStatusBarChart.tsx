@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {BarChart} from './BarChart'
+import {BarChart, BarChartDataItem} from './BarChart'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -29,23 +30,22 @@ export type IssueStatusBarChartProps = {
 export const IssueStatusBarChart = (props: IssueStatusBarChartProps) => {
   const open = props.open || 0
   const resolved = props.resolved || 0
-  return (
-    <BarChart
-      title={I18n.t('Issue status')}
-      barThickness={24}
-      data={[
-        {
-          label: I18n.t('%{count} open', {count: I18n.n(open)}),
-          emphasized: true,
-          value: open,
-          color: 'red',
-        },
-        {
-          label: I18n.t('%{count} resolved', {count: I18n.n(resolved)}),
-          value: resolved,
-          color: 'green',
-        },
-      ]}
-    />
-  )
+
+  const data = useMemo((): BarChartDataItem[] => {
+    return [
+      {
+        label: I18n.t('%{count} open', {count: I18n.n(open)}),
+        emphasized: true,
+        value: open,
+        color: 'red',
+      },
+      {
+        label: I18n.t('%{count} resolved', {count: I18n.n(resolved)}),
+        value: resolved,
+        color: 'green',
+      },
+    ]
+  }, [open, resolved])
+
+  return <BarChart title={I18n.t('Issue status')} barThickness={24} data={data} />
 }

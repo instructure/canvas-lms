@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Conversation < ActiveRecord::Base
+class Conversation < ApplicationRecord
   include SimpleTags
   include ModelCache
   include SendToStream
@@ -63,7 +63,7 @@ class Conversation < ActiveRecord::Base
     super
   end
 
-  def participants(reload = false)
+  def participants(reload: false)
     if !@participants || reload
       Conversation.preload_participants([self])
     end
@@ -420,7 +420,7 @@ class Conversation < ActiveRecord::Base
 
           new_tags, message_tags = infer_new_tags_for(cp, all_new_tags)
           if new_tags.present?
-            updated_tags = if (active_tags = cp.user.conversation_context_codes(false)).present?
+            updated_tags = if (active_tags = cp.user.conversation_context_codes(include_concluded_codes: false)).present?
                              (cp.tags | new_tags) & active_tags
                            else
                              cp.tags | new_tags
@@ -484,7 +484,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def infer_new_tags_for(participant, all_new_tags)
-    active_tags   = participant.user.conversation_context_codes(false)
+    active_tags   = participant.user.conversation_context_codes(include_concluded_codes: false)
     context_codes = active_tags.presence || participant.user.conversation_context_codes
     visible_codes = all_new_tags & context_codes
 
@@ -618,7 +618,7 @@ class Conversation < ActiveRecord::Base
     select("conversations.*, (SELECT #{connection.func(:group_concat, :user_id, ",")} FROM #{ConversationParticipant.quoted_table_name} WHERE conversation_id = conversations.id) AS user_ids")
       .where(id: ids)
       .each do |c|
-        c.regenerate_private_hash!(c.user_ids.split(",").map(&:to_i)) # group_concat order is arbitrary in sqlite, so we just let ruby do the sorting
+      c.regenerate_private_hash!(c.user_ids.split(",").map(&:to_i)) # group_concat order is arbitrary in sqlite, so we just let ruby do the sorting
     end
   end
 

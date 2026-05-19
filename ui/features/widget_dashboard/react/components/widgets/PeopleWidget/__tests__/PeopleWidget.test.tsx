@@ -24,12 +24,12 @@ import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import PeopleWidget from '../PeopleWidget'
 import type {BaseWidgetProps, Widget} from '../../../../types'
-import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import {clearWidgetDashboardCache, PlatformTestWrapper} from '../../../../__tests__/testHelpers'
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 
 // Mock useBroadcastQuery to avoid BroadcastChannel issues in jsdom
-vi.mock('@canvas/query/broadcast', () => ({
+vi.mock('@instructure/platform-query/broadcast', () => ({
   useBroadcastQuery: vi.fn(),
 }))
 
@@ -139,11 +139,13 @@ const renderWithQueryClient = (ui: React.ReactElement) => {
   })
 
   return render(
-    <QueryClientProvider client={queryClient}>
-      <WidgetDashboardEditProvider>
-        <WidgetLayoutProvider>{ui}</WidgetLayoutProvider>
-      </WidgetDashboardEditProvider>
-    </QueryClientProvider>,
+    <PlatformTestWrapper>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardEditProvider>
+          <WidgetLayoutProvider>{ui}</WidgetLayoutProvider>
+        </WidgetDashboardEditProvider>
+      </QueryClientProvider>
+    </PlatformTestWrapper>,
   )
 }
 

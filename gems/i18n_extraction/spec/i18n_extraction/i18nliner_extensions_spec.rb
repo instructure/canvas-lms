@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "prism"
-require "spec_helper"
 require "i18n_extraction/i18nliner_extensions"
 
 describe I18nliner::Extractors::RubyExtractor do

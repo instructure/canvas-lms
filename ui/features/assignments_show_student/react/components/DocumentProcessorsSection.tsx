@@ -28,7 +28,7 @@ import {
 const I18n = createI18nScope('assignments_2_student_content')
 
 type DocumentProcessorsSectionProps = {
-  submission: AssetReportsForStudentParams & {ifLastAttemptIsNumber: number}
+  submission: AssetReportsForStudentParams & {attachmentId?: string}
 }
 
 /*
@@ -44,6 +44,8 @@ export default function DocumentProcessorsSection({submission}: DocumentProcesso
       <LtiAssetReportsForStudentSubmission
         submissionId={submission.submissionId}
         submissionType={submission.submissionType}
+        attempt={submission.attempt}
+        attachmentId={submission.attachmentId}
       />
     </Flex>
   ) : null

@@ -28,6 +28,11 @@ import {List} from '@instructure/ui-list'
 import {Alert} from '@instructure/ui-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {Flex} from '@instructure/ui-flex'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {EnvCourseSettings} from '@canvas/global/env/EnvCourse'
+
+declare const ENV: GlobalEnv & EnvCourseSettings
 
 const {Item: ListItem} = List as any
 
@@ -184,7 +189,16 @@ const MigrationIssuesModal = ({
         />
         <Heading>{I18n.t('%{migration_type_title} Issues', {migration_type_title})}</Heading>
       </Modal.Header>
-      <Modal.Body>{content}</Modal.Body>
+      <Modal.Body>
+        <Flex direction="column">
+          <Flex.Item>{content}</Flex.Item>
+          {ENV.FEATURES.course_navigation_and_feature_options_permissions && issues && (
+            <Flex.Item>
+              <Text>{I18n.t('Please contact your Canvas Administrator for further details.')}</Text>
+            </Flex.Item>
+          )}
+        </Flex>
+      </Modal.Body>
       <Modal.Footer>
         <Button onClick={onClose} color="primary">
           {I18n.t('Close')}

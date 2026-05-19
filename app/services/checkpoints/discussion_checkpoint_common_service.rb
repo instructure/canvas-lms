@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
-  require_relative "discussion_checkpoint_error"
-
   def initialize(discussion_topic:, checkpoint_label:, dates:, points_possible: nil, replies_required: 1, saved_by: nil, updating_user: nil)
     super()
     @discussion_topic = discussion_topic

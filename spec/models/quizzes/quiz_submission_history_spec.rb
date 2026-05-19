@@ -27,18 +27,18 @@ describe Quizzes::QuizSubmissionHistory do
       @submission.workflow_state = "complete"
       @submission.score = 5.0
       @submission.attempt = 1
-      @submission.with_versioning(true, &:save!)
+      @submission.with_versioning(&:save!)
 
       # regrade 1
       @submission.score_before_regrade = 5.0
       @submission.score = 4.0
       @submission.attempt = 1
-      @submission.with_versioning(true, &:save!)
+      @submission.with_versioning(&:save!)
 
       # new attempt
       @submission.score = 3.0
       @submission.attempt = 2
-      @submission.with_versioning(true, &:save!)
+      @submission.with_versioning(&:save!)
     end
 
     describe "#initialize" do

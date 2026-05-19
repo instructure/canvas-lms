@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import $ from 'jquery'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 import ready from '@instructure/ready'
 
@@ -50,14 +50,14 @@ ready(() => {
     }
 
     if (dashcard_query_enabled) {
-      ReactDOM.render(
+      legacyRender(
         <QueryClientProvider client={queryClient}>
           <DashboardWrapper {...dashboardProps} />
         </QueryClientProvider>,
         dashboardHeaderContainer,
       )
     } else {
-      ReactDOM.render(<DashboardHeader {...dashboardProps} />, dashboardHeaderContainer)
+      legacyRender(<DashboardHeader {...dashboardProps} />, dashboardHeaderContainer)
     }
   } else {
     // if we are on the root dashboard page, then we conditinally load the

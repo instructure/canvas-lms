@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Collaboration < ActiveRecord::Base
+class Collaboration < ApplicationRecord
   include Workflow
   include SendToStream
 

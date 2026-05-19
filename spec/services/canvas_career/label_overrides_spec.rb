@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 RSpec.describe CanvasCareer::LabelOverrides do
   describe ".permission_label_overrides" do
     context "when context is in career mode" do

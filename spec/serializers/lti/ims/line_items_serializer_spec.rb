@@ -104,7 +104,7 @@ RSpec.describe Lti::IMS::LineItemsSerializer do
 
     context "with launch_url extensions" do
       it "includes extension" do
-        expect(described_class.new(line_item, line_item_id, true).as_json).to include(Lti::LineItem::AGS_EXT_LAUNCH_URL => tool.url)
+        expect(described_class.new(line_item, line_item_id, include_launch_url: true).as_json).to include(Lti::LineItem::AGS_EXT_LAUNCH_URL => tool.url)
       end
     end
   end

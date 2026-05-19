@@ -112,7 +112,7 @@ describe "better_file_browsing, folders" do
       folder_name = "this#could+be bad? maybe"
       add_folder(folder_name)
       folder = @course.folders.where(name: folder_name).first
-      expect(folder).to_not be_nil
+      expect(folder).not_to be_nil
       file_name = "some silly file"
       @course.attachments.create!(display_name: file_name, uploaded_data: default_uploaded_data, folder:)
       folder_link = fln(folder_name, f(".ef-directory"))

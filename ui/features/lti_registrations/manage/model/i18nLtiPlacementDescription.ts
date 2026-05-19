@@ -99,7 +99,7 @@ export const LtiPlacementDescriptionTranslations: Record<LtiPlacement, string> =
     'On the modules page this placement is available from the dropdown next to a module header and opens a modal above the current screen',
   ),
   post_grades: I18n.t(
-    'From the gradebook when you click the actions button this provides an option to sync grades to the tool',
+    'From the gradebook when you click the actions button this provides an option to sync grades to the tool. Not pictured: when enabled on a tool available at the root account the SIS grade export settings on the Account Settings page under the Settings tab are enabled.',
   ),
   quiz_menu: I18n.t(
     'On the Quizzes page within a course the tool can be launched from the dropdown next to a quiz',

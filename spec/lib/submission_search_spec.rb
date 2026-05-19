@@ -405,6 +405,20 @@ describe SubmissionSearch do
       # "Piper, Peter", "Peterson, James", "Miller, Mandy", "Jones, Amanda", "Jameson, Jonah"
       expect(results.extract_associated(:user)).to eq [peter, james, mandy, amanda, jonah]
     end
+
+    it "returns students ordered by their 'anonymous name' when the assignment has NQ anonymous participants, ascending" do
+      assignment.update!(anonymous_participants: true)
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }]).search
+      anon_names = results.map { |sub| assignment.anonymous_student_identities.dig(sub.user_id, :name) }
+      expect(anon_names).to eql ["Student 1", "Student 2", "Student 3", "Student 4", "Student 5"]
+    end
+
+    it "returns students ordered by their 'anonymous name' when the assignment has NQ anonymous participants, descending" do
+      assignment.update!(anonymous_participants: true)
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username", direction: "descending" }]).search
+      anon_names = results.map { |sub| assignment.anonymous_student_identities.dig(sub.user_id, :name) }
+      expect(anon_names).to eql ["Student 5", "Student 4", "Student 3", "Student 2", "Student 1"]
+    end
   end
 
   describe "username_first_last ordering" do
@@ -1027,6 +1041,16 @@ describe SubmissionSearch do
       user_scope = User.where(id: [student_section1.id])
       result = search.send(:filter_section_enrollment_states, user_scope)
       expect(result.pluck(:id)).to eq [student_section1.id]
+    end
+
+    it "returns user_scope unchanged when only_visible_to_overrides is true but no section overrides exist" do
+      assignment.only_visible_to_overrides = true
+      assignment.save!
+
+      search = SubmissionSearch.new(assignment, teacher, nil, apply_gradebook_enrollment_filters: true)
+      user_scope = User.where(id: [student_section1.id, student_section2.id])
+      result = search.send(:filter_section_enrollment_states, user_scope)
+      expect(result.pluck(:id)).to match_array([student_section1.id, student_section2.id])
     end
   end
 end

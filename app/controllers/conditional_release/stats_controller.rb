@@ -24,7 +24,7 @@ module ConditionalRelease
     def students_per_range
       rule = get_rule
       include_trend_data = Array.wrap(params[:include]).include? "trends"
-      render json: Stats.students_per_range(rule, include_trend_data)
+      render json: Stats.students_per_range(rule, include_trend_data:)
     end
 
     def student_details

@@ -20,8 +20,9 @@ import React, {useCallback, useState} from 'react'
 import {legacyRender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import authenticity_token from '@canvas/authenticity-token'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {checkStatus, defaultFetchOptions} from '@canvas/util/xhr'
 import {Button} from '@instructure/ui-buttons'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
@@ -188,7 +189,7 @@ const DeleteCalendarEventDialog = ({
 
     if (isAppointmentGroup) {
       message = I18n.t(
-        'If you delete this appointment group, all course teachers will lose access, and all student signups will be permanently deleted.',
+        'If you delete this appointment, all course teachers will lose access, and all student signups will be permanently deleted.',
       )
     } else if (eventType === 'assignment') {
       message = I18n.t(
@@ -214,6 +215,8 @@ const DeleteCalendarEventDialog = ({
       label={isAppointmentGroup ? I18n.t('Delete for everyone?') : I18n.t('Confirm Deletion')}
       footer={renderFooter}
       data-testid={`${testIdPrefix || ''}dialog`}
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
     >
       <View as="div" margin="0 small" data-testid={`${testIdPrefix || ''}dialog-content`}>
         {isRepeating ? renderRepeating() : renderOne()}

@@ -31,12 +31,12 @@ export const MigrationInfoAlert = () => {
         <Flex gap="small" direction="column">
           <Text>
             {I18n.t(
-              'We are replacing LTI 2.0 (CPF) with LTI 1.3 (Asset/Document Processor). Below are the migrations that need to occur in order to easily start using LTI 1.3 on all of your assignments.',
+              'We’re replacing LTI 2.0 (CPF) with LTI 1.3 (Asset/Document Processor). Review the migrations below to start using LTI 1.3 on your assignments. Most migrations finish in less than an hour. We’ll email you once yours is complete.',
             )}
           </Text>
           <Text>
             {I18n.t(
-              'Once you click the button to start the migration, reports will not be visible in SpeedGrader until they have been migrated.',
+              'After you select the button to start, reports won’t be visible in SpeedGrader until the migration is finished.',
             )}
           </Text>
         </Flex>

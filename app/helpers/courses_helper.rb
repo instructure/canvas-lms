@@ -29,11 +29,12 @@ module CoursesHelper
     show_assignment_type_icon = opts[:show_assignment_type_icon]
 
     return [nil, "Quiz", "icon-quiz"] if recent_event.is_a?(Quizzes::Quiz)
-    return [nil, "Event", "icon-calendar-day"] unless recent_event.is_a?(Assignment) || recent_event.is_a?(SubAssignment)
+    return [nil, "Event", "icon-calendar-day"] unless recent_event.is_a?(Assignment) || recent_event.is_a?(SubAssignment) || recent_event.is_a?(PeerReviewSubAssignment)
 
     event_type = ["Assignment", "icon-assignment"]
     event_type = ["Quiz", "icon-quiz"] if recent_event.submission_types == "online_quiz"
     event_type = ["Discussion", "icon-discussion"] if recent_event.submission_types == "discussion_topic"
+    event_type = ["Peer Review", "icon-peer-review"] if recent_event.submission_types == "peer_review"
 
     # because this happens in a sidebar, the context may be wrong. check and fix
     # it if that's the case.
@@ -50,15 +51,19 @@ module CoursesHelper
       end
       icon_data[0] = nil unless recent_event.expects_submission?
     elsif !student_only && can_do(context, current_user, :manage_grades)
+      event_needs_grading = current_user.assignments_needing_grading(
+        contexts:,
+        is_peer_review_sub_assignment: recent_event.is_a?(PeerReviewSubAssignment)
+      ).include?(recent_event)
+
       # no submissions
       icon_data = if !recent_event.has_submitted_submissions?
                     [t("#courses.recent_event.no_submissions", "no submissions")] + event_type
                   # all received submissions graded (but not all turned in)
-                  elsif recent_event.submitted_count < context.students.size &&
-                        !current_user.assignments_needing_grading(contexts:).include?(recent_event)
+                  elsif recent_event.submitted_count < context.students.size && !event_needs_grading
                     [t("#courses.recent_event.no_new_submissions", "no new submissions")] + event_type
                   # all submissions turned in and graded
-                  elsif !current_user.assignments_needing_grading(contexts:).include?(recent_event)
+                  elsif !event_needs_grading
                     [t("#courses.recent_event.all_graded", "all graded")] + event_type
                   # assignments need grading
                   else
@@ -78,7 +83,7 @@ module CoursesHelper
     context = recent_event.context
     if recent_event.is_a?(Assignment)
       context_url(context, :context_assignment_url, id: recent_event.id)
-    elsif recent_event.is_a?(SubAssignment)
+    elsif recent_event.is_a?(SubAssignment) || recent_event.is_a?(PeerReviewSubAssignment)
       context_url(context, :context_assignment_url, id: recent_event.parent_assignment_id)
     else
       calendar_url_for(nil, {

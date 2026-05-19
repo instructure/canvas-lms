@@ -24,7 +24,7 @@ import PaginatedCollectionView from '@canvas/pagination/backbone/views/Paginated
 import ProgressionStudentView from './backbone/views/ProgressionStudentView'
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import ProgressionModuleHeader from './react/components/ProgressionModuleHeader'
 
 ready(() => {
@@ -39,8 +39,7 @@ ready(() => {
     afterRender() {
       const container = document.getElementById('progression-module-header-root')
       if (container) {
-        this.root = createRoot(container)
-        this.root.render(<ProgressionModuleHeader bridge={this.collection} />)
+        this.root = render(<ProgressionModuleHeader bridge={this.collection} />, container)
       }
     }
 

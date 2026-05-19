@@ -45,13 +45,9 @@ const LoginLayout = () => {
           <Flex.Item shouldGrow={true} overflowX="hidden">
             <ContentLayout>
               <Flex direction="column" gap="large">
-                {loginLogoUrl && (
-                  <View as="header">
-                    <LoginLogo />
-                  </View>
-                )}
+                {loginLogoUrl && <LoginLogo />}
 
-                <View as="main" minHeight="18.75rem">
+                <View as="div" minHeight="18.75rem">
                   <Outlet />
                 </View>
 

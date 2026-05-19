@@ -18,32 +18,65 @@
 
 import {useState, useRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import {FormMessage} from '@instructure/ui-form-field'
+import {FormMessage, FormFieldGroup} from '@instructure/ui-form-field'
 
 const I18n = createI18nScope('course_navigation_settings')
 
 const MAX_URL_LENGTH = 2048
 const MAX_TEXT_LENGTH = 50
 
-// Returns an error string if invalid
-function validateUrl(str: string): string | undefined {
-  if (str.length > MAX_URL_LENGTH) {
-    return I18n.t('URL is too long (maximum %{max} characters)', {max: MAX_URL_LENGTH})
-  }
+export type Placement = 'course_nav' | 'account_nav' | 'user_nav'
+
+const PLACEMENT_LABELS: Record<Placement, () => string> = {
+  course_nav: () => I18n.t('Course Navigation'),
+  account_nav: () => I18n.t('Account Navigation'),
+  user_nav: () => I18n.t('User Navigation'),
+}
+
+// Characters invalid in URLs, new URL() does not [always] change these, but rejected by ruby
+const INVALID_URL_CHARS = /["[\]^|]/
+
+// % not followed by exactly 2 hex digits = invalid percent-encoding. new URL() leaves these alone, Ruby rejects them.
+const INVALID_PERCENT_ENCODING = /%(?![0-9A-Fa-f]{2})/
+
+export type UrlValidationResult = {error: string} | {normalized: string}
+
+// Returns {error} if invalid, {normalized} with the URL canonical form if valid
+export function validateUrl(str: string): UrlValidationResult {
+  const err = (msg: string): UrlValidationResult => ({error: msg})
+  const invalid = I18n.t('Please enter a valid URL beginning with https:// or http://')
 
   try {
-    const url = new URL(str)
+    const prenormalized = str.trim().replace(/^https:\/\/https?:\/\//, 'https://')
+    const url = new URL(prenormalized)
     if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-      return I18n.t('Please enter a valid URL beginning with https:// or http://')
+      return err(invalid)
     }
-    return undefined
+    const normalized = url.href
+
+    // Cases that even once normalized, ruby rejects:
+    if (INVALID_PERCENT_ENCODING.test(normalized) || INVALID_URL_CHARS.test(normalized)) {
+      return err(invalid)
+    }
+    if (url.hash.slice(1).includes('#')) {
+      return err(I18n.t('URL cannot have two fragments (the # character)'))
+    }
+    if (normalized.length > MAX_URL_LENGTH) {
+      return err(
+        I18n.t('URL is too long (maximum %{max} characters after URL encoding)', {
+          max: MAX_URL_LENGTH,
+        }),
+      )
+    }
+    return {normalized}
   } catch (_) {
-    return I18n.t('Please enter a valid URL beginning with https:// or http://')
+    return err(invalid)
   }
 }
 
@@ -56,11 +89,12 @@ function validateText(normalizedText: string): string | undefined {
 
 export interface AddLinkModalProps {
   onDismiss: () => void
-  onAdd: (link: {label: string; url: string}) => void
-}
-
-function normalize({label, url}: {label: string; url: string}): {label: string; url: string} {
-  return {label: label.trim(), url: url.trim()}
+  onAdd: (link: {
+    label: string
+    url: string
+    placements: {course_nav: boolean; account_nav: boolean; user_nav: boolean}
+  }) => void
+  availablePlacements?: Placement[]
 }
 
 function textLengthHintText(normalizedText: string): string {
@@ -92,40 +126,63 @@ function makeMessages({
   return result
 }
 
-export const AddLinkModal = ({onDismiss, onAdd}: AddLinkModalProps) => {
+export const AddLinkModal = ({
+  onDismiss,
+  onAdd,
+  availablePlacements = ['course_nav'] as Placement[],
+}: AddLinkModalProps) => {
   const [text, setText] = useState('')
   const [url, setUrl] = useState('https://')
+
+  const initialPlacements = () => ({
+    course_nav: availablePlacements.length <= 1 && availablePlacements.includes('course_nav'),
+    account_nav: availablePlacements.length <= 1 && availablePlacements.includes('account_nav'),
+    user_nav: availablePlacements.length <= 1 && availablePlacements.includes('user_nav'),
+  })
+
+  const [selectedPlacements, setSelectedPlacements] = useState(initialPlacements)
+  const [placementsErrorEnabled, setPlacementsErrorEnabled] = useState(false)
 
   // We only show errors after field has been blurred
   const [hasBlurred, setHasBlurred] = useState({text: false, url: false})
   const textInputRef = useRef<HTMLInputElement | null>(null)
   const urlInputRef = useRef<HTMLInputElement | null>(null)
 
-  const normalized = normalize({label: text, url})
-  const urlError = validateUrl(normalized.url)
-  const textError = validateText(normalized.label)
+  const normalizedLabel = text.trim()
+  const textError = validateText(normalizedLabel)
+
+  const urlValidation = validateUrl(url)
+  const urlError = 'error' in urlValidation ? urlValidation.error : undefined
+
+  const placementsError = !Object.values(selectedPlacements).some(Boolean)
+    ? I18n.t('Please select at least one placement.')
+    : undefined
 
   const handleAdd = () => {
-    // Mark all fields as blurred to show any errors
     setHasBlurred({text: true, url: true})
+    setPlacementsErrorEnabled(true)
 
-    // Focus on first field with error
     if (textError) {
       textInputRef.current?.focus()
       return
     }
 
-    if (urlError) {
+    if ('error' in urlValidation) {
       urlInputRef.current?.focus()
       return
     }
 
-    // All valid, proceed
-    onAdd(normalized)
+    if (placementsError) {
+      return
+    }
+
+    onAdd({label: normalizedLabel, url: urlValidation.normalized, placements: selectedPlacements})
     onDismiss()
     setText('')
     setUrl('https://')
+    setSelectedPlacements(initialPlacements())
     setHasBlurred({text: false, url: false})
+    setPlacementsErrorEnabled(false)
   }
 
   return (
@@ -157,12 +214,12 @@ export const AddLinkModal = ({onDismiss, onAdd}: AddLinkModalProps) => {
                 errorEnabled: hasBlurred.text,
               })}
             />
-            <View as="div" margin="x-small none none">
+            <View as="div" margin="none">
               <Text
                 size="small"
-                color={normalized.label.length > MAX_TEXT_LENGTH ? 'danger' : 'secondary'}
+                color={normalizedLabel.length > MAX_TEXT_LENGTH ? 'danger' : 'secondary'}
               >
-                {textLengthHintText(normalized.label)}
+                {textLengthHintText(normalizedLabel)}
               </Text>
             </View>
           </View>
@@ -181,18 +238,36 @@ export const AddLinkModal = ({onDismiss, onAdd}: AddLinkModalProps) => {
                 setHasBlurred(prev => ({...prev, url: true}))
               }}
               messages={makeMessages({
-                hint: I18n.t('This can be an external link or a Canvas URL.'),
+                hint: I18n.t(
+                  'This can be an external link or a Canvas URL. This link will open in a new tab.',
+                ),
                 error: urlError,
                 errorEnabled: hasBlurred.url,
               })}
             />
           </View>
-          <View as="div">
-            <Text weight="bold">{I18n.t('Opening Behavior')}</Text>
-            <View as="div" margin="x-small none none">
-              <Text>{I18n.t('This link will open in a new tab.')}</Text>
+          {availablePlacements.length > 1 && (
+            <View as="div" margin="none none medium">
+              <FormFieldGroup
+                description={I18n.t('Placements')}
+                rowSpacing="small"
+                messages={
+                  placementsErrorEnabled && placementsError
+                    ? [{type: 'error', text: placementsError}]
+                    : []
+                }
+              >
+                {availablePlacements.map(p => (
+                  <Checkbox
+                    key={p}
+                    label={PLACEMENT_LABELS[p]()}
+                    checked={selectedPlacements[p]}
+                    onChange={() => setSelectedPlacements(prev => ({...prev, [p]: !prev[p]}))}
+                  />
+                ))}
+              </FormFieldGroup>
             </View>
-          </View>
+          )}
         </View>
       </Modal.Body>
       <Modal.Footer>

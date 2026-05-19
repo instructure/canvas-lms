@@ -78,7 +78,7 @@ describe Quizzes::SubmissionGrader do
 
       it "does not have grade rounding issues" do
         Quizzes::SubmissionGrader.new(quiz_submission).grade_submission
-        expect(quiz_submission.score).to_not eq(float_rounding)
+        expect(quiz_submission.score).not_to eq(float_rounding)
         expect(quiz_submission.score).to eq(actual_score)
       end
     end

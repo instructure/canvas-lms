@@ -27,7 +27,7 @@ import template from '../../jst/groupCategory.handlebars'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import GroupCategoryProgress from '../../react/GroupCategoryProgress'
 
 const I18n = createI18nScope('groups')
@@ -90,6 +90,7 @@ export default class GroupCategoryView extends View {
       // @ts-expect-error - Legacy Backbone typing
       addUnassignedMenu = new AddUnassignedMenu({collection: users})
     }
+    // @ts-expect-error TS7 migration
     return new GroupsView({
       // @ts-expect-error - Backbone View property
       collection: this.groups,
@@ -100,6 +101,7 @@ export default class GroupCategoryView extends View {
   // @ts-expect-error - Legacy Backbone typing
   unassignedUsersView(_options) {
     if (ENV.IS_LARGE_ROSTER) return false
+    // @ts-expect-error TS7 migration
     return new UnassignedUsersView({
       // @ts-expect-error - Backbone View property
       category: this.model,
@@ -218,7 +220,7 @@ export default class GroupCategoryView extends View {
   renderProgress() {
     const container = document.getElementById('group-category-progress')
     if (container != null) {
-      ReactDOM.render(
+      legacyRender(
         // @ts-expect-error - Backbone View property
         <GroupCategoryProgress progressPercent={this.model.progressModel.attributes.completion} />,
         container,

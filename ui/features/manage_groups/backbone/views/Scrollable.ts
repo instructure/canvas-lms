@@ -101,7 +101,6 @@ export default {
     return this._resize()
   },
 
-  // @ts-expect-error - Legacy Backbone typing
   _initializeDragAndDropHandling() {
     // @ts-expect-error - Backbone View property
     this.$el.on('dragstart', (_event, _ui) => (this._$pointerScrollable = this.$el))

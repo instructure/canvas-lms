@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe LtiOutbound::LTIAssignment do
   it_behaves_like "it has a proc attribute setter and getter for", :id
   it_behaves_like "it has a proc attribute setter and getter for", :source_id

@@ -18,7 +18,7 @@
 
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('assignments_peer_reviews_student')

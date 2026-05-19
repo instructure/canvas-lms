@@ -105,9 +105,9 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
       const radioInputGroup = screen.queryByRole('group', {name: /Dimension Type/i})
       expect(radioInputGroup).toBeNull()
     })
-    it('The custom text description is displayed', () => {
-      const label = screen.getByText('Custom width and height (Pixels)')
-      expect(label).toBeVisible()
+    it('The width and height inputs are rendered with visible labels', () => {
+      expect(screen.getByText('Width')).toBeVisible()
+      expect(screen.getByText('Height')).toBeVisible()
     })
   })
 })

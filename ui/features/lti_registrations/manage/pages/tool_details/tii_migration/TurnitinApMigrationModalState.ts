@@ -17,7 +17,7 @@
  */
 
 import {useQuery, useMutation} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import doFetchApi, {doFetchWithSchema} from '@canvas/do-fetch-api-effect'
 import * as z from 'zod'
 

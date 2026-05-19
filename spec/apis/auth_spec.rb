@@ -247,7 +247,8 @@ describe "API Authentication", type: :request do
         expect(response).to be_successful
       end
 
-      it "redirects with access_denied if the user doesn't accept" do
+      it "redirects with access_denied if the user doesn't accept via GET" do
+        Account.site_admin.disable_feature!(:oauth2_deny_post)
         course_with_student_logged_in(active_all: true, user: user_with_pseudonym)
         get "/login/oauth2/auth", params: { response_type: "code", client_id: @client_id, redirect_uri: "urn:ietf:wg:oauth:2.0:oob" }
         expect(response).to be_redirect
@@ -262,6 +263,33 @@ describe "API Authentication", type: :request do
         expect(response["Location"]).not_to match(/code=/)
         get response["Location"]
         expect(response).to be_successful
+      end
+
+      it "redirects with access_denied if the user doesn't accept via POST" do
+        course_with_student_logged_in(active_all: true, user: user_with_pseudonym)
+        get "/login/oauth2/auth", params: { response_type: "code", client_id: @client_id, redirect_uri: "urn:ietf:wg:oauth:2.0:oob" }
+        expect(response).to be_redirect
+        expect(response["Location"]).to match(%r{/login/oauth2/confirm$})
+        get response["Location"]
+        expect(response).to render_template("oauth2_provider/confirm")
+        post "/login/oauth2/deny"
+        expect(response).to be_redirect
+        expect(response["Location"]).to match(%r{/login/oauth2/auth\?})
+        error = response["Location"].match(/error=([^?&]+)/)[1]
+        expect(error).to eq "access_denied"
+        expect(response["Location"]).not_to match(/code=/)
+        get response["Location"]
+        expect(response).to be_successful
+      end
+
+      it "rejects GET deny when oauth2_deny_post flag is enabled" do
+        Account.site_admin.enable_feature!(:oauth2_deny_post)
+        course_with_student_logged_in(active_all: true, user: user_with_pseudonym)
+        get "/login/oauth2/auth", params: { response_type: "code", client_id: @client_id, redirect_uri: "urn:ietf:wg:oauth:2.0:oob" }
+        expect(response).to be_redirect
+        get response["Location"]
+        get "/login/oauth2/deny"
+        expect(response).to have_http_status(:method_not_allowed)
       end
 
       it "requires the correct client secret" do
@@ -372,7 +400,7 @@ describe "API Authentication", type: :request do
       end
 
       context "untrusted developer key" do
-        def login_and_confirm(create_token = false)
+        def login_and_confirm(create_token: false)
           enable_forgery_protection do
             enable_cache do
               user_with_pseudonym(active_user: true, username: "test1@example.com", password: "test1234")
@@ -433,7 +461,7 @@ describe "API Authentication", type: :request do
         end
 
         it "enables the web app flow if token already exists" do
-          login_and_confirm(true)
+          login_and_confirm(create_token: true)
         end
 
         it "does not allow an account level dev key to auth with other account's user" do
@@ -461,7 +489,7 @@ describe "API Authentication", type: :request do
       end
 
       context "trusted developer key" do
-        def trusted_exchange(create_token = false, userinfo: false)
+        def trusted_exchange(create_token: false, userinfo: false)
           @key.trusted = true
           @key.save!
 
@@ -496,12 +524,12 @@ describe "API Authentication", type: :request do
 
         it "gives first token" do
           json = trusted_exchange
-          expect(json["access_token"]).to_not be_nil
+          expect(json["access_token"]).not_to be_nil
         end
 
         it "gives second token if not force_token_reuse" do
-          json = trusted_exchange(true)
-          expect(json["access_token"]).to_not be_nil
+          json = trusted_exchange(create_token: true)
+          expect(json["access_token"]).not_to be_nil
           expect(@user.access_tokens.count).to eq 2
         end
 
@@ -510,7 +538,7 @@ describe "API Authentication", type: :request do
           @key.auto_expire_tokens = false
           @key.save!
 
-          json = trusted_exchange(true) do |token|
+          json = trusted_exchange(create_token: true) do |token|
             expect_any_instantiation_of(token).to receive(:save).at_least(:once).and_call_original
           end
           expect(json["access_token"]).not_to be_nil
@@ -522,7 +550,7 @@ describe "API Authentication", type: :request do
           @key.auto_expire_tokens = false
           @key.save!
 
-          json = trusted_exchange(true, userinfo: true) do |token|
+          json = trusted_exchange(create_token: true, userinfo: true) do |token|
             expect_any_instantiation_of(token).not_to receive(:save)
           end
           expect(json["user"]).not_to be_nil
@@ -604,7 +632,7 @@ describe "API Authentication", type: :request do
     end
 
     def wrapped_jwt_from_service(payload = { sub: @user.global_id })
-      services_jwt = CanvasSecurity::ServicesJwt.generate(payload, false, symmetric: true)
+      services_jwt = CanvasSecurity::ServicesJwt.generate(payload, base64: false, symmetric: true)
       payload = {
         iss: "some other service",
         user_token: services_jwt

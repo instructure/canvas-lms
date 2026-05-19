@@ -19,15 +19,12 @@
 <% access_token ||= nil %>
 <tr class="access_token <%= 'blank' unless access_token %>" style="<%= hidden unless access_token %>">
   <td class="app_name"><%= access_token&.app_name || t(:default_app_name, "No App") %></td>
-  <% if @current_user&.account.feature_enabled?(:admin_manage_access_tokens) %>
-    <td class="workflow_state">
-      <%= access_token&.localized_workflow_state %>
-    <% if access_token&.pending? && @real_current_user.nil? %>
-      (<a href="#" class="activate_token_link" rel="<%= activate_profile_token_url(access_token)%>"><%= t("activate") %></a>)
-    <% else %>
-    <% end %>
-    </td>
+  <td class="workflow_state">
+    <%= access_token&.localized_workflow_state %>
+  <% if access_token&.pending? && @real_current_user.nil? %>
+    (<a href="#" class="activate_token_link" rel="<%= activate_profile_token_url(access_token)%>"><%= t("activate") %></a>)
   <% end %>
+  </td>
   <td class="purpose"><%= access_token&.purpose || nbsp %></td>
   <td class="dates">
     <table class="subtable" role="presentation">

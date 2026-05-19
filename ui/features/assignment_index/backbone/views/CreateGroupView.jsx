@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import round from '@canvas/round'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
@@ -257,9 +257,12 @@ class CreateGroupView extends DialogFormView {
     }
     const errorsContainer = this.getElement(`#${fieldSelector}_errors`)
     if (errorsContainer) {
-      const root = this.errorRoots[field] ?? createRoot(errorsContainer)
-      root.render(<FormattedErrorMessage message={message} margin={'x-small 0 0 0'} />)
-      this.errorRoots[field] = root
+      const element = <FormattedErrorMessage message={message} margin={'x-small 0 0 0'} />
+      if (this.errorRoots[field]) {
+        rerender(this.errorRoots[field], element)
+      } else {
+        this.errorRoots[field] = render(element, errorsContainer)
+      }
     }
   }
 
@@ -366,8 +369,7 @@ class CreateGroupView extends DialogFormView {
       const dropLowestContainer = this.getElement(
         `.ag_${this.assignmentGroup.id}_drop_lowest_container`,
       )
-      this.dropLowestRoot = this.dropLowestRoot ?? createRoot(dropLowestContainer)
-      this.dropLowestRoot.render(
+      const dropLowestElement = (
         <GroupRuleInput
           groupId={this.assignmentGroup.id}
           type={'drop_lowest'}
@@ -375,13 +377,17 @@ class CreateGroupView extends DialogFormView {
           initialValue={dropLowestContainer?.dataset.value}
           onChange={() => this.hideErrors(AG_FIELDS.DROP_RULES.LOWEST)}
           data-testid={'drop_lowest_input'}
-        />,
+        />
       )
+      if (this.dropLowestRoot) {
+        rerender(this.dropLowestRoot, dropLowestElement)
+      } else {
+        this.dropLowestRoot = render(dropLowestElement, dropLowestContainer)
+      }
       const dropHighestContainer = this.getElement(
         `.ag_${this.assignmentGroup.id}_drop_highest_container`,
       )
-      this.dropHighestRoot = this.dropHighestRoot ?? createRoot(dropHighestContainer)
-      this.dropHighestRoot.render(
+      const dropHighestElement = (
         <GroupRuleInput
           groupId={this.assignmentGroup.id}
           type={'drop_highest'}
@@ -389,8 +395,13 @@ class CreateGroupView extends DialogFormView {
           initialValue={dropHighestContainer?.dataset.value}
           onChange={() => this.hideErrors(AG_FIELDS.DROP_RULES.HIGHEST)}
           data-testid={'drop_highest_input'}
-        />,
+        />
       )
+      if (this.dropHighestRoot) {
+        rerender(this.dropHighestRoot, dropHighestElement)
+      } else {
+        this.dropHighestRoot = render(dropHighestElement, dropHighestContainer)
+      }
     }
     this.checkGroupWeight()
     return this.getNeverDrops()

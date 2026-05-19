@@ -19,10 +19,9 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
+import {render} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
-import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import OriginalityReportVisibilityPicker from './OriginalityReportVisibilityPicker'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
@@ -53,10 +52,6 @@ class AssignmentConfigurationTools extends React.Component {
 
   componentDidMount() {
     this.setToolLaunchUrl()
-
-    if (this.iframe) {
-      this.iframe.setAttribute('allow', iframeAllowances())
-    }
   }
 
   getTools = () => {
@@ -223,8 +218,7 @@ const attach = function (
       visibilitySetting={visibilitySetting}
     />
   )
-  // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(configTools, element)
+  return render(configTools, element, {sync: true})
 }
 
 const ConfigurationTools = {

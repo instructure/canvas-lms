@@ -129,7 +129,7 @@ class CourseGroups
     end
 
     def clone_category_confirm
-      wait_for_new_page_load(clone_category_submit_button.click)
+      wait_for_new_page_load { clone_category_submit_button.click }
     end
 
     def remove_student_from_group(student_id, curr_group_name)

@@ -20,7 +20,7 @@ import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import PeerReviewsStudentView from '../PeerReviewsStudentView'
 import {executeQuery} from '@canvas/graphql'
 import {useAllocatePeerReviews} from '../../hooks/useAllocatePeerReviews'
@@ -151,6 +151,47 @@ describe('PeerReviewsStudentView', () => {
     })
   })
 
+  it('renders the assignment title inside an h1 heading', async () => {
+    mockExecuteQuery.mockResolvedValueOnce({
+      assignment: {
+        _id: '1',
+        name: 'Test Peer Review Assignment',
+        description: '<p>This is the assignment description</p>',
+        courseId: '100',
+        peerReviews: {
+          count: 2,
+          submissionRequired: false,
+        },
+        peerReviewSubAssignment: {
+          dueAt: '2025-12-31T23:59:59Z',
+          unlockAt: null,
+          lockAt: null,
+        },
+        submissionsConnection: {
+          nodes: [{_id: 'sub-1', submittedAt: '2025-12-01T00:00:00Z'}],
+        },
+        assessmentRequestsForCurrentUser: [
+          {
+            _id: 'ar-1',
+            available: true,
+            workflowState: 'assigned',
+            createdAt: '2025-11-01T00:00:00Z',
+          },
+        ],
+      },
+    })
+
+    const {getByTestId} = setup()
+
+    await waitFor(() => {
+      expect(getByTestId('title')).toBeInTheDocument()
+    })
+
+    const titleElement = getByTestId('title')
+    const headingElement = titleElement.closest('h1')
+    expect(headingElement).toBeInTheDocument()
+  })
+
   it('renders assignment details successfully', async () => {
     mockExecuteQuery.mockResolvedValueOnce({
       assignment: {
@@ -256,7 +297,7 @@ describe('PeerReviewsStudentView', () => {
         description: '<p>Description</p>',
         courseId: '100',
         peerReviews: {
-          count: 1,
+          count: 2,
         },
         peerReviewSubAssignment: null,
         assessmentRequestsForCurrentUser: [],
@@ -269,7 +310,7 @@ describe('PeerReviewsStudentView', () => {
       expect(getByText('Assignment Details')).toBeInTheDocument()
     })
 
-    expect(getByText('Submission')).toBeInTheDocument()
+    expect(getByText('Submissions to Review')).toBeInTheDocument()
   })
 
   it('renders peer review selector when assessment requests exist', async () => {
@@ -396,7 +437,7 @@ describe('PeerReviewsStudentView', () => {
       const {getByText} = setup({assignmentId: '9'})
 
       await waitFor(() => {
-        expect(getByText('Submission')).toBeInTheDocument()
+        expect(getByText('Submissions to Review')).toBeInTheDocument()
       })
     })
 
@@ -429,11 +470,11 @@ describe('PeerReviewsStudentView', () => {
       const {getByTestId, getByText} = setup({assignmentId: '11'})
 
       await waitFor(() => {
-        expect(getByText('Submission')).toBeInTheDocument()
+        expect(getByText('Submissions to Review')).toBeInTheDocument()
       })
 
       const user = userEvent.setup()
-      await user.click(getByText('Submission'))
+      await user.click(getByText('Submissions to Review'))
 
       await waitFor(() => {
         expect(getByTestId('text-entry-content')).toBeInTheDocument()
@@ -490,11 +531,11 @@ describe('PeerReviewsStudentView', () => {
       const {getByTestId, getByText} = setup({assignmentId: '12'})
 
       await waitFor(() => {
-        expect(getByText('Submission')).toBeInTheDocument()
+        expect(getByText('Submissions to Review')).toBeInTheDocument()
       })
 
       const user = userEvent.setup()
-      await user.click(getByText('Submission'))
+      await user.click(getByText('Submissions to Review'))
 
       await waitFor(() => {
         expect(getByTestId('text-entry-content')).toHaveTextContent('First submission')
@@ -810,7 +851,7 @@ describe('PeerReviewsStudentView', () => {
       expect(getByText('Assignment description here')).toBeInTheDocument()
 
       const user = userEvent.setup()
-      await user.click(getByText('Submission'))
+      await user.click(getByText('Submissions to Review'))
 
       await waitFor(() => {
         expect(getByTestId('text-entry-content')).toBeInTheDocument()
@@ -859,6 +900,9 @@ describe('PeerReviewsStudentView', () => {
           name: 'Mobile Test',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
+          peerReviews: {
+            count: 2,
+          },
           peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [],
         },
@@ -873,7 +917,34 @@ describe('PeerReviewsStudentView', () => {
         expect(getByText('Assignment')).toBeInTheDocument()
       })
 
-      expect(getByText('Peer Review')).toBeInTheDocument()
+      expect(getByText('Submissions')).toBeInTheDocument()
+    })
+
+    it('renders mobile singular tab label when count is 1', async () => {
+      mockExecuteQuery.mockResolvedValueOnce({
+        assignment: {
+          _id: '15-singular',
+          name: 'Mobile Test Singular',
+          dueAt: '2025-12-31T23:59:59Z',
+          description: '<p>Description</p>',
+          peerReviews: {
+            count: 1,
+          },
+          peerReviewSubAssignment: null,
+          assessmentRequestsForCurrentUser: [],
+        },
+      })
+
+      const {getByText} = setup({
+        assignmentId: '15-singular',
+        breakpoints: {mobileOnly: true, tablet: false, desktop: false},
+      })
+
+      await waitFor(() => {
+        expect(getByText('Assignment')).toBeInTheDocument()
+      })
+
+      expect(getByText('Submission')).toBeInTheDocument()
     })
 
     it('renders desktop tab labels when mobileOnly is false', async () => {
@@ -883,6 +954,9 @@ describe('PeerReviewsStudentView', () => {
           name: 'Desktop Test',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
+          peerReviews: {
+            count: 2,
+          },
           peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [],
         },
@@ -897,30 +971,34 @@ describe('PeerReviewsStudentView', () => {
         expect(getByText('Assignment Details')).toBeInTheDocument()
       })
 
-      expect(getByText('Submission')).toBeInTheDocument()
+      expect(getByText('Submissions to Review')).toBeInTheDocument()
     })
 
-    it('renders divider on mobile', async () => {
+    it('renders desktop singular tab label when count is 1', async () => {
       mockExecuteQuery.mockResolvedValueOnce({
         assignment: {
-          _id: '17',
-          name: 'Mobile Divider Test',
+          _id: '16-singular',
+          name: 'Desktop Test Singular',
           dueAt: '2025-12-31T23:59:59Z',
           description: '<p>Description</p>',
+          peerReviews: {
+            count: 1,
+          },
           peerReviewSubAssignment: null,
           assessmentRequestsForCurrentUser: [],
         },
       })
 
-      const {container} = setup({
-        assignmentId: '17',
-        breakpoints: {mobileOnly: true, tablet: false, desktop: false},
+      const {getByText} = setup({
+        assignmentId: '16-singular',
+        breakpoints: {mobileOnly: false, tablet: false, desktop: true},
       })
 
       await waitFor(() => {
-        const dividers = container.querySelectorAll('hr')
-        expect(dividers.length).toBeGreaterThan(0)
+        expect(getByText('Assignment Details')).toBeInTheDocument()
       })
+
+      expect(getByText('Submission to Review')).toBeInTheDocument()
     })
   })
 
@@ -1170,7 +1248,7 @@ describe('PeerReviewsStudentView', () => {
       })
 
       expect(queryByText('Assignment Details')).not.toBeInTheDocument()
-      expect(queryByText('Submission')).not.toBeInTheDocument()
+      expect(queryByText('Submissions to Review')).not.toBeInTheDocument()
     })
 
     it('shows tabs when submission is required and user has submitted', async () => {
@@ -1198,7 +1276,7 @@ describe('PeerReviewsStudentView', () => {
         expect(getByText('Assignment Details')).toBeInTheDocument()
       })
 
-      expect(getByText('Submission')).toBeInTheDocument()
+      expect(getByText('Submissions to Review')).toBeInTheDocument()
     })
 
     it('allows peer reviews when student submits late (after due date)', async () => {
@@ -1227,7 +1305,7 @@ describe('PeerReviewsStudentView', () => {
       })
 
       expect(getByTestId('peer-review-selector')).toBeInTheDocument()
-      expect(getByText('Submission')).toBeInTheDocument()
+      expect(getByText('Submissions to Review')).toBeInTheDocument()
     })
 
     it('calls allocate when student submits late and needs reviews', async () => {
@@ -1673,7 +1751,7 @@ describe('PeerReviewsStudentView', () => {
       })
 
       expect(getByText('Assignment Details')).toBeInTheDocument()
-      expect(getByText('Submission')).toBeInTheDocument()
+      expect(getByText('Submissions to Review')).toBeInTheDocument()
     })
 
     it('does not allocate peer reviews when past lock date', async () => {
@@ -1724,7 +1802,7 @@ describe('PeerReviewsStudentView', () => {
         expect(getByText('Assignment Details')).toBeInTheDocument()
       })
 
-      expect(queryByText('Submission')).not.toBeInTheDocument()
+      expect(queryByText('Submissions to Review')).not.toBeInTheDocument()
     })
 
     it('shows Submission tab when past lock date but assessment requests exist', async () => {
@@ -1767,7 +1845,7 @@ describe('PeerReviewsStudentView', () => {
         expect(getByText('Assignment Details')).toBeInTheDocument()
       })
 
-      expect(getByText('Submission')).toBeInTheDocument()
+      expect(getByText('Submissions to Review')).toBeInTheDocument()
     })
 
     it('shows peer review selector when past lock date and assessment requests exist', async () => {
@@ -1906,11 +1984,11 @@ describe('PeerReviewsStudentView', () => {
       const {getByTestId, getByText} = setup({assignmentId: '28'})
 
       await waitFor(() => {
-        expect(getByText('Submission')).toBeInTheDocument()
+        expect(getByText('Submissions to Review')).toBeInTheDocument()
       })
 
       const user = userEvent.setup()
-      await user.click(getByText('Submission'))
+      await user.click(getByText('Submissions to Review'))
 
       await waitFor(() => {
         expect(getByTestId('text-entry-content')).toHaveTextContent('First submission')
@@ -1965,11 +2043,11 @@ describe('PeerReviewsStudentView', () => {
       const {getByTestId, getByText, queryByTestId} = setup({assignmentId: '29'})
 
       await waitFor(() => {
-        expect(getByText('Submission')).toBeInTheDocument()
+        expect(getByText('Submissions to Review')).toBeInTheDocument()
       })
 
       const user = userEvent.setup()
-      await user.click(getByText('Submission'))
+      await user.click(getByText('Submissions to Review'))
 
       const selector = getByTestId('peer-review-selector')
       await user.click(selector)
@@ -2014,7 +2092,7 @@ describe('PeerReviewsStudentView', () => {
         expect(getByTestId('peer-review-selector')).toBeInTheDocument()
       })
       const user = userEvent.setup()
-      await user.click(getByText('Submission'))
+      await user.click(getByText('Submissions to Review'))
 
       await waitFor(() => {
         expect(getByTestId('unavailable-peer-review')).toBeInTheDocument()
@@ -2273,7 +2351,7 @@ describe('PeerReviewsStudentView', () => {
       })
 
       const user = userEvent.setup()
-      await user.click(getByText('Submission'))
+      await user.click(getByText('Submissions to Review'))
 
       await waitFor(() => {
         expect(getByTestId('unavailable-peer-review')).toBeInTheDocument()
@@ -2320,7 +2398,7 @@ describe('PeerReviewsStudentView', () => {
       })
 
       const user = userEvent.setup()
-      await user.click(getByText('Submission'))
+      await user.click(getByText('Submission to Review'))
 
       await waitFor(() => {
         expect(getByTestId('unavailable-peer-review')).toBeInTheDocument()
@@ -2380,7 +2458,7 @@ describe('PeerReviewsStudentView', () => {
       const user = userEvent.setup()
       const selector = getByTestId('peer-review-selector')
 
-      await user.click(getByText('Submission'))
+      await user.click(getByText('Submissions to Review'))
 
       await waitFor(() => {
         expect(getByTestId('text-entry-content')).toBeInTheDocument()

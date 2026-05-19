@@ -18,7 +18,4 @@ module.exports = {
       global: true,
     },
   },
-  rules: {
-    'react/no-deprecated': 'warn',
-  },
 }

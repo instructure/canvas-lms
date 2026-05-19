@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -36,7 +35,6 @@ const I18n = createI18nScope('AssignmentSettingsView')
 // @ts-expect-error
 extend(AssignmentSettingsView, DialogFormView)
 
-// @ts-expect-error
 function AssignmentSettingsView() {
   // @ts-expect-error
   this.errorRoots = {}

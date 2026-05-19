@@ -21,11 +21,15 @@ import {fetchAccessibilityIssueSummary} from '../api/accessibility_issue_summary
 
 interface UseAccessibilityIssueSummaryOptions {
   accountId: string
+  enrollmentTermId?: string
 }
 
-export const useAccessibilityIssueSummary = ({accountId}: UseAccessibilityIssueSummaryOptions) => {
+export const useAccessibilityIssueSummary = ({
+  accountId,
+  enrollmentTermId,
+}: UseAccessibilityIssueSummaryOptions) => {
   return useQuery({
-    queryKey: ['accessibility-issue-summary', accountId],
-    queryFn: () => fetchAccessibilityIssueSummary({accountId}),
+    queryKey: ['accessibility-issue-summary', accountId, enrollmentTermId],
+    queryFn: () => fetchAccessibilityIssueSummary({accountId, enrollmentTermId}),
   })
 }

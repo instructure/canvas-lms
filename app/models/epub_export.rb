@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class EpubExport < ActiveRecord::Base
+class EpubExport < ApplicationRecord
   include CC::Exporter::Epub::Exportable
   include LocaleSelection
   include Workflow
@@ -163,7 +163,7 @@ class EpubExport < ActiveRecord::Base
 
   def self.fail_stuck_epub_exports(exports)
     cutoff = 2.hours.ago
-    exports.select { |e| (e.generating? || e.exporting?) && e.updated_at < cutoff }.each(&:mark_as_failed)
+    exports.select { |e| (e.generating? || e.exporting?) && e.job_progress&.updated_at&.<(cutoff) }.each(&:mark_as_failed)
   end
 
   def convert_to_epub

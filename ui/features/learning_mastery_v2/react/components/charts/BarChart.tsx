@@ -15,23 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useEffect, useRef} from 'react'
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  BarController,
-  Title,
-  Tooltip,
-  Legend,
-  ChartConfiguration,
-  Plugin,
-  ActiveElement,
-  ChartEvent,
-} from 'chart.js'
-
-ChartJS.register(CategoryScale, LinearScale, BarElement, BarController, Title, Tooltip, Legend)
+import React, {lazy, Suspense} from 'react'
+import extensions from '@canvas/bundles/extensions'
 
 export interface BarChartProps {
   labels: string[]
@@ -41,12 +26,7 @@ export interface BarChartProps {
   backgroundColor?: string | string[]
   borderColor?: string | string[]
   borderWidth?: number
-  borderRadius?: {
-    topLeft?: number
-    topRight?: number
-    bottomLeft?: number
-    bottomRight?: number
-  }
+  borderRadius?: number
   datasetLabel?: string
   title?: string
   xAxisLabel?: string
@@ -58,162 +38,43 @@ export interface BarChartProps {
   showXAxisTicks?: boolean
   showYAxisTicks?: boolean
   gridColor?: string
-  maintainAspectRatio?: boolean
-  plugins?: Plugin<'bar'>[]
   padding?: {
     left?: number
     right?: number
     top?: number
     bottom?: number
   }
-  onClick: (event: ChartEvent, elements: ActiveElement[]) => void
+  onClick?: (index: number) => void
+  xAxisImages?: (string | null)[]
+  description?: string
+  pointDescriptions?: string[]
+  barFocusColor?: string
+  xAxisLineColor?: string
 }
 
-export const BarChart: React.FC<BarChartProps> = ({
-  labels,
-  values,
-  width = '100%',
-  height = 400,
-  backgroundColor,
-  borderColor,
-  borderWidth = 1,
-  borderRadius = {topLeft: 3, topRight: 3, bottomLeft: 0, bottomRight: 0},
-  datasetLabel = 'Data',
-  title,
-  xAxisLabel,
-  yAxisLabel,
-  indexAxis = 'x',
-  showLegend = true,
-  showXAxisGrid = false,
-  showYAxisGrid = false,
-  showXAxisTicks = false,
-  showYAxisTicks = false,
-  gridColor = 'rgba(0, 0, 0, 0.1)',
-  maintainAspectRatio = false,
-  plugins = [],
-  padding,
-  onClick,
-}) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const chartRef = useRef<ChartJS<'bar'> | null>(null)
+const EXTENSION_KEY = 'ui/features/learning_mastery_v2/react/components/charts/HighchartsBarChart'
 
-  useEffect(() => {
-    if (!canvasRef.current) return
+const HighchartsBarChart = lazy(async () => {
+  const EmptyComponent = () => <></>
+  try {
+    const extension = (
+      extensions as Record<string, () => Promise<{default: React.ComponentType<BarChartProps>}>>
+    )[EXTENSION_KEY]
 
-    const ctx = canvasRef.current.getContext('2d')
-    if (!ctx) return
-
-    if (chartRef.current) {
-      chartRef.current.destroy()
+    if (extension) {
+      return await extension()
+    } else {
+      return {default: EmptyComponent}
     }
+  } catch {
+    return {default: EmptyComponent}
+  }
+})
 
-    const config: ChartConfiguration<'bar'> = {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [
-          {
-            label: datasetLabel,
-            data: values,
-            backgroundColor,
-            borderColor,
-            borderWidth,
-            categoryPercentage: 1.0,
-            barPercentage: 0.85,
-            borderRadius,
-          },
-        ],
-      },
-      options: {
-        indexAxis,
-        responsive: true,
-        maintainAspectRatio,
-        layout: {
-          padding,
-        },
-        plugins: {
-          legend: {
-            display: showLegend,
-            position: 'top',
-          },
-          title: {
-            display: !!title,
-            text: title || '',
-          },
-        },
-        scales: {
-          x: {
-            grid: {
-              display: showXAxisGrid,
-              drawBorder: false,
-              offset: true,
-              color: gridColor,
-            },
-            title: {
-              display: !!xAxisLabel,
-              text: xAxisLabel || '',
-            },
-            ticks: {
-              display: showXAxisTicks,
-            },
-            offset: true,
-          },
-          y: {
-            grid: {
-              display: showYAxisGrid,
-              drawBorder: false,
-              color: gridColor,
-            },
-            title: {
-              display: false,
-              text: yAxisLabel || '',
-            },
-            ticks: {
-              display: showYAxisTicks,
-            },
-            beginAtZero: true,
-          },
-        },
-        onClick: onClick,
-      },
-      plugins,
-    }
+export const BarChart: React.FC<BarChartProps> = props => (
+  <Suspense>
+    <HighchartsBarChart {...props} />
+  </Suspense>
+)
 
-    chartRef.current = new ChartJS(ctx, config)
-
-    return () => {
-      if (chartRef.current) {
-        chartRef.current.destroy()
-        chartRef.current = null
-      }
-    }
-  }, [
-    labels,
-    values,
-    backgroundColor,
-    borderColor,
-    borderWidth,
-    borderRadius,
-    datasetLabel,
-    title,
-    xAxisLabel,
-    yAxisLabel,
-    indexAxis,
-    showLegend,
-    showXAxisGrid,
-    showYAxisGrid,
-    showXAxisTicks,
-    showYAxisTicks,
-    gridColor,
-    maintainAspectRatio,
-    plugins,
-    padding,
-    onClick,
-  ])
-
-  return (
-    <div style={{width, height}}>
-      <canvas ref={canvasRef} />
-    </div>
-  )
-}
+export default BarChart

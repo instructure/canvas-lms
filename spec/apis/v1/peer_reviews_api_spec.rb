@@ -928,7 +928,7 @@ describe PeerReviewsApiController, type: :request do
         )
       end
 
-      it "creates peer review without linking when feature flag is disabled" do
+      it "creates peer review with linking for legacy mode compatibility" do
         @user = @teacher
         json = api_call(:post, @resource_path, @resource_params, { user_id: @reviewer.id })
 
@@ -936,7 +936,7 @@ describe PeerReviewsApiController, type: :request do
         expect(json["id"]).to be_present
 
         created_request = AssessmentRequest.find(json["id"])
-        expect(created_request.peer_review_sub_assignment_id).to be_nil
+        expect(created_request.peer_review_sub_assignment_id).to eq(@peer_review_sub_assignment.id)
       end
     end
 

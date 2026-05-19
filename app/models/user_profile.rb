@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class UserProfile < ActiveRecord::Base
+class UserProfile < ApplicationRecord
   belongs_to :user
 
   delegate :short_name, :name, :asset_string, :opaque_identifier, to: :user
@@ -103,6 +103,7 @@ class UserProfile < ActiveRecord::Base
         insert_observer_tabs(tabs, user)
         insert_qr_mobile_login_tab(tabs, user, opts)
         insert_past_global_announcements(tabs, user, opts)
+        insert_nav_menu_link_tabs(tabs, opts)
         tabs
       end
   end
@@ -199,6 +200,13 @@ class UserProfile < ActiveRecord::Base
           no_args: { include_past: true }
         }
     end
+  end
+
+  def insert_nav_menu_link_tabs(tabs, opts)
+    root_account = opts[:root_account]
+    return unless root_account&.feature_enabled?(:nav_menu_links)
+
+    tabs.concat(NavMenuLinkTabs.user_tabs(root_account))
   end
 end
 

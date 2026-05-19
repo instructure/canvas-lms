@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import CanvasCropper from './cropper'
 
 // CanvasCropperMaker is the component you'll create if injecting the cropper
@@ -41,11 +41,11 @@ class CanvasCropperMaker {
   }
 
   unmount() {
-    ReactDOM.unmountComponentAtNode(this.root)
+    legacyUnmountComponentAtNode(this.root)
   }
 
   render() {
-    ReactDOM.render(
+    legacyRender(
       <CanvasCropper
         height={this.height}
         imgFile={this.imgFile}

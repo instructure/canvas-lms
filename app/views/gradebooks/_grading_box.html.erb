@@ -24,6 +24,7 @@
   <input
     type="text" size="3"
     value="<%= I18n.n(submission.entered_score) if submission %>"
+    placeholder="-"
     class="grading_value grading_box" id="student_grading_<%= assignment.id %>"
     style="<%= hidden unless submission %> text-align: center;"/>
 <% elsif assignment.grading_type == "percent" %>
@@ -31,6 +32,7 @@
     <input
       type="text" size="3" class="grading_value" style="text-align: center;"
       value="<%= I18n.n(submission.entered_grade.to_f, percentage: true) if submission %>"
+      placeholder="-"
     />
     <span style="display: none;">%</span>
   </span>
@@ -38,6 +40,7 @@
   <input
     type="text" size="3" class="grading_value grading_box score_value"
     value="<%= I18n.n(submission.entered_score) if submission %>"
+    placeholder="-"
     id="student_grading_<%= assignment.id %>"
     style="<%= hidden unless submission %> text-align: center;"
   />
@@ -45,6 +48,7 @@
   <input
     type="text" size="3" class="grading_value grading_box score_value gpa_scale_cell"
     value="<%= I18n.n(submission.entered_score) if submission %>"
+    placeholder="-"
     id="student_grading_<%= assignment.id %>"
     style="<%= hidden unless submission %> text-align: center;"/>
 <% elsif assignment.grading_type == "pass_fail"

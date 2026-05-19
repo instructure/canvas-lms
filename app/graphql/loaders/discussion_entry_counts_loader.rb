@@ -37,8 +37,8 @@ class Loaders::DiscussionEntryCountsLoader < GraphQL::Batch::Loader
   end
 
   def perform(objects)
-    entries_objects = objects.select { |object| object.is_a?(DiscussionEntry) }
-    topics_objects = objects.select { |object| object.is_a?(DiscussionTopic) }
+    entries_objects = objects.grep(DiscussionEntry)
+    topics_objects = objects.grep(DiscussionTopic)
 
     entries_counts = counts_for_objects(entries_objects)
     topics_counts = counts_for_objects(topics_objects)

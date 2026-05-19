@@ -21,7 +21,8 @@
 class ContentExportsController < ApplicationController
   include K5Mode
 
-  before_action :require_user, :get_context, :require_permission, except: :xml_schema
+  skip_before_action :require_user, only: :xml_schema
+  before_action :get_context, :require_permission, except: :xml_schema
   before_action { |c| c.active_tab = "settings" }
 
   def require_permission

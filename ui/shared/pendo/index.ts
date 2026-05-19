@@ -16,23 +16,114 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Visitor} from '@pendo/agent'
+import {PendoConfig, Visitor} from '@pendo/agent'
 import {getPrimaryRole} from './utils'
+import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
+declare global {
+  interface Window {
+    CANVAS_COOKIE_CONSENT_STATE: boolean | null
+    CANVAS_DEBUGTAP: any
+  }
+}
+declare const ENV: GlobalEnv
+
+const oneTrustPerformanceCookieClass: string = 'C0002'
+const isDevEnv: boolean = ENV && ENV.RAILS_ENVIRONMENT === 'development'
+
+let libraryInitialized: boolean = false
 let whenPendoReady: Promise<any> | null = null
+let pendoInitializing: boolean = false
+let pendoInitParams: PendoConfig | null = null
+let thePendo: any = null
+let debuglog: (msg: string) => void
+
+function initializeLib(): void {
+  if (!libraryInitialized) {
+    libraryInitialized = true
+
+    if (isDevEnv) {
+      debuglog = (message: string) => {
+        console.log(message)
+      }
+      if (!window.CANVAS_DEBUGTAP) {
+        window.CANVAS_DEBUGTAP = {}
+      }
+      window.CANVAS_DEBUGTAP.testPendoConsentChange = (state: boolean) => {
+        const event = new CustomEvent('OneTrustGroupsUpdated', {
+          detail: state ? [oneTrustPerformanceCookieClass] : [],
+        })
+        window.dispatchEvent(event)
+      }
+    } else {
+      debuglog = (_message: string) => {}
+    }
+
+    window.addEventListener('OneTrustGroupsUpdated', (e: any) => {
+      if (e.detail.includes(oneTrustPerformanceCookieClass)) {
+        window.CANVAS_COOKIE_CONSENT_STATE = true
+        debuglog('User consented to cookies via OneTrust.')
+        if (!pendoInitializing && !thePendo) {
+          debuglog('Initializing Pendo for the first time.')
+          initializePendo()
+        } else if (!pendoInitializing && thePendo && !thePendo.isReady()) {
+          debuglog('Restarting Pendo.')
+          thePendo.initialize(pendoInitParams)
+          whenPendoReady = Promise.resolve(thePendo)
+        }
+      } else {
+        window.CANVAS_COOKIE_CONSENT_STATE = false
+        debuglog('User revoked cookie consent via OneTrust.')
+        if (pendoInitializing && whenPendoReady) {
+          debuglog('Pendo is still initializing, will teardown once ready.')
+          whenPendoReady.then(() => {
+            debuglog('Pendo finished initializing, now tearing down due to revoked consent.')
+            thePendo?.teardown()
+            whenPendoReady = Promise.resolve(null)
+          })
+        } else if (thePendo && thePendo.isReady()) {
+          debuglog('Tearing down Pendo immediately due to revoked consent.')
+          thePendo.teardown()
+          whenPendoReady = Promise.resolve(null)
+        }
+      }
+    })
+  }
+}
 
 export async function initializePendo() {
+  initializeLib()
+
+  if (window.CANVAS_COOKIE_CONSENT_STATE !== true) {
+    debuglog('User has not consented to cookies. Pendo will not be initialized.')
+    return Promise.resolve(null)
+  }
+
   if (!whenPendoReady) {
+    pendoInitializing = true
     const result = init()
+
     if (!result) {
+      pendoInitializing = false
       console.info('Pendo not initialized: PENDO_APP_ID missing')
       whenPendoReady = Promise.resolve(null)
       return whenPendoReady
     }
 
-    whenPendoReady = result.catch(error => {
-      console.error('Pendo initialization failed:', error)
-    })
+    whenPendoReady = result
+      .then((pendoo: any) => {
+        thePendo = pendoo
+        if (isDevEnv) {
+          window.CANVAS_DEBUGTAP.pendoInstance = pendoo
+        }
+        pendoInitializing = false
+        debuglog('Pendo initialized successfully.')
+        return pendoo
+      })
+      .catch(error => {
+        pendoInitializing = false
+        console.error('Pendo initialization failed:', error)
+      })
   }
   return whenPendoReady
 }
@@ -90,17 +181,29 @@ function init(): Promise<any> | null {
       Object.assign(visitorData, instanceVars, accountVars, userVars, courseVars)
     }
 
-    return initialize({
+    const accountData: {
+      id: string
+      surveyOptOut: boolean
+      oemAccountId?: string | null
+    } = {
+      id: ENV.DOMAIN_ROOT_ACCOUNT_UUID,
+      surveyOptOut: !ENV.FEATURES['account_survey_notifications'],
+    }
+
+    if (ENV.USAGE_METRICS_METADATA?.oem_account_id) {
+      accountData.oemAccountId = ENV.USAGE_METRICS_METADATA.oem_account_id
+    }
+
+    pendoInitParams = {
       apiKey: ENV.PENDO_APP_ID,
-      env: 'io',
+      env: ENV.PENDO_APP_ENV,
       visitor: visitorData,
-      account: {
-        id: ENV.DOMAIN_ROOT_ACCOUNT_UUID,
-        surveyOptOut: !ENV.FEATURES['account_survey_notifications'],
-      },
+      account: accountData,
       globalKey: 'canvasUsageMetrics',
       plugins: [Replay, VocPortal],
-    })
+    }
+
+    return initialize(pendoInitParams)
   })
 }
 

@@ -136,7 +136,7 @@ describe Types::PeerReviewSubAssignmentType do
         assessment_request1.submission_comments << comment1
         assessment_request2.submission_comments << comment2
 
-        PeerReview::PeerReviewSubmitterService.new(
+        PeerReview::SubmissionCreatorService.new(
           parent_assignment:,
           assessor: student
         ).call

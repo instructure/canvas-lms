@@ -524,10 +524,10 @@ describe "Discussion Topic Show" do
         update_reply_to_topic_time(1, format_date_for_view(new_dates[:student][:reply_to_topic], "%l:%M %p"))
         update_required_replies_date(1, format_date_for_view(new_dates[:student][:required_replies], "%b %-d, %Y"))
         update_required_replies_time(1, format_date_for_view(new_dates[:student][:required_replies], "%l:%M %p"))
-        update_available_date(1, format_date_for_view(new_dates[:student][:available_from], "%b %-d, %Y"), false, false)
-        update_available_time(1, format_date_for_view(new_dates[:student][:available_from], "%l:%M %p"), false, false)
-        update_until_date(1, format_date_for_view(new_dates[:student][:until], "%b %-d, %Y"), false, false)
-        update_until_time(1, format_date_for_view(new_dates[:student][:until], "%l:%M %p"), false, false)
+        update_available_date(1, format_date_for_view(new_dates[:student][:available_from], "%b %-d, %Y"), exclude_checkpoints: false)
+        update_available_time(1, format_date_for_view(new_dates[:student][:available_from], "%l:%M %p"), exclude_checkpoints: false)
+        update_until_date(1, format_date_for_view(new_dates[:student][:until], "%b %-d, %Y"), exclude_checkpoints: false)
+        update_until_time(1, format_date_for_view(new_dates[:student][:until], "%l:%M %p"), exclude_checkpoints: false)
 
         update_reply_to_topic_date(2, format_date_for_view(new_dates[:section][:reply_to_topic], "%b %-d, %Y"))
         update_reply_to_topic_time(2, format_date_for_view(new_dates[:section][:reply_to_topic], "%l:%M %p"))
@@ -830,6 +830,7 @@ describe "Discussion Topic Show" do
 
   context "when Discussion Summary feature flag is ON" do
     before do
+      allow(FeatureFlags::Hooks).to receive(:tier_1_visible_on_hook).and_return(true)
       Account.default.enable_feature!(:discussion_summary)
 
       @inst_llm = instance_double(InstLLM::Client)
@@ -991,6 +992,7 @@ describe "Discussion Topic Show" do
 
   context "nutrition facts functionality" do
     before do
+      allow(FeatureFlags::Hooks).to receive(:tier_1_visible_on_hook).and_return(true)
       @course.enable_feature!(:translation)
       allow(Translation).to receive(:available?).and_return(true)
     end
@@ -998,7 +1000,7 @@ describe "Discussion Topic Show" do
     it "loads nutrition facts element with content in the DOM" do
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       wait_for_ajaximations
-      expect(element_exists?("#nutrition_facts_trigger")).to be_truthy
+      expect(element_exists?("[data-testid='nutrition-facts-trigger']")).to be_truthy
     end
   end
 end

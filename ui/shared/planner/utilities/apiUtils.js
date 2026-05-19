@@ -95,6 +95,7 @@ const TYPE_MAPPING = {
   discussion_topic: 'Discussion',
   assignment: 'Assignment',
   sub_assignment: 'Discussion Checkpoint',
+  peer_review_sub_assignment: 'Peer Review Sub Assignment',
   wiki_page: 'Page',
   announcement: 'Announcement',
   planner_note: 'To Do',

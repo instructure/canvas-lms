@@ -111,8 +111,8 @@ module AnnouncementsCommon
   end
 
   # sets the course setting checkbox for 'Disable comments on announcements'
-  def disable_comments_on_announcements(set = true)
-    @course.lock_all_announcements = set
+  def disable_comments_on_announcements
+    @course.lock_all_announcements = true
     @course.save!
   end
 end

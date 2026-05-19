@@ -42,7 +42,7 @@ module CanvasCrummy
               options = crumb[2] || {}
               options = options.merge("aria-current" => "page") if index == crumbs.length - 1
               content_tag(:li, crumb_to_html(crumb), options)
-            end.join.html_safe
+            end.inject(&:<<)
           end
         end
       end
@@ -67,7 +67,7 @@ module CanvasCrummy
             options = crumb[2] || {}
             options = options.merge("aria-current" => "page") if index == k5_crumbs.length - 1
             content_tag(:li, crumb_to_html(crumb), options)
-          end.join.html_safe
+          end.inject(&:<<)
         end
       end
     end

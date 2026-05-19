@@ -340,7 +340,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
             cm = ContentMigration.create(context: account_model)
             cm.update_columns(context_id: account.global_id, root_account_id: nil)
             expect(cm.reload.root_account_id).to be_nil
-            expect(cm.shard.id).to_not eq(cm.context.shard.id)
+            expect(cm.shard.id).not_to eq(cm.context.shard.id)
             DataFixup::PopulateRootAccountIdOnModels.run
             expect(cm.reload.root_account_id).to be_nil
           end
@@ -1104,10 +1104,10 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         f4 = Folder.create!(context: @course)
         result = described_class.scope_for_association_does_not_exist(Folder, :course).pluck(:id)
 
-        expect(result).to_not include(f1.id)
+        expect(result).not_to include(f1.id)
         expect(result).to include(f2.id)
-        expect(result).to_not include(f3.id)
-        expect(result).to_not include(f4.id)
+        expect(result).not_to include(f3.id)
+        expect(result).not_to include(f4.id)
       end
     end
 
@@ -1118,10 +1118,10 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         f1 = Favorite.create!(context: @course, user: @user)
         f1.update_columns(root_account_id: Account.last.id.to_i + 9999)
         f2 = Favorite.create!(context: @course, user: user_model)
-        expect(f2.root_account_id).to_not be_nil
+        expect(f2.root_account_id).not_to be_nil
         result = described_class.scope_for_association_does_not_exist(Favorite, :root_account).pluck(:id)
         expect(result).to include(f1.id)
-        expect(result).to_not include(f2.id)
+        expect(result).not_to include(f2.id)
       end
     end
   end

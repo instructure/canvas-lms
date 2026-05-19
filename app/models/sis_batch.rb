@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class SisBatch < ActiveRecord::Base
+class SisBatch < ApplicationRecord
   include Workflow
   include CaptureJobIds
 
@@ -305,7 +305,6 @@ class SisBatch < ActiveRecord::Base
   end
 
   def process_instructure_csv_zip
-    require "sis"
     download_zip
     diff_result = generate_diff
     case diff_result

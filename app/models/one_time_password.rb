@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class OneTimePassword < ActiveRecord::Base
+class OneTimePassword < ApplicationRecord
   belongs_to :user, inverse_of: :one_time_passwords
 
   validates :user_id, :code, presence: true

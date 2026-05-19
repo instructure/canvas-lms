@@ -16,28 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from '@canvas/axios'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 // For now, context is always an account, so just pass the id
 
-// Here is an example API call.
-//
-// export function getPermissions (contextId) {
-//   return axios.get(`/api/v1/accounts/${contextId}/permissions`)
-// }
-
 export function postNewRole({contextId}, label, role) {
-  return axios.post(`/api/v1/accounts/${contextId}/roles`, {
-    label,
-    base_role_type: role.base_role_type,
+  return doFetchApi({
+    path: `/api/v1/accounts/${contextId}/roles`,
+    method: 'POST',
+    body: {label, base_role_type: role.base_role_type},
   })
 }
 
 export function updateRole(contextID, roleID, putData) {
-  return axios.put(`/api/v1/accounts/${contextID}/roles/${roleID}`, putData)
+  return doFetchApi({
+    path: `/api/v1/accounts/${contextID}/roles/${roleID}`,
+    method: 'PUT',
+    body: putData,
+  })
 }
 
 export function deleteRole(contextId, role) {
-  return axios.delete(`/api/v1/accounts/${contextId}/roles/${role.id}`)
+  return doFetchApi({
+    path: `/api/v1/accounts/${contextId}/roles/${role.id}`,
+    method: 'DELETE',
+  })
 }
 
 // TODO there does not currently exist an API for this, and because of

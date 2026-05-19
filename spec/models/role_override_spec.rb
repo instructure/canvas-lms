@@ -107,7 +107,7 @@ describe RoleOverride do
     allow(@group).to receive(:account).and_return(nil)
     expect do
       RoleOverride.permission_for(@group, :read_course_content, teacher_role)
-    end.to_not raise_error
+    end.not_to raise_error
   end
 
   it "updates the roles updated_at timestamp on save" do
@@ -697,6 +697,120 @@ describe RoleOverride do
       end
     end
 
+    describe "manage_rules" do
+      let(:view_perm) { RoleOverride.permissions[:manage_rules_view] }
+      let(:add_perm) { RoleOverride.permissions[:manage_rules_add] }
+      let(:edit_perm) { RoleOverride.permissions[:manage_rules_edit] }
+      let(:delete_perm) { RoleOverride.permissions[:manage_rules_delete] }
+
+      describe "account_allows" do
+        it "allows when account is a horizon account with horizon_autopilot enabled" do
+          allow(@account).to receive(:horizon_account?).and_return(true)
+          @account.root_account.enable_feature!(:horizon_autopilot)
+
+          expect(view_perm[:account_allows].call(@account)).to be true
+          expect(add_perm[:account_allows].call(@account)).to be true
+          expect(edit_perm[:account_allows].call(@account)).to be true
+          expect(delete_perm[:account_allows].call(@account)).to be true
+        end
+
+        it "does not allow when account is not a horizon account" do
+          allow(@account).to receive(:horizon_account?).and_return(false)
+          @account.root_account.enable_feature!(:horizon_autopilot)
+
+          expect(view_perm[:account_allows].call(@account)).to be false
+          expect(add_perm[:account_allows].call(@account)).to be false
+          expect(edit_perm[:account_allows].call(@account)).to be false
+          expect(delete_perm[:account_allows].call(@account)).to be false
+        end
+
+        it "does not allow when horizon_autopilot feature flag is disabled" do
+          allow(@account).to receive(:horizon_account?).and_return(true)
+
+          expect(view_perm[:account_allows].call(@account)).to be false
+          expect(add_perm[:account_allows].call(@account)).to be false
+          expect(edit_perm[:account_allows].call(@account)).to be false
+          expect(delete_perm[:account_allows].call(@account)).to be false
+        end
+
+        it "does not allow when neither condition is met" do
+          allow(@account).to receive(:horizon_account?).and_return(false)
+
+          expect(view_perm[:account_allows].call(@account)).to be false
+          expect(add_perm[:account_allows].call(@account)).to be false
+          expect(edit_perm[:account_allows].call(@account)).to be false
+          expect(delete_perm[:account_allows].call(@account)).to be false
+        end
+      end
+    end
+
+    describe "manage_institutional_tags" do
+      let(:view_perm) { RoleOverride.permissions[:manage_institutional_tags_view] }
+      let(:create_perm) { RoleOverride.permissions[:manage_institutional_tags_create] }
+      let(:edit_perm) { RoleOverride.permissions[:manage_institutional_tags_edit] }
+      let(:sub_account) { @account.sub_accounts.create! }
+      let(:sub_admin) { account_admin_user(account: sub_account) }
+
+      it "is not restricted to root accounts" do
+        expect(view_perm[:account_only]).to be_nil
+        expect(create_perm[:account_only]).to be_nil
+        expect(edit_perm[:account_only]).to be_nil
+      end
+
+      it "grants the permissions to a sub-account AccountAdmin when the flag is enabled at the root" do
+        @account.enable_feature!(:institutional_tags)
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_view)).to be_truthy
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_create)).to be_truthy
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_edit)).to be_truthy
+      end
+
+      it "grants the permissions when the flag is enabled only on the sub-account" do
+        @account.allow_feature!(:institutional_tags)
+        sub_account.enable_feature!(:institutional_tags)
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_view)).to be_truthy
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_create)).to be_truthy
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_edit)).to be_truthy
+      end
+
+      it "denies the permissions when the sub-account disables the flag even though the root has it on" do
+        @account.enable_feature!(:institutional_tags)
+        sub_account.disable_feature!(:institutional_tags)
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_view)).to be_falsey
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_create)).to be_falsey
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_edit)).to be_falsey
+      end
+
+      it "denies the permissions when the flag is not enabled anywhere in the chain" do
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_view)).to be_falsey
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_create)).to be_falsey
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_edit)).to be_falsey
+      end
+    end
+
+    describe "manage_course_details" do
+      let(:permission) { RoleOverride.permissions[:manage_course_details] }
+
+      it "is enabled by default for account admins, teachers, and designers" do
+        expect(permission[:true_for]).to match_array %w[AccountAdmin TeacherEnrollment DesignerEnrollment]
+      end
+
+      it "is available to account admins, account memberships, teachers, TAs, and designers" do
+        expect(permission[:available_to]).to match_array %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment]
+      end
+
+      describe "account_allows" do
+        it "is allowed when course_navigation_and_feature_options_permissions is enabled" do
+          @account.root_account.enable_feature!(:course_navigation_and_feature_options_permissions)
+          expect(permission[:account_allows].call(@account)).to be true
+        end
+
+        it "is not allowed when course_navigation_and_feature_options_permissions is disabled" do
+          @account.root_account.disable_feature!(:course_navigation_and_feature_options_permissions)
+          expect(permission[:account_allows].call(@account)).to be false
+        end
+      end
+    end
+
     it "view_course_changes" do
       root_account = @account.root_account
       sub_account = root_account.sub_accounts.create!
@@ -784,13 +898,13 @@ describe RoleOverride do
       expect(Course.find(course.id).grants_right?(@student, :read_forum)).to be false
     end
 
-    it "does not try to hit caches inside permission_for if no_caching == true" do
+    it "does not try to hit caches inside permission_for if caching == false" do
       account = Account.default
       role = teacher_role
       cache_key = "role_override_calculation/#{Shard.global_id_for(role)}"
       expect(RoleOverride).to receive(:uncached_permission_for).once.and_call_original
       expect(RequestCache).not_to receive(:cache).with(cache_key, account)
-      RoleOverride.permission_for(account, :moderate_forum, role, account, true)
+      RoleOverride.permission_for(account, :moderate_forum, role, account, caching: false)
     end
   end
 

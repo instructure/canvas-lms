@@ -62,7 +62,7 @@
         <%= 'show_assignment_menu' %>
       <% end %>
     <% end %>
-    <%= module_item.content_type_class(@is_student) if module_item %>
+    <%= module_item.content_type_class(is_student: @is_student) if module_item %>
     <%= 'also_assignment' if module_item && module_item.graded? %>
     indent_<%= @context.horizon_course? ? '0' : (module_item.try_rescue(:indent) || '0') %>
     <%= 'progression_requirement' if criterion %>
@@ -456,7 +456,7 @@
   </div>
   <% if @is_student && @context.discussion_checkpoints_enabled? && module_item && module_item.content_type == 'DiscussionTopic' && module_item.content.checkpoints? %>
     <div class="context_module_item indent_<%= module_item.try_rescue(:indent) || '0' %>">
-      <% checkpoints = [module_item.content.reply_to_topic_checkpoint, module_item.content.reply_to_entry_checkpoint] %>
+      <% checkpoints = [module_item.content.reply_to_topic_checkpoint, module_item.content.reply_to_entry_checkpoint].compact %>
       <% checkpoints.each do |checkpoint| %>
         <div class="ig-row" data-testid="checkpoint" style="display: flex; align-items: center;">
           <% left_padding = case module_item.try_rescue(:indent)

@@ -48,12 +48,12 @@ module Importers
       end
     end
 
-    def self.select_linked_module_items(mod, migration, select_all = false)
+    def self.select_linked_module_items(mod, migration, select_all: false)
       if select_all || migration.import_object?("context_modules", mod["migration_id"]) || migration.import_object?("modules", mod["migration_id"])
         (mod["items"] || []).each do |item|
           if item["type"] == "submodule"
             # recursively select content in submodules
-            select_linked_module_items(item, migration, true)
+            select_linked_module_items(item, migration, select_all: true)
           elsif (resource_class = linked_resource_type_class(item["linked_resource_type"]))
             migration.import_object!(resource_class.table_name, item["linked_resource_id"])
           end
@@ -131,7 +131,9 @@ module Importers
       end
 
       position = (hash[:position] || hash[:order])&.to_i
-      if (item.new_record? || item.workflow_state_was == "deleted") && migration.try(:last_module_position) # try to import new modules after current ones instead of interweaving positions
+      # For regular imports, offset new modules to append after existing ones instead of interweaving positions.
+      # For Blueprint/Master Course imports, preserve absolute positions to maintain module order across syncs.
+      if (item.new_record? || item.workflow_state_was == "deleted") && migration.try(:last_module_position) && !migration.for_master_course_import?
         position = migration.last_module_position + (position || 1)
       end
       item.position = position

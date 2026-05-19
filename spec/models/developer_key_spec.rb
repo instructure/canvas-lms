@@ -233,13 +233,13 @@ describe DeveloperKey do
     describe "client_type" do
       context "when client_type is Confidential" do
         it "does not raise an exception" do
-          expect { DeveloperKey.create!(client_type: DeveloperKey::CONFIDENTIAL_CLIENT_TYPE) }.to_not raise_error
+          expect { DeveloperKey.create!(client_type: DeveloperKey::CONFIDENTIAL_CLIENT_TYPE) }.not_to raise_error
         end
       end
 
       context "when client_type is Public" do
         it "does not raise an exception" do
-          expect { DeveloperKey.create!(client_type: DeveloperKey::PUBLIC_CLIENT_TYPE) }.to_not raise_error
+          expect { DeveloperKey.create!(client_type: DeveloperKey::PUBLIC_CLIENT_TYPE) }.not_to raise_error
         end
       end
 
@@ -279,22 +279,36 @@ describe DeveloperKey do
     end
 
     it "validates when public jwk is present" do
-      expect { DeveloperKey.create!(is_lti_key: true, public_jwk:) }.to_not raise_error
+      expect { DeveloperKey.create!(is_lti_key: true, public_jwk:) }.not_to raise_error
     end
 
     it "validates when public jwk url is present" do
-      expect { DeveloperKey.create!(is_lti_key: true, public_jwk_url:) }.to_not raise_error
+      expect { DeveloperKey.create!(is_lti_key: true, public_jwk_url:) }.not_to raise_error
     end
   end
 
   describe "external tool management" do
     specs_require_sharding
 
+    # lti_registration_with_tool sets up the full registration stack (tool config,
+    # overlay, binding) needed for InstallTemplateRegistrationService to work.
     def lti_key_for_account(account)
       account.shard.activate do
-        lti_developer_key_model(account:).tap do |developer_key|
-          lti_tool_configuration_model(developer_key:)
-        end
+        lti_registration_with_tool(account:).developer_key
+      end
+    end
+
+    # Install a proper local copy via the service so sync_app_id can resolve the
+    # cross-shard registration reference when tools are created on non-SA shards.
+    def install_local_copy_for(registration, account, binding_state: :on)
+      account.shard.activate do
+        user = user_model
+        Lti::InstallTemplateRegistrationService.call(
+          account:,
+          user:,
+          template: registration,
+          binding_state:
+        )[:local_copy]
       end
     end
 
@@ -304,6 +318,7 @@ describe DeveloperKey do
     let(:shard_1_tool) do
       tool = nil
       @shard1.activate do
+        install_local_copy_for(developer_key.lti_registration, shard_1_account)
         tool = ContextExternalTool.create!(
           name: "shard 1 tool",
           workflow_state: "public",
@@ -314,11 +329,6 @@ describe DeveloperKey do
           consumer_key: "key",
           shared_secret: "secret"
         )
-        DeveloperKeyAccountBinding.create!(
-          developer_key: tool.developer_key,
-          account: shard_1_account,
-          workflow_state: "on"
-        )
       end
       tool
     end
@@ -326,6 +336,7 @@ describe DeveloperKey do
     let(:shard_2_tool) do
       tool = nil
       @shard2.activate do
+        install_local_copy_for(developer_key.lti_registration, shard_2_account, binding_state: :off)
         tool = ContextExternalTool.create!(
           name: "shard 2 tool",
           workflow_state: "public",
@@ -335,11 +346,6 @@ describe DeveloperKey do
           url: "https://www.test.com",
           consumer_key: "key",
           shared_secret: "secret"
-        )
-        DeveloperKeyAccountBinding.create!(
-          developer_key: tool.developer_key,
-          account: shard_2_account,
-          workflow_state: "off"
         )
       end
       tool
@@ -357,6 +363,7 @@ describe DeveloperKey do
 
       before do
         developer_key
+        run_jobs  # flush jobs from dev key binding setup before mocking Statsd
         allow(InstStatsd::Statsd).to receive(:distributed_increment)
         allow(InstStatsd::Statsd).to receive(:timing)
       end
@@ -452,6 +459,7 @@ describe DeveloperKey do
     describe "#disable_external_tools!" do
       before do
         developer_key
+        run_jobs  # flush SA binding setup jobs before creating test tools
         shard_1_tool
         shard_2_tool
         disable_external_tools
@@ -499,6 +507,7 @@ describe DeveloperKey do
     describe "#enable_external_tools!" do
       before do
         developer_key
+        run_jobs  # flush SA binding setup jobs before configuring tool states
         shard_1_tool.update!(workflow_state: "disabled")
         shard_2_tool.update!(workflow_state: "disabled")
         @shard1.activate do
@@ -547,6 +556,7 @@ describe DeveloperKey do
 
       before do
         developer_key
+        run_jobs  # flush SA binding setup jobs before configuring tool states
         shard_1_tool.update!(workflow_state: "disabled")
         shard_2_tool.update!(workflow_state: "disabled")
       end
@@ -628,6 +638,52 @@ describe DeveloperKey do
         end
       end
 
+      context "logging old settings when propagating site admin changes" do
+        before do
+          Account.site_admin.shard.activate { tool_configuration.update!(privacy_level: "anonymous") }
+          developer_key.update!(account: nil)
+        end
+
+        context "when lti_registrations_templates is disabled" do
+          before do
+            shard_1_account.disable_feature!(:lti_registrations_templates)
+            shard_2_account.disable_feature!(:lti_registrations_templates)
+          end
+
+          it "logs old settings for each tool before replacing with site admin configuration" do
+            old_shard_1_settings = shard_1_tool.reload.settings.to_json
+            old_shard_2_settings = shard_2_tool.reload.settings.to_json
+            log_messages = []
+            allow(Rails.logger).to receive(:info) { |msg| log_messages << msg }
+
+            update_external_tools
+            run_jobs
+
+            expect(log_messages).to include(
+              a_string_including(shard_1_tool.global_id.to_s, old_shard_1_settings),
+              a_string_including(shard_2_tool.global_id.to_s, old_shard_2_settings)
+            )
+          end
+        end
+
+        context "when lti_registrations_templates is enabled" do
+          before do
+            shard_1_account.enable_feature!(:lti_registrations_templates)
+            shard_2_account.enable_feature!(:lti_registrations_templates)
+          end
+
+          it "does not log old tool settings" do
+            log_messages = []
+            allow(Rails.logger).to receive(:info) { |msg| log_messages << msg }
+
+            update_external_tools
+            run_jobs
+
+            expect(log_messages).not_to include(a_string_including("Old settings:"))
+          end
+        end
+      end
+
       describe "when there are broken tools with no context" do
         before do
           developer_key
@@ -670,7 +726,7 @@ describe DeveloperKey do
             account: subaccount,
             user: admin,
             template:
-          )
+          )[:local_copy]
         end
         let_once(:template_tool) { template.new_external_tool(Account.site_admin) }
         let_once(:local_copy_tool) { local_copy.new_external_tool(subaccount) }
@@ -689,6 +745,38 @@ describe DeveloperKey do
 
           expect(template_tool.reload.name).to eq("Updated Template Title")
           expect(local_copy_tool.reload.name).to eq(original_title)
+        end
+
+        it "logs local copy's settings before overwriting with site admin configuration when flag is disabled" do
+          # Ensure local_copy exists so sync_app_id can resolve it for inherited_tool
+          local_copy
+
+          # Deploy a tool for the subaccount directly from the template, as would
+          # exist before the templates flag was introduced
+          inherited_tool = template.new_external_tool(subaccount)
+
+          # Simulate modifications the account made while the local copy was in use
+          inherited_tool.settings["selection_width"] = 900
+          inherited_tool.save!
+
+          old_settings = inherited_tool.reload.settings.to_json
+
+          # Disable the templates flag at both levels, reverting to legacy inheritance behavior.
+          # Site admin flag must also be disabled since the before block enables it "on",
+          # which would otherwise propagate down and make feature_enabled? still return true.
+          Account.site_admin.disable_feature!(:lti_registrations_templates)
+          subaccount.disable_feature!(:lti_registrations_templates)
+
+          log_messages = []
+          allow(Rails.logger).to receive(:info) { |msg| log_messages << msg }
+
+          template.manual_configuration.update!(title: "Updated Site Admin Title")
+          template_developer_key.update_external_tools!
+          run_jobs
+
+          expect(log_messages).to include(
+            a_string_including(inherited_tool.global_id.to_s, old_settings)
+          )
         end
       end
     end
@@ -753,6 +841,70 @@ describe DeveloperKey do
     context "when the context is a course" do
       it_behaves_like "a boolean indicating the key is usable in context" do
         let(:context) { course_model(account:) }
+      end
+    end
+
+    context "when lti_deactivate_registrations is enabled" do
+      subject { developer_key.usable_in_context?(account) }
+
+      let(:developer_key) do
+        DeveloperKey.create!(
+          account:,
+          is_lti_key: true,
+          public_jwk_url: "https://example.com/jwks"
+        )
+      end
+
+      before { account.enable_feature!(:lti_deactivate_registrations) }
+
+      context "when the key is usable and the registration is active" do
+        it { is_expected.to be true }
+      end
+
+      context "when the key is not usable" do
+        before { developer_key.update!(workflow_state: "deleted") }
+
+        it { is_expected.to be false }
+      end
+
+      context "when the registration is inactive" do
+        before { developer_key.lti_registration.deactivate! }
+
+        it { is_expected.to be false }
+      end
+
+      context "when there is no lti_registration" do
+        before { developer_key.update_column(:lti_registration_id, nil) }
+
+        it { is_expected.to be false }
+      end
+
+      context "when the account binding is off" do
+        before do
+          developer_key.account_binding_for(account).update!(workflow_state: "off")
+        end
+
+        it "ignores the binding and returns true" do
+          expect(subject).to be true
+        end
+      end
+
+      context "when the key is not an LTI key" do
+        let(:developer_key) { DeveloperKey.create!(account:) }
+
+        context "when binding is on" do
+          before { developer_key.account_binding_for(account).update!(workflow_state: "on") }
+
+          it "uses the binding-based check" do
+            expect(subject).to be true
+          end
+        end
+
+        context "when binding is off" do
+          it "uses the binding-based check" do
+            expect(subject).to be false
+          end
+        end
       end
     end
   end
@@ -1069,9 +1221,7 @@ describe DeveloperKey do
     context "when site admin" do
       let(:key) do
         Shard.default.activate do
-          lti_developer_key_model(account: Account.site_admin).tap do |key|
-            lti_tool_configuration_model(developer_key: key)
-          end
+          lti_registration_with_tool(account: Account.site_admin).developer_key
         end
       end
 
@@ -1092,10 +1242,30 @@ describe DeveloperKey do
           let(:shard_1_account) { @shard1.activate { account_model } }
           let(:shard_2_account) { @shard2.activate { account_model } }
           let(:shard_1_tool) do
-            @shard1.activate { key.lti_registration.new_external_tool(shard_1_account) }
+            @shard1.activate do
+              user = user_model
+              local_copy = Lti::InstallTemplateRegistrationService.call(
+                account: shard_1_account,
+                user:,
+                template: key.lti_registration
+              )[:local_copy]
+              # The service creates a deployment with no developer_key that won't be
+              # cleaned up by key.destroy; remove it to keep the subject assertion clean.
+              local_copy.app_deployments.destroy_all
+              key.lti_registration.new_external_tool(shard_1_account)
+            end
           end
           let(:shard_2_tool) do
-            @shard2.activate { key.lti_registration.new_external_tool(shard_2_account) }
+            @shard2.activate do
+              user = user_model
+              local_copy = Lti::InstallTemplateRegistrationService.call(
+                account: shard_2_account,
+                user:,
+                template: key.lti_registration
+              )[:local_copy]
+              local_copy.app_deployments.destroy_all
+              key.lti_registration.new_external_tool(shard_2_account)
+            end
           end
 
           before do
@@ -1262,7 +1432,7 @@ describe DeveloperKey do
       it "deletes all associated objects" do
         subject
         expect(lti_registration.reload).to be_deleted
-        expect(developer_key.reload.tool_configuration).to be_nil
+        expect(developer_key.reload.tool_configuration).to be_deleted
         expect(developer_key.developer_key_account_bindings.all?(&:deleted?)).to be true
       end
 
@@ -1461,12 +1631,12 @@ describe DeveloperKey do
 
       context "when the developer key and account are on different, non site-admin shards" do
         it "doesn't return a binding for an account with the same local ID on a different shard" do
-          expect(root_account.shard.id).to_not eq(@shard2.id)
+          expect(root_account.shard.id).not_to eq(@shard2.id)
           @shard2.activate do
             account = Account.find_by(id: root_account.local_id)
             account ||= Account.create!(id: root_account.local_id)
             shard2_developer_key = DeveloperKey.create!(name: "Shard 2 Key", account_id: account.id)
-            expect(shard2_developer_key.account_binding_for(account)).to_not be_nil
+            expect(shard2_developer_key.account_binding_for(account)).not_to be_nil
             expect(shard2_developer_key.account_binding_for(root_account)).to be_nil
           end
         end
@@ -1536,8 +1706,8 @@ describe DeveloperKey do
       end
 
       it "finds existing keys" do
-        expect(DeveloperKey.default).to_not be_nil
-        expect(DeveloperKey.default(create_if_missing: false)).to_not be_nil
+        expect(DeveloperKey.default).not_to be_nil
+        expect(DeveloperKey.default(create_if_missing: false)).not_to be_nil
       end
     end
 

@@ -288,4 +288,89 @@ describe('useCoursesParams', () => {
       expect(result.current.search).toBe('history')
     })
   })
+
+  describe('enrollmentTermId', () => {
+    it('defaults to empty string when no enrollment_term_id in URL', () => {
+      const {result} = renderHook(() => useCoursesParams(defaultOptions), {
+        wrapper: createWrapper(['/courses']),
+      })
+
+      expect(result.current.enrollmentTermId).toBe('')
+    })
+
+    it('reads enrollment_term_id from URL', () => {
+      const {result} = renderHook(() => useCoursesParams(defaultOptions), {
+        wrapper: createWrapper(['/courses?enrollment_term_id=42']),
+      })
+
+      expect(result.current.enrollmentTermId).toBe('42')
+    })
+  })
+
+  describe('handleTermChange', () => {
+    it('sets enrollment_term_id in URL when a term is selected', () => {
+      const {result} = renderHook(() => useCoursesParams(defaultOptions), {
+        wrapper: createWrapper(['/courses']),
+      })
+
+      act(() => {
+        result.current.handleTermChange('42')
+      })
+
+      expect(result.current.enrollmentTermId).toBe('42')
+    })
+
+    it('removes enrollment_term_id from URL when called with empty string', () => {
+      const {result} = renderHook(() => useCoursesParams(defaultOptions), {
+        wrapper: createWrapper(['/courses?enrollment_term_id=42']),
+      })
+
+      act(() => {
+        result.current.handleTermChange('')
+      })
+
+      expect(result.current.enrollmentTermId).toBe('')
+    })
+
+    it('resets page to 1 when a term is selected', () => {
+      const {result} = renderHook(() => useCoursesParams(defaultOptions), {
+        wrapper: createWrapper(['/courses?page=4']),
+      })
+
+      act(() => {
+        result.current.handleTermChange('42')
+      })
+
+      expect(result.current.page).toBe(1)
+      expect(result.current.enrollmentTermId).toBe('42')
+    })
+
+    it('resets page to 1 when term is cleared', () => {
+      const {result} = renderHook(() => useCoursesParams(defaultOptions), {
+        wrapper: createWrapper(['/courses?enrollment_term_id=42&page=3']),
+      })
+
+      act(() => {
+        result.current.handleTermChange('')
+      })
+
+      expect(result.current.page).toBe(1)
+      expect(result.current.enrollmentTermId).toBe('')
+    })
+
+    it('preserves sort, order and search when changing term', () => {
+      const {result} = renderHook(() => useCoursesParams(defaultOptions), {
+        wrapper: createWrapper(['/courses?sort=sis_course_id&order=desc&search=bio']),
+      })
+
+      act(() => {
+        result.current.handleTermChange('42')
+      })
+
+      expect(result.current.sort).toBe('sis_course_id')
+      expect(result.current.order).toBe('desc')
+      expect(result.current.search).toBe('bio')
+      expect(result.current.enrollmentTermId).toBe('42')
+    })
+  })
 })

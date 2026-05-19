@@ -114,7 +114,7 @@ describe Quizzes::QuizRegrader::Answer do
         question_regrade = instance_double(Quizzes::QuizQuestionRegrade,
                                            quiz_question: question,
                                            regrade_option:)
-        expect { Quizzes::QuizRegrader::Answer.new(answer, question_regrade) }.to_not raise_error
+        expect { Quizzes::QuizRegrader::Answer.new(answer, question_regrade) }.not_to raise_error
       end
     end
   end

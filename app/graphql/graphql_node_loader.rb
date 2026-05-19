@@ -39,7 +39,9 @@ module GraphQLNodeLoader
     when "CourseBySis"
       Loaders::SISIDLoader.for(Course, root_account: ctx[:domain_root_account]).load(id).then(check_read_permission)
     when "Assignment"
-      Loaders::IDLoader.for(Assignment).load(id).then(check_read_permission)
+      Loaders::IDLoader.for(AbstractAssignment).load(id).then(check_read_permission)
+    when "SubAssignment"
+      Loaders::IDLoader.for(SubAssignment).load(id).then(check_read_permission)
     when "AbstractAssignment"
       include_types = id[:include_types]
       include_types = ["Assignment"] if include_types.blank?
@@ -329,6 +331,22 @@ module GraphQLNodeLoader
         next if !record || record.deleted? || !record.course.grants_right?(ctx[:current_user], :read)
 
         record
+      end
+    when "InstitutionalTag"
+      Loaders::IDLoader.for(InstitutionalTag).load(id).then do |tag|
+        next nil unless ctx[:domain_root_account]&.feature_enabled?(:institutional_tags)
+        next nil unless ctx[:domain_root_account]&.grants_right?(ctx[:current_user], ctx[:session], :manage_institutional_tags_view)
+
+        tag
+      end
+    when "InstitutionalTagAssociation"
+      Loaders::IDLoader.for(InstitutionalTagAssociation).load(id).then(check_read_permission)
+    when "InstitutionalTagCategory"
+      Loaders::IDLoader.for(InstitutionalTagCategory).load(id).then do |category|
+        next nil unless ctx[:domain_root_account]&.feature_enabled?(:institutional_tags)
+        next nil unless ctx[:domain_root_account]&.grants_right?(ctx[:current_user], ctx[:session], :manage_institutional_tags_view)
+
+        category
       end
     else
       raise UnsupportedTypeError, "don't know how to load #{type}"

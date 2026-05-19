@@ -198,6 +198,26 @@ describe CC::TopicResources do
 
             it("should validate the xml output by xsd") { expect(ccc_schema.validate(subject)).to be_empty }
           end
+
+          context "when sub_assignments are deleted" do
+            before do
+              # Soft-delete the checkpoints but keep has_sub_assignments=true
+              topic.assignment.sub_assignments.unscoped.update_all(workflow_state: "deleted")
+            end
+
+            it "should include deleted sub_assignments in export (uses unscoped)" do
+              sub_assignments = subject.css("sub_assignments")
+              expect(sub_assignments.count).to eq 1
+              expect(sub_assignments.css("sub_assignment").count).to eq 2
+            end
+
+            it "should include workflow_state=deleted in export" do
+              # The workflow_state should be exported as part of the assignment data
+              expect(subject.css("sub_assignment workflow_state").map(&:text)).to all(eq("deleted"))
+            end
+
+            it("should validate the xml output by xsd") { expect(ccc_schema.validate(subject)).to be_empty }
+          end
         end
 
         context "when sub_assignment is not present" do

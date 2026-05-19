@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class Csp::Domain < ActiveRecord::Base
+class Csp::Domain < ApplicationRecord
   self.table_name = "csp_domains"
 
   belongs_to :account

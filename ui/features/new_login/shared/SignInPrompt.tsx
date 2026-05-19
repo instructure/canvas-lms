@@ -20,22 +20,24 @@ import React from 'react'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {assignLocation} from '@canvas/util/globalUtils'
 import type {ViewOwnProps} from '@instructure/ui-view'
-import {LOGIN_ENTRY_URL} from '../routes/routes'
+import {useNavigate} from 'react-router-dom'
+import {ROUTES} from '../routes/routes'
 
 const I18n = createI18nScope('new_login')
 
 const SignInPrompt = () => {
+  const navigate = useNavigate()
+
   const handleClick = (event: React.MouseEvent<ViewOwnProps>) => {
     event.preventDefault()
-    assignLocation(LOGIN_ENTRY_URL)
+    navigate(ROUTES.SIGN_IN)
   }
 
   return (
     <Text>
       {I18n.t('Already have an account?')}{' '}
-      <Link data-testid="log-in-link" href={LOGIN_ENTRY_URL} onClick={handleClick}>
+      <Link data-testid="log-in-link" href={ROUTES.SIGN_IN} onClick={handleClick}>
         {I18n.t('Log in')}
       </Link>
     </Text>

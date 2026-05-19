@@ -41,7 +41,7 @@ module CanvasQuizStatistics::Analyzers::Concerns
       return [] if source.blank?
 
       source.map do |answer|
-        stats = build_answer(answer[:id], answer[:text], answer[:weight] == 100)
+        stats = build_answer(answer[:id], answer[:text], correct: answer[:weight] == 100)
         yield answer, stats if block_given?
         stats
       end
@@ -109,7 +109,7 @@ module CanvasQuizStatistics::Analyzers::Concerns
 
     private
 
-    def build_answer(id, text, correct = false)
+    def build_answer(id, text, correct: false)
       {
         id: id.to_s,
         text: text.to_s,

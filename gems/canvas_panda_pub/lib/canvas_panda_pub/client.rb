@@ -97,7 +97,7 @@ module CanvasPandaPub
     #
     # Returns a String token.
 
-    def generate_token(channel, read = false, write = false, expires = 1.hour.from_now)
+    def generate_token(channel, read: false, write: false, expires: 1.hour.from_now)
       JSON::JWT.new({
                       keyId: @key_id,
                       channel: "/#{@application_id}#{channel}",

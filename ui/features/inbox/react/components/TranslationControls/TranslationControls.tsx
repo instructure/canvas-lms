@@ -23,7 +23,7 @@ import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import TranslationOptions from './TranslationOptions'
 import useTranslationDisplay from '../../hooks/useTranslationDisplay'
-import {NutritionFacts} from '@canvas/nutrition-facts/react/NutritionFacts'
+import {NutritionFacts} from '@instructure/platform-nutrition-facts'
 import {AiInfo} from '@instructure.ai/aiinfo'
 
 declare const ENV: Global & {
@@ -31,6 +31,21 @@ declare const ENV: Global & {
 }
 
 const I18n = createI18nScope('conversations_2')
+const NF_I18n = createI18nScope('nutrition_facts')
+
+const nutritionFactsTranslations = () => ({
+  title: '',
+  triggerScreenReaderLabel: NF_I18n.t('Nutrition facts'),
+  dataPermissionLevelsTitle: NF_I18n.t('Data Permission Levels'),
+  dataPermissionLevelsCurrentFeatureText: NF_I18n.t('Current Feature:'),
+  dataPermissionLevelsCloseIconButtonScreenReaderLabel: NF_I18n.t('Close'),
+  dataPermissionLevelsCloseButtonText: NF_I18n.t('Close'),
+  dataPermissionLevelsModalLabel: NF_I18n.t('This is a Data Permission Levels modal'),
+  nutritionFactsModalLabel: NF_I18n.t('This is a modal for AI facts'),
+  nutritionFactsTitle: NF_I18n.t('Nutrition Facts'),
+  nutritionFactsCloseButtonText: NF_I18n.t('Close'),
+  nutritionFactsCloseIconButtonScreenReaderLabel: NF_I18n.t('Close'),
+})
 
 interface TranslationControlsProps {
   inboxSettingsFeature: boolean
@@ -69,17 +84,15 @@ const TranslationControls = (props: TranslationControlsProps) => {
         {showNutritionFacts && (
           <Flex.Item>
             <NutritionFacts
-              aiInformation={inboxTranslationInfo.aiInformation}
-              dataPermissionLevels={inboxTranslationInfo.dataPermissionLevels}
+              aiInformation={inboxTranslationInfo.aiInformation.data}
+              dataPermissionLevels={inboxTranslationInfo.dataPermissionLevels.data}
               nutritionFacts={inboxTranslationInfo.nutritionFacts}
+              translations={nutritionFactsTranslations()}
               iconSize={24}
-              responsiveProps={{
-                fullscreenModals: false,
-                color: 'primary',
-                buttonColor: 'primary',
-                withBackground: false,
-                domElement: 'inbox_nutrition_facts_container',
-              }}
+              fullscreenModals={false}
+              color="primary"
+              buttonColor="primary"
+              withBackground={false}
             />
           </Flex.Item>
         )}

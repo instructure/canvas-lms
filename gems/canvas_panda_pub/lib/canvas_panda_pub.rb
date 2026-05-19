@@ -66,9 +66,9 @@ module CanvasPandaPub
     #
     # Returns nil if PandaPub is not configured.
 
-    def generate_token(channel, read = false, write = false, expires = 1.hour.from_now)
+    def generate_token(channel, read: false, write: false, expires: 1.hour.from_now)
       if CanvasPandaPub.enabled?
-        CanvasPandaPub::Client.new.generate_token(channel, read, write, expires)
+        CanvasPandaPub::Client.new.generate_token(channel, read:, write:, expires:)
       end
     end
 

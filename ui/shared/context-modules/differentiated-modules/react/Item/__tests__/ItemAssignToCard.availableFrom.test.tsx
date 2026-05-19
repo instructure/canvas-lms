@@ -23,7 +23,7 @@ import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import fakeEnv from '@canvas/test-utils/fakeENV'
 
@@ -109,15 +109,20 @@ describe('ItemAssignToCard - Available From Defaults', () => {
     onCardDatesChangeMock.mockClear()
     await userEvent.type(dateInput, 'Nov 9, 2020')
     await userEvent.tab()
-    await waitFor(() => {
-      const unlockAtCalls = onCardDatesChangeMock.mock.calls.filter(call => call[1] === 'unlock_at')
-      expect(unlockAtCalls.length).toBeGreaterThan(0)
-      expect(unlockAtCalls[unlockAtCalls.length - 1]).toEqual([
-        expect.any(String),
-        'unlock_at',
-        '2020-11-09T00:00:00.000Z',
-      ])
-    }, {timeout: 30000})
+    await waitFor(
+      () => {
+        const unlockAtCalls = onCardDatesChangeMock.mock.calls.filter(
+          call => call[1] === 'unlock_at',
+        )
+        expect(unlockAtCalls.length).toBeGreaterThan(0)
+        expect(unlockAtCalls[unlockAtCalls.length - 1]).toEqual([
+          expect.any(String),
+          'unlock_at',
+          '2020-11-09T00:00:00.000Z',
+        ])
+      },
+      {timeout: 30000},
+    )
     const timeInputs = await findAllByLabelText('Time')
     expect(timeInputs[1]).toHaveValue('12:00 AM')
   })

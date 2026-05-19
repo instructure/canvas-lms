@@ -127,4 +127,40 @@ describe InstLLMHelper do
       end.to raise_error(StandardError, "test error")
     end
   end
+
+  describe ".extract_json" do
+    it "extracts an object surrounded by prose" do
+      raw = "Here is the result: {\"response\": \"ok\"} -- done"
+      expect(InstLLMHelper.extract_json(raw)).to eq({ response: "ok" })
+    end
+
+    it "handles nested braces inside strings" do
+      raw = 'prefix {"msg": "look: {nested}", "n": 1} suffix'
+      expect(InstLLMHelper.extract_json(raw)).to eq({ msg: "look: {nested}", n: 1 })
+    end
+
+    it "returns nil for unbalanced input" do
+      expect(InstLLMHelper.extract_json("no braces here")).to be_nil
+    end
+  end
+
+  describe ".extract_json_array" do
+    it "extracts an array surrounded by prose" do
+      raw = "Here you go: [{\"question\": \"Q\", \"answer\": \"A\"}] hope that helps!"
+      expect(InstLLMHelper.extract_json_array(raw)).to eq([{ question: "Q", answer: "A" }])
+    end
+
+    it "handles nested brackets inside strings" do
+      raw = 'prefix [{"msg": "see [1]", "n": 1}] suffix'
+      expect(InstLLMHelper.extract_json_array(raw)).to eq([{ msg: "see [1]", n: 1 }])
+    end
+
+    it "returns nil for unbalanced input" do
+      expect(InstLLMHelper.extract_json_array("no brackets here")).to be_nil
+    end
+
+    it "returns nil for invalid JSON inside balanced brackets" do
+      expect(InstLLMHelper.extract_json_array("[not, valid, json}")).to be_nil
+    end
+  end
 end

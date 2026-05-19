@@ -96,9 +96,11 @@ describe('RandomlyAssignMembersView', () => {
     })
 
     // Create model with groups_count=0 to prevent auto-fetch
+    // @ts-expect-error TS7 migration
     model = new GroupCategory({id: 20, name: 'Project Group', groups_count: 0})
 
     // Create the RandomlyAssignMembersView directly (no need for GroupCategoryView)
+    // @ts-expect-error TS7 migration
     randomlyAssignView = new RandomlyAssignMembersView({model})
   })
 

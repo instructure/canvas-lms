@@ -22,7 +22,7 @@ import {MockedProvider} from '@apollo/client/testing'
 import {within} from '@testing-library/dom'
 import {pick} from 'es-toolkit/compat'
 import OutcomeEditModal from '../OutcomeEditModal'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {
   updateLearningOutcomeMocks,
@@ -34,9 +34,13 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 
 injectGlobalAlertContainers()
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(() => vi.fn(() => {})),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(() => vi.fn(() => {})),
+  }
+})
 
 vi.mock('@canvas/rce/react/CanvasRce')
 

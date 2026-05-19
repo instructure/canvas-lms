@@ -64,4 +64,8 @@ class TempCache
       yield
     end
   end
+
+  def self.exist?(*)
+    @enabled ? @cache.key?(create_key(*)) : false
+  end
 end

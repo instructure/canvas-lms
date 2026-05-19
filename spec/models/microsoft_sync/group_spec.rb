@@ -123,19 +123,19 @@ describe MicrosoftSync::Group do
       end
 
       it "does not update the workflow_state in the DB" do
-        expect { run_method! }.to_not change {
+        expect { run_method! }.not_to change {
           described_class.find(subject.id).workflow_state
         }.from("deleted")
       end
 
       it "does not update the extra attributes in the DB" do
-        expect { run_method! }.to_not change {
+        expect { run_method! }.not_to change {
           described_class.find(subject.id).job_state
         }.from(nil)
       end
 
       it "does not update the extra attributes on the object" do
-        expect { run_method! }.to_not change { subject.job_state }.from(nil)
+        expect { run_method! }.not_to change { subject.job_state }.from(nil)
       end
     end
 
@@ -206,7 +206,7 @@ describe MicrosoftSync::Group do
     context "when the MicrosoftSync::Group is in the deleted state" do
       it "does not enqueue a job" do
         subject.destroy
-        expect(subject).to_not receive(:syncer_job)
+        expect(subject).not_to receive(:syncer_job)
         subject.enqueue_future_sync
       end
     end
@@ -237,8 +237,8 @@ describe MicrosoftSync::Group do
     context "when the MicrosoftSync::Group is in the deleted state" do
       it "does not upsert a sync change or enqueue a job" do
         subject.destroy
-        expect(MicrosoftSync::PartialSyncChange).to_not receive(:upsert_for_enrollment)
-        expect(subject).to_not receive(:syncer_job)
+        expect(MicrosoftSync::PartialSyncChange).not_to receive(:upsert_for_enrollment)
+        expect(subject).not_to receive(:syncer_job)
         subject.enqueue_future_partial_sync(instance_double(Enrollment))
       end
     end

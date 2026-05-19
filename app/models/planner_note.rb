@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-class PlannerNote < ActiveRecord::Base
+class PlannerNote < ApplicationRecord
   include Canvas::SoftDeletable
   include Plannable
 

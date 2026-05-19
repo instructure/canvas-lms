@@ -29,9 +29,10 @@ const I18n = createI18nScope('rubrics-assessment-tray')
 type OutcomeTagProps = {
   outcome?: GetRubricOutcomeQuery['learningOutcome']
   displayName: string
+  maxWidth?: string
   onClick: () => void
 }
-export const OutcomeTag = ({displayName, outcome, onClick}: OutcomeTagProps) => {
+export const OutcomeTag = ({displayName, outcome, maxWidth, onClick}: OutcomeTagProps) => {
   return (
     <OutcomePopover
       renderTrigger={
@@ -54,6 +55,7 @@ export const OutcomeTag = ({displayName, outcome, onClick}: OutcomeTagProps) => 
             defaultBackground: 'white',
             defaultBorderColor: 'rgb(3, 116, 181)',
             defaultColor: 'rgb(3, 116, 181)',
+            maxWidth: maxWidth ?? '10rem',
           }}
           onClick={onClick}
           data-testid="rubric-criteria-row-outcome-tag"

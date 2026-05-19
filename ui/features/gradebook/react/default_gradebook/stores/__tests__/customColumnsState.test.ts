@@ -21,9 +21,13 @@ import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import store from '../index'
 import type {CustomColumn} from '../../gradebook.d'
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn(),
+  }
+})
 
 const exampleCustomColumns: CustomColumn[] = [
   {

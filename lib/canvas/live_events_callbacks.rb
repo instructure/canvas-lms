@@ -55,6 +55,8 @@ module Canvas::LiveEventsCallbacks
           Canvas::LiveEvents.quiz_updated(quiz)
         end
       end
+    when Lti::ResourceLink
+      Canvas::LiveEvents.lti_resource_link_created(obj)
     when Assignment
       Canvas::LiveEvents.assignment_created(obj)
     when Quizzes::Quiz
@@ -126,6 +128,12 @@ module Canvas::LiveEventsCallbacks
         Canvas::LiveEvents.course_syllabus_updated(obj, changes["syllabus_body"].first)
       end
       Canvas::LiveEvents.course_updated(obj)
+    when DiscussionEntry
+      if changes["deleted_at"] && obj.deleted?
+        Canvas::LiveEvents.discussion_entry_deleted(obj)
+      else
+        Canvas::LiveEvents.discussion_entry_updated(obj)
+      end
     when DiscussionTopic
       Canvas::LiveEvents.discussion_topic_updated(obj)
     when Enrollment
@@ -155,6 +163,8 @@ module Canvas::LiveEventsCallbacks
           Canvas::LiveEvents.quiz_updated(quiz)
         end
       end
+    when Lti::ResourceLink
+      Canvas::LiveEvents.lti_resource_link_updated(obj)
     when Assignment
       Canvas::LiveEvents.assignment_updated(obj)
     when Quizzes::Quiz
@@ -165,7 +175,7 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.assignment_override_updated(obj)
     when Attachment
       if attachment_eligible?(obj)
-        if %w[display_name lock_at unlock_at folder_id].any? { |field| changes[field] }
+        if %w[display_name lock_at unlock_at folder_id locked].any? { |field| changes[field] }
           Canvas::LiveEvents.attachment_updated(obj, changes["display_name"]&.first)
         elsif changes["file_state"] && obj.file_state == "deleted"
           # Attachments are often soft deleted rather than destroyed

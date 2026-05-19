@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module ConditionalRelease
-  class ScoringRange < ActiveRecord::Base
+  class ScoringRange < ApplicationRecord
     include BoundsValidations
     include Deletion
 
@@ -36,6 +36,10 @@ module ConditionalRelease
     delegate :course_id, to: :rule
 
     acts_as_list scope: { rule: self, deleted_at: nil }
+
+    def self.score_at_100_percent?(score)
+      score.present? && (score.to_f * 100).round == 100
+    end
 
     scope :for_score, lambda { |score|
       # Special case: if score is 1.0 (100%) and upper_bound is 1.0, include it

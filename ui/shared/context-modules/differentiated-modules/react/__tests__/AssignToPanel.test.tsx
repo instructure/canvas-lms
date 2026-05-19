@@ -29,7 +29,7 @@ import * as utils from '../../utils/assignToHelper'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 import userEvent from '@testing-library/user-event'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 

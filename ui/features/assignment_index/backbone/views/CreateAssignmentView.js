@@ -381,10 +381,10 @@ CreateAssignmentView.prototype._validateDueDate = function (data, errors) {
   }
   // need to override default error message to focus only on due date field for quick add/edit
   if (errs.lock_at) {
-    errs.due_at = I18n.t('Due date cannot be after lock date')
+    errs.due_at = I18n.t('Due date cannot be after until date')
   }
   if (errs.unlock_at) {
-    errs.due_at = I18n.t('Due date cannot be before unlock date')
+    errs.due_at = I18n.t('Due date cannot be before available from date')
   }
   errors.due_at = [
     {

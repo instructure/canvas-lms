@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class SubmissionComment < ActiveRecord::Base
+class SubmissionComment < ApplicationRecord
   include SendToStream
   include HtmlTextHelper
   include Workflow
@@ -62,6 +62,8 @@ class SubmissionComment < ActiveRecord::Base
     end
   end
   validates :workflow_state, inclusion: { in: ["active"] }, allow_nil: true
+
+  sanitize_field :comment, CanvasSanitize::SANITIZE
 
   after_destroy :refresh_submission_comment_read_state
   before_save :infer_details
@@ -523,6 +525,8 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def publishable_for?(user)
+    return false unless user
+
     draft? && author_id == user.id
   end
 

@@ -15,9 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {cleanup, render, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {Toolbar, ToolbarProps} from '../Toolbar'
 import {DEFAULT_GRADEBOOK_SETTINGS} from '@canvas/outcomes/react/utils/constants'
+import {mapSettingsToFilters} from '@canvas/outcomes/react/utils/filter'
+import * as apiClient from '../../../apiClient'
+
+vi.mock('../../../apiClient', () => ({
+  exportCSV: vi.fn().mockResolvedValue({data: []}),
+}))
 
 const makeProps = (props = {}): ToolbarProps => ({
   courseId: '123',
@@ -60,6 +67,18 @@ describe('Toolbar', () => {
       const tray = queryByTestId('lmgb-settings-tray')
       expect(tray?.classList.contains('transition--slide-right-exited')).toBe(true)
     })
+  })
+
+  it('calls exportCSV with courseId and mapped filters when export button is clicked', async () => {
+    const user = userEvent.setup()
+    render(<Toolbar {...makeProps()} />)
+    await user.click(screen.getByTestId('export-button'))
+    await waitFor(() =>
+      expect(apiClient.exportCSV).toHaveBeenCalledWith(
+        '123',
+        mapSettingsToFilters(DEFAULT_GRADEBOOK_SETTINGS),
+      ),
+    )
   })
 
   it('hides data-dependent controls when showDataDependentControls is false', () => {

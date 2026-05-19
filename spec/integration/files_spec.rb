@@ -206,6 +206,13 @@ describe FilesController do
     enable_cache do
       course_with_teacher(active_all: true, user: @user, name: "Teacher 1")
       @course.root_account.enable_feature!(:file_association_access)
+      ad1 = @course.root_account.account_domains.new(host: "test.host")
+      ad1.save(validate: false)
+      ad2 = @course.root_account.account_domains.new(host: "files-test.host")
+      ad2.save(validate: false)
+      AccountDomain.reload
+      MultiCache.delete(AccountDomain.domain_lookup_cache_key("test.host", force_current_test_cluster: false))
+      MultiCache.delete(AccountDomain.domain_lookup_cache_key("files-test.host", force_current_test_cluster: false))
       host!("test.host")
       attachment_model(uploaded_data: stub_png_data, content_type: "image/png", context: @teacher)
       wiki_page_model(title: "Test Page", body: %(<p><a href="http://test.host/users/#{@teacher.id}/files/#{@attachment.id}/download">File 1</a></p>), saving_user: @teacher, context: @course)
@@ -238,6 +245,14 @@ describe FilesController do
       Account.site_admin.enable_feature!(:disable_file_verifiers_in_public_syllabus)
       course_model(name: "Public Course", public_syllabus: true, is_public: false)
       @course.offer!
+      ad1 = @course.root_account.account_domains.new(host: "test.host")
+      ad1.save(validate: false)
+      ad2 = @course.root_account.account_domains.new(host: "files-test.host")
+      ad2.save(validate: false)
+      # Clear AccountDomain caches so find_cached picks up the new domains
+      AccountDomain.reload
+      MultiCache.delete(AccountDomain.domain_lookup_cache_key("test.host", force_current_test_cluster: false))
+      MultiCache.delete(AccountDomain.domain_lookup_cache_key("files-test.host", force_current_test_cluster: false))
       host!("test.host")
       allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
       att1 = attachment_model(uploaded_data: stub_png_data, content_type: "image/png", context: @teacher)
@@ -329,7 +344,7 @@ describe FilesController do
     # ensure that the user wasn't logged in by the normal means
     expect(controller.instance_variable_get(:@current_user)).to be_nil
     access = AssetUserAccess.for_user(@user).first
-    expect(access).to_not be_nil
+    expect(access).not_to be_nil
     expect(access.asset).to eq a1
   end
 
@@ -523,7 +538,7 @@ describe FilesController do
       expect(session["file_access_user_id"]).to be_present
 
       get "/courses/#{@course.id}/files/#{att.id}/file_preview"
-      expect(response.body).to_not include("This file has not been unlocked yet")
+      expect(response.body).not_to include("This file has not been unlocked yet")
       expect(response.body).to include("/courses/#{@course.id}/files/#{att.id}")
     end
   end
@@ -554,6 +569,6 @@ describe FilesController do
 
     # course and file don't match
     get "http://files-test.host/users/#{secret_user.id}/files/#{some_file.id}?verifier=#{some_file.uuid}"
-    expect(response.body).to_not include(secret_user.name)
+    expect(response.body).not_to include(secret_user.name)
   end
 end

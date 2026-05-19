@@ -65,6 +65,17 @@ describe DelayedMessage do
       expect(DelayedMessage.for(@assignment)).to eq [@delayed_message]
     end
 
+    it "accepts PeerReviewSubAssignment as a valid context" do
+      peer_review_sub = peer_review_model
+      delayed_message_model
+      expect do
+        @delayed_message.context = peer_review_sub
+        @delayed_message.save!
+      end.not_to raise_error
+      expect(@delayed_message.reload.context).to eq peer_review_sub
+      expect(DelayedMessage.for(peer_review_sub)).to eq [@delayed_message]
+    end
+
     it "has a scope to filter by the state" do
       notification_model name: "New Stuff"
       delayed_message_model(workflow_state: "pending")

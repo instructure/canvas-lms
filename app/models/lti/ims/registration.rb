@@ -315,6 +315,8 @@ class Lti::IMS::Registration < ApplicationRecord
   end
 
   def reinstall_disabled?
+    return true unless root_account.feature_enabled?(:lti_dr_registrations_update)
+
     lti_tool_configuration[DISABLE_REINSTALL_EXTENSION] == true
   end
 

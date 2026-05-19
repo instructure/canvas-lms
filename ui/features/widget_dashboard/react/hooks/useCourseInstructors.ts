@@ -23,7 +23,7 @@ import {COURSE_INSTRUCTORS_PAGINATED_KEY, QUERY_CONFIG} from '../constants'
 import {fetchPaginatedCourseInstructors} from '../graphql/coursePeople'
 import {useWidgetDashboard} from './useWidgetDashboardContext'
 import {widgetDashboardPersister} from '../utils/persister'
-import {useBroadcastQuery} from '@canvas/query/broadcast'
+import {useBroadcastQuery} from '@instructure/platform-query/broadcast'
 
 export interface CourseInstructorForComponent {
   id: string
@@ -194,6 +194,41 @@ export function useCourseInstructorsPaginated(options: UseCourseInstructorsOptio
     queryKey: [COURSE_INSTRUCTORS_PAGINATED_KEY],
     broadcastChannel: 'widget-dashboard',
   })
+
+  // Prefetch next page for instant forward pagination
+  useEffect(() => {
+    if (currentPage?.pageInfo.hasNextPage) {
+      const nextPageIndex = currentPageIndex + 1
+      queryClient.prefetchQuery({
+        queryKey: [
+          COURSE_INSTRUCTORS_PAGINATED_KEY,
+          'page',
+          nextPageIndex,
+          courseIds.join(','),
+          limit,
+          observedUserId ?? undefined,
+          enrollmentTypes?.join(','),
+        ],
+        queryFn: () =>
+          fetchInstructorsPage(
+            nextPageIndex,
+            courseIds,
+            limit,
+            observedUserId ?? undefined,
+            enrollmentTypes,
+          ),
+        staleTime: QUERY_CONFIG.STALE_TIME.USERS * 60 * 1000,
+      })
+    }
+  }, [
+    currentPage,
+    currentPageIndex,
+    courseIds,
+    limit,
+    observedUserId,
+    enrollmentTypes,
+    queryClient,
+  ])
 
   // Reset to page 0 when course filters or enrollment types change
   const courseIdString = courseIds.join(',')

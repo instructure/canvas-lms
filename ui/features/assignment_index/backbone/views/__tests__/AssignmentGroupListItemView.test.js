@@ -131,8 +131,10 @@ describe('AssignmentGroupListItemView', () => {
   })
 
   afterEach(() => {
-    view?.$el.remove()
-    document.getElementById('fixtures').innerHTML = ''
+    view?.collection?.each(m => m.view?.remove())
+    view?.remove()
+    const fixtures = document.getElementById('fixtures')
+    if (fixtures) fixtures.innerHTML = ''
   })
 
   describe('SIS integration', () => {

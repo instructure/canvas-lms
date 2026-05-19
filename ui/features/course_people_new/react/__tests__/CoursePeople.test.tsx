@@ -24,9 +24,9 @@ import useSearch from '../hooks/useSearch'
 import {mockUser, mockEnrollment} from '../../graphql/Mocks'
 import {INACTIVE_ENROLLMENT, PENDING_ENROLLMENT} from '../../util/constants'
 import {User} from '../../types'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 vi.mock('../hooks/useCoursePeopleQuery')
 vi.mock('../hooks/useSearch')
 vi.mock('../hooks/useCoursePeopleContext', () => ({

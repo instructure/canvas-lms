@@ -37,7 +37,7 @@ import PeopleReadyList from './people_ready_list'
 import PeopleValidationIssues from './people_validation_issues'
 import APIError from './api_error'
 import {parseNameList, findEmailInEntry, emailValidator, validateEmailForNewUser} from '../helpers'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('add_people')
 

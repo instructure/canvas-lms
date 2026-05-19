@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 
 declare global {
   interface Window {
@@ -167,7 +167,7 @@ export const defaultFetchOptions = (
   // because we don't have a good pattern for sharing them yet.
   // If you change these defaults, you should probably cascade that change
   // to that ruby location
-  const csrfToken = getCookie('_csrf_token')
+  const csrfToken = getCookie('_csrf_token') ?? ''
 
   return {
     credentials: 'same-origin' as RequestCredentials,

@@ -19,14 +19,14 @@
 import axios from '@canvas/axios'
 
 function getAssignmentsByName(courseId, searchTerm) {
-  if (searchTerm.length < 3) {
-    // the endpoint doesn't allow searching by 2 letters or less
+  if (searchTerm.length < 1) {
     return Promise.resolve({response: {data: []}})
   }
 
   const params = {
     params: {
       search_term: searchTerm,
+      per_page: 10,
     },
   }
 

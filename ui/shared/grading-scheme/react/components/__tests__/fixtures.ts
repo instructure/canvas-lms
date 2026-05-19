@@ -408,6 +408,8 @@ export class IntersectionObserver {
 
   rootMargin = ''
 
+  scrollMargin = ''
+
   thresholds = []
 
   callback: IntersectionObserverCallback

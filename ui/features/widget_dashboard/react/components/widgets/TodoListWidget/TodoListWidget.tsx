@@ -25,8 +25,8 @@ import {List} from '@instructure/ui-list'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import TemplateWidget from '../TemplateWidget/TemplateWidget'
+import {showFlashAlert} from '@instructure/platform-alerts'
+import {TemplateWidget} from '@instructure/platform-widget-dashboard'
 import TodoItem from './TodoItem'
 import CreateTodoModal from './CreateTodoModal'
 import type {BaseWidgetProps} from '../../../types'
@@ -69,6 +69,9 @@ const TodoListWidget: React.FC<BaseWidgetProps> = ({
     }
   }, [])
 
+  const {mutate: createPlannerNote, isPending: isCreating} = useCreatePlannerNote()
+  const {sharedCourseData, observedUserId} = useWidgetDashboard()
+
   const {
     currentPage,
     currentPageIndex,
@@ -79,20 +82,19 @@ const TodoListWidget: React.FC<BaseWidgetProps> = ({
     error,
     refetch,
     resetPagination,
+    updateItemOverride,
   } = usePlannerItems({
     perPage: 5,
     startDate: dateRange.startDate,
     endDate: dateRange.endDate,
     filter: filter === 'all' ? undefined : filter,
+    observedUserId,
   })
 
   // Reset pagination when filter changes
   React.useEffect(() => {
     resetPagination()
   }, [filter, resetPagination])
-
-  const {mutate: createPlannerNote, isPending: isCreating} = useCreatePlannerNote()
-  const {sharedCourseData} = useWidgetDashboard()
 
   const handleCreateTodo = (data: {
     title: string
@@ -167,7 +169,11 @@ const TodoListWidget: React.FC<BaseWidgetProps> = ({
             <List isUnstyled margin="0">
               {currentPage.map(item => (
                 <List.Item key={`${item.plannable_type}-${item.plannable_id}`} margin="0">
-                  <TodoItem item={item} />
+                  <TodoItem
+                    item={item}
+                    onItemUpdate={updateItemOverride}
+                    readOnly={!!observedUserId}
+                  />
                 </List.Item>
               ))}
             </List>
@@ -188,9 +194,11 @@ const TodoListWidget: React.FC<BaseWidgetProps> = ({
         onRetry={refetch}
         loadingText={I18n.t('Loading to-do items...')}
         headerActions={
-          <Button size="small" onClick={() => setIsModalOpen(true)} data-testid="new-todo-button">
-            {I18n.t('+ New To-do')}
-          </Button>
+          !observedUserId && (
+            <Button size="small" onClick={() => setIsModalOpen(true)} data-testid="new-todo-button">
+              {I18n.t('+ New To-do')}
+            </Button>
+          )
         }
         pagination={{
           currentPage: currentPageIndex + 1,

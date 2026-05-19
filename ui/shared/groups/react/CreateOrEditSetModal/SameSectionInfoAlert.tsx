@@ -26,7 +26,7 @@ const SameSectionInfoAlert = () => (
   <div style={{maxWidth: '400px'}}>
     <Alert variant="info" margin="small">
       {I18n.t(
-        'Students who are enrolled in multiple sections will be put in a group by themselves.',
+        'Restrict by Section keeps students in the same section, but students enrolled in multiple sections may be grouped unpredictably. For exact section groupings, create groups manually.',
       )}
     </Alert>
   </div>

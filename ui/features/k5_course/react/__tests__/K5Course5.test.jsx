@@ -36,6 +36,15 @@ import {
   MOCK_GROUPS,
 } from './mocks'
 
+import {showFlashError} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
 vi.mock('@canvas/util/globalUtils', () => ({
   reloadWindow: vi.fn(),
 }))
@@ -324,8 +333,9 @@ describe('K-5 Subject Course', () => {
         const {findAllByText} = render(
           <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />,
         )
-        const errors = await findAllByText('Failed to load important info.')
-        expect(errors[0]).toBeInTheDocument()
+        await waitFor(() =>
+          expect(showFlashError).toHaveBeenCalledWith('Failed to load important info.'),
+        )
       })
     })
 
@@ -354,8 +364,8 @@ describe('K-5 Subject Course', () => {
             return new HttpResponse(null, {status: 400})
           }),
         )
-        const {getAllByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
-        await waitFor(() => expect(getAllByText('Failed to load apps.')[0]).toBeInTheDocument())
+        render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
+        await waitFor(() => expect(showFlashError).toHaveBeenCalledWith('Failed to load apps.'))
       })
     })
 

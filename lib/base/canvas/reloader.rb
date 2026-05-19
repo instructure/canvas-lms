@@ -22,15 +22,22 @@
 # Canvas
 module Canvas::Reloader
   class << self
-    attr_reader :pending_reload
+    # Maximum random delay (in seconds) before executing reload callbacks
+    # when triggered by SIGHUP, to avoid thundering herd effects across
+    # multiple processes reloading simultaneously.
+    RELOAD_DELAY_MAX = 60
+    private_constant :RELOAD_DELAY_MAX
 
     def reload
-      reload! if pending_reload
+      return unless @reload_at
+      return if Process.clock_gettime(Process::CLOCK_MONOTONIC) < @reload_at
+
+      reload!
     end
 
     def reload!
       Rails.logger.info("Canvas::Reloader fired")
-      @pending_reload = false
+      @reload_at = nil
       to_reload.each do |block|
         block.call
       rescue => e
@@ -44,7 +51,7 @@ module Canvas::Reloader
 
     def trap_signal
       trap("HUP") do
-        @pending_reload = true
+        @reload_at = Process.clock_gettime(Process::CLOCK_MONOTONIC) + (Rails.env.production? ? rand(RELOAD_DELAY_MAX) : 0)
       end
     end
 

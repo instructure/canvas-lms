@@ -176,6 +176,7 @@ function Assignment() {
   this.originalCourseID = this.originalCourseID.bind(this)
   this.originalQuizID = this.originalQuizID.bind(this)
   this.peerReviewCount = this.peerReviewCount.bind(this)
+  this.isLegacyPeerReview = this.isLegacyPeerReview.bind(this)
   this.peerReviews = this.peerReviews.bind(this)
   this.peerReviewsAssignAt = this.peerReviewsAssignAt.bind(this)
   this.peerReviewSubmissionRequired = this.peerReviewSubmissionRequired.bind(this)
@@ -718,6 +719,10 @@ Assignment.prototype.intraGroupPeerReviews = function () {
 
 Assignment.prototype.peerReviewSubAssignment = function () {
   return this.get('peer_review_sub_assignment')
+}
+
+Assignment.prototype.isLegacyPeerReview = function () {
+  return !this.isNew() && this.peerReviews() && !this.peerReviewSubAssignment()
 }
 
 Assignment.prototype.hasPeerReviewSubmissions = function () {

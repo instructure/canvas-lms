@@ -79,7 +79,7 @@
 class WidgetDashboardLayoutValidator
   # Valid widget types - keep in sync with WIDGET_TYPES in
   # ui/features/widget_dashboard/react/constants.ts
-  VALID_WIDGET_TYPES = %w[
+  LEARNER_WIDGET_TYPES = %w[
     course_work_summary
     course_work
     course_work_combined
@@ -91,6 +91,51 @@ class WidgetDashboardLayoutValidator
     recent_grades
     inbox
   ].freeze
+
+  EDUCATOR_WIDGET_TYPES = %w[
+    educator_announcement_creation
+    educator_todo_list
+    educator_content_quality
+  ].freeze
+
+  VALID_WIDGET_TYPES = (LEARNER_WIDGET_TYPES + EDUCATOR_WIDGET_TYPES).freeze
+
+  def self.sanitize_educator_layout(config)
+    return config unless config.is_a?(Hash) && config["layout"].is_a?(Hash)
+
+    config = config.deep_dup
+    widgets = Array(config["layout"]["widgets"])
+    config["layout"]["widgets"] = widgets.select do |widget|
+      widget.is_a?(Hash) && EDUCATOR_WIDGET_TYPES.include?(widget["type"])
+    end
+    config
+  end
+
+  def self.default_educator_layout
+    {
+      "columns" => 2,
+      "widgets" => [
+        {
+          "id" => "educator-announcement-creation-widget",
+          "type" => "educator_announcement_creation",
+          "position" => { "col" => 1, "row" => 1, "relative" => 1 },
+          "title" => I18n.t("Announcement Creation")
+        },
+        {
+          "id" => "educator-todo-list-widget",
+          "type" => "educator_todo_list",
+          "position" => { "col" => 2, "row" => 1, "relative" => 2 },
+          "title" => I18n.t("Todo List")
+        },
+        {
+          "id" => "educator-content-quality-widget",
+          "type" => "educator_content_quality",
+          "position" => { "col" => 1, "row" => 2, "relative" => 3 },
+          "title" => I18n.t("Content Quality")
+        }
+      ]
+    }
+  end
 
   attr_reader :errors
 

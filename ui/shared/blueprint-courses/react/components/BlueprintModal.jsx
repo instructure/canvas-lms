@@ -21,7 +21,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
 
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'

@@ -15,39 +15,17 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useEffect, useMemo, useRef, useState} from 'react'
+import React, {useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Outcome} from '@canvas/outcomes/react/types/rollup'
 import {svgUrl} from '@canvas/outcomes/react/utils/icons'
 import {BarChart} from './BarChart'
-import type {Chart as ChartJS, Plugin} from 'chart.js'
 import {RatingDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
 import {canvas} from '@instructure/ui-themes'
+import type {CanvasTheme} from '@instructure/ui-themes'
+import {useTheme} from '@instructure/emotion'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
-
-interface CustomLabel {
-  iconUrl: string | null
-  text: string
-}
-
-const loadIcons = (
-  labels: Array<CustomLabel & {iconUrl: string}>,
-  imagesRef: React.MutableRefObject<Map<string, HTMLImageElement>>,
-): Promise<void>[] => {
-  return labels.map(
-    label =>
-      new Promise<void>(resolve => {
-        const img = new Image()
-        img.src = label.iconUrl
-        img.onload = () => {
-          imagesRef.current.set(label.iconUrl, img)
-          resolve()
-        }
-        img.onerror = () => resolve()
-      }),
-  )
-}
 
 export interface MasteryDistributionChartProps {
   outcome: Outcome
@@ -84,9 +62,8 @@ export const MasteryDistributionChart: React.FC<MasteryDistributionChartProps> =
   onBarClick,
   selectedLabel,
 }) => {
-  const imagesRef = useRef<Map<string, HTMLImageElement>>(new Map())
-  const [imagesLoaded, setImagesLoaded] = useState(false)
-
+  const theme = useTheme() as CanvasTheme
+  const themeBorderColor = theme.colors?.contrasts?.grey1424 ?? canvas.colors.contrasts.grey1424
   const masteryLevels = useMemo(() => {
     if (distributionData.length === 0 && outcome.ratings) {
       const sortedRatings = [...outcome.ratings].sort((a, b) => b.points - a.points)
@@ -109,86 +86,37 @@ export const MasteryDistributionChart: React.FC<MasteryDistributionChartProps> =
     }))
   }, [distributionData, outcome.ratings])
 
-  const labels = masteryLevels.map(level => level.description)
+  const descriptions = masteryLevels.map(level => level.description)
+  const displayLabels = masteryLevels.map(level => String(level.points))
   const values = masteryLevels.map(level => level.count)
   const colors = useMemo(() => {
     return masteryLevels.map(level => {
       if (selectedLabel && level.description !== selectedLabel) {
-        return canvas.colors.contrasts.grey1424
+        return themeBorderColor
       }
       return level.color
     })
-  }, [masteryLevels, selectedLabel])
+  }, [masteryLevels, selectedLabel, themeBorderColor])
 
-  // Create custom labels with icons and counts (only if not in preview mode)
-  const customLabels: Array<CustomLabel & {iconUrl: string}> | undefined = useMemo(() => {
+  const xAxisImages = useMemo(() => {
     if (isPreview) return undefined
-    return masteryLevels
-      .map(level => ({
-        iconUrl: svgUrl(level.points, outcome.mastery_points),
-        text: level.count.toString(),
-      }))
-      .filter((label): label is CustomLabel & {iconUrl: string} => label.iconUrl !== null)
+    return masteryLevels.map(level => svgUrl(level.points, outcome.mastery_points))
   }, [masteryLevels, outcome.mastery_points, isPreview])
 
-  // Load images for custom labels
-  useEffect(() => {
-    if (!customLabels || customLabels.length === 0) {
-      setImagesLoaded(true)
-      return
-    }
+  const chartDescription = useMemo(() => {
+    if (isPreview) return undefined
+    return I18n.t('Mastery distribution chart for %{outcome}', {outcome: outcome.title})
+  }, [outcome.title, isPreview])
 
-    setImagesLoaded(false)
-    Promise.all(loadIcons(customLabels, imagesRef)).then(() => {
-      setImagesLoaded(true)
-    })
-  }, [customLabels])
-
-  // Custom plugin to draw icons and counts below the bars
-  const customLabelsPlugin: Plugin<'bar'> = useMemo(
-    () => ({
-      id: 'customLabels',
-      afterDraw(chart: ChartJS<'bar'>) {
-        if (!customLabels || customLabels.length === 0) return
-
-        const {ctx: chartCtx, scales, chartArea} = chart
-        const xScale = scales.x
-        const iconSize = 12
-        const textIconGap = 4
-        const yPosition = chartArea.bottom + 10
-
-        customLabels.forEach((label, index) => {
-          const x = xScale.getPixelForValue(index)
-          const img = imagesRef.current.get(label.iconUrl)
-
-          if (img) {
-            const bodyStyle = getComputedStyle(document.body)
-            const fontFamily = bodyStyle.fontFamily
-
-            chartCtx.save()
-            chartCtx.font = `bold 16px ${fontFamily}`
-            const textMetrics = chartCtx.measureText(label.text)
-            const textWidth = textMetrics.width
-            const totalWidth = iconSize + textIconGap + textWidth
-            const textY = yPosition + iconSize / 2
-
-            const iconX = x - totalWidth / 2
-            const iconY = textY - iconSize / 2 - 1
-
-            chartCtx.drawImage(img, iconX, iconY, iconSize, iconSize)
-
-            chartCtx.fillStyle = '#000'
-            chartCtx.textAlign = 'left'
-            chartCtx.textBaseline = 'middle'
-            const textX = iconX + iconSize + textIconGap
-            chartCtx.fillText(label.text, textX, textY)
-            chartCtx.restore()
-          }
-        })
-      },
-    }),
-    [customLabels],
-  )
+  const pointDescriptions = useMemo(() => {
+    if (isPreview) return undefined
+    return masteryLevels.map(level =>
+      I18n.t('%{description}: %{count} students', {
+        description: level.description,
+        count: level.count,
+      }),
+    )
+  }, [masteryLevels, isPreview])
 
   const chartPadding = isPreview
     ? {left: 28, right: 30, top: 12, bottom: 12}
@@ -196,27 +124,28 @@ export const MasteryDistributionChart: React.FC<MasteryDistributionChartProps> =
 
   return (
     <BarChart
-      labels={isPreview ? labels.map(() => '') : labels}
+      labels={isPreview ? descriptions.map(() => '') : displayLabels}
       values={values}
       width={width}
       height={height}
       backgroundColor={colors}
       borderWidth={0}
-      borderRadius={
-        isPreview ? {topLeft: 1, topRight: 1, bottomLeft: 0, bottomRight: 0} : undefined
-      }
+      borderRadius={isPreview ? 1 : undefined}
       datasetLabel={isPreview ? '' : I18n.t('Number of Students')}
       title={isPreview ? undefined : title}
       showLegend={isPreview ? false : showLegend}
       showXAxisGrid={isPreview ? false : showXAxisGrid}
       showYAxisGrid={isPreview ? false : showYAxisGrid}
+      showXAxisTicks={!isPreview}
       gridColor={gridColor}
       padding={chartPadding}
-      maintainAspectRatio={false}
-      plugins={customLabels && imagesLoaded ? [customLabelsPlugin] : []}
-      onClick={(_, elements) => {
-        if (elements.length === 0) return
-        onBarClick?.(labels[elements[0].index], values[elements[0].index])
+      xAxisLineColor={isPreview ? 'black' : undefined}
+      barFocusColor={theme['ic-brand-primary'] ?? canvas['ic-brand-primary']}
+      xAxisImages={xAxisImages}
+      description={chartDescription}
+      pointDescriptions={pointDescriptions}
+      onClick={index => {
+        onBarClick?.(descriptions[index], values[index])
       }}
     />
   )

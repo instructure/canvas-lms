@@ -18,7 +18,7 @@
 
 import React from 'react'
 import useStore from '@canvas/rubrics/stores'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {RubricSelfAssessmentSettings} from './RubricSelfAssessmentSettings'
 

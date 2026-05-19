@@ -20,8 +20,8 @@ import {extend} from '@canvas/backbone/utils'
 import {defer} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
-import ReactDOM from 'react-dom'
+import {flushSync} from 'react-dom'
+import {render, rerender} from '@canvas/react'
 import NeverDropComponent from '../../react/NeverDrop'
 
 extend(NeverDrop, Backbone.View)
@@ -39,10 +39,6 @@ NeverDrop.prototype.render = function () {
 }
 
 NeverDrop.prototype.renderReactComponent = function () {
-  if (!this.reactRoot) {
-    this.reactRoot = createRoot(this.el)
-  }
-
   const modelData = this.model.toJSON()
   const props = {
     canChangeDropRules: this.canChangeDropRules,
@@ -67,8 +63,13 @@ NeverDrop.prototype.renderReactComponent = function () {
     },
   }
 
-  ReactDOM.flushSync(() => {
-    this.reactRoot.render(<NeverDropComponent {...props} />)
+  const element = <NeverDropComponent {...props} />
+  flushSync(() => {
+    if (!this.reactRoot) {
+      this.reactRoot = render(element, this.el)
+    } else {
+      rerender(this.reactRoot, element)
+    }
   })
 
   if (this.model.has('focus')) {

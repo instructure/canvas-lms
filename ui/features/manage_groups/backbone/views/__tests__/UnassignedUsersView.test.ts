@@ -43,16 +43,21 @@ describe('UnassignedUsersView', () => {
     vi.useFakeTimers()
     fakeENV.setup()
     $('#fixtures').html('<div id="content"></div>')
+    // @ts-expect-error TS7 migration
     groups = new GroupCollection([new Group({name: 'a group'}), new Group({name: 'another group'})])
+    // @ts-expect-error TS7 migration
     users = new UnassignedGroupUserCollection(
+      // @ts-expect-error TS7 migration
       [
         {id: 1, name: 'bob', sortable_name: 'bob'},
         {id: 2, name: 'joe', sortable_name: 'joe'},
       ],
+      // @ts-expect-error TS7 migration
       {category: new GroupCategory()},
     )
     // @ts-expect-error - Legacy Backbone typing
     const menu = new AssignToGroupMenu({collection: groups})
+    // @ts-expect-error TS7 migration
     view = new UnassignedUsersView({
       collection: users,
       groupsCollection: groups,

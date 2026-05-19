@@ -36,10 +36,25 @@ module Types
           null: true,
           description: "Total number of items in the connection, ignoring pagination."
 
+    field :total_nr_of_pages,
+          Integer,
+          null: true,
+          description: "Total number of pages given the current page size."
+
     # Calculate the total count efficiently while preserving query intent
     def total_count
       # Memoize to avoid multiple database calls for the same PageInfo object
       @total_count ||= calculate_total_count
+    end
+
+    def total_nr_of_pages
+      count = total_count
+      return nil if count.nil?
+
+      page_size = object.first || object.context.schema.default_page_size
+      return nil if page_size.nil? || page_size <= 0
+
+      (count.to_f / page_size).ceil
     end
 
     private
@@ -50,9 +65,16 @@ module Types
 
       begin
         if items.respond_to?(:unscope)
-          # Remove only pagination scopes, preserve all business logic
-          # This keeps WHERE, GROUP BY, HAVING, JOIN, DISTINCT, etc.
-          items.unscope(:limit, :offset, :order).count
+          # Remove pagination and display scopes; preserve all business logic
+          # (WHERE, GROUP BY, HAVING, JOIN, DISTINCT, etc.).
+          #
+          # :select must be unscoped because UserSearch.order_scope adds
+          # extra SELECT columns for sorting (e.g. "users.*, collation_key(sortable_name)")
+          # which cause .count to generate invalid SQL like COUNT(users.*, varchar_col).
+          # Dropping SELECT is safe here: it only contained sort-display columns,
+          # DISTINCT is a separate scope and is preserved, and :order (which
+          # depended on those columns) is already unscoped above.
+          items.unscope(:limit, :offset, :order, :select).count
         elsif items.respond_to?(:count)
           # For regular collections (arrays, etc.)
           items.count

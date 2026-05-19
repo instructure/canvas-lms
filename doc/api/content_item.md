@@ -69,9 +69,19 @@ links, and return them as module items or assignments.
 * module_index_menu_modal:
 Appears in the dropdown menu in the top right of the modules page. Allows users that
 have permission to create module items to launch to a tool, select one or many deep
-links, and return them as module items or assignments. Adds all returned deep links
-to a newly created module.
+links, and return them as module items or assignments. 
 
+Module items returned from these two placements are all added to a newly created module.
+It is possible to override the default name of this new module by including a custom extension
+in the `LtiDeepLinkingResponse` JWT, which looks like this:
+
+```json
+{
+   ...
+   "https://purl.imsglobal.org/spec/lti-dl/claim/content_items": [ ... ],
+   "https://canvas.instructure.com/lti/module_name": "Week 3 Activities"
+}
+```
 
 This document will continue referring to this process as "Content-Item" for LTI
 1.1 and Deep Linking for LTI Advantage.

@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 describe "Rack::Utils" do
   it "raises an exception if the params are too deep" do
     len = Rack::Utils.param_depth_limit
@@ -29,6 +27,6 @@ describe "Rack::Utils" do
 
     expect do
       Rack::Utils.parse_nested_query("foo#{"[a]" * (len - 1)}=bar")
-    end.to_not raise_error
+    end.not_to raise_error
   end
 end

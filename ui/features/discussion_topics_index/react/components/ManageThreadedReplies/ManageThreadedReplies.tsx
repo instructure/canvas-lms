@@ -28,7 +28,7 @@ import {View} from '@instructure/ui-view'
 import DiscussionTable from './DiscussionTable'
 import {useManageThreadedRepliesStore} from '../../hooks/useManageThreadedRepliesStore'
 import {gql, useQuery} from '@apollo/client'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {updateDiscussionTopicTypes} from '../../apiClient'
 import {Alert} from '@instructure/ui-alerts'
 

@@ -421,7 +421,7 @@ describe "SpeedGrader" do
 
   context "group assignment comments" do
     before(:once) do
-      @assignment = create_assignment_for_group("online_url", true)
+      @assignment = create_assignment_for_group("online_url", grade_group_students_individually: true)
       @student_1 = @students.first
       @student_2 = @students.second
       add_user_to_group(@student_2, @testgroup[0])

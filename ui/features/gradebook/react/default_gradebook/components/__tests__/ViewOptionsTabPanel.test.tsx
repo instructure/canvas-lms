@@ -53,6 +53,11 @@ describe('ViewOptionsTabPanel', () => {
         checked: true,
         onChange: vi.fn(),
       },
+      showSuppressedAssignments: {
+        allowed: false,
+        checked: false,
+        onChange: vi.fn(),
+      },
       statusColors: {
         currentValues: statusColors(),
         onChange: vi.fn(),
@@ -178,6 +183,41 @@ describe('ViewOptionsTabPanel', () => {
 
       fireEvent.click(getByLabelText('Unpublished Assignments'))
       expect(onChange).toHaveBeenCalledWith(true)
+    })
+  })
+
+  describe('.showSuppressedAssignments', () => {
+    describe('when .allowed is true', () => {
+      it('is checked if .checked is true', () => {
+        const {getByLabelText} = renderPanel({
+          showSuppressedAssignments: {allowed: true, checked: true, onChange: () => {}},
+        })
+        expect(getByLabelText('All Hidden Assignments')).toBeChecked()
+      })
+
+      it('is unchecked if .checked is false', () => {
+        const {getByLabelText} = renderPanel({
+          showSuppressedAssignments: {allowed: true, checked: false, onChange: () => {}},
+        })
+        expect(getByLabelText('All Hidden Assignments')).not.toBeChecked()
+      })
+
+      it('calls .onChange when the user toggles the item', () => {
+        const onChange = vi.fn()
+        const {getByLabelText} = renderPanel({
+          showSuppressedAssignments: {allowed: true, checked: false, onChange},
+        })
+
+        fireEvent.click(getByLabelText('All Hidden Assignments'))
+        expect(onChange).toHaveBeenCalledWith(true)
+      })
+    })
+
+    it('is not present when .allowed is false', () => {
+      const {queryByText} = renderPanel({
+        showSuppressedAssignments: {allowed: false, checked: true, onChange: () => {}},
+      })
+      expect(queryByText('All hidden Assignments')).not.toBeInTheDocument()
     })
   })
 
@@ -345,14 +385,14 @@ describe('ViewOptionsTabPanel', () => {
       const {getByLabelText} = renderPanel({
         viewStatusForColorblindness: {checked: true, onChange: () => {}},
       })
-      expect(getByLabelText('View status for colorblindness')).toBeChecked()
+      expect(getByLabelText('Enable Gradebook Status Icons')).toBeChecked()
     })
 
     it('is unchecked if .checked is false', () => {
       const {getByLabelText} = renderPanel({
         viewStatusForColorblindness: {checked: false, onChange: () => {}},
       })
-      expect(getByLabelText('View status for colorblindness')).not.toBeChecked()
+      expect(getByLabelText('Enable Gradebook Status Icons')).not.toBeChecked()
     })
 
     it('calls .onChange when the user toggles the item', () => {
@@ -361,7 +401,7 @@ describe('ViewOptionsTabPanel', () => {
         viewStatusForColorblindness: {checked: false, onChange},
       })
 
-      fireEvent.click(getByLabelText('View status for colorblindness'))
+      fireEvent.click(getByLabelText('Enable Gradebook Status Icons'))
       expect(onChange).toHaveBeenCalledWith(true)
     })
   })

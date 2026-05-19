@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AssessmentQuestionBank < ActiveRecord::Base
+class AssessmentQuestionBank < ApplicationRecord
   extend RootAccountResolver
   include Workflow
 
@@ -130,7 +130,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
     LearningOutcome.update_alignments(self, context, [])
   end
 
-  def bookmark_for(user, do_bookmark = true)
+  def bookmark_for(user, do_bookmark: true)
     if do_bookmark
       assessment_question_bank_users.where(user:).first_or_create!
     else

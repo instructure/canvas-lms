@@ -71,7 +71,6 @@ export const RegistrationUpdateWizardModal = ({accountId}: RegistrationUpdateWiz
           <RegistrationUpdateWizard
             accountId={accountId}
             registration={state.registration}
-            ltiRegistrationUpdateRequestId={state.ltiRegistrationUpdateRequestId}
             onDismiss={onDismiss}
             onSuccess={close}
           />

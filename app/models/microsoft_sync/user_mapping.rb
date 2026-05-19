@@ -34,7 +34,7 @@
 # such as the Canvas user's email address is referred to throughout MicrosoftSync
 # as a "ULUV" or User Lookup Value.
 #
-class MicrosoftSync::UserMapping < ActiveRecord::Base
+class MicrosoftSync::UserMapping < ApplicationRecord
   belongs_to :root_account, class_name: "Account"
   belongs_to :user
   validates :root_account, presence: true

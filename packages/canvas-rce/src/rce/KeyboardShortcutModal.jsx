@@ -52,7 +52,7 @@ export default function KeyboardShortcutModal(props) {
           offset="medium"
           color="primary"
           onClick={props.onDismiss}
-          screenReaderLabel={formatMessage('Close')}
+          screenReaderLabel={formatMessage('Close Keyboard Shortcuts Modal')}
         />
         <Heading>{formatMessage('Keyboard Shortcuts')}</Heading>
       </Modal.Header>

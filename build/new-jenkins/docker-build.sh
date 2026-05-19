@@ -11,13 +11,13 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 # 1. When using a multi-stage build, only the first stage was cached. We were
 #    unable to get the CI system to use cached layers from any subsequent stage.
 # 2. When using buildkit, the entire cache would be intermittently not reused.
-#    It seemed to happen if Buildkit also pulled the starlord.inscloudgate.net/jenkins/ruby-passenger
+#    It seemed to happen if Buildkit also pulled the 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/instructure/ruby-passenger
 #    image manifest before pulling the image layers.
 # 3. When using buildkit, modifying a layer could result in the cache for previous
 #    layers not being used, even when their contents have not changed.
 
 # Images:
-# $BASE_RUNNER_PREFIX: starlord.inscloudgate.net/jenkins/ruby-passenger + additional packages
+# $BASE_RUNNER_PREFIX: 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/instructure/ruby-passenger + additional packages
 # $RUBY_RUNNER_PREFIX: $BASE_RUNNER_PREFIX + gems
 # $YARN_RUNNER_PREFIX: $RUBY_RUNNER_PREFIX + yarn
 # $WEBPACK_BUILDER_PREFIX: $YARN_RUNNER_PREFIX + compiled packages/
@@ -45,8 +45,8 @@ fi
 
 source ./build/new-jenkins/docker-build-helpers.sh
 
-./build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/dockerfile:1.5.2
-./build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/core:focal
+./build/new-jenkins/docker-with-flakey-network-protection.sh pull 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/docker/dockerfile:1.5.2
+./build/new-jenkins/docker-with-flakey-network-protection.sh pull 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/instructure/core:jammy
 
 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper" "$WORKSPACE"
 
@@ -60,9 +60,9 @@ WEBPACK_ASSETS_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.webpack-assets | md5sum)
 WEBPACK_CACHE_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.webpack-cache | md5sum)
 WEBPACK_RUNNER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.webpack-runner | md5sum)
 
-./build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/ruby-passenger:$RUBY
+./build/new-jenkins/docker-with-flakey-network-protection.sh pull 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/instructure/ruby-passenger:$RUBY-jammy
 
-BASE_IMAGE_ID=$(docker images --filter=reference=starlord.inscloudgate.net/jenkins/ruby-passenger:$RUBY --format '{{.ID}}')
+BASE_IMAGE_ID=$(docker images --filter=reference=948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/instructure/ruby-passenger:$RUBY-jammy --format '{{.ID}}')
 
 BASE_RUNNER_BUILD_ARGS=(
   --build-arg CANVAS_RAILS=${CANVAS_RAILS:-8.0}
@@ -240,7 +240,7 @@ if [[ -z "${WEBPACK_ASSETS_SELECTED_TAG}" || "${FORCE_BUILD_WEBPACK-0}" == "1" ]
     "WEBPACK_ASSETS_CACHE_ID" \
     $WEBPACK_ASSETS_CACHE_ID \
     local/webpack-assets-previous \
-  || tag_many starlord.inscloudgate.net/jenkins/core:focal local/webpack-assets-previous
+  || tag_many 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/instructure/core:jammy local/webpack-assets-previous
 
   [[ ! -z "${WEBPACK_CACHE_FUZZY_LOAD_TAG-}" && "$READ_BUILD_CACHE" == "1" ]] && load_image_if_label_eq \
     $WEBPACK_CACHE_FUZZY_LOAD_TAG \
@@ -248,7 +248,7 @@ if [[ -z "${WEBPACK_ASSETS_SELECTED_TAG}" || "${FORCE_BUILD_WEBPACK-0}" == "1" ]
     $WEBPACK_CACHE_ID \
     local/webpack-cache-previous \
   && export USE_BUILD_CACHE=1 \
-  || tag_many starlord.inscloudgate.net/jenkins/core:focal local/webpack-cache-previous
+  || tag_many 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/instructure/core:jammy local/webpack-cache-previous
 
   # *_BUILD_CACHE are special variables and do not need to be included in the image cache hash
   # because it shouldn't produce any compiled asset changes

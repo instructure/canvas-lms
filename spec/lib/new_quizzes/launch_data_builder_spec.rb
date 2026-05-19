@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../spec_helper"
-
 module NewQuizzes
   describe LaunchDataBuilder do
     let_once(:account) { Account.default }
@@ -33,6 +31,7 @@ module NewQuizzes
       ApplicationController.new.respond_to?(:lti_grade_passback_api_url)
       instance_double(ApplicationController,
                       request:,
+                      params: ActionController::Parameters.new({}),
                       lti_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/grade_passback",
                       blti_legacy_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/legacy_grade_passback",
                       lti_turnitin_outcomes_placement_url: "https://canvas.instructure.com/api/lti/v1/turnitin/outcomes_placement",
@@ -466,6 +465,7 @@ module NewQuizzes
           ApplicationController.new.respond_to?(:lti_grade_passback_api_url)
           instance_double(ApplicationController,
                           request:,
+                          params: ActionController::Parameters.new({}),
                           lti_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/grade_passback",
                           blti_legacy_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/legacy_grade_passback",
                           lti_turnitin_outcomes_placement_url: "https://canvas.instructure.com/api/lti/v1/turnitin/outcomes_placement",
@@ -477,6 +477,42 @@ module NewQuizzes
           expect(controller).to receive(:set_return_url).and_return("https://canvas.instructure.com/courses/#{course.id}/quizzes")
           result = builder.build
           expect(result[:launch_presentation_return_url]).to eq("https://canvas.instructure.com/courses/#{course.id}/quizzes")
+        end
+      end
+
+      context "when module_item_id is present in params" do
+        let(:request) { instance_double(ActionDispatch::Request, host: "canvas.instructure.com", host_with_port: "canvas.instructure.com", params: { module_item_id: "464" }) }
+        let(:controller) do
+          ApplicationController.new.respond_to?(:lti_grade_passback_api_url)
+          instance_double(ApplicationController,
+                          request:,
+                          params: ActionController::Parameters.new({ module_item_id: "464" }),
+                          lti_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/grade_passback",
+                          blti_legacy_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/legacy_grade_passback",
+                          lti_turnitin_outcomes_placement_url: "https://canvas.instructure.com/api/lti/v1/turnitin/outcomes_placement",
+                          course_assignment_url: "https://canvas.instructure.com/courses/#{course.id}/assignments/#{assignment.id}?module_item_id=464",
+                          set_return_url: "https://canvas.instructure.com/courses/#{course.id}/modules")
+        end
+
+        it "includes platform_redirect_url with the assignment URL and module_item_id" do
+          expect(controller).to receive(:course_assignment_url).with(course, assignment, module_item_id: "464")
+                                                               .and_return("https://canvas.instructure.com/courses/#{course.id}/assignments/#{assignment.id}?module_item_id=464")
+          result = builder.build
+          expect(result[:platform_redirect_url]).to eq("https://canvas.instructure.com/courses/#{course.id}/assignments/#{assignment.id}?module_item_id=464")
+        end
+
+        it "uses set_return_url for launch_presentation_return_url" do
+          allow(controller).to receive(:course_assignment_url)
+            .and_return("https://canvas.instructure.com/courses/#{course.id}/assignments/#{assignment.id}?module_item_id=464")
+          result = builder.build
+          expect(result[:launch_presentation_return_url]).to eq("https://canvas.instructure.com/courses/#{course.id}/modules")
+        end
+      end
+
+      context "when module_item_id is not present in params" do
+        it "does not include platform_redirect_url" do
+          result = builder.build
+          expect(result[:platform_redirect_url]).to be_nil
         end
       end
 
@@ -498,6 +534,104 @@ module NewQuizzes
           result = builder.build
           expect(result[:launch_presentation_return_url]).to be_nil
         end
+      end
+    end
+
+    describe "result launch behavior (submission views)" do
+      let(:controller) do
+        ApplicationController.new.respond_to?(:lti_grade_passback_api_url)
+        instance_double(ApplicationController,
+                        request:,
+                        params: ActionController::Parameters.new({ participant_session_id: "85", quiz_session_id: "53" }),
+                        lti_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/grade_passback",
+                        blti_legacy_grade_passback_api_url: "https://canvas.instructure.com/api/lti/v1/tools/legacy_grade_passback",
+                        lti_turnitin_outcomes_placement_url: "https://canvas.instructure.com/api/lti/v1/turnitin/outcomes_placement",
+                        set_return_url: "https://canvas.instructure.com/courses/#{course.id}/assignments",
+                        polymorphic_url: "https://canvas.instructure.com/courses/#{course.id}")
+      end
+
+      it "includes participant_session_id and quiz_session_id in build output" do
+        result = builder.build
+        expect(result[:participant_session_id]).to eq("85")
+        expect(result[:quiz_session_id]).to eq("53")
+      end
+
+      it "excludes outcome service params for result launches" do
+        course.enroll_student(user, enrollment_state: "active")
+        result = builder.build
+        expect(result).not_to have_key(:lis_result_sourcedid)
+        expect(result).not_to have_key(:lis_outcome_service_url)
+        expect(result).not_to have_key(:ext_ims_lis_basic_outcome_url)
+        expect(result).not_to have_key(:ext_outcome_data_values_accepted)
+        expect(result).not_to have_key(:ext_outcome_result_total_score_accepted)
+        expect(result).not_to have_key(:ext_outcome_submission_submitted_at_accepted)
+        expect(result).not_to have_key(:ext_outcome_submission_needs_additional_review_accepted)
+        expect(result).not_to have_key(:ext_outcome_submission_prioritize_non_tool_grade_accepted)
+        expect(result).not_to have_key(:ext_outcomes_tool_placement_url)
+      end
+
+      it "uses course URL for launch_presentation_return_url" do
+        result = builder.build
+        expect(result[:launch_presentation_return_url]).to eq("https://canvas.instructure.com/courses/#{course.id}")
+      end
+    end
+
+    describe "API gateway routing" do
+      context "when new_quizzes_native_experience_api_gateway feature flag is enabled" do
+        before do
+          allow(course).to receive(:feature_enabled?).with(:new_quizzes_native_experience_api_gateway).and_return(true)
+          allow(Services::NewQuizzes).to receive(:api_gateway_host).and_return("https://gateway-prod.example.com")
+        end
+
+        it "routes backend_url through the API gateway" do
+          result = builder.build
+          expect(result[:backend_url]).to eq("https://gateway-prod.example.com/new-quizzes-lti")
+        end
+
+        it "appends /new-quizzes-lti to the gateway host" do
+          allow(Services::NewQuizzes).to receive(:api_gateway_host).and_return("https://gateway-beta.example.com")
+          result = builder.build
+          expect(result[:backend_url]).to eq("https://gateway-beta.example.com/new-quizzes-lti")
+        end
+      end
+
+      context "when feature flag is enabled but gateway host is blank" do
+        before do
+          allow(course).to receive(:feature_enabled?).with(:new_quizzes_native_experience_api_gateway).and_return(true)
+          allow(Services::NewQuizzes).to receive(:api_gateway_host).and_return(nil)
+        end
+
+        it "falls back to direct tool URL" do
+          result = builder.build
+          expect(result[:backend_url]).to eq("https://account.quiz-lti-dub-prod.instructure.com")
+        end
+      end
+
+      context "when feature flag is disabled" do
+        before do
+          allow(course).to receive(:feature_enabled?).with(:new_quizzes_native_experience_api_gateway).and_return(false)
+        end
+
+        it "uses the direct tool URL" do
+          result = builder.build
+          expect(result[:backend_url]).to eq("https://account.quiz-lti-dub-prod.instructure.com")
+        end
+      end
+    end
+
+    describe "non-result launch includes outcome service params" do
+      it "includes outcome service params when participant_session_id is absent" do
+        course.enroll_student(user, enrollment_state: "active")
+        result = builder.build
+        expect(result[:lis_outcome_service_url]).to be_present
+        expect(result[:ext_ims_lis_basic_outcome_url]).to be_present
+        expect(result).to have_key(:ext_outcome_data_values_accepted)
+      end
+
+      it "does not include participant_session_id or quiz_session_id" do
+        result = builder.build
+        expect(result[:participant_session_id]).to be_nil
+        expect(result[:quiz_session_id]).to be_nil
       end
     end
   end

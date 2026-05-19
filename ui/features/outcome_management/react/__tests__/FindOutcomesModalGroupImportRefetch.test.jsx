@@ -31,9 +31,13 @@ import {
   defaultTreeGroupMocks,
 } from './FindOutcomesModalTestUtils'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 vi.mock('@canvas/progress/resolve_progress')
 

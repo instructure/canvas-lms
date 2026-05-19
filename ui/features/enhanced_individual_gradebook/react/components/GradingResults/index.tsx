@@ -17,9 +17,9 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {Button} from '@instructure/ui-buttons'
 import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 describe ScoreStatisticsGenerator do
   # Because this functionality has been transplanted out of the grade
   # summary presenter, there are tests there that check the

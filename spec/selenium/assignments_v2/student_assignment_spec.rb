@@ -300,7 +300,7 @@ describe "as a student" do
       end
 
       it "shows assignment title" do
-        expect(StudentAssignmentPageV2.assignment_title(@assignment.title)).to_not be_nil
+        expect(StudentAssignmentPageV2.assignment_title(@assignment.title)).not_to be_nil
       end
 
       it "shows details toggle" do
@@ -316,11 +316,11 @@ describe "as a student" do
       end
 
       it "shows assignment due date" do
-        expect(StudentAssignmentPageV2.due_date_css(@assignment.due_at)).to_not be_nil
+        expect(StudentAssignmentPageV2.due_date_css(@assignment.due_at)).not_to be_nil
       end
 
       it "shows how many points possible the assignment is worth" do
-        expect(StudentAssignmentPageV2.points_possible_css(@assignment.points_possible)).to_not be_nil
+        expect(StudentAssignmentPageV2.points_possible_css(@assignment.points_possible)).not_to be_nil
       end
     end
 
@@ -482,7 +482,7 @@ describe "as a student" do
           expect(StudentAssignmentPageV2.assignment_title("Test Assignment")).to be_displayed
 
           expect(StudentAssignmentPageV2.view).to include_text("Unlimited Attempts")
-          expect(StudentAssignmentPageV2.submit_button).to_not be_disabled
+          expect(StudentAssignmentPageV2.submit_button).not_to be_disabled
         end
       end
     end
@@ -652,7 +652,7 @@ describe "as a student" do
         StudentAssignmentPageV2.cancel_attempt_button.click
         wait_for_ajaximations
         StudentAssignmentPageV2.new_attempt_button.click
-        expect(StudentAssignmentPageV2.url_entry).to_not include_text("Please enter a valid url")
+        expect(StudentAssignmentPageV2.url_entry).not_to include_text("Please enter a valid url")
       end
     end
 
@@ -861,9 +861,9 @@ describe "as a student" do
 
         scroll_to(StudentAssignmentPageV2.similarity_pledge)
         StudentAssignmentPageV2.similarity_pledge.click
-        expect(StudentAssignmentPageV2.similarity_pledge).to_not include_text("You must agree to the submission pledge before you can submit the assignment")
+        expect(StudentAssignmentPageV2.similarity_pledge).not_to include_text("You must agree to the submission pledge before you can submit the assignment")
 
-        expect(StudentAssignmentPageV2.submit_button).to_not be_disabled
+        expect(StudentAssignmentPageV2.submit_button).not_to be_disabled
       end
     end
 
@@ -1409,6 +1409,8 @@ describe "as a student" do
                                                      submission_types: "online_text_entry"
                                                    })
 
+        PeerReview::PeerReviewCreatorService.call(parent_assignment: @peer_review_assignment)
+
         @peer_review_assignment.assign_peer_review(@student1, @student3)
       end
 
@@ -1447,6 +1449,51 @@ describe "as a student" do
 
         expect(element_exists?("[data-testid='header-peer-review-link']")).to be_falsey
       end
+
+      context "without a peer review sub assignment" do
+        before(:once) do
+          @legacy_assignment = assignment_model({
+                                                  course: @course,
+                                                  peer_reviews: true,
+                                                  automatic_peer_reviews: false,
+                                                  points_possible: 10,
+                                                  submission_types: "online_text_entry"
+                                                })
+
+          @legacy_assignment.assign_peer_review(@student1, @student3)
+          @legacy_assignment.assign_peer_review(@student1, @student2)
+        end
+
+        it "shows peer review details in modal after submitting" do
+          @legacy_assignment.submit_homework(
+            @student3,
+            body: "student 3 attempt",
+            submission_type: "online_text_entry"
+          )
+          StudentAssignmentPageV2.visit(@course, @legacy_assignment)
+          wait_for_ajaximations
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.create_text_entry_draft("hello")
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.submit_button_enabled
+          StudentAssignmentPageV2.submit_assignment
+
+          expect(StudentAssignmentPageV2.peer_review_header_text).to include("Your work has been submitted.\nCheck back later to view feedback.")
+          expect(StudentAssignmentPageV2.peer_review_sub_header_text).to include("You have 2 Peer Reviews to complete.\nPeer submissions ready for review: 1")
+        end
+
+        it "shows peer review counter and navigation link in header" do
+          @legacy_assignment.submit_homework(
+            @student3,
+            body: "student 3 attempt",
+            submission_type: "online_text_entry"
+          )
+          StudentAssignmentPageV2.visit(@course, @legacy_assignment)
+          wait_for_ajaximations
+
+          expect(element_exists?("[data-testid='header-peer-review-link']")).to be_truthy
+        end
+      end
     end
 
     context "with an active and concluded enrollment" do
@@ -1479,7 +1526,7 @@ describe "as a student" do
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
         wait_for_ajaximations
-        expect(StudentAssignmentPageV2.view).to_not include_text("You are unable to submit to this assignment as your enrollment in this section has been concluded.")
+        expect(StudentAssignmentPageV2.view).not_to include_text("You are unable to submit to this assignment as your enrollment in this section has been concluded.")
       end
     end
   end

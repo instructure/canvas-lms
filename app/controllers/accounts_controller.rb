@@ -301,11 +301,13 @@
 #     }
 
 class AccountsController < ApplicationController
-  before_action :require_user, only: %i[index
-                                        help_links
-                                        manually_created_courses_account
-                                        account_calendar_settings
-                                        environment]
+  skip_before_action :require_user, only: %i[acceptable_use_policy
+                                             course_accounts
+                                             course_creation_accounts
+                                             courses_redirect
+                                             horizon_accounts
+                                             manageable_accounts
+                                             terms_of_service]
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]
@@ -356,9 +358,41 @@ class AccountsController < ApplicationController
 
         # originally had 'includes' instead of 'include' like other endpoints
         includes = params[:include] || params[:includes]
-        render json: @accounts.map { |a| account_json(a, @current_user, session, includes || [], false) }
+        render json: @accounts.map { |a| account_json(a, @current_user, session, includes || []) }
       end
     end
+  end
+
+  # @API List horizon accounts
+  # A paginated list of horizon accounts that the current user can view or manage.
+  # Returns all accounts with the horizon_account setting enabled. If there are any
+  # horizon accounts and the user has access to Site Admin, Site Admin will also be
+  # included in the results.
+  #
+  # Typically, students and even teachers will get an empty list in response,
+  # only account admins can view the accounts that they are in.
+  #
+  # @argument include[] [String, "lti_guid"|"registration_settings"|"services"|"course_count"|"sub_account_count"|"site_admin"]
+  #   Array of additional information to include.
+  #
+  #   "lti_guid":: the 'tool_consumer_instance_guid' that will be sent for this account on LTI launches
+  #   "registration_settings":: returns info about the privacy policy and terms of use
+  #   "services":: returns services and whether they are enabled (requires account management permissions)
+  #   "course_count":: returns the number of courses directly under each account
+  #   "sub_account_count":: returns the number of sub-accounts directly under each account
+  #   "site_admin":: returns true if the account is the Site Admin account (only included if true)
+  #
+  # @returns [Account]
+  def horizon_accounts
+    @accounts = if @current_user
+                  Api.paginate(@current_user.all_paginatable_horizon_accounts, self, api_v1_horizon_accounts_url)
+                else
+                  []
+                end
+    ActiveRecord::Associations.preload(@accounts, :root_account)
+
+    includes = params[:include] || params[:includes]
+    render json: @accounts.map { |a| account_json(a, @current_user, session, includes || []) }
   end
 
   # @API Get accounts that admins can manage
@@ -377,7 +411,7 @@ class AccountsController < ApplicationController
       end
     end
     @all_accounts = Api.paginate(@all_accounts, self, api_v1_manageable_accounts_url)
-    render json: @all_accounts.map { |a| account_json(a, @current_user, session, [], false) }
+    render json: @all_accounts.map { |a| account_json(a, @current_user, session, []) }
   end
 
   # @API Get accounts that users can create courses in
@@ -430,7 +464,7 @@ class AccountsController < ApplicationController
     account_active_records = Account.where(id: accounts)
     accounts_json = accounts.map do |a|
       a = account_active_records.find { |ar| ar.id == a }
-      hash = account_json(a, @current_user, session, [], false)
+      hash = account_json(a, @current_user, session, [])
       hash[:adminable] = adminable_accounts.include?(a) if Account.site_admin.feature_enabled?(:enhanced_course_creation_account_fetching)
       hash
     end
@@ -456,7 +490,7 @@ class AccountsController < ApplicationController
       @accounts = []
     end
     ActiveRecord::Associations.preload(@accounts, :root_account)
-    render json: @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || [], true) }
+    render json: @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || [], read_only: true) }
   end
 
   # @API Get a single account
@@ -478,7 +512,7 @@ class AccountsController < ApplicationController
                                   @current_user,
                                   session,
                                   params[:includes] || [],
-                                  !@account.grants_right?(@current_user, session, :manage))
+                                  read_only: !@account.grants_right?(@current_user, session, :manage))
       end
     end
   end
@@ -612,7 +646,7 @@ class AccountsController < ApplicationController
 
     ActiveRecord::Associations.preload(@accounts, [:root_account, :parent_account])
 
-    supported_includes = %w[course_count sub_account_count]
+    supported_includes = %w[course_count sub_account_count horizon_account]
     includes = Array(params[:include])
     includes &= supported_includes
 
@@ -673,7 +707,7 @@ class AccountsController < ApplicationController
   def manually_created_courses_account
     account = @domain_root_account.manually_created_courses_account
     read_only = !account.grants_right?(@current_user, session, :read)
-    render json: account_json(account, @current_user, session, [], read_only)
+    render json: account_json(account, @current_user, session, [], read_only:)
   end
 
   include Api::V1::Course
@@ -731,8 +765,9 @@ class AccountsController < ApplicationController
   #   If set, only return courses that are in the given state(s). By default,
   #   all states but "deleted" are returned.
   #
-  # @argument enrollment_term_id [Integer]
-  #   If set, only includes courses from the specified term.
+  # @argument enrollment_term_id[] [Integer]
+  #   If set, only includes courses from the specified terms. Can be either a single ID or
+  #   an array of enrollment term IDs.
   #
   # @argument search_term [String]
   #   The partial course name, code, or full ID to match and return in the results list. Must be at least 3 characters.
@@ -949,8 +984,12 @@ class AccountsController < ApplicationController
     end
 
     if params[:enrollment_term_id]
-      term = api_find(@account.root_account.enrollment_terms, params[:enrollment_term_id])
-      @courses = @courses.for_term(term)
+      terms = if params[:enrollment_term_id].is_a?(Array)
+                api_find_all(@account.root_account.enrollment_terms, params[:enrollment_term_id])
+              else
+                api_find(@account.root_account.enrollment_terms, params[:enrollment_term_id])
+              end
+      @courses = @courses.for_term(terms)
     end
 
     if params[:search_term]
@@ -1048,6 +1087,11 @@ class AccountsController < ApplicationController
       GuardRail.activate(:secondary) do
         courses = @account.associated_courses.where.not(workflow_state: "deleted")
 
+        if params[:enrollment_term_id]
+          term = api_find(@account.root_account.enrollment_terms, params[:enrollment_term_id])
+          courses = courses.for_term(term)
+        end
+
         stats_table = AccessibilityCourseStatistic.arel_table
         active_issues, resolved_issues = courses
                                          .left_joins(:accessibility_course_statistic)
@@ -1117,6 +1161,9 @@ class AccountsController < ApplicationController
 
       # Set default Dashboard View
       set_default_dashboard_view(params.dig(:account, :settings)&.delete(:default_dashboard_view))
+      # Extract suppress_notifications from raw params before strong params coercion,
+      # since it accepts both boolean and array values
+      suppress_notifications_param = params.dig(:account, :settings)&.delete(:suppress_notifications)
       unauthorized = true if set_course_template == :unauthorized
 
       # account settings (:manage_account_settings)
@@ -1159,6 +1206,19 @@ class AccountsController < ApplicationController
 
             account_settings[:settings].slice!(*permitted_api_account_settings)
             account_settings[:settings][:password_policy] = policy_settings if policy_settings
+
+            # suppress_notifications accepts true/false (all/none) or an array of category slugs
+            account_settings[:settings].delete(:suppress_notifications)
+            unless suppress_notifications_param.nil?
+              validated = if suppress_notifications_param.is_a?(Array)
+                            valid_slugs = Notification.all_cached.map(&:category_slug).uniq
+                            suppress_notifications_param.map(&:to_s) & valid_slugs
+                          else
+                            value_to_boolean(suppress_notifications_param)
+                          end
+              @account.settings[:suppress_notifications] = validated.presence || false
+            end
+
             ensure_sis_max_name_length_value!(account_settings)
           end
           @account.errors.add(:name, t(:account_name_required, "The account name cannot be blank")) if account_params.key?(:name) && account_params[:name].blank?
@@ -1311,6 +1371,13 @@ class AccountsController < ApplicationController
   #
   # @argument account[settings][enable_course_paces][locked] [Boolean]
   #   Lock this setting for sub-accounts and courses
+  #
+  # @argument account[settings][suppress_notifications] [Boolean|Array]
+  #   Suppress notification messages from being created and sent. When set to
+  #   +true+, all notifications are suppressed. When set to an array of
+  #   notification category slugs (e.g. +["grading", "announcement"]+), only
+  #   notifications in those categories are suppressed. Set to +false+ to
+  #   allow all notifications. Root account setting only.
   #
   # @argument account[settings][password_policy] [Hash]
   #   Hash of optional password policy configuration parameters for a root account
@@ -1469,6 +1536,15 @@ class AccountsController < ApplicationController
           end
         end
 
+        # Handle impact_account_type setting (site admin only)
+        if Account.site_admin.grants_right?(@current_user, :manage)
+          impact_account_type = params[:account][:settings].try(:delete, :impact_account_type)
+          @account.settings[:impact_account_type] = impact_account_type if impact_account_type.present?
+        else
+          # Remove the field from params if user is not a site admin
+          params[:account][:settings].try(:delete, :impact_account_type)
+        end
+
         # For each inheritable setting, if the value for the account is the same as the inheritable value,
         # remove it from the settings hash on the account
         Account.inheritable_settings.each do |setting|
@@ -1497,6 +1573,18 @@ class AccountsController < ApplicationController
         params[:account][:settings][:help_link_name] = nil if help_link_name == default_help_link_name
 
         ensure_sis_max_name_length_value!(params[:account]) if params[:account][:settings]
+
+        # Handle suppress_notifications: accepts "1"/"0" (boolean) or an array of category slugs
+        if params[:account][:settings]&.key?(:suppress_notifications)
+          suppress_val = params[:account][:settings].delete(:suppress_notifications)
+          if suppress_val.is_a?(Array)
+            valid_slugs = Notification.all_cached.map(&:category_slug).uniq
+            validated = suppress_val.map(&:to_s) & valid_slugs
+            @account.settings[:suppress_notifications] = validated.presence || false
+          else
+            @account.settings[:suppress_notifications] = value_to_boolean(suppress_val)
+          end
+        end
 
         if (sis_id = params[:account].delete(:sis_source_id)) &&
            !@account.root_account? && sis_id != @account.sis_source_id &&
@@ -1529,7 +1617,8 @@ class AccountsController < ApplicationController
 
         nav_menu_links_success = NavMenuLink.sync_with_link_objects_json(
           context: @account,
-          link_objects_json: params[:account].delete(:nav_menu_links)
+          link_objects_json: params[:account].delete(:nav_menu_links),
+          can_manage_links: @account.grants_right?(@current_user, session, :manage_nav_menu_links)
         )
 
         if nav_menu_links_success && @account.update(strong_account_params)
@@ -1633,7 +1722,8 @@ class AccountsController < ApplicationController
         manage_feature_flags: @account.grants_right?(@current_user, session, :manage_feature_flags),
         add_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_add),
         edit_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_edit),
-        delete_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_delete)
+        delete_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_delete),
+        manage_nav_menu_links: @account.grants_right?(@current_user, session, :manage_nav_menu_links)
       }
 
       can_set_token = %i[add_tool_manually edit_tool_manually delete_tool_manually].any? { |perm| js_permissions[perm] }
@@ -1672,10 +1762,10 @@ class AccountsController < ApplicationController
                })
       end
 
-      js_env(edit_help_links_env, true)
+      js_env(edit_help_links_env, overwrite: true)
       if @account.root_account?
-        js_env(EARLY_ACCESS_PROGRAM: @account.early_access_program[:value] ||
-                                     @account.grants_right?(@current_user, :manage_site_settings))
+        js_env({ EARLY_ACCESS_PROGRAM: @account.early_access_program[:value] ||
+                                     @account.grants_right?(@current_user, :manage_site_settings) })
       end
     end
   end
@@ -1694,6 +1784,7 @@ class AccountsController < ApplicationController
 
     authentication_logging = @account.grants_any_right?(@current_user, :view_statistics, :manage_user_logins)
     grade_change_logging = @account.grants_right?(@current_user, :view_grade_changes)
+    search_as_subaccount = !@account.root_account.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
     course_logging = @account.grants_right?(@current_user, :view_course_changes)
     mutation_logging = @account.feature_enabled?(:mutation_audit_log) &&
                        @account.grants_right?(@current_user, :manage_account_settings)
@@ -1701,23 +1792,26 @@ class AccountsController < ApplicationController
       logging = {
         authentication: authentication_logging,
         grade_change: grade_change_logging,
+        grade_change_search_as_subaccount: search_as_subaccount,
         course: course_logging,
         mutation: mutation_logging,
       }
     end
     logging ||= false
 
-    js_env PERMISSIONS: {
-      restore_course: @account.grants_right?(@current_user, session, :undelete_courses),
-      restore_user: @account.grants_right?(@current_user, session, :manage_user_logins),
-      # Permission caching issue makes explicitly checking the account setting
-      # an easier option.
-      view_messages: (@account.settings[:admins_can_view_notifications] &&
-                       @account.grants_right?(@current_user, session, :view_notifications)) ||
-                     Account.site_admin.grants_right?(@current_user, :read_messages),
-      logging:
-    }
-    js_env bounced_emails_admin_tool: @account.grants_right?(@current_user, session, :view_bounced_emails)
+    js_env({
+             PERMISSIONS: {
+               restore_course: @account.grants_right?(@current_user, session, :undelete_courses),
+               restore_user: @account.grants_right?(@current_user, session, :manage_user_logins),
+               # Permission caching issue makes explicitly checking the account setting
+               # an easier option.
+               view_messages: (@account.settings[:admins_can_view_notifications] &&
+                             @account.grants_right?(@current_user, session, :view_notifications)) ||
+                           Account.site_admin.grants_right?(@current_user, :read_messages),
+               logging:
+             },
+             BOUNCED_EMAILS_ADMIN_TOOL: @account.grants_right?(@current_user, session, :view_bounced_emails)
+           })
   end
 
   def confirm_delete_user
@@ -1984,6 +2078,13 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       return redirect_to account_settings_url(@account) if !@account.allow_sis_import || !@account.root_account?
 
+      is_site_admin = Account.site_admin.grants_right?(@current_user, :read) &&
+                      !@account.account_users.active.where(user_id: @current_user).exists?
+      js_env({
+               SHOW_SITE_ADMIN_CONFIRMATION: is_site_admin,
+               INSTITUTIONAL_TAGS_ENABLED: @account.root_account.feature_enabled?(:institutional_tags)
+             })
+
       @current_batch = @account.current_sis_batch
       @last_batch = @account.sis_batches.order(created_at: :desc).first
       respond_to do |format|
@@ -2030,7 +2131,6 @@ class AccountsController < ApplicationController
       can_create_dsr:,
       can_create_courses: @account.grants_right?(@current_user, session, :create_courses),
       can_create_users: @account.root_account.grants_right?(@current_user, session, :manage_user_logins),
-      analytics: @account.service_enabled?(:analytics),
       can_read_sis: @account.grants_right?(@current_user, session, :read_sis),
       can_masquerade: @account.grants_right?(@current_user, session, :become_user),
       can_message_users: @account.grants_right?(@current_user, session, :send_messages),
@@ -2049,6 +2149,15 @@ class AccountsController < ApplicationController
       can_add_designer: @account.grants_right?(@current_user, session, :add_designer_to_course),
       can_add_observer: @account.grants_right?(@current_user, session, :add_observer_to_course)
     }
+
+    if @account.root_account.feature_enabled?(:institutional_tags)
+      js_permissions[:can_view_institutional_tags] =
+        @account.root_account.grants_right?(@current_user, session, :manage_institutional_tags_view)
+      js_permissions[:can_create_institutional_tags] =
+        @account.root_account.grants_right?(@current_user, session, :manage_institutional_tags_create)
+      js_permissions[:can_edit_institutional_tags] =
+        @account.root_account.grants_right?(@current_user, session, :manage_institutional_tags_edit)
+    end
 
     if @account.root_account.feature_enabled?(:temporary_enrollments)
       js_permissions[:can_add_temporary_enrollments] =
@@ -2324,6 +2433,7 @@ class AccountsController < ApplicationController
                                    :external_notification_warning,
                                    :global_includes,
                                    :google_docs_domain,
+                                   :has_underage_users,
                                    :help_link_icon,
                                    :help_link_name,
                                    :include_integration_ids_in_gradebook_exports,
@@ -2440,6 +2550,7 @@ class AccountsController < ApplicationController
        restrict_quantitative_data
        lock_all_announcements
        sis_assignment_name_length_input
+       suppress_notifications
        conditional_release
        enable_course_paces]
   end

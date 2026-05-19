@@ -443,7 +443,7 @@ describe NotificationMessageCreator do
       expect(channels.size).to eq(1)
       policy = nmc.send(:effective_policy_for, @user, channels.first)
       policy2 = nmc.send(:effective_policy_for, @user, channels.first)
-      expect(policy2.id).to_not be_nil
+      expect(policy2.id).not_to be_nil
       expect(policy2.id).to eq(policy.id)
     end
 
@@ -708,7 +708,7 @@ describe NotificationMessageCreator do
       end
 
       dm = @cc.delayed_messages.reload.first
-      expect(dm).to_not be_nil
+      expect(dm).not_to be_nil
 
       DelayedMessage.summarize([dm])
       message = @user.messages.reload.last

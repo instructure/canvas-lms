@@ -150,7 +150,7 @@ describe Quizzes::QuizSubmissionsController do
   describe "PUT 'backup'" do
     before :once do
       quiz_model(course: @course)
-      @qs = @quiz.generate_submission(@student, false)
+      @qs = @quiz.generate_submission(@student)
     end
 
     it "requires authentication" do
@@ -194,13 +194,26 @@ describe Quizzes::QuizSubmissionsController do
       json = response.parsed_body
       expect(json["backup"]).to be_falsey
     end
+
+    it "allows anonymous backup for ungraded quizzes in public courses" do
+      @course.update!(is_public: true)
+      @quiz.update!(quiz_type: "practice_quiz")
+      temp_code = "tmp_#{SecureRandom.hex}"
+      session[:temporary_user_code] = temp_code
+      qs = @quiz.generate_submission(temp_code)
+      Quizzes::QuizSubmission.where(id: qs).update_all(updated_at: 1.hour.ago)
+
+      put "backup", params: { quiz_id: @quiz.id, course_id: @course.id, a: "test" }
+      expect(response).to be_successful
+      expect(qs.reload.submission_data[:a]).to eq "test"
+    end
   end
 
   describe "POST 'record_answer'" do
     before :once do
       @course = nil
       @student = nil
-      quiz_with_submission(false)
+      quiz_with_submission(complete_quiz: false)
       @quiz.update_attribute(:one_question_at_a_time, true)
     end
 
@@ -229,11 +242,48 @@ describe Quizzes::QuizSubmissionsController do
     end
   end
 
+  context "unauthenticated user in public course with practice quiz" do
+    before :once do
+      @course.update!(is_public: true)
+      @quiz = @course.quizzes.create!
+      @quiz.update!(workflow_state: "available",
+                    quiz_type: "practice_quiz",
+                    quiz_data: [{ correct_comments: "",
+                                  assessment_question_id: nil,
+                                  incorrect_comments: "",
+                                  question_name: "Question 1",
+                                  points_possible: 1,
+                                  question_text: "Pick one",
+                                  name: "Question 1",
+                                  id: 128,
+                                  answers: [{ weight: 0, text: "A", comments: "", id: 1490 }],
+                                  question_type: "multiple_choice_question" }])
+    end
+
+    it "allows anonymous quiz submission via create" do
+      temp_code = "tmp_#{SecureRandom.hex}"
+      session[:temporary_user_code] = temp_code
+      @quiz.generate_submission(temp_code)
+
+      post "create", params: { course_id: @course.id, quiz_id: @quiz.id }
+      expect(response).to be_redirect
+    end
+
+    it "allows anonymous record_answer" do
+      temp_code = "tmp_#{SecureRandom.hex}"
+      session[:temporary_user_code] = temp_code
+      qs = @quiz.generate_submission(temp_code)
+
+      post "record_answer", params: { quiz_id: @quiz.id, course_id: @course.id, id: qs.id, a: "test" }
+      expect(response).to be_redirect
+    end
+  end
+
   describe "GET / (#index)" do
     context "with a zip parameter present" do
       it "queues a job to get all attachments for all submissions of a quiz" do
         user_session(@teacher)
-        quiz = course_quiz true
+        quiz = course_quiz(active: true)
         expect(ContentZipper).to receive(:delay).and_return(ContentZipper)
         expect(ContentZipper).to receive(:process_attachment)
         get "index", params: { quiz_id: quiz.id, zip: "1", course_id: @course }
@@ -245,7 +295,7 @@ describe Quizzes::QuizSubmissionsController do
           enrollment_type: "TeacherEnrollment", start_at: 2.days.ago, end_at: 1.day.ago, context: term.root_account
         )
         user_session(@teacher)
-        quiz = course_quiz true
+        quiz = course_quiz(active: true)
         expect(quiz.grants_right?(@teacher, :grade)).to be false
         expect(quiz.grants_right?(@teacher, :review_grades)).to be true
         expect(ContentZipper).to receive(:delay).and_return(ContentZipper)
@@ -257,7 +307,7 @@ describe Quizzes::QuizSubmissionsController do
 
   describe "POST / (#extension)" do
     context "as a teacher in course" do
-      let_once(:quiz) { course_quiz true }
+      let_once(:quiz) { course_quiz(active: true) }
       it "is able to extend own extra attempts" do
         user_session(@teacher)
         request.accept = "application/json"

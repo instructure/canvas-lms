@@ -423,10 +423,10 @@ class YoutubeMigrationService
                                          .active
                                          .without_assessment_question_association
                                          .flat_map do |question|
-                                           QUESTION_RCE_FIELDS.map do |field|
-                                             embeds, error = scan_resource(question, field, question.question_data[field], resource_group_key)
-                                             [embeds, error]
-                                           end
+        QUESTION_RCE_FIELDS.map do |field|
+          embeds, error = scan_resource(question, field, question.question_data[field], resource_group_key)
+          [embeds, error]
+        end
       end
 
       embeds = (description_embeds + questions_embeds_with_errors.flat_map(&:first)).flatten
@@ -541,7 +541,7 @@ class YoutubeMigrationService
     studio_url = "#{uri.scheme}://#{uri.host}"
 
     account = course.account
-    token = CanvasSecurity::ServicesJwt.generate({ sub: account.uuid, user_uuid: }, false, encrypt: false)
+    token = CanvasSecurity::ServicesJwt.generate({ sub: account.uuid, user_uuid: }, base64: false, encrypt: false)
     headers = { "Authorization" => "Bearer #{token}" }
 
     body = {

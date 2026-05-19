@@ -48,11 +48,11 @@ describe Canvas::Apm do
 
       it "is false if missing or set to false" do
         inject_apm_settings("sample_rate: 0.5\nhost_sample_rate: 1.0")
-        expect(Canvas::Apm).to_not be_analytics_enabled
+        expect(Canvas::Apm).not_to be_analytics_enabled
         Canvas::Apm.reset!
         DynamicSettings.reset_cache!
         inject_apm_settings("sample_rate: 0.5\nhost_sample_rate: 1.0\napp_analytics_enabled: false")
-        expect(Canvas::Apm).to_not be_analytics_enabled
+        expect(Canvas::Apm).not_to be_analytics_enabled
       end
     end
   end
@@ -172,7 +172,7 @@ describe Canvas::Apm do
           }
         }
       }
-      expect(Canvas::Apm).to_not be_configured
+      expect(Canvas::Apm).not_to be_configured
       Canvas::Apm.trace("test") do |span|
         expect(span.class).to eq(Canvas::Apm::StubTracer::StubSpan)
       end

@@ -71,7 +71,7 @@ describe "Stuff related to how we load stuff from CDN and use brandable_css" do
     assert_tag("link", "href", url)
   end
 
-  def check_asset(tag, asset_path, skip_rev = false)
+  def check_asset(tag, asset_path, skip_rev: false)
     unless skip_rev
       asset_path = Canvas::Cdn.registry.url_for(asset_path)
       expect(asset_path).to be_present
@@ -92,7 +92,7 @@ describe "Stuff related to how we load stuff from CDN and use brandable_css" do
 
     check_asset("script", "/timezone/Etc/UTC.js")
     check_asset("script", "/timezone/ca_ES.js")
-    Canvas::Cdn.registry.scripts_for("main").each { |c| check_asset("script", c, true) }
+    Canvas::Cdn.registry.scripts_for("main").each { |c| check_asset("script", c, skip_rev: true) }
 
     expect(element_exists?("head script[src*='/moment/locale/ca']")).to be true
     expect(element_exists?("head script[src^='/javascripts']")).to be false

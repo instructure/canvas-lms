@@ -473,7 +473,7 @@ OutcomeGradebookView.prototype._rollupsUrl = function (course, exclude, page) {
   return (
     '/api/v1/courses/' +
     course +
-    '/outcome_rollups?rating_percents=true&per_page=20&include[]=outcomes&include[]=users&include[]=outcome_paths' +
+    '/outcome_rollups?per_page=20&include[]=outcomes&include[]=users&include[]=outcome_paths' +
     excluding +
     '&page=' +
     page +

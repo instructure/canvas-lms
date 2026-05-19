@@ -1,0 +1,306 @@
+{
+    "ConfirmationDialog": {
+        "Cancel": "취소",
+        "Confirm": "확인"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "중요한 날짜로 표시하고 시작 페이지 사이드바에 표시"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "계정 기본 성적 평가 기준",
+        "Account default grading scheme was successfully saved.": "계정 기본 성적 평가 기준을 저장했습니다.",
+        "Active Grading Schemes": "활성 성적 평가 기준",
+        "Applied": "적용됨",
+        "Apply": "적용",
+        "Archive Grading Scheme": "성적 평가 기준 보관",
+        "Archived": "보관됨",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "보관되었지만 아직 사용 중인 성적 평가 기준은 계속 사용할 수 있지만 새 과목 또는 과제에 추가될 수는 없습니다.",
+        "Are you sure you want to delete this grading scheme?": "이 성적 평가 기준을 삭제하시겠습니까?",
+        "Cancel": "취소",
+        "Canvas Default": "Canvas 기본값",
+        "Close": "닫기",
+        "Confirm": "확인",
+        "Confirm Default Grading Scheme Change": "기본값 성적 평가 기준 변경 확인",
+        "Delete Grading Scheme": "성적 평가 기준 삭제",
+        "Duplicate Grading Scheme": "성적 평가 기준 복제",
+        "Edit Grading Scheme": "성적 평가 기준 편집",
+        "Grading Scheme Name": "성적 평가 기간 이름",
+        "Grading scheme was successfully archived.": "성적 평가 기준을 보관했습니다.",
+        "Grading scheme was successfully created.": "성적 평가 기준을 만들었습니다.",
+        "Grading scheme was successfully removed.": "성적 평가 기준을 제거했습니다.",
+        "Grading scheme was successfully saved.": "성적 평가 기준을 저장했습니다.",
+        "Grading scheme was successfully unarchived.": "성적 평가 기준을 보관 해제했습니다.",
+        "Locations Used": "사용된 위치",
+        "Lower limit of range": "범위의 낮은 한도",
+        "New Grading Scheme": "새 성적 평가 기준",
+        "Next Page": "다음 페이지",
+        "No account default": "계정 기본값 없음",
+        "Previous Page": "이전 페이지",
+        "Save": "저장",
+        "Search": "검색",
+        "Search...": "검색...",
+        "Show courses and assignments": "과목 및 과제 표시",
+        "Show locations used": "사용된 위치 표시",
+        "Sort by": "정렬 기준",
+        "There was an error while archiving the grading scheme": "성적 평가 기준을 보관하는 동안 오류가 있었습니다",
+        "There was an error while creating the grading scheme": "성적 평가 기준을 만드는 동안 오류가 있었습니다",
+        "There was an error while loading grading schemes": "성적 평가 기준을 로드하는 동안 오류가 있었습니다",
+        "There was an error while loading the default canvas grading scheme": "기본값 Canvas 성적 평가 기준을 로드하는 동안 오류가 있었습니다",
+        "There was an error while loading the default grading scheme": "기본값 성적 평가 기준을 로드하는 동안 오류가 있었습니다",
+        "There was an error while removing the grading scheme": "성적 평가 기준을 제거하는 동안 오류가 있었습니다",
+        "There was an error while unarchiving the grading scheme": "성적 평가 기준을 보관 해제하는 동안 오류가 있었습니다",
+        "There was an error while updating the default grading scheme": "기본값 성적 평가 기준을 업로드하는 동안 오류가 있었습니다",
+        "There was an error while updating the grading scheme": "성적 평가 기준을 업데이트하는 동안 오류가 있었습니다",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "이 변경은 현재 계정 기본값을 상속하는 모든 활성 과목 및 과제에 영향을 줍니다. 새 계정 기본값 성적 평가 기준에 따라 모든 과목 및 과제 성적을 다시 계산하므로 이 변경은 완료되는 데 시간이 걸립니다.",
+        "Unarchive Grading Scheme": "성적 평가 기준 보관 해제",
+        "Upper limit of range": "범위의 높은 한도",
+        "View Grading Scheme": "성적 평가 기준 보기",
+        "View/Copy Grading Scheme": "성적 평가 기준 보기/복사",
+        "View/Edit Grading Scheme": "성적 평가 기준 보기/편집",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "과목 또는 계정의 기본값으로 설정되었기 때문에 이 성적 평가 기준은 보관할 수 없습니다.",
+        "You can't delete this grading scheme because it is in use.": "사용 중이므로 이 성적 평가 기준을 삭제할 수 없습니다.",
+        "You have no active grading schemes.": "활성 성적 평가 기준이 없습니다.",
+        "You have no archived grading schemes.": "보관된 성적 평가 기준이 없습니다.",
+        "to": "대상/까지"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "이 성적 평가 기준을 삭제하시겠습니까?",
+        "Are you sure you want to duplicate this grading scheme?": "이 성적 평가 기준을 복제하시겠습니까?",
+        "Cancel": "취소",
+        "Close": "닫기",
+        "Delete": "삭제",
+        "Delete ": "삭제 ",
+        "Duplicate": "복제",
+        "Duplicate ": "복제 ",
+        "Edit Grading Scheme": "성적 평가 기준 편집",
+        "New Grading Scheme": "새 성적 평가 기준",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "백분율 및 점수는 계정 수준 성적 평가 기준이므로 편집할 수 없습니다.",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "백분율 및 점수는 기본 성적 평가 기준으로 사용 중이므로 편집할 수 없습니다.",
+        "Percentages and points can't be edited because it is currently being used.": "백분율 및 점수는 현재 사용 중이므로 편집할 수 없습니다.",
+        "Save": "저장"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "기본값 Canvas 성적 평가 기준 데이터를 포함하는 표입니다.  각 행은 이름, 최대 백분율 및 최소 백분율을 포함합니다.",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "성적 평가 기준 데이터를 포함하는 표입니다.  각 행은 이름, 최대 백분율 및 최소 백분율을 포함합니다.",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "중복된 또는 비어둔 열 이름을 사용할 수 없습니다. 이름을 수정하고 '저장'을 다시 클릭해보세요.",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "중첩된 또는 비어둔 범위를 사용할 수 없습니다. 범위를 수정하고 '저장'을 다시 클릭해보세요.",
+        "Delete grading scheme": "성적 평가 기준 삭제",
+        "Edit Grading Scheme": "성적 평가 기준 편집",
+        "Edit a copy of this grading scheme": "이 성적 평가 기준의 복사본을 편집",
+        "Edit grading scheme": "성적 평가 기준 편집",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "성적 평가 기간 이름은 필수입니다. 이름을 추가하고 '저장'을 다시 클릭해보세요.",
+        "Grading scheme title": "성적 평가 기준 제목",
+        "Invalid grading scheme": "잘못된 성적 평가 기준",
+        "Letter Grade": "평점",
+        "Looks great!": "좋습니다!",
+        "Percentage": "백분율",
+        "Points": "점수",
+        "Range": "범위",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "범위는 유효한 숫자여야 합니다. 음수 또는 100보다 큰 수가 될 수 없습니다. 범위를 수정하고 '저장'을 다시 클릭해보세요.",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "범위는 유효한 숫자여야 합니다. 음수 또는 상위 점수 범위보다 큰 수가 될 수 없습니다. 범위를 수정하고 '저장'을 다시 클릭해보세요.",
+        "edit a copy": "복사본 편집"
+    },
+    "OutcomeManagement": {
+        "Course": "과목",
+        "Institution": "기관"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "계정",
+        "Close": "닫기",
+        "Concluded": "종결됨",
+        "Courses": "과목",
+        "Failed to load account used locations": "계정이 사용된 위치를 로드 실패",
+        "Failed to load assignments used locations": "과제가 사용된 위치를 로드 실패",
+        "Failed to load used locations": "사용된 위치를 로드 실패",
+        "Load Assignments ...": "평가 로드 중...",
+        "Load More Assignments ...": "더 많은 과제 로드..",
+        "Loading": "로드",
+        "Locations Used": "사용된 위치",
+        "Search": "검색",
+        "Search...": "검색..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "사용 제한 정책",
+        "Close": "닫기",
+        "Loading page": "페이지 로드",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "사용 제한 정책을 현재 사용할 수 없습니다. 나중에 다시 확인하거나 추가 지원이 필요한 경우 지원 팀에 문의하세요.",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "사용 제한 정책을 로드할 수 없습니다. 나중에 다시 시도하거나 문제가 지속되는 경우 지원 팀에 문의하세요."
+    },
+    "account_reports": {
+        "Close": "닫기",
+        "Invalid date and time.": "잘못된 날짜 및 시간입니다.",
+        "Next month": "다음 달",
+        "Previous month": "이전 달",
+        "Time": "시간"
+    },
+    "admin_split": {
+        "Cancel": "취소",
+        "Failed to split users.": "사용자를 분할하지 못했습니다.",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "참고: 가능한 완전하게 병합을 실행 취소하려고 시도하지만 병합된 사용자는 이전 상태로 완벽하게 복원되지 않을 수 있습니다.",
+        "OK": "확인",
+        "Split": "분할",
+        "The following users will be split into separate user accounts:": "다음 사용자는 별도의 사용자 계정으로 분할됩니다:",
+        "There are no user accounts to split from this user.": "이 사용자에서 분할할 사용자 계정이 없습니다.",
+        "User split complete. Links to split user accounts follow:": "사용자 분할이 완료되었습니다. 분할된 사용자 계정에 링크:"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "설명"
+    },
+    "assignment_footer": {
+        "Next": "다음",
+        "Previous": "이전"
+    },
+    "assignment_tabs": {
+        "Assignment": "과제",
+        "Peer Review": "동료 검토"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "(과목 기본값)",
+        "Account Level": "계정 수준",
+        "Canvas Grading Scheme (course default)": "Canvas 성적 평가 기준(과목 기본값)",
+        "Close": "닫기",
+        "Course Level": "과목 수준",
+        "Default Canvas Grading Scheme": "기본값 Canvas 성적 평가 기준",
+        "Grading scheme was successfully removed.": "성적 평가 기준을 제거했습니다.",
+        "Grading scheme was successfully updated.": "성적 평가 기준을 업데이트했습니다.",
+        "Manage All Grading Schemes": "모든 성적 평가 기준 관리",
+        "New Grading Scheme": "새 성적 평가 기준",
+        "Select a grading scheme": "성적 평가 기준 선택",
+        "There was an error while loading grading schemes": "성적 평가 기준을 로드하는 동안 오류가 있었습니다",
+        "There was an error while loading the grading scheme": "성적 평가 기준을 로드하는 동안 오류가 있었습니다",
+        "There was an error while refreshing grading schemes": "성적 평가 기준을 새로 고치는 동안 오류가 있었습니다",
+        "There was an error while removing the grading scheme": "성적 평가 기준을 제거하는 동안 오류가 있었습니다",
+        "View": "보기"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "과제 2 교사 오류 페이지",
+        "Assignments 2 Teacher initial query error": "과제 2 교사 초기 쿼리 오류",
+        "Loading": "로드"
+    },
+    "catalog": {
+        "Course Catalog": "과목 카탈로그"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "잘하셨습니다! Canvas 개발자"
+    },
+    "content_copy_redesign": {
+        "Cancel": "취소",
+        "Copy course": "과목 복사",
+        "Course code": "과목 코드",
+        "Course code must be 255 characters or less": "과목 코드 255자 이하여야 합니다",
+        "Course name must be 255 characters or less": "과목 이름 255자 이하여야 합니다",
+        "Create course": "과목 만들기",
+        "Creating...": "만드는 중...",
+        "End date": "종료 날짜",
+        "End date must be after start date": "종료 날짜는 시작 날짜 이후여야 함",
+        "Name": "이름",
+        "No results": "결과 없음",
+        "Please enter the details for the new course.": "새 과목에 대한 세부 정보를 입력하세요.",
+        "Select a new beginning date": "새 시작 날짜 선택",
+        "Select a new end date": "새 종료 날짜 선택",
+        "Select end date": "종료 날짜 선택",
+        "Select start date": "시작 날짜 선택",
+        "Start date": "시작 날짜",
+        "Start date must be before end date": "시작 날짜는 종료 날짜 이전이어야 함",
+        "Start typing to search...": "입력을 시작하여 검색...",
+        "Term": "학기",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "학기 시작 및 종료 날짜는 여기에서 수정할 수 없으며 관리자 밑에 학기 세부 정보 페이지에서만 수정할 수 있습니다.",
+        "Use arrow keys to navigate options.": "화살표 키를 사용하여 옵션을 탐색합니다."
+    },
+    "content_share_preview_overlay": {
+        "Close": "닫기",
+        "Content Share Preview": "콘텐츠 공유 미리 보기",
+        "Preview": "미리 보기"
+    },
+    "copy_warnings_modal": {
+        "Attention": "주의"
+    },
+    "course_logging_content": {
+        "No results": "결과 없음",
+        "Type to search": "입력하여 검색"
+    },
+    "create_course_modal": {
+        "Cancel": "취소",
+        "Course Details": "과목 세부 정보",
+        "Course Name": "과목 이름",
+        "Create": "만들기",
+        "Create Course": "과목 만들기",
+        "Create Subject": "과목 만들기",
+        "Creating new course...": "새 과목 만드는 중...",
+        "Creating new subject...": "새 과목 만드는 중....",
+        "Error creating new course": "새 과목 만들기 오류",
+        "Error creating new subject": "새 과목 만들기 오류",
+        "Loading accounts...": "계정 로드 중...",
+        "Name...": "이름...",
+        "No Results": "결과 없음",
+        "Select a homeroom": "시작 페이지를 선택",
+        "Subject Name": "과목 이름",
+        "Unable to get accounts": "계정을 가져올 수 없음",
+        "Unable to get homerooms": "시작 페이지를 가져올 수 없음",
+        "Use arrow keys to navigate options.": "화살표 키를 사용하여 옵션을 탐색합니다.",
+        "Which account will this course be associated with?": "이 과목은 어떤 계정에 연결될 것입니까?",
+        "Which account will this subject be associated with?": "이 과목은 어떤 계정에 연결될 것입니까?"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "최종 성적 덮어쓰기"
+    },
+    "feature_flags": {
+        "Accept": "수락",
+        "Cancel": "취소"
+    },
+    "filter_bar": {
+        "All": "모두",
+        "Clear": "지우기",
+        "Filter by": "필터링 기능",
+        "Search": "검색",
+        "Use arrow keys to navigate options.": "화살표 키를 사용하여 옵션을 탐색합니다."
+    },
+    "groupNavigationSelector": {
+        "Select Group": "그룹 선택",
+        "Use arrow keys to navigate options.": "화살표 키를 사용하여 옵션을 탐색합니다."
+    },
+    "jobs": {
+        "Close": "닫기"
+    },
+    "modules_home_page": {
+        "Create a new Module": "새 모듈 만들기"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "열심히 공부하는 판다",
+        "Moves:": "이동:"
+    },
+    "overview_page": {
+        "Edit home page": "홈페이지 편집",
+        "Subject Home Page": "과목 홈페이지"
+    },
+    "pages_edit_title": {
+        "Page Title": "페이지 제목"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "취소",
+        "Close": "닫기"
+    },
+    "study_assist": {
+        "Back": "뒤로",
+        "Close": "닫기",
+        "Page": "페이지"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "유효한 URL은 필수입니다",
+        "Website URL": "웹사이트 URL"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "사용 제한 정책",
+        "Loading...": "로드 중...",
+        "Preview": "미리 보기"
+    },
+    "todos_page": {
+        "Failed to load todos": "할 일 로드 실패",
+        "Loading Additional Todo Details": "추가 할 일 세부 정보 로드",
+        "Loading Todo Course Name": "할 일 과목 이름 로드",
+        "Loading Todo Title": "할 일 제목 로드"
+    },
+    "tray": {
+        "Close": "닫기"
+    }
+}

@@ -41,6 +41,10 @@ describe Types::FileType do
     expect(file_type.resolve("size")).to eq "100 Bytes"
   end
 
+  it "has the file's size in bytes" do
+    expect(file_type.resolve("sizeBytes")).to eq 100
+  end
+
   it "has modules" do
     module1 = course.context_modules.create!(name: "Module 1")
     module2 = course.context_modules.create!(name: "Module 2")
@@ -82,7 +86,7 @@ describe Types::FileType do
     ).not_to include("verifier=#{uuid}")
   end
 
-  it "add a location query param to url if file_association_access feature flag is enabled" do
+  it "add a location query param to url if file_association_access or file_association_access_conversation feature flag is enabled" do
     file.root_account.enable_feature!(:file_association_access)
     file_type = GraphQLTypeTester.new(file, current_user: @teacher, in_app: true, domain_root_account: Account.default, asset_location: "course_#{file.context_id}")
     expect(
@@ -90,8 +94,9 @@ describe Types::FileType do
     ).to include("location=course_#{file.context_id}")
   end
 
-  it "does not add a location query param to url if file_association_access feature flag is disabled" do
+  it "does not add a location query param to url if both file association flags are disabled" do
     file.root_account.disable_feature!(:file_association_access)
+    file.root_account.disable_feature!(:file_association_access_conversation)
     file.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
     file_type = GraphQLTypeTester.new(file, current_user: @teacher, in_app: true, domain_root_account: Account.default, asset_location: "course_#{file.context_id}")
     resolver = file_type.resolve("url", request: ActionDispatch::TestRequest.create, current_user: @student)
@@ -181,6 +186,26 @@ describe Types::FileType do
         expect(@submission.peer_reviewer?(other_student)).to be false
       end
 
+      it "returns download URL to peer reviewers even when submission attachment is manually locked" do
+        @submission_file.update!(locked: true)
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @reviewer, in_app: true, domain_root_account: Account.default, request: ActionDispatch::TestRequest.create)
+        urls = submission_type.resolve("attachments { url }")
+
+        expect(urls).not_to be_empty
+        url = urls.first
+        expect(url).not_to be_nil
+        expect(url).to include("download=#{@submission_file.id}")
+      end
+
+      it "returns nil for locked submission files when peer_reviewer_locked_file_access is disabled" do
+        Account.site_admin.disable_feature!(:peer_reviewer_locked_file_access)
+        @submission_file.update!(locked: true)
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @reviewer, in_app: true, domain_root_account: Account.default, request: ActionDispatch::TestRequest.create)
+        urls = submission_type.resolve("attachments { url }")
+
+        expect(urls).to eq [nil]
+      end
+
       it "returns regular submission download URL for non-anonymous peer reviewers" do
         submission_type = GraphQLTypeTester.new(@submission, current_user: @reviewer, in_app: true, domain_root_account: Account.default, request: ActionDispatch::TestRequest.create)
         urls = submission_type.resolve("attachments { url }")
@@ -200,6 +225,36 @@ describe Types::FileType do
         url = urls.first
         expect(url).to include("/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_submissions/#{@submission.anonymous_id}")
         expect(url).to include("download=#{@submission_file.id}")
+      end
+
+      it "returns anonymous download URL to peer reviewer for individual (non-group) assignment submissions" do
+        @course.update!(usage_rights_required: true)
+        anon_assignment = assignment_model(course: @course, peer_reviews: true, anonymous_peer_reviews: true)
+        reviewee = student_in_course(course: @course, active_all: true).user
+        reviewer = student_in_course(course: @course, active_all: true).user
+
+        original = reviewee.attachments.build(filename: "doc.pdf", content_type: "application/pdf", uploaded_data: StringIO.new("x"))
+        original.folder = Folder.unfiled_folder(reviewee)
+        original.set_publish_state_for_usage_rights
+        original.save!
+        expect(original.locked).to be false
+
+        submitted = Attachment.copy_attachments_to_submissions_folder(@course, [original]).first
+        expect(submitted.folder.for_submissions?).to be true
+        expect(submitted.locked).to be false
+
+        submission = anon_assignment.submit_homework(reviewee, submission_type: "online_upload", attachments: [submitted])
+        AttachmentAssociation.create!(attachment: submitted, context: submission, context_type: "Submission")
+        anon_assignment.assign_peer_review(reviewer, reviewee)
+
+        submission_type = GraphQLTypeTester.new(submission, current_user: reviewer, in_app: true, domain_root_account: Account.default, request: ActionDispatch::TestRequest.create)
+        urls = submission_type.resolve("attachments { url }")
+
+        expect(urls).not_to be_empty
+        url = urls.first
+        expect(url).not_to be_nil
+        expect(url).to include("/courses/#{@course.id}/assignments/#{anon_assignment.id}/anonymous_submissions/#{submission.anonymous_id}")
+        expect(url).to include("download=#{submitted.id}")
       end
 
       it "does not return submission download URL for non-peer-reviewers" do

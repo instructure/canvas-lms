@@ -39,7 +39,6 @@ export const GradingTypeSelect = ({
   return (
     <SimpleSelect
       renderLabel={I18n.t('Type')}
-      width={freeFormCriterionComments ? '12.563rem' : '10.563rem'}
       value={gradingType}
       onChange={(_e, {value}) => handleChange(value !== undefined ? value.toString() : '')}
       data-testid="rubric-rating-type-select"

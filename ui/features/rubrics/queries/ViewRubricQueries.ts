@@ -25,7 +25,7 @@ import type {
   archiveRubricResponse,
 } from '../types/Rubric'
 import type {RubricImport, Rubric, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 import qs from 'qs'
 import type {UsedLocation} from '@canvas/grading-scheme/gradingSchemeApiModel'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -305,7 +305,7 @@ export const deleteRubric = async ({
   const response = await fetch(url, {
     method,
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
     },
     body: qs.stringify({
@@ -352,6 +352,7 @@ export const duplicateRubric = async ({
       points: criterion.points,
       learning_outcome_id: criterion.learningOutcomeId,
       criterion_use_range: criterion.criterionUseRange,
+      ignore_for_scoring: criterion.ignoreForScoring,
       ratings: criterion.ratings.map(rating => ({
         description: rating.description,
         long_description: rating.longDescription,
@@ -364,7 +365,7 @@ export const duplicateRubric = async ({
   const response = await fetch(url, {
     method,
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
     },
     body: qs.stringify({
@@ -383,6 +384,7 @@ export const duplicateRubric = async ({
         association_id: accountId ?? courseId,
         association_type: accountId ? 'Account' : 'Course',
         hide_points: hidePoints ? 1 : 0,
+        purpose: 'bookmark',
       },
     }),
   })
@@ -436,7 +438,7 @@ export const importRubric = async (
   const response = await fetch(url, {
     method: 'POST',
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
     },
     body: formData,
   })
@@ -459,7 +461,7 @@ export const fetchRubricImport = async (
   const response = await fetch(url, {
     method: 'GET',
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
     },
   })
 
@@ -489,7 +491,7 @@ export const downloadRubrics = async (
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
     },
     body: JSON.stringify({
       rubric_ids: selectedRubricIds,
@@ -522,7 +524,7 @@ export const getImportedRubrics = async (
   const response = await fetch(url, {
     method: 'GET',
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
     },
   })
 

@@ -191,6 +191,7 @@ describe "outcomes" do
         click_confirm_new_group_in_move_modal_button
         select_drilldown_outcome_group_with_text("New group").click
         force_click(confirm_move_button)
+        wait_for_instui_flash_message("outcomes have been moved to")
         # Verify through AR to save time
         new_group_children = LearningOutcomeGroup.find_by(title: "New group").child_outcome_links
         expect(new_group_children.count).to eq(2)

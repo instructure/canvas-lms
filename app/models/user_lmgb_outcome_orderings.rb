@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class UserLmgbOutcomeOrderings < ActiveRecord::Base
+class UserLmgbOutcomeOrderings < ApplicationRecord
   belongs_to :user
   belongs_to :course
   belongs_to :learning_outcome

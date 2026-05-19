@@ -123,6 +123,30 @@ export default (function (superClass) {
     })
   }
 
+  User.prototype.temporaryEnrollmentBadge = function () {
+    var enrollment = (this.get('enrollments') || []).find(function (e) {
+      return e.temporary_enrollment_display_state
+    })
+    if (!enrollment) return {label: null, labelClass: ''}
+    var state = enrollment.temporary_enrollment_display_state
+    var labels = {
+      future: I18n.t('temporary - future'),
+      active: I18n.t('temporary - active'),
+      inactive: I18n.t('temporary - inactive'),
+      completed: I18n.t('temporary - completed'),
+    }
+    var classes = {
+      active: 'label label-success',
+      future: 'label label-info',
+      inactive: 'label',
+      completed: 'label',
+    }
+    return {
+      label: labels[state] || null,
+      labelClass: classes[state] || 'label',
+    }
+  }
+
   User.prototype.sectionEditableEnrollments = function () {
     return filter(this.get('enrollments'), function (e) {
       return e.type !== 'ObserverEnrollment'

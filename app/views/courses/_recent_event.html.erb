@@ -22,7 +22,8 @@
   recent_event ||= nil
   show_context ||= false
   is_sub_assignment = recent_event.is_a?(SubAssignment)
-  is_assignment_or_sub_assignment = recent_event.is_a?(Assignment) || is_sub_assignment
+  is_peer_review_sub_assignment = recent_event.is_a?(PeerReviewSubAssignment)
+  is_assignment_or_sub_assignment = recent_event.is_a?(Assignment) || is_sub_assignment || is_peer_review_sub_assignment
   is_calendar_event = recent_event.is_a?(CalendarEvent)
   if is_assignment_or_sub_assignment
     if @current_user_submissions

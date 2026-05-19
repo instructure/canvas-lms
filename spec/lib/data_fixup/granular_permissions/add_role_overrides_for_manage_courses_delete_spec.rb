@@ -53,7 +53,7 @@ describe "DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete
       DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete.run(
         base_role_type: "AccountAdmin"
       )
-    end.to_not raise_error
+    end.not_to raise_error
   end
 
   context "AccountAdmin" do

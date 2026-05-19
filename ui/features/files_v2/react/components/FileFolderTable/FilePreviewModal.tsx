@@ -32,7 +32,7 @@ import {generatePreviewUrlPath} from '../../../utils/fileUtils'
 import {FilePreview} from './FilePreview'
 import {FilePreviewNavigationButtons} from './FilePreviewNavigationButtons'
 import {FileNotFound} from './FileNotFound'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {getFilesEnv} from '../../../utils/filesEnvUtils'
 
 const I18n = createI18nScope('files_v2')

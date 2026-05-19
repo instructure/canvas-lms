@@ -27,15 +27,19 @@ import {
   enrollmentTermsFetchKey,
   createCourseAndMigrationKey,
 } from '../../types'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 vi.mock('@canvas/util/globalUtils', () => ({
   assignLocation: vi.fn(),
 }))
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn(() => jest.fn()),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn(() => vi.fn()),
+  }
+})
 
 describe('CourseCopy', () => {
   const defaultProps = {

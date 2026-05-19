@@ -25,33 +25,41 @@ import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
 import {IconCheckPlusLine, IconCheckLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
-import type {PlannerItem} from './types'
+import type {PlannerItem, PlannerOverride} from './types'
 import {formatDate, formatAnnouncementDate, getPlannableTypeLabel, isOverdue} from './utils'
 import {usePlannerOverride} from './hooks/usePlannerOverride'
+import {useWidgetTheme} from '../../../theme/WidgetThemeContext'
 
 const I18n = createI18nScope('widget_dashboard')
 
 interface TodoItemProps {
   item: PlannerItem
+  onItemUpdate?: (plannableId: string, plannableType: string, override: PlannerOverride) => void
+  readOnly?: boolean
 }
 
-const TodoItem: React.FC<TodoItemProps> = ({item}) => {
+const TodoItem: React.FC<TodoItemProps> = ({item, onItemUpdate, readOnly = false}) => {
   const isAnnouncement = item.plannable_type === 'announcement'
   const dateText = isAnnouncement
     ? formatAnnouncementDate(item.plannable_date)
     : formatDate(item.plannable_date)
   const isItemOverdue = isAnnouncement ? false : isOverdue(item.plannable_date)
   const typeLabel = getPlannableTypeLabel(item.plannable_type)
-  const {toggleComplete, isLoading} = usePlannerOverride()
+  const {toggleComplete, isLoading} = usePlannerOverride({
+    onSuccess: (override, {item: toggledItem}) => {
+      onItemUpdate?.(toggledItem.plannable_id, toggledItem.plannable_type, override)
+    },
+  })
+  const {colors, isDark} = useWidgetTheme()
   const buttonRef = useRef<HTMLButtonElement | null>(null)
   const previousLoadingRef = useRef<boolean>(false)
 
-  const isMarkedComplete =
-    item.planner_override?.marked_complete ||
-    (item.submissions &&
+  const isMarkedComplete = item.planner_override
+    ? item.planner_override.marked_complete
+    : item.submissions &&
       typeof item.submissions === 'object' &&
       item.submissions.submitted &&
-      !item.submissions.redo_request)
+      !item.submissions.redo_request
 
   // For planner notes, course_id may be in plannable.course_id instead of item.course_id
   const courseId = item.course_id || item.plannable.course_id
@@ -82,13 +90,13 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
       role="group"
       aria-label={item.plannable?.title ?? I18n.t('Unnamed To-Do')}
       themeOverride={{
-        backgroundSecondary: '#F9FAFA',
+        backgroundSecondary: colors.cardSecondary,
       }}
     >
       <Flex gap="small" alignItems="center">
         <Flex.Item shouldGrow shouldShrink>
           <Flex direction="column" gap="x-small">
-            <Flex.Item>
+            <Flex.Item overflowY="visible">
               <Text size="small" color="secondary">
                 {typeLabel}
               </Text>
@@ -132,7 +140,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
               </Flex.Item>
             )}
 
-            <Flex.Item>
+            <Flex.Item overflowY="visible">
               <Text size="small">
                 {dateText && (
                   <Text size="small" color={isItemOverdue ? 'danger' : 'secondary'}>
@@ -171,6 +179,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
               elementRef={(el: Element | null) => {
                 buttonRef.current = el as HTMLButtonElement | null
               }}
+              color={isDark ? 'primary-inverse' : 'secondary'}
               screenReaderLabel={
                 isMarkedComplete
                   ? I18n.t('Mark %{title} as incomplete', {title: item.plannable.title})
@@ -178,6 +187,7 @@ const TodoItem: React.FC<TodoItemProps> = ({item}) => {
               }
               onClick={handleCheckboxClick}
               data-testid={`todo-checkbox-${item.plannable_id}`}
+              interaction={readOnly ? 'disabled' : 'enabled'}
             >
               {isMarkedComplete ? <IconCheckLine color="success" /> : <IconCheckPlusLine />}
             </IconButton>

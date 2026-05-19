@@ -39,6 +39,7 @@ module AdheresToPolicy
     attr_accessor_with_default :cache_related_permissions, true
     attr_accessor_with_default :cache_intermediate_permissions, true
     attr_accessor_with_default :cache_permissions, true
+    attr_accessor :override_proc
 
     def initialize
       init_defaults
@@ -54,6 +55,7 @@ module AdheresToPolicy
       self.class.defaults.each do |attr_name, default_value|
         instance_variable_set(:"@#{attr_name}", default_value)
       end
+      @override_proc = nil
     end
   end
 end

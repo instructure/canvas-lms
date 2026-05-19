@@ -90,12 +90,12 @@ describe('PeerReviewWidget', () => {
 
   it('renders the widget', () => {
     renderWithQueryClient()
-    expect(screen.getByText('Peer Review')).toBeInTheDocument()
+    expect(screen.getByTestId('peer-review-text')).toBeInTheDocument()
   })
 
   it('renders the peer review icon and text', () => {
     renderWithQueryClient()
-    expect(screen.getByText('Peer Review')).toBeInTheDocument()
+    expect(screen.getByTestId('peer-review-text')).toBeInTheDocument()
   })
 
   it('renders the View Configuration button', () => {

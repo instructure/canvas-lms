@@ -30,7 +30,7 @@ module Canvas::Builders
       @enrollment_dates = []
     end
 
-    def self.preload(enrollments, use_cache = true)
+    def self.preload(enrollments, use_cache: true)
       raise "call #to_a first before preloading enrollment scope" if enrollments.is_a?(::ActiveRecord::Relation)
       # if enrollments is still a relation, we'll be unnecessarily calling the query multiple times
       # below with `enrollments.empty?` and `enrollments.first`
@@ -46,7 +46,7 @@ module Canvas::Builders
 
       ::ActiveRecord::Associations.preload(to_preload, :course_section)
       ::ActiveRecord::Associations.preload(to_preload.map(&:course).uniq, :enrollment_term)
-      to_preload.each { |e| build(e, use_cache) }
+      to_preload.each { |e| build(e, use_cache:) }
     end
 
     def self.preload_state(enrollments)
@@ -69,15 +69,15 @@ module Canvas::Builders
       enrollment.instance_variable_set(:@enrollment_dates, result)
     end
 
-    def self.build(enrollment, use_cache = true)
-      EnrollmentDateBuilder.new(enrollment).build(use_cache)
+    def self.build(enrollment, use_cache: true)
+      EnrollmentDateBuilder.new(enrollment).build(use_cache:)
     end
 
     def cache_key
       @cache_key ||= self.class.cache_key(@enrollment)
     end
 
-    def build(use_cache = true)
+    def build(use_cache: true)
       if enrollment_is_restricted?
         add_enrollment_dates(@enrollment)
       elsif section_is_restricted?

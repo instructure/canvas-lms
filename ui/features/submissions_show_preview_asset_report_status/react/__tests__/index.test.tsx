@@ -47,10 +47,10 @@ describe('AttachmentAssetReportStatus', () => {
 
     mockUseLtiAssetProcessorsAndReportsForStudent.mockReturnValue({
       assignmentName,
-      attempt: 1,
       submissionType: 'online_upload',
       assetProcessors: defaultLtiAssetProcessors,
       reports: mockReports,
+      hasNextPage: false,
     })
   })
 
@@ -91,8 +91,8 @@ describe('AttachmentAssetReportStatus', () => {
       {
         type: ASSET_REPORT_MODAL_EVENT,
         assignmentName,
-        attempt: 1,
         submissionType: 'online_upload',
+        hasNextPage: false,
         assetProcessors: expect.arrayContaining([
           expect.objectContaining({
             _id: expect.any(String),

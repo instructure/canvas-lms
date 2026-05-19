@@ -42,7 +42,7 @@
 # All past_lti_ids are stored on the same shard as the context so that a user
 # can always be looked up from the context's shard.
 #
-class UserPastLtiId < ActiveRecord::Base
+class UserPastLtiId < ApplicationRecord
   belongs_to :user
   belongs_to :context, polymorphic: %i[account course group]
 

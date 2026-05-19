@@ -25,11 +25,9 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Flex} from '@instructure/ui-flex'
 import {IconTrashLine, IconVideoLine, IconWarningSolid} from '@instructure/ui-icons'
-import {MediaPlayer} from '@instructure/ui-media-player'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
-import {px} from '@instructure/ui-utils'
 import {View} from '@instructure/ui-view'
 import {
   arrayOf,
@@ -42,19 +40,11 @@ import {
   shape,
   string,
 } from 'prop-types'
-import React, {
-  forwardRef,
-  Suspense,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from 'react'
+import React, {forwardRef, Suspense, useEffect, useImperativeHandle, useRef, useState} from 'react'
 import formatMessage from './format-message'
 
 import RocketSVG from './RocketSVG'
-import {isAudio, isPreviewable, isVideo, sizeMediaPlayer} from './shared/utils'
+import {isAudio, isPreviewable, isVideo} from './shared/utils'
 import translationShape from './translationShape'
 import useComputerPanelFocus from './useComputerPanelFocus'
 
@@ -75,7 +65,6 @@ const ComputerPanel = forwardRef(
       userLocale,
       bounds,
       mountNode,
-      useStudioPlayer,
     },
     ref,
   ) => {
@@ -91,8 +80,6 @@ const ComputerPanel = forwardRef(
     const [fileNameMessages, setFileNameMessages] = useState([])
     const [mediaTracksCheckbox, setMediaTracksCheckbox] = useState(false)
     const [previewURL, setPreviewURL] = useState(null)
-    const height = useStudioPlayer ? 400 : 0.8 * (bounds?.height - 38 - px('1.5rem')) // the trashcan is 38px tall and the 1.5rem margin-bottom
-    const width = 0.8 * bounds?.width
 
     const previewPanelRef = useRef(null)
     const clearButtonRef = useRef(null)
@@ -108,43 +95,6 @@ const ComputerPanel = forwardRef(
         previewPanelRef.current.scrollIntoView(false)
       }
     }, [mediaTracksCheckbox])
-
-    const handlePlayerSize = useCallback(
-      _event => {
-        if (previewPanelRef.current === null || useStudioPlayer) return
-
-        const player = previewPanelRef.current.querySelector('video')
-        let boundingBox = {width, height}
-        if (document.fullscreenElement || document.webkitFullscreenElement) {
-          boundingBox = {
-            width: window.innerWidth,
-            height: window.innerHeight,
-          }
-        }
-        const sz = sizeMediaPlayer(player, theFile.type, boundingBox)
-        player.style.width = sz.width
-        player.style.height = sz.height
-        player.style.margin = '0 auto'
-        // from this sub-package, I don't have a URL to use as the
-        // audio player's poster image. We can give it a background image though
-        player.classList.add(isAudio(theFile.type) ? 'audio-player' : 'video-player')
-      },
-      [theFile, width, height],
-    )
-
-    const handleLoadedMetadata = useCallback(
-      _event => {
-        handlePlayerSize()
-      },
-      [handlePlayerSize],
-    )
-
-    useEffect(() => {
-      window.addEventListener('resize', handlePlayerSize)
-      return () => {
-        window.removeEventListener('resize', handlePlayerSize)
-      }
-    }, [handlePlayerSize])
 
     useImperativeHandle(ref, () => ({
       updateValidationMessages,
@@ -208,8 +158,8 @@ const ComputerPanel = forwardRef(
             as="div"
             textAlign="center"
             margin="0 auto"
-            width={useStudioPlayer ? width : undefined}
-            height={useStudioPlayer ? height : undefined}
+            width={0.8 * bounds?.width}
+            height={400}
           >
             {/* avi, wma, and wmv files won't load from a blob URL */}
             {!(isPreviewable(theFile.type) && previewURL) ? (
@@ -219,17 +169,11 @@ const ComputerPanel = forwardRef(
                   {formatMessage('No preview is available for this file.')}
                 </Text>
               </>
-            ) : useStudioPlayer ? (
+            ) : (
               <StudioPlayer
                 src={{src: theFile, type: `${fileBaseType}/object`}}
                 hideFullScreen={!(document.fullscreenEnabled || document.webkitFullscreenEnabled)}
                 disableStorage
-              />
-            ) : (
-              <MediaPlayer
-                sources={[{label: theFile.name, src: previewURL, type: theFile.type}]}
-                hideFullScreen={!(document.fullscreenEnabled || document.webkitFullscreenEnabled)}
-                onLoadedMetadata={handleLoadedMetadata}
               />
             )}
           </View>
@@ -321,7 +265,6 @@ ComputerPanel.propTypes = {
   }),
   userLocale: string.isRequired,
   mountNode: oneOfType([element, func]),
-  useStudioPlayer: bool,
 }
 
 export default ComputerPanel

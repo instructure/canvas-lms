@@ -16,10 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+import {act, screen} from '@testing-library/react'
 import {start} from '../index'
-import {fakeAxios} from '../components/__tests__/utils'
+
+const server = setupServer(
+  http.get('/api/v1/accounts/1/csp_settings', () =>
+    HttpResponse.json({
+      enabled: false,
+      inherited: false,
+      effective_whitelist: [],
+      current_account_whitelist: [],
+      tools_whitelist: {},
+    }),
+  ),
+)
 
 describe('start', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  afterEach(() => server.resetHandlers())
+
   beforeEach(() => {
     window.ENV = {
       ACCOUNT: {id: '1234'},
@@ -27,21 +45,18 @@ describe('start', () => {
   })
 
   afterEach(() => {
-    document.getElementById('fixtures').remove()
+    document.getElementById('fixtures')?.remove()
   })
 
-  it('renders without errors', () => {
+  it('renders without errors', async () => {
     const fixtures = document.createElement('div')
     fixtures.setAttribute('id', 'fixtures')
     document.body.appendChild(fixtures)
 
-    expect(() => {
-      start(fixtures, {
-        context: 'account',
-        contextId: '1',
-        api: fakeAxios,
-        liveRegion: [],
-      })
-    }).not.toThrow()
+    await act(async () => {
+      start(fixtures, {context: 'account', contextId: '1'})
+    })
+
+    await screen.findByText(/canvas content security policy/i)
   })
 })

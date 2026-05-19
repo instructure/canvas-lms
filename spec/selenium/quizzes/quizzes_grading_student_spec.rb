@@ -62,7 +62,7 @@ describe "Viewing graded quizzes" do
         question_data["regrade_user"] = @teacher
         question.question_data = question_data
         question.save!
-        @quiz.with_versioning(true) do
+        @quiz.with_versioning do
           @quiz.generate_quiz_data
           @quiz.save!
         end

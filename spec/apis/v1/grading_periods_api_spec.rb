@@ -36,7 +36,7 @@ describe GradingPeriodsController, type: :request do
     end
 
     describe "GET show" do
-      def get_show(raw = false)
+      def get_show(raw: false)
         helper = method(raw ? :raw_api_call : :api_call)
         helper.call(
           :get,
@@ -68,13 +68,13 @@ describe GradingPeriodsController, type: :request do
 
       it "doesn't return deleted grading periods" do
         @grading_period.destroy
-        get_show(true)
+        get_show(raw: true)
         expect(response).to have_http_status :not_found
       end
     end
 
     describe "PUT update" do
-      def put_update(params, raw = false)
+      def put_update(params, raw: false)
         helper = method(raw ? :raw_api_call : :api_call)
 
         helper.call(
@@ -93,13 +93,13 @@ describe GradingPeriodsController, type: :request do
 
       it "updates a grading period successfully" do
         new_weight = @grading_period.weight + 11.11
-        put_update(weight: new_weight)
+        put_update({ weight: new_weight })
         expect(@grading_period.reload.weight).to eql(new_weight)
       end
 
       it "doesn't update deleted grading periods" do
         @grading_period.destroy
-        put_update({ weight: 80 }, true)
+        put_update({ weight: 80 }, raw: true)
         expect(response).to have_http_status :not_found
       end
     end

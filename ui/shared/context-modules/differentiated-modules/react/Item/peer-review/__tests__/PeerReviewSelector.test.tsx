@@ -23,12 +23,9 @@ import PeerReviewSelector from '../PeerReviewSelector'
 describe('PeerReviewSelector', () => {
   const defaultProps = {
     assignmentDueDate: '2024-11-20T23:59:00Z',
-    peerReviewAvailableToDate: null,
+    assignmentUntilDate: '2024-11-30T23:59:00Z',
     setPeerReviewAvailableToDate: vi.fn(),
-    handlePeerReviewAvailableToDateChange: vi.fn(),
-    peerReviewAvailableFromDate: null,
     setPeerReviewAvailableFromDate: vi.fn(),
-    handlePeerReviewAvailableFromDateChange: vi.fn(),
     peerReviewDueDate: null,
     setPeerReviewDueDate: vi.fn(),
     handlePeerReviewDueDateChange: vi.fn(),
@@ -38,11 +35,7 @@ describe('PeerReviewSelector', () => {
     timeInputRefs: {},
     handleBlur: vi.fn(() => vi.fn()),
     breakpoints: {},
-    clearButtonAltLabels: {
-      dueDateLabel: 'Clear due date for 2 students',
-      availableFromLabel: 'Clear available from for 2 students',
-      availableToLabel: 'Clear available to for 2 students',
-    },
+    clearButtonAltLabel: 'Clear due date for 2 students',
   }
 
   let mockCheckbox: HTMLInputElement
@@ -85,8 +78,8 @@ describe('PeerReviewSelector', () => {
     it('renders when PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED is true and checkbox is checked', () => {
       renderComponent()
       expect(screen.getByText('Review Due Date')).toBeInTheDocument()
-      expect(screen.getByText('Reviewing Starts')).toBeInTheDocument()
-      expect(screen.getByText('Until')).toBeInTheDocument()
+      expect(screen.queryByText('Reviewing Starts')).not.toBeInTheDocument()
+      expect(screen.queryByText('Until')).not.toBeInTheDocument()
     })
 
     it('does not render when PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED is false', () => {
@@ -113,8 +106,8 @@ describe('PeerReviewSelector', () => {
       document.body.removeChild(mockCheckbox)
       renderComponent({peerReviewsEnabled: true})
       expect(screen.getByText('Review Due Date')).toBeInTheDocument()
-      expect(screen.getByText('Reviewing Starts')).toBeInTheDocument()
-      expect(screen.getByText('Until')).toBeInTheDocument()
+      expect(screen.queryByText('Reviewing Starts')).not.toBeInTheDocument()
+      expect(screen.queryByText('Until')).not.toBeInTheDocument()
     })
 
     it('does not render when checkbox does not exist and peerReviewsEnabled is false', () => {
@@ -161,11 +154,11 @@ describe('PeerReviewSelector', () => {
   })
 
   describe('child component rendering', () => {
-    it('renders all three peer review input components', () => {
+    it('renders only the Review Due Date input', () => {
       renderComponent()
       expect(screen.getByText('Review Due Date')).toBeInTheDocument()
-      expect(screen.getByText('Reviewing Starts')).toBeInTheDocument()
-      expect(screen.getByText('Until')).toBeInTheDocument()
+      expect(screen.queryByText('Reviewing Starts')).not.toBeInTheDocument()
+      expect(screen.queryByText('Until')).not.toBeInTheDocument()
     })
 
     it('passes correct props to PeerReviewDueDateTimeInput', () => {
@@ -184,63 +177,41 @@ describe('PeerReviewSelector', () => {
       ).toBeInTheDocument()
     })
 
-    it('passes correct props to PeerReviewAvailableFromDateTimeInput', () => {
-      const peerReviewAvailableFromDate = '2024-11-10T00:00:00Z'
-      const setPeerReviewAvailableFromDate = vi.fn()
-      const handlePeerReviewAvailableFromDateChange = vi.fn()
-
-      const {container} = renderComponent({
-        peerReviewAvailableFromDate,
-        setPeerReviewAvailableFromDate,
-        handlePeerReviewAvailableFromDateChange,
-      })
+    it('does not render PeerReviewAvailableFromDateTimeInput', () => {
+      const {container} = renderComponent()
 
       expect(
         container.querySelector('[data-testid="peer_review_available_from_input"]'),
-      ).toBeInTheDocument()
+      ).not.toBeInTheDocument()
     })
 
-    it('passes correct props to PeerReviewAvailableToDateTimeInput', () => {
-      const peerReviewAvailableToDate = '2024-11-25T23:59:00Z'
-      const setPeerReviewAvailableToDate = vi.fn()
-      const handlePeerReviewAvailableToDateChange = vi.fn()
-
-      const {container} = renderComponent({
-        peerReviewAvailableToDate,
-        setPeerReviewAvailableToDate,
-        handlePeerReviewAvailableToDateChange,
-      })
+    it('does not render PeerReviewAvailableToDateTimeInput', () => {
+      const {container} = renderComponent()
 
       expect(
         container.querySelector('[data-testid="peer_review_available_to_input"]'),
-      ).toBeInTheDocument()
+      ).not.toBeInTheDocument()
     })
 
-    it('passes clearButtonAltLabels to child components', () => {
+    it('passes clearButtonAltLabel to due date component', () => {
       renderComponent()
       expect(screen.getByText('Clear due date for 2 students')).toBeInTheDocument()
-      expect(screen.getByText('Clear available from for 2 students')).toBeInTheDocument()
-      expect(screen.getByText('Clear available to for 2 students')).toBeInTheDocument()
+      expect(screen.queryByText('Clear available from for 2 students')).not.toBeInTheDocument()
+      expect(screen.queryByText('Clear available to for 2 students')).not.toBeInTheDocument()
     })
   })
 
   describe('disabled state', () => {
-    it('disables inputs when assignmentDueDate is null', () => {
+    it('disables the due date input when assignmentDueDate is null', () => {
       renderComponent({assignmentDueDate: null})
-      const clearButtons = screen.getAllByText('Clear').map(el => el.closest('button'))
-
-      clearButtons.forEach(button => {
-        expect(button).toBeDisabled()
-      })
+      const clearButton = screen.getByText('Clear').closest('button')
+      expect(clearButton).toBeDisabled()
     })
 
-    it('enables inputs when assignmentDueDate is set', () => {
+    it('enables the due date input when assignmentDueDate is set', () => {
       renderComponent({assignmentDueDate: '2024-11-20T23:59:00Z'})
-      const clearButtons = screen.getAllByText('Clear').map(el => el.closest('button'))
-
-      clearButtons.forEach(button => {
-        expect(button).not.toBeDisabled()
-      })
+      const clearButton = screen.getByText('Clear').closest('button')
+      expect(clearButton).not.toBeDisabled()
     })
   })
 
@@ -372,7 +343,7 @@ describe('PeerReviewSelector', () => {
   })
 
   describe('clearing peer review dates', () => {
-    it('clears all peer review dates when assignmentDueDate becomes null', async () => {
+    it('clears due date and available from but not available to when assignmentDueDate becomes null', async () => {
       const setPeerReviewDueDate = vi.fn()
       const setPeerReviewAvailableFromDate = vi.fn()
       const setPeerReviewAvailableToDate = vi.fn()
@@ -380,8 +351,6 @@ describe('PeerReviewSelector', () => {
       const {rerender} = renderComponent({
         assignmentDueDate: '2024-11-20T23:59:00Z',
         peerReviewDueDate: '2024-11-18T00:00:00Z',
-        peerReviewAvailableFromDate: '2024-11-10T00:00:00Z',
-        peerReviewAvailableToDate: '2024-11-25T23:59:00Z',
         setPeerReviewDueDate,
         setPeerReviewAvailableFromDate,
         setPeerReviewAvailableToDate,
@@ -398,8 +367,6 @@ describe('PeerReviewSelector', () => {
           {...defaultProps}
           assignmentDueDate={null}
           peerReviewDueDate="2024-11-18T00:00:00Z"
-          peerReviewAvailableFromDate="2024-11-10T00:00:00Z"
-          peerReviewAvailableToDate="2024-11-25T23:59:00Z"
           setPeerReviewDueDate={setPeerReviewDueDate}
           setPeerReviewAvailableFromDate={setPeerReviewAvailableFromDate}
           setPeerReviewAvailableToDate={setPeerReviewAvailableToDate}
@@ -409,7 +376,9 @@ describe('PeerReviewSelector', () => {
       await waitFor(() => {
         expect(setPeerReviewDueDate).toHaveBeenCalledWith(null)
         expect(setPeerReviewAvailableFromDate).toHaveBeenCalledWith(null)
-        expect(setPeerReviewAvailableToDate).toHaveBeenCalledWith(null)
+        // lock_at (available to) inherits from assignment until date and must
+        // not be cleared when only the due date is cleared
+        expect(setPeerReviewAvailableToDate).not.toHaveBeenCalledWith(null)
       })
     })
 
@@ -420,8 +389,6 @@ describe('PeerReviewSelector', () => {
 
       const {rerender} = renderComponent({
         peerReviewDueDate: '2024-11-18T00:00:00Z',
-        peerReviewAvailableFromDate: '2024-11-10T00:00:00Z',
-        peerReviewAvailableToDate: '2024-11-25T23:59:00Z',
         setPeerReviewDueDate,
         setPeerReviewAvailableFromDate,
         setPeerReviewAvailableToDate,
@@ -446,8 +413,6 @@ describe('PeerReviewSelector', () => {
         <PeerReviewSelector
           {...defaultProps}
           peerReviewDueDate="2024-11-18T00:00:00Z"
-          peerReviewAvailableFromDate="2024-11-10T00:00:00Z"
-          peerReviewAvailableToDate="2024-11-25T23:59:00Z"
           setPeerReviewDueDate={setPeerReviewDueDate}
           setPeerReviewAvailableFromDate={setPeerReviewAvailableFromDate}
           setPeerReviewAvailableToDate={setPeerReviewAvailableToDate}
@@ -463,11 +428,9 @@ describe('PeerReviewSelector', () => {
   })
 
   describe('prop passing', () => {
-    it('passes through validation errors to child components', () => {
+    it('passes through validation errors to the due date component', () => {
       const validationErrors = {
         peer_review_due_at: 'Due date is required',
-        peer_review_available_from: 'Start date is required',
-        peer_review_available_to: 'End date is required',
       }
 
       renderComponent({
@@ -476,11 +439,9 @@ describe('PeerReviewSelector', () => {
       })
 
       expect(screen.getByText('Due date is required')).toBeInTheDocument()
-      expect(screen.getByText('Start date is required')).toBeInTheDocument()
-      expect(screen.getByText('End date is required')).toBeInTheDocument()
     })
 
-    it('passes through unparsed field keys to child components', () => {
+    it('passes through unparsed field keys to the due date component', () => {
       const unparsedFieldKeys = new Set(['peer_review_due_at'])
 
       renderComponent({
@@ -497,22 +458,150 @@ describe('PeerReviewSelector', () => {
       // Component renders without errors
     })
 
-    it('passes through dateInputRefs to child components', () => {
+    it('passes through dateInputRefs to the due date component', () => {
       const dateInputRefs: Record<string, HTMLInputElement | null> = {}
       renderComponent({dateInputRefs})
 
       expect(dateInputRefs.peer_review_due_at).toBeDefined()
-      expect(dateInputRefs.peer_review_available_from).toBeDefined()
-      expect(dateInputRefs.peer_review_available_to).toBeDefined()
     })
 
-    it('passes through timeInputRefs to child components', () => {
+    it('passes through timeInputRefs to the due date component', () => {
       const timeInputRefs: Record<string, HTMLInputElement | null> = {}
       renderComponent({timeInputRefs})
 
       expect(timeInputRefs.peer_review_due_at).toBeDefined()
-      expect(timeInputRefs.peer_review_available_from).toBeDefined()
-      expect(timeInputRefs.peer_review_available_to).toBeDefined()
+    })
+  })
+
+  describe('auto-sync peer review dates from assignment dates', () => {
+    it('sets peer review available from to assignment due date', () => {
+      const setPeerReviewAvailableFromDate = vi.fn()
+      renderComponent({
+        assignmentDueDate: '2024-11-20T23:59:00Z',
+        setPeerReviewAvailableFromDate,
+      })
+
+      expect(setPeerReviewAvailableFromDate).toHaveBeenCalledWith('2024-11-20T23:59:00Z')
+    })
+
+    it('sets peer review available to to assignment until date', () => {
+      const setPeerReviewAvailableToDate = vi.fn()
+      renderComponent({
+        assignmentUntilDate: '2024-11-30T23:59:00Z',
+        setPeerReviewAvailableToDate,
+      })
+
+      expect(setPeerReviewAvailableToDate).toHaveBeenCalledWith('2024-11-30T23:59:00Z')
+    })
+
+    it('updates peer review available from when assignment due date changes', () => {
+      const setPeerReviewAvailableFromDate = vi.fn()
+      const {rerender} = renderComponent({
+        assignmentDueDate: '2024-11-20T23:59:00Z',
+        setPeerReviewAvailableFromDate,
+      })
+
+      setPeerReviewAvailableFromDate.mockClear()
+
+      rerender(
+        <PeerReviewSelector
+          {...defaultProps}
+          assignmentDueDate="2024-12-01T23:59:00Z"
+          setPeerReviewAvailableFromDate={setPeerReviewAvailableFromDate}
+        />,
+      )
+
+      expect(setPeerReviewAvailableFromDate).toHaveBeenCalledWith('2024-12-01T23:59:00Z')
+    })
+
+    it('updates peer review available to when assignment until date changes', () => {
+      const setPeerReviewAvailableToDate = vi.fn()
+      const {rerender} = renderComponent({
+        assignmentUntilDate: '2024-11-30T23:59:00Z',
+        setPeerReviewAvailableToDate,
+      })
+
+      setPeerReviewAvailableToDate.mockClear()
+
+      rerender(
+        <PeerReviewSelector
+          {...defaultProps}
+          assignmentUntilDate="2024-12-15T23:59:00Z"
+          setPeerReviewAvailableToDate={setPeerReviewAvailableToDate}
+        />,
+      )
+
+      expect(setPeerReviewAvailableToDate).toHaveBeenCalledWith('2024-12-15T23:59:00Z')
+    })
+
+    it('sets peer review available from to null when assignment due date is null', () => {
+      const setPeerReviewAvailableFromDate = vi.fn()
+      renderComponent({
+        assignmentDueDate: null,
+        setPeerReviewAvailableFromDate,
+      })
+
+      expect(setPeerReviewAvailableFromDate).toHaveBeenCalledWith(null)
+    })
+
+    it('sets peer review available to to null when assignment until date is null', () => {
+      const setPeerReviewAvailableToDate = vi.fn()
+      renderComponent({
+        assignmentUntilDate: null,
+        setPeerReviewAvailableToDate,
+      })
+
+      expect(setPeerReviewAvailableToDate).toHaveBeenCalledWith(null)
+    })
+  })
+
+  describe('clearing peer review due date', () => {
+    it('clears peer review due date to null when assignment due date is cleared', async () => {
+      const setPeerReviewDueDate = vi.fn()
+      const setPeerReviewAvailableFromDate = vi.fn()
+      const setPeerReviewAvailableToDate = vi.fn()
+
+      const {rerender} = renderComponent({
+        assignmentDueDate: '2024-11-20T23:59:00Z',
+        peerReviewDueDate: '2024-11-25T00:00:00Z',
+        setPeerReviewDueDate,
+        setPeerReviewAvailableFromDate,
+        setPeerReviewAvailableToDate,
+      })
+
+      setPeerReviewDueDate.mockClear()
+
+      rerender(
+        <PeerReviewSelector
+          {...defaultProps}
+          assignmentDueDate={null}
+          peerReviewDueDate="2024-11-25T00:00:00Z"
+          setPeerReviewDueDate={setPeerReviewDueDate}
+          setPeerReviewAvailableFromDate={setPeerReviewAvailableFromDate}
+          setPeerReviewAvailableToDate={setPeerReviewAvailableToDate}
+        />,
+      )
+
+      await waitFor(() => {
+        expect(setPeerReviewDueDate).toHaveBeenCalledWith(null)
+      })
+    })
+
+    it('allows clearing peer review due date independently', () => {
+      const setPeerReviewDueDate = vi.fn()
+
+      renderComponent({
+        assignmentDueDate: '2024-11-20T23:59:00Z',
+        peerReviewDueDate: null,
+        setPeerReviewDueDate,
+      })
+
+      // setPeerReviewDueDate should not be called with a non-null value
+      // (the component does not auto-set the peer review due date)
+      const nonNullCalls = setPeerReviewDueDate.mock.calls.filter(
+        (args: unknown[]) => args[0] !== null,
+      )
+      expect(nonNullCalls).toHaveLength(0)
     })
   })
 })

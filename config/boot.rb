@@ -23,5 +23,17 @@ ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)
 require "bundler"
 Bundler.self_manager.restart_with_locked_bundler_if_needed
 
+# Default to loading :app_server gems for app servers, :jobs_server gems for jobs servers.
+# Everything else (e.g. console, runner) will load both groups by default.
+#
+# Of course the default can be overridden by setting the RAILS_GROUPS env var explicitly.
+ENV["RAILS_GROUPS"] ||= if ENV["RUNNING_AS_DAEMON"]
+                          "jobs_server"
+                        elsif ENV["RUNNING_IN_RACK"]
+                          "app_server"
+                        else
+                          "app_server,jobs_server"
+                        end
+
 require "bundler/setup" if File.exist?(ENV["BUNDLE_GEMFILE"])
 require "bootsnap/setup" unless ENV["RAILS_ENV"] == "production"

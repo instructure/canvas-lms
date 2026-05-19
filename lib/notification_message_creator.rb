@@ -297,8 +297,8 @@ class NotificationMessageCreator
     to_list = [to_list] unless to_list.is_a? Enumerable
 
     to_users = []
-    to_users += User.find(to_list.select { |to| to.is_a? Numeric }.uniq)
-    to_users += to_list.select { |to| to.is_a? User }
+    to_users += User.find(to_list.grep(Numeric).uniq)
+    to_users += to_list.grep(User)
     to_users.uniq!
 
     to_users
@@ -306,7 +306,7 @@ class NotificationMessageCreator
 
   def communication_channels_from_to_list(to_list)
     to_list = [to_list] unless to_list.is_a? Enumerable
-    to_list.select { |to| to.is_a? CommunicationChannel }.uniq
+    to_list.grep(CommunicationChannel).uniq
   end
 
   def asset_applied_to(user)

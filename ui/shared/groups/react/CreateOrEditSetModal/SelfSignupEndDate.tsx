@@ -20,7 +20,7 @@ import React, {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import ClearableDateTimeInput from '@canvas/context-modules/differentiated-modules/react/Item/ClearableDateTimeInput'
-import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints/'
+import {WithBreakpoints, type Breakpoints} from '@instructure/platform-with-breakpoints'
 
 const I18n = createI18nScope('groups')
 

@@ -36,22 +36,16 @@ describe "Apps Page" do
     expect(f("#breadcrumbs")).to include_text("Apps - Manage")
   end
 
-  context "with the discover page enabled" do
-    before(:once) do
-      account.enable_feature!(:lti_registrations_discover_page)
-    end
+  it "dynamically changes breadcrumbs" do
+    get("/accounts/#{account.id}/apps")
+    wait_for_ajaximations
 
-    it "dynamically changes breadcrumbs" do
-      get("/accounts/#{account.id}/apps")
-      wait_for_ajaximations
+    expect(f("#breadcrumbs")).to include_text("Apps - Discover")
 
-      expect(f("#breadcrumbs")).to include_text("Apps - Discover")
+    f("#tab-manage > span").click
 
-      f("#tab-manage > span").click
-
-      wait_for_ajaximations
-      expect(f("#breadcrumbs")).to include_text("Apps - Manage")
-    end
+    wait_for_ajaximations
+    expect(f("#breadcrumbs")).to include_text("Apps - Manage")
   end
 
   context "with the monitor page enabled" do

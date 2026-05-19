@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useRef} from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {Modal} from '@instructure/ui-modal'
 import type {GradingScheme, GradingSchemeTemplate} from '../../gradingSchemeApiModel'
 import {Heading} from '@instructure/ui-heading'
@@ -28,8 +28,6 @@ import {
   type GradingSchemeInputHandle,
 } from './form/GradingSchemeInput'
 import {Alert} from '@instructure/ui-alerts'
-
-const I18n = createI18nScope('GradingSchemeViewModal')
 
 export type GradingSchemeEditModalProps = {
   open: boolean
@@ -56,6 +54,7 @@ const GradingSchemeEditModal = ({
   viewingFromAccountManagementPage,
   isCourseDefault,
 }: GradingSchemeEditModalProps) => {
+  const {t} = useTranslation('GradingSchemeViewModal')
   const gradingSchemeUpdateRef = useRef<GradingSchemeInputHandle>(null)
   if (!gradingScheme) {
     return <></>
@@ -70,13 +69,13 @@ const GradingSchemeEditModal = ({
       as="form"
       open={open}
       onDismiss={() => handleCancelEdit(gradingScheme.id)}
-      label={I18n.t('Edit Grading Scheme')}
+      label={t('Edit Grading Scheme')}
       size="small"
       data-testid="grading-scheme-edit-modal"
     >
       <Modal.Header>
         <CloseButton
-          screenReaderLabel={I18n.t('Close')}
+          screenReaderLabel={t('Close')}
           placement="end"
           offset="small"
           onClick={() => handleCancelEdit(gradingScheme.id)}
@@ -93,16 +92,14 @@ const GradingSchemeEditModal = ({
             renderCloseButtonLabel="Close"
           >
             {!viewingFromAccountManagementPage && gradingScheme.context_type === 'Account'
-              ? I18n.t(
+              ? t(
                   "Percentages and points can't be edited because it is an account level grading scheme.",
                 )
               : isCourseDefault
-                ? I18n.t(
+                ? t(
                     "Percentages and points can't be edited because it is being used as the default grading scheme.",
                   )
-                : I18n.t(
-                    "Percentages and points can't be edited because it is currently being used.",
-                  )}
+                : t("Percentages and points can't be edited because it is currently being used.")}
           </Alert>
         )}
         <GradingSchemeInput
@@ -142,10 +139,10 @@ const GradingSchemeEditModal = ({
               disabled={editSchemeDataDisabled}
               data-testid="grading-scheme-edit-modal-delete-button"
             >
-              {I18n.t('Delete')}
+              {t('Delete')}
             </Button>
             <Button onClick={() => handleCancelEdit(gradingScheme.id)} margin="0 x-small 0 x-small">
-              {I18n.t('Cancel')}
+              {t('Cancel')}
             </Button>
             <Button
               onClick={() => {
@@ -154,7 +151,7 @@ const GradingSchemeEditModal = ({
               color="primary"
               data-testid="grading-scheme-edit-modal-update-button"
             >
-              {I18n.t('Save')}
+              {t('Save')}
             </Button>
           </Flex.Item>
         </Flex>

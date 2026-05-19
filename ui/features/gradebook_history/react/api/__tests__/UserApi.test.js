@@ -73,6 +73,7 @@ describe('UserApi', () => {
       search_term: searchTerm,
       enrollment_type: ['teacher', 'ta'],
       enrollment_state: [],
+      per_page: '10',
     })
   })
 
@@ -88,6 +89,7 @@ describe('UserApi', () => {
       search_term: searchTerm,
       enrollment_type: ['student', 'student_view'],
       enrollment_state: [],
+      per_page: '10',
     })
   })
 
@@ -104,6 +106,7 @@ describe('UserApi', () => {
       search_term: searchTerm,
       enrollment_type: ['student', 'student_view'],
       enrollment_state: enrollmentState,
+      per_page: '10',
     })
   })
 
@@ -119,6 +122,7 @@ describe('UserApi', () => {
       search_term: searchTerm,
       enrollment_type: ['student', 'student_view'],
       enrollment_state: [],
+      per_page: '10',
     })
   })
 
@@ -134,7 +138,38 @@ describe('UserApi', () => {
       search_term: searchTerm,
       enrollment_type: ['student', 'student_view'],
       enrollment_state: [],
+      per_page: '10',
     })
+  })
+
+  test('getUsersByName makes an API call and returns results for a two character search', async function () {
+    const mockUsers = [{id: '1', name: 'Li Wei'}]
+    server.use(
+      http.get('*', ({request}) => {
+        const url = new URL(request.url)
+        requestedUrls.push(url.pathname)
+        return HttpResponse.json(mockUsers)
+      }),
+    )
+
+    const result = await UserApi.getUsersByName(courseId, 'graders', 'Li')
+
+    expect(requestedUrls).toHaveLength(1)
+    expect(result.data).toEqual(mockUsers)
+  })
+
+  test('getUsersByName returns empty results for a single character search', async function () {
+    const result = await UserApi.getUsersByName(courseId, 'graders', 'a')
+
+    expect(result.response.data).toEqual([])
+    expect(requestedUrls).toHaveLength(0)
+  })
+
+  test('getUsersByName returns empty results for an empty string search', async function () {
+    const result = await UserApi.getUsersByName(courseId, 'graders', '')
+
+    expect(result.response.data).toEqual([])
+    expect(requestedUrls).toHaveLength(0)
   })
 
   test('getUsersNextPage makes a request with given url', async function () {

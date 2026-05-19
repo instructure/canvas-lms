@@ -20,7 +20,7 @@ import React from 'react'
 import {bool, func, number, oneOf, oneOfType, string} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'

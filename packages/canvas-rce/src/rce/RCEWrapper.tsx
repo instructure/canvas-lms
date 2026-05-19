@@ -176,7 +176,6 @@ function renderLoading() {
 let alertIdValue = 0
 
 interface RCEWrapperProps {
-  ai_text_tools?: boolean
   autosave?: {
     enabled?: boolean
     maxAge?: number
@@ -205,13 +204,13 @@ interface RCEWrapperProps {
   tinymce: typeof tinymce
   trayProps: RCETrayProps
   use_rce_icon_maker?: boolean
+  useHighContrast?: boolean
+  fontFamily?: string
   userCacheKey?: string
 }
 
 interface RCEWrapperState {
   a11yErrorsCount: number
-  AIToolsOpen: boolean
-  AITToolsFocusReturn: unknown
   alertId?: number
   announcement: string | null
   autoSavedContent: string
@@ -244,7 +243,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   _statusBarId: string
   _textareaEl?: HTMLTextAreaElement
   _effectiveContainingContext: RCETrayProps['containingContext']
-  AIToolsTray?: ReactNode
   editor: TinyMCEEditor | null
   initialContent?: string
   intersectionObserver?: IntersectionObserver
@@ -285,7 +283,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
 
   constructor(props: RCEWrapperProps) {
     super(props)
-    this.style = buildStyle()
+    this.style = buildStyle(!!props.useHighContrast, props.fontFamily)
 
     // Set up some limited global state that can be referenced
     // as needed in RCE's components and function / plugin definitions
@@ -358,7 +356,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
         typeof IntersectionObserver === 'undefined' ||
         maxInitRenderedRCEs <= 0 ||
         currentRCECount < maxInitRenderedRCEs,
-      AIToolsOpen: false,
     }
     this._statusBarId = `${this.state.id}_statusbar`
 
@@ -389,8 +386,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     this.resizeObserver = new ResizeObserver(() => {
       this._handleFullscreenResize()
     })
-
-    this.AIToolsTray = undefined
 
     this._effectiveContainingContext = normalizeContainingContext(
       this.props.trayProps?.containingContext,
@@ -426,7 +421,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       rce_studio_embed_improvements = false,
       rce_asr_captioning_improvements = false,
       file_verifiers_for_quiz_links = false,
-      consolidated_media_player = false,
     } = this.props.features
 
     return {
@@ -437,7 +431,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       rce_asr_captioning_improvements,
       file_verifiers_for_quiz_links,
       rce_find_replace,
-      consolidated_media_player,
     }
   }
 
@@ -1430,7 +1423,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
           if (autosavedContent !== editorContent) {
             this.setState({
               confirmAutoSave: true,
-              // @ts-expect-error
               autoSavedContent: patchAutosavedContent(autosaved.content),
             })
           } else {
@@ -1656,75 +1648,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       // launched from kb shortcut button on status bar
       this.state.KBShortcutFocusReturn?.focus()
     }
-  }
-
-  handleAIClick = () => {
-    import('./plugins/shared/ai_tools')
-      .then(module => {
-        // @ts-expect-error
-        this.AIToolsTray = module.AIToolsTray
-
-        this.setState({
-          AIToolsOpen: true,
-          AITToolsFocusReturn: document.activeElement,
-        })
-      })
-      .catch(ex => {
-        console.error('Failed loading the AIToolsTray', ex)
-      })
-  }
-
-  closeAITools = () => {
-    this.setState({AIToolsOpen: false})
-  }
-
-  AIToolsExited = () => {
-    if (this.state.AITToolsFocusReturn === this.iframe) {
-      // launched using a kb shortcut
-      // the iframe has focus so we need to forward it on to tinymce editor
-      if (this.editor) {
-        this.editor.focus(false)
-      }
-    } else if (
-      this.state.AITToolsFocusReturn === document.getElementById(`show-on-focus-btn-${this.id}`)
-    ) {
-      // launched from showOnFocus button
-      // edge case where focusing KBShortcutFocusReturn doesn't work
-      this._showOnFocusButton?.focus()
-    } else {
-      // launched from kb shortcut button on status bar
-      // @ts-expect-error
-      this.state.AITToolsFocusReturn?.focus()
-    }
-  }
-
-  handleInsertAIContent = (content: string) => {
-    const editor = this.mceInstance()
-    contentInsertion.insertContent(editor, content)
-  }
-
-  handleReplaceAIContent = (content: string) => {
-    const ed = this.mceInstance()
-    const selection = ed.selection
-    if (selection.getContent().length > 0) {
-      selection.setContent(content)
-    } else {
-      ed.selection.select(ed.getBody(), true)
-      selection.setContent(content)
-    }
-  }
-
-  getCurrentContentForAI = () => {
-    const selected = this.mceInstance().selection.getContent()
-    return selected
-      ? {
-          type: 'selection',
-          content: selected,
-        }
-      : {
-          type: 'full',
-          content: this.mceInstance().getContent(),
-        }
   }
 
   componentWillUnmount() {
@@ -2098,7 +2021,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       )
     }
     const statusBarOptions: StatusBarOptions = {
-      aiTextTools: this.props.ai_text_tools,
       isDesktop: tinymce.Env.deviceType.isDesktop(),
       a11yResizers: !!this.props.features?.rce_a11y_resize,
     }
@@ -2197,7 +2119,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
                     }
                     disabledPlugins={this.pluginsToExclude}
                     features={statusBarFeatures}
-                    onAI={this.handleAIClick}
                   />
                 )}
                 {this._effectiveContainingContext && (
@@ -2220,20 +2141,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
                   onDismiss={this.closeKBShortcutModal}
                   open={this.state.KBShortcutModalOpen}
                 />
-                {this.props.ai_text_tools && this.AIToolsTray && (
-                  // @ts-expect-error
-                  <this.AIToolsTray
-                    open={this.state.AIToolsOpen}
-                    container={document.querySelector('[role="main"]')}
-                    mountNode={instuiPopupMountNodeFn}
-                    contextId={trayProps.contextId}
-                    contextType={trayProps.contextId}
-                    currentContent={this.getCurrentContentForAI()}
-                    onClose={this.closeAITools}
-                    onInsertContent={this.handleInsertAIContent}
-                    onReplaceContent={this.handleReplaceAIContent}
-                  />
-                )}
                 {this.state.confirmAutoSave ? (
                   <Suspense fallback={<Spinner renderTitle={renderLoading} size="small" />}>
                     <RestoreAutoSaveModal

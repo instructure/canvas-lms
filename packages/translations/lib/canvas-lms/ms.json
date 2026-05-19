@@ -1,0 +1,306 @@
+{
+    "ConfirmationDialog": {
+        "Cancel": "Batal",
+        "Confirm": "Sahkan"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "Tandakan sebagai tarikh penting dan tunjuk bar sisi kelas umum"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "Skema penggredan lalai akaun",
+        "Account default grading scheme was successfully saved.": "Skema penggredan lalai akaun berjaya disimpan.",
+        "Active Grading Schemes": "Skema Penggredan Aktif",
+        "Applied": "Digunakan",
+        "Apply": "Gunakan",
+        "Archive Grading Scheme": "Arkibkan Skema Penggredan",
+        "Archived": "Diarkibkan",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Skema penggredan diarkibkan yang sedang digunakan masih boleh digunakan, tetapi tidak boleh ditambah kepada kursus atau tugasan baharu.",
+        "Are you sure you want to delete this grading scheme?": "Adakah anda pasti anda ingin memadamkan skema penggredan ini?",
+        "Cancel": "Batal",
+        "Canvas Default": "Lalai Canvas",
+        "Close": "Tutup",
+        "Confirm": "Sahkan",
+        "Confirm Default Grading Scheme Change": "Sahkan Perubahan Skema Penggredan Lalai",
+        "Delete Grading Scheme": "Padam Skema Penggredan",
+        "Duplicate Grading Scheme": "Duplikasikan Skema Penggredan",
+        "Edit Grading Scheme": "Edit Skema Penggredan",
+        "Grading Scheme Name": "Nama Skema Penggredan",
+        "Grading scheme was successfully archived.": "Skema penggredan berjaya diarkibkan.",
+        "Grading scheme was successfully created.": "Skema penggredan berjaya dicipta.",
+        "Grading scheme was successfully removed.": "Skema penggredan berjaya dialih keluar.",
+        "Grading scheme was successfully saved.": "Skema penggredan berjaya disimpan.",
+        "Grading scheme was successfully unarchived.": "Skema penggredan berjaya dinyaharkibkan.",
+        "Locations Used": "Lokasi Digunakan",
+        "Lower limit of range": "Had bawah julat",
+        "New Grading Scheme": "Skema Penggredan Baharu",
+        "Next Page": "Halaman Seterusnya",
+        "No account default": "Tiada lalai akaun",
+        "Previous Page": "Halaman Sebelumnya",
+        "Save": "Simpan",
+        "Search": "Cari",
+        "Search...": "Cari...",
+        "Show courses and assignments": "Tunjuk kursus dan tugasan",
+        "Show locations used": "Tunjukkan lokasi digunakan",
+        "Sort by": "Isih mengikut",
+        "There was an error while archiving the grading scheme": "Terdapat ralat semasa mengarkibkan skema penggredan",
+        "There was an error while creating the grading scheme": "Terdapat ralat semasa mencipta skema penggredan",
+        "There was an error while loading grading schemes": "Terdapat ralat semasa memuatkan skema penggredan",
+        "There was an error while loading the default canvas grading scheme": "Terdapat ralat semasa memuatkan skema penggredan canvas lalai",
+        "There was an error while loading the default grading scheme": "Terdapat ralat semasa memuatkan skema penggredan lali",
+        "There was an error while removing the grading scheme": "Terdapat ralat semasa mengalih keluar skema penggredan",
+        "There was an error while unarchiving the grading scheme": "Terdapat ralat semasa menyaharkibkan skema penggredan",
+        "There was an error while updating the default grading scheme": "Terdapat ralat semasa mengemas kini skema penggredan lalai",
+        "There was an error while updating the grading scheme": "Terdapat ralat semasa mengemas kini skema penggredan",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Perubahan ini akan menjejaskan semua kursus dan tugasan aktif dan yang mewarisi lalai akaun pada masa ini. Perubahan ini akan mengambil masa untuk selesai kerana semua gred kursus dan tugasan dikira semula mengikut skema penggredan lalai akaun yang baharu.",
+        "Unarchive Grading Scheme": "Nyaharkibkan Skema Penggredan",
+        "Upper limit of range": "Had atas julat",
+        "View Grading Scheme": "Lihat Skema Penggredan",
+        "View/Copy Grading Scheme": "Lihat/Salin Skema Penggredan",
+        "View/Edit Grading Scheme": "Lihat/Edit Skema Penggredan",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "Anda tidak boleh mengarkibkan skema penggredan ini kerana ia ditetapkan sebagai lalai untuk kursus atau akaun.",
+        "You can't delete this grading scheme because it is in use.": "Anda tidak boleh memadamkan skema penggredan ini kerana ia sedang digunakan.",
+        "You have no active grading schemes.": "Anda tiada skema penggredan yang aktif.",
+        "You have no archived grading schemes.": "Anda tiada skema penggredan yang diarkibkan.",
+        "to": "kepada"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "Adakah anda pasti anda ingin memadamkan skema penggredan ini?",
+        "Are you sure you want to duplicate this grading scheme?": "Adakah anda pasti anda ingin menduplikasikan skema penggredan ini?",
+        "Cancel": "Batal",
+        "Close": "Tutup",
+        "Delete": "Padam",
+        "Delete ": "Padam ",
+        "Duplicate": "Duplikasikan",
+        "Duplicate ": "Duplikasikan ",
+        "Edit Grading Scheme": "Edit Skema Penggredan",
+        "New Grading Scheme": "Skema Penggredan Baharu",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "Peratusan dan mata tidak boleh diedit kerana merupakan skema penggredan tahap akaun.",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "Peratusan dan mata tidak boleh diedit kerana sedang digunakan sebagai skema penggredan lalai.",
+        "Percentages and points can't be edited because it is currently being used.": "Peratusan dan mata tidak boleh diedit kerana sedang digunakan.",
+        "Save": "Simpan"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Jadual yang mengandungi data skema penggredan Canvas lalai.  Setiap baris mengandungi nama, peratusan maksimum dan peratusan minimum.",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Jadual yang mengandungi data skema penggredan.  Setiap baris mengandungi nama, peratusan maksimum dan peratusan minimum.",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Tidak boleh mempunyai nama baris yang serupa atau kosong Betulkan nama dan cuba klik 'Simpan' sekali lagi.",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Tidak boleh mempunyai julat yang bertindan atau kosong. Betulkan julat dan cuba klik 'Simpan' sekali lagi.",
+        "Delete grading scheme": "Padam skema penggredan",
+        "Edit Grading Scheme": "Edit Skema Penggredan",
+        "Edit a copy of this grading scheme": "Edit salinan skema penggredan ini",
+        "Edit grading scheme": "Edit skema penggredan",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Nama Skema Penggredan diperlukan. Tambah nama dan cuba klik 'Simpan' sekali lagi.",
+        "Grading scheme title": "Tajuk skema penggredan",
+        "Invalid grading scheme": "Skema penggredan tidak sah",
+        "Letter Grade": "Gred Huruf",
+        "Looks great!": "Terbaik!",
+        "Percentage": "Peratusan",
+        "Points": "Mata",
+        "Range": "Julat",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Julat mestilah nombor yang sah. Tidak boleh mempunyai nombor negatif atau nombor yang lebih besar daripada 100. Betulkan julat dan cuba klik 'Simpan' sekali lagi.",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Julat mestilah nombor yang sah. Tidak boleh mempunyai nombor negatif atau nombor yang lebih besar daripada julat mata tinggi. Betulkan julat dan cuba klik 'Simpan' sekali lagi.",
+        "edit a copy": "edit salinan"
+    },
+    "OutcomeManagement": {
+        "Course": "Kursus",
+        "Institution": "Institusi"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "Akaun",
+        "Close": "Tutup",
+        "Concluded": "Telah Selesai",
+        "Courses": "Kursus",
+        "Failed to load account used locations": "Gagal memuatkan lokasi digunakan akaun",
+        "Failed to load assignments used locations": "Gagal memuatkan lokasi digunakan tugasan",
+        "Failed to load used locations": "Gagal memuatkan lokasi digunakan",
+        "Load Assignments ...": "Muatkan Tugasan ...",
+        "Load More Assignments ...": "Muatkan Tugasan Lagi ...",
+        "Loading": "Memuatkan",
+        "Locations Used": "Lokasi Digunakan",
+        "Search": "Cari",
+        "Search...": "Cari..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "Dasar Penggunaan Boleh Diterima",
+        "Close": "Tutup",
+        "Loading page": "Memuatkan halaman",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Dasar Penggunaan Boleh Diterima tidak tersedia buat masa ini. Sila semak semula kemudian atau hubungi sokongan jika anda memerlukan bantuan lanjut.",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Tidak dapat memuatkan Dasar Penggunaan Boleh Diterima. Sila cuba semula kemudian atau hubungi sokongan jika masalah masih berterusan."
+    },
+    "account_reports": {
+        "Close": "Tutup",
+        "Invalid date and time.": "Tarikh dan masa tidak sah.",
+        "Next month": "Bulan seterusnya",
+        "Previous month": "Bulan sebelumnya",
+        "Time": "Masa"
+    },
+    "admin_split": {
+        "Cancel": "Batal",
+        "Failed to split users.": "Gagal memisahkan pengguna.",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "NOTA: Tindakan ini akan cuba membatalkan gabungan sebaik yang mungkin, namun pengguna yang digabungkan berkemungkinan tidak akan dipulihkan dengan sempurna seperti keadaan asal.",
+        "OK": "OK",
+        "Split": "Split",
+        "The following users will be split into separate user accounts:": "Pengguna berikut akan displit menjadi akaun pengguna berasingan:",
+        "There are no user accounts to split from this user.": "Tiada akaun pengguna untuk displit daripada pengguna ini.",
+        "User split complete. Links to split user accounts follow:": "Split pengguna lengkap. Berikut ialah pautan untuk split akaun pengguna:"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "Penerangan"
+    },
+    "assignment_footer": {
+        "Next": "Seterusnya",
+        "Previous": "Sebelumnya"
+    },
+    "assignment_tabs": {
+        "Assignment": "Tugasan",
+        "Peer Review": "Tinjauan Semula Setara"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "(lalai kursus)",
+        "Account Level": "Tahap Akaun",
+        "Canvas Grading Scheme (course default)": "Skema Penggredan Canvas (lalai kursus)",
+        "Close": "Tutup",
+        "Course Level": "Tahap Kursus",
+        "Default Canvas Grading Scheme": "Skema Penggredan Canvas Lalai",
+        "Grading scheme was successfully removed.": "Skema penggredan berjaya dialih keluar.",
+        "Grading scheme was successfully updated.": "Skema penggredan berjaya dikemaskinikan.",
+        "Manage All Grading Schemes": "Urus Semua Skema Penggredan",
+        "New Grading Scheme": "Skema Penggredan Baharu",
+        "Select a grading scheme": "Pilih skema penggredan",
+        "There was an error while loading grading schemes": "Terdapat ralat semasa memuatkan skema penggredan",
+        "There was an error while loading the grading scheme": "Terdapat ralat semasa memuatkan skema penggredan",
+        "There was an error while refreshing grading schemes": "Terdapat ralat semasa menyegar semula skema penggredan",
+        "There was an error while removing the grading scheme": "Terdapat ralat semasa mengalih keluar skema penggredan",
+        "View": "Lihat"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "Tugasan 2 Halaman Ralat Guru",
+        "Assignments 2 Teacher initial query error": "Tugasan 2 Ralat pertanyaan permulaan guru",
+        "Loading": "Memuatkan"
+    },
+    "catalog": {
+        "Course Catalog": "Katalog Kursus"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "Hasil kerja yang bagus! Daripada pembangun Canvas"
+    },
+    "content_copy_redesign": {
+        "Cancel": "Batal",
+        "Copy course": "Salin kursus",
+        "Course code": "Kod Kursus",
+        "Course code must be 255 characters or less": "Kod kursus mestilah 255 aksara atau kurang",
+        "Course name must be 255 characters or less": "Nama kursus mestilah 255 aksara atau kurang",
+        "Create course": "Cipta kursus",
+        "Creating...": "Dicipta...",
+        "End date": "Tarikh tamat",
+        "End date must be after start date": "Tarikh tamat mestilah selepas tarikh mula",
+        "Name": "Nama",
+        "No results": "Tiada hasil",
+        "Please enter the details for the new course.": "Sila masukkan butiran untuk kursus baharu.",
+        "Select a new beginning date": "Pilih tarikh permulaan baharu",
+        "Select a new end date": "Pilih tarikh tamat baharu",
+        "Select end date": "Pilih tarikh tamat",
+        "Select start date": "Pilih tarikh mula",
+        "Start date": "Tarikh mula",
+        "Start date must be before end date": "Tarikh mula mestilah sebelum tarikh tamat",
+        "Start typing to search...": "Mula menaip untuk mencari...",
+        "Term": "Penggal",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Tarikh mula dan tamat penggal tidak boleh diubah suai di sini, hanya pada halaman Butiran Penggal di bawah Pentadbir.",
+        "Use arrow keys to navigate options.": "Gunakan kekunci anak panah untuk menavigasi pilihan."
+    },
+    "content_share_preview_overlay": {
+        "Close": "Tutup",
+        "Content Share Preview": "Pratonton Kongsi Kandungan",
+        "Preview": "Pratonton"
+    },
+    "copy_warnings_modal": {
+        "Attention": "Perhatian"
+    },
+    "course_logging_content": {
+        "No results": "Tiada hasil",
+        "Type to search": "Taip untuk mencari"
+    },
+    "create_course_modal": {
+        "Cancel": "Batal",
+        "Course Details": "Butiran Kursus",
+        "Course Name": "Nama Kursus",
+        "Create": "Cipta",
+        "Create Course": "Cipta Kursus",
+        "Create Subject": "Cipta Subjek",
+        "Creating new course...": "Mencipta kursus baharu...",
+        "Creating new subject...": "Mencipta subjek baharu...",
+        "Error creating new course": "Ralat semasa mencipta kursus baharu",
+        "Error creating new subject": "Ralat semasa mencipta subjek baharu",
+        "Loading accounts...": "Memuatkan akaun...",
+        "Name...": "Nama...",
+        "No Results": "Tiada Hasil",
+        "Select a homeroom": "Pilih kelas umum",
+        "Subject Name": "Nama Subjek",
+        "Unable to get accounts": "Tidak dapat memperoleh akaun",
+        "Unable to get homerooms": "Tidak dapat memperoleh kelas umum",
+        "Use arrow keys to navigate options.": "Gunakan kekunci anak panah untuk menavigasi pilihan.",
+        "Which account will this course be associated with?": "Akaun manakah yang akan dikaitkan dengan kursus ini?",
+        "Which account will this subject be associated with?": "Akaun manakah yang akan dikaitkan dengan subjek ini?"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "Gantian Gred Akhir"
+    },
+    "feature_flags": {
+        "Accept": "Terima",
+        "Cancel": "Batal"
+    },
+    "filter_bar": {
+        "All": "Semua",
+        "Clear": "Kosongkan",
+        "Filter by": "Tapis mengikut",
+        "Search": "Cari",
+        "Use arrow keys to navigate options.": "Gunakan kekunci anak panah untuk menavigasi pilihan."
+    },
+    "groupNavigationSelector": {
+        "Select Group": "Pilih Kumpulan",
+        "Use arrow keys to navigate options.": "Gunakan kekunci anak panah untuk menavigasi pilihan."
+    },
+    "jobs": {
+        "Close": "Tutup"
+    },
+    "modules_home_page": {
+        "Create a new Module": "Cipta Modul baharu"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "Panda rajin belajar",
+        "Moves:": "Alih:"
+    },
+    "overview_page": {
+        "Edit home page": "Edit laman utama",
+        "Subject Home Page": "Laman Utama Subjek"
+    },
+    "pages_edit_title": {
+        "Page Title": "Tajuk Halaman"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "Batal",
+        "Close": "Tutup"
+    },
+    "study_assist": {
+        "Back": "Kembali",
+        "Close": "Tutup",
+        "Page": "Halaman"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "URL sah diperlukan",
+        "Website URL": "URL Laman Web"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "Dasar Penggunaan Boleh Diterima",
+        "Loading...": "Memuatkan...",
+        "Preview": "Pratonton"
+    },
+    "todos_page": {
+        "Failed to load todos": "Gagal memuatkan untuk dilakukan",
+        "Loading Additional Todo Details": "Memuatkan Butiran Tambahan Untuk Dilakukan",
+        "Loading Todo Course Name": "Memuatkan Nama Kursus Untuk Dilakukan",
+        "Loading Todo Title": "Memuatkan Tajuk Untuk Dilakukan"
+    },
+    "tray": {
+        "Close": "Tutup"
+    }
+}

@@ -55,6 +55,8 @@ module.exports = {
     'crypto-es': '<rootDir>/src/rce/__mocks__/_mockCryptoEs.ts',
     '@instructure/studio-player':
       '<rootDir>/__mocks__/@instructure/studio-player/_mockStudioPlayer.js',
+    '@instructure/ui-media-player':
+      '<rootDir>/__mocks__/@instructure/ui-media-player/_mockUiMediaPlayer.js',
   },
 
   transform: {

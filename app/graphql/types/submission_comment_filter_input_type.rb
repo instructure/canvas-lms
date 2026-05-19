@@ -36,5 +36,11 @@ module Types
       Whether the current user is completing a peer review and should only see
       comments authored by themselves.
     MD
+
+    argument :status, [Types::SubmissionCommentStatusType], <<~MD, required: false, default_value: nil
+      Filter comments by status type.
+      - ALL: Returns all comments visible to the current user (published + drafts based on permissions)
+      When set, includeDraftComments, includeDraftsFromOthers and includeProvisionalComments will be ignored.
+    MD
   end
 end

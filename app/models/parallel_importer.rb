@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ParallelImporter < ActiveRecord::Base
+class ParallelImporter < ApplicationRecord
   belongs_to :sis_batch
   belongs_to :attachment
   has_many :sis_batch_errors, inverse_of: :parallel_importer

@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 describe ActiveSupport::Cache::HaStore do
   before do
     skip unless Canvas.redis_enabled?
@@ -166,7 +164,7 @@ describe ActiveSupport::Cache::HaStore do
         Timecop.travel(1)
         expect(Account.site_admin.cache_key(:feature_flags)).to eq key1
         Timecop.travel(1)
-        expect(Canvas.redis).to_not receive(:del)
+        expect(Canvas.redis).not_to receive(:del)
         Account.site_admin.clear_cache_key(:feature_flags)
         expect(Account.site_admin.cache_key(:feature_flags)).not_to eq key1
       end

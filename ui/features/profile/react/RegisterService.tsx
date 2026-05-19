@@ -29,7 +29,7 @@ import * as z from 'zod'
 import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 import {zodResolver} from '@hookform/resolvers/zod'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('profile')
 

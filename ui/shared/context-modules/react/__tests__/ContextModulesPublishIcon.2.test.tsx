@@ -24,7 +24,7 @@ import {http, HttpResponse} from 'msw'
 import {updateModuleItem} from '../../jquery/utils'
 import ContextModulesPublishIcon from '../ContextModulesPublishIcon'
 import {initBody, makeModuleWithItems} from '../../__tests__/testHelpers'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const server = setupServer()
 
@@ -37,7 +37,7 @@ vi.mock('@canvas/context-modules/jquery/utils', async () => {
   }
 })
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+vi.mock('@instructure/platform-alerts', () => ({
   showFlashAlert: vi.fn(),
 }))
 
@@ -116,9 +116,7 @@ describe('ContextModulesPublishIcon', () => {
 
   it('calls updateModuleItem when publishing', async () => {
     const user = userEvent.setup({delay: null})
-    const {getByRole} = render(
-      <ContextModulesPublishIcon {...defaultProps} published={false} />,
-    )
+    const {getByRole} = render(<ContextModulesPublishIcon {...defaultProps} published={false} />)
     const menuButton = getByRole('button', {hidden: true})
     await user.click(menuButton)
     const publishButton = getByRole('menuitem', {name: 'Publish module and all items'})
@@ -147,9 +145,7 @@ describe('ContextModulesPublishIcon', () => {
       }),
     )
 
-    const {getByRole} = render(
-      <ContextModulesPublishIcon {...defaultProps} published={true} />,
-    )
+    const {getByRole} = render(<ContextModulesPublishIcon {...defaultProps} published={true} />)
     const menuButton = getByRole('button', {hidden: true})
     await user.click(menuButton)
     const unpublishButton = getByRole('menuitem', {name: 'Unpublish module and all items'})

@@ -56,10 +56,11 @@ describe "quizzes" do
       add_due_date_override(@quiz)
 
       get "/courses/#{@course.id}/quizzes"
-      expect(f(".item-group-container .date-available")).to include_text "Multiple Dates"
-      driver.action.move_to(f(".item-group-container .date-available")).perform
-      wait_for_ajaximations
-      tooltip = fj(".ui-tooltip:visible")
+      date_available = f(".item-group-container .date-available")
+      expect(date_available).to include_text "Multiple Dates"
+      driver.action.move_to(date_available).perform
+      tooltip_id = date_available.find_element(:css, "a").dom_attribute("aria-describedby")
+      tooltip = f("[role='tooltip'][id=#{tooltip_id}]")
       expect(tooltip).to include_text "New Section"
       expect(tooltip).to include_text "Everyone else"
     end
@@ -162,7 +163,7 @@ describe "quizzes" do
         add_question_to_group
         wait_for_ajaximations
 
-        expect(f(".insufficient_count_warning")).to_not be_displayed
+        expect(f(".insufficient_count_warning")).not_to be_displayed
 
         f("#questions .edit_group_link").click
         replace_content(f('#questions .group_top input[name="quiz_group[pick_count]"]'), "2")
@@ -183,7 +184,7 @@ describe "quizzes" do
         add_question_to_group
         wait_for_ajaximations
 
-        expect(f(".insufficient_count_warning")).to_not be_displayed
+        expect(f(".insufficient_count_warning")).not_to be_displayed
       end
 
       it "shows a warning for groups picking too many questions from a bank", priority: "2" do
@@ -201,7 +202,7 @@ describe "quizzes" do
         submit_form(".quiz_group_form")
         wait_for_ajaximations
 
-        expect(f(".insufficient_count_warning")).to_not be_displayed
+        expect(f(".insufficient_count_warning")).not_to be_displayed
 
         f("#questions .edit_group_link").click
         replace_content(f('#questions .group_top input[name="quiz_group[pick_count]"]'), "2")
@@ -223,7 +224,7 @@ describe "quizzes" do
         replace_content(f('#questions .group_top input[name="quiz_group[pick_count]"]'), "1")
         submit_form(".quiz_group_form")
         wait_for_ajaximations
-        expect(f(".insufficient_count_warning")).to_not be_displayed
+        expect(f(".insufficient_count_warning")).not_to be_displayed
       end
     end
 

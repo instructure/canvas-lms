@@ -50,31 +50,31 @@ class AssetUserAccessLog
   # throughout the rails stack, and they should
   # only get used internally to the AssetUserAccessLog
   # class.
-  class AuaLog0 < ActiveRecord::Base
+  class AuaLog0 < ApplicationRecord
     self.table_name = "aua_logs_0"
   end
 
-  class AuaLog1 < ActiveRecord::Base
+  class AuaLog1 < ApplicationRecord
     self.table_name = "aua_logs_1"
   end
 
-  class AuaLog2 < ActiveRecord::Base
+  class AuaLog2 < ApplicationRecord
     self.table_name = "aua_logs_2"
   end
 
-  class AuaLog3 < ActiveRecord::Base
+  class AuaLog3 < ApplicationRecord
     self.table_name = "aua_logs_3"
   end
 
-  class AuaLog4 < ActiveRecord::Base
+  class AuaLog4 < ApplicationRecord
     self.table_name = "aua_logs_4"
   end
 
-  class AuaLog5 < ActiveRecord::Base
+  class AuaLog5 < ApplicationRecord
     self.table_name = "aua_logs_5"
   end
 
-  class AuaLog6 < ActiveRecord::Base
+  class AuaLog6 < ApplicationRecord
     self.table_name = "aua_logs_6"
   end
 

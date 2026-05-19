@@ -22,6 +22,7 @@ class AnnouncementsController < ApplicationController
   include Api::V1::DiscussionTopics
 
   before_action :require_context, except: :public_feed
+  skip_before_action :require_user, only: :public_feed
 
   include HorizonMode
 
@@ -43,16 +44,18 @@ class AnnouncementsController < ApplicationController
       can_edit = @context.grants_right?(@current_user, session, :manage_course_content_edit)
       can_delete = @context.grants_right?(@current_user, session, :manage_course_content_delete)
 
-      js_env permissions: {
-        create: can_create,
-        moderate: can_create,
-        manage_course_content_edit: can_edit,
-        manage_course_content_delete: can_delete
-      }
-      js_env is_showing_announcements: true
-      js_env atom_feed_url: feeds_announcements_format_path((@context_enrollment || @context).feed_code, :atom)
-      js_env(COURSE_ID: @context.id.to_s) if @context.is_a?(Course)
-      js_env ANNOUNCEMENTS_LOCKED: announcements_locked?
+      js_env({
+               permissions: {
+                 create: can_create,
+                 moderate: can_create,
+                 manage_course_content_edit: can_edit,
+                 manage_course_content_delete: can_delete
+               },
+               is_showing_announcements: true,
+               atom_feed_url: feeds_announcements_format_path((@context_enrollment || @context).feed_code, :atom),
+               ANNOUNCEMENTS_LOCKED: announcements_locked?
+             })
+      js_env({ COURSE_ID: @context.id.to_s }) if @context.is_a?(Course)
     end
   end
 

@@ -17,13 +17,13 @@
  */
 
 import React from 'react'
-import {bool, func, number, shape, string, object} from 'prop-types'
+import {bool, func, number, object, shape, string} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {IconLockLine, IconWarningSolid} from '@instructure/ui-icons'
-import {Flex} from '@instructure/ui-flex'
-import {Text} from '@instructure/ui-text'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
+import {Text} from '@instructure/ui-text'
 
 import formatMessage from '../../../../format-message'
 import DimensionInput from './DimensionInput'
@@ -42,7 +42,11 @@ const errorMessage = message => {
 }
 
 const getMessage = (dimensionsState, minWidth, minHeight, minPercentage) => {
-  let result = {text: formatMessage('Aspect ratio will be preserved'), type: 'hint'}
+  const baseHint = formatMessage('Aspect ratio will be preserved')
+  let result = {
+    text: baseHint,
+    type: 'hint',
+  }
   if (dimensionsState.usePercentageUnits) {
     if (!dimensionsState.isNumeric) {
       result = {text: formatMessage('Percentage must be a number'), type: 'error'}
@@ -96,10 +100,8 @@ export default function DimensionsInput(props) {
 
   return (
     <Flex direction="column">
-      <Flex.Item padding="small">
-        {hidePercentage ? (
-          <Text weight="bold">{formatMessage('Custom width and height (Pixels)')}</Text>
-        ) : (
+      {!hidePercentage && (
+        <Flex.Item padding="small">
           <RadioInputGroup
             data-testid="dimension-type"
             name="dimension-type"
@@ -110,13 +112,15 @@ export default function DimensionsInput(props) {
             <RadioInput label={formatMessage('Percentage')} value="percentage" />
             <RadioInput label={formatMessage('Pixels')} value="pixels" />
           </RadioInputGroup>
-        )}
-      </Flex.Item>
-      <Flex.Item padding="small">
+        </Flex.Item>
+      )}
+      <Flex.Item overflowX="hidden">
         <FormFieldGroup
-          description={<ScreenReaderContent>{formatMessage('Dimensions')}</ScreenReaderContent>}
+          description={
+            <ScreenReaderContent>{formatMessage('Custom Dimensions')}</ScreenReaderContent>
+          }
         >
-          <Flex alignItems="start" direction="row" data-testid="input-number-container">
+          <Flex alignItems="end" direction="row" data-testid="input-number-container">
             {dimensionsState.usePercentageUnits ? (
               <>
                 <Flex.Item shouldShrink={true} shouldGrow={true}>
@@ -142,7 +146,7 @@ export default function DimensionsInput(props) {
                   />
                 </Flex.Item>
 
-                <Flex.Item padding="x-small small">
+                <Flex.Item padding="0 x-small small">
                   <IconLockLine />
                 </Flex.Item>
 

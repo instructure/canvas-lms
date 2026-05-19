@@ -154,6 +154,31 @@ module CanvasCareer
           expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::CAREER_LEARNER
         end
 
+        context "with a persisted user experience" do
+          it "returns CAREER_LEARNER when user has a UserExperience record and no enrollments" do
+            UserExperience.create!(user: @user, root_account: @root_account)
+            expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::CAREER_LEARNER
+          end
+
+          it "returns ACADEMIC when user has a deleted UserExperience record and no enrollments" do
+            experience = UserExperience.create!(user: @user, root_account: @root_account)
+            experience.destroy
+            expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::ACADEMIC
+          end
+
+          it "returns CAREER_LEARNER when user has a UserExperience and academic enrollments and prefers career" do
+            UserExperience.create!(user: @user, root_account: @root_account)
+            @course_academic.enroll_student(@user, enrollment_state: "active")
+            allow(@user_preference).to receive(:prefers_career?).and_return(true)
+            expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::CAREER_LEARNER
+          end
+
+          it "does not grant learning provider role from UserExperience alone" do
+            UserExperience.create!(user: @user, root_account: @root_account)
+            expect(ExperienceResolver.new(@user, nil, @root_account, @session).available_apps).not_to include(Constants::App::CAREER_LEARNING_PROVIDER)
+          end
+        end
+
         context "as a learner" do
           it "returns ACADEMIC when user is enrolled in only academic courses" do
             @course_academic.enroll_student(@user, enrollment_state: "active")
@@ -365,6 +390,22 @@ module CanvasCareer
         expect(ExperienceResolver.new(@user, nil, @root_account, @session).available_apps).to contain_exactly(
           Constants::App::ACADEMIC,
           Constants::App::CAREER_LEARNING_PROVIDER
+        )
+      end
+
+      it "returns only CAREER_LEARNER when user has only a UserExperience record" do
+        UserExperience.create!(user: @user, root_account: @root_account)
+        expect(ExperienceResolver.new(@user, nil, @root_account, @session).available_apps).to contain_exactly(
+          Constants::App::CAREER_LEARNER
+        )
+      end
+
+      it "returns ACADEMIC and CAREER_LEARNER when user has a UserExperience and academic enrollments" do
+        UserExperience.create!(user: @user, root_account: @root_account)
+        @course_academic.enroll_student(@user, enrollment_state: "active")
+        expect(ExperienceResolver.new(@user, nil, @root_account, @session).available_apps).to contain_exactly(
+          Constants::App::ACADEMIC,
+          Constants::App::CAREER_LEARNER
         )
       end
     end

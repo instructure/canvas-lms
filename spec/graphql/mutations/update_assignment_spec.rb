@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Mutations::UpdateAssignment do
@@ -664,7 +663,7 @@ describe Mutations::UpdateAssignment do
       state: deleted
     GQL
     errors = result["errors"]
-    expect(errors).to_not be_nil
+    expect(errors).not_to be_nil
     expect(errors[0]["message"]).to eq "assignment not found: 1234"
   end
 
@@ -687,7 +686,7 @@ describe Mutations::UpdateAssignment do
       state: deleted
     GQL
     errors = result["errors"]
-    expect(errors).to_not be_nil
+    expect(errors).not_to be_nil
     expect(errors.length).to be 1
     expect(errors[0]["message"]).to eq "insufficient permission"
   end

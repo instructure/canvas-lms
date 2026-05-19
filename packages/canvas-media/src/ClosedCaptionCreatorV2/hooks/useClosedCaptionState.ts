@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useEffect, useState} from 'react'
+import {useCallback, useEffect, useRef, useState} from 'react'
 import formatMessage from '../../format-message'
 import type {CaptionCreationMode, LanguageOption, Subtitle} from '../types'
 
@@ -31,13 +31,15 @@ interface UseClosedCaptionStateReturn {
   subtitles: Subtitle[]
   creationMode: CaptionCreationMode | null
   announcement: string | null
+  setAnnouncement: React.Dispatch<React.SetStateAction<string | null>>
   handleNewButtonClick: () => void
   handleCreationModeSelect: (mode: CaptionCreationMode) => void
   handleCancelCreation: () => void
   handleDeleteRow: (locale: string) => void
-  handleCaptionProcessing: (locale: string, file: File) => void
+  handleCaptionProcessing: (params: {locale: string; file?: File; isAsr?: boolean}) => void
   handleCaptionUploaded: (subtitle: Subtitle) => void
-  handleCaptionUploadFailed: (locale: string, errorMessage: string) => void
+  handleCaptionUploadFailed: (locale: string, failedOperation: 'upload' | 'delete' | 'asr') => void
+  handleCaptionRetrying: (locale: string) => void
 }
 
 /**
@@ -53,7 +55,12 @@ export function useClosedCaptionState({
   const [creationMode, setCreationMode] = useState<CaptionCreationMode | null>(null)
   const [announcement, setAnnouncement] = useState<string | null>(null)
 
-  // Sync internal state when parent passes updated subtitles
+  // Always-current ref so async callbacks (e.g. inside .catch()) read the
+  // latest subtitle list even after re-renders that changed state.
+  const subtitlesRef = useRef(subtitles)
+  subtitlesRef.current = subtitles
+
+  // Sync internal state when parent passes updated subtitles.
   useEffect(() => {
     setSubtitles(initialSubtitles)
   }, [initialSubtitles])
@@ -73,13 +80,9 @@ export function useClosedCaptionState({
   const handleDeleteRow = useCallback(
     (locale: string) => {
       const deletedLanguage = closedCaptionLanguages.find(l => l.id === locale)
-
-      setSubtitles(prev => {
-        const newSubtitles = prev.filter(s => s.locale !== locale)
-        onUpdateSubtitles(newSubtitles)
-        return newSubtitles
-      })
-
+      const newSubtitles = subtitlesRef.current.filter(s => s.locale !== locale)
+      setSubtitles(newSubtitles)
+      onUpdateSubtitles(newSubtitles)
       setAnnouncement(
         formatMessage(`Captions have been deleted for {lang}`, {
           lang: deletedLanguage?.label || locale,
@@ -93,20 +96,18 @@ export function useClosedCaptionState({
   // (handleLanguageSelected + handleFileSelected already add to list with isNew=true)
   // Just need to mark as processing
   const handleCaptionProcessing = useCallback(
-    (locale: string, file: File) => {
-      setSubtitles(prev => {
-        const updatedSubtitles: Subtitle[] = [
-          ...prev,
-          {
-            locale,
-            file: {name: file.name},
-            status: 'processing' as const,
-          },
-        ]
-        onUpdateSubtitles(updatedSubtitles)
-        return updatedSubtitles
-      })
-
+    ({locale, file, isAsr}: {locale: string; file?: File; isAsr?: boolean}) => {
+      const updatedSubtitles: Subtitle[] = [
+        ...subtitlesRef.current,
+        {
+          locale,
+          ...(file && {file: {name: file.name}, rawFile: file}),
+          workflow_state: 'processing' as const,
+          ...(isAsr && {asr: true}),
+        },
+      ]
+      setSubtitles(updatedSubtitles)
+      onUpdateSubtitles(updatedSubtitles)
       setCreationMode(null)
     },
     [onUpdateSubtitles],
@@ -116,55 +117,73 @@ export function useClosedCaptionState({
   const handleCaptionUploaded = useCallback(
     (subtitle: Subtitle) => {
       const language = closedCaptionLanguages.find(l => l.id === subtitle.locale)
-
-      setSubtitles(prev => {
-        const updatedSubtitles = prev.map(s =>
-          s.locale === subtitle.locale ? {...subtitle, status: 'uploaded' as const} : s,
-        )
-        onUpdateSubtitles(updatedSubtitles)
-        return updatedSubtitles
-      })
-
+      const updatedSubtitles = subtitlesRef.current.map(s =>
+        s.locale === subtitle.locale ? {...subtitle, workflow_state: 'ready' as const} : s,
+      )
+      setSubtitles(updatedSubtitles)
+      onUpdateSubtitles(updatedSubtitles)
       setAnnouncement(
         formatMessage(`Captions have been added for {lang}`, {
           lang: language?.label || subtitle.locale,
         }),
       )
-
       handleCancelCreation()
     },
     [closedCaptionLanguages, onUpdateSubtitles, handleCancelCreation],
   )
 
-  // Called when upload fails
+  // Called when upload or delete fails
   const handleCaptionUploadFailed = useCallback(
-    (locale: string, errorMessage: string) => {
+    (locale: string, failedOperation: 'upload' | 'delete' | 'asr') => {
       const language = closedCaptionLanguages.find(l => l.id === locale)
-      const announcedErrorMessage = formatMessage(errorMessage, {
-        captionName: language?.label || locale,
-      })
+      const captionName = language?.label || locale
 
-      setSubtitles(prev => {
-        const updatedSubtitles = prev.map(s =>
-          s.locale === locale
-            ? {...s, status: 'failed' as const, errorMessage: formatMessage('Failed')}
-            : s,
-        )
-        onUpdateSubtitles(updatedSubtitles)
-        return updatedSubtitles
-      })
+      const announcements = {
+        upload: formatMessage('{captionName} caption upload failed', {captionName}),
+        delete: formatMessage('{captionName} caption delete failed', {captionName}),
+        asr: formatMessage('{captionName} caption generation failed', {captionName}),
+      }
 
-      setAnnouncement(announcedErrorMessage)
-
+      const updatedSubtitles = subtitlesRef.current.map(s =>
+        s.locale === locale
+          ? {
+              ...s,
+              workflow_state: 'failed' as const,
+              failedOperation,
+            }
+          : s,
+      )
+      setSubtitles(updatedSubtitles)
+      onUpdateSubtitles(updatedSubtitles)
+      setAnnouncement(announcements[failedOperation])
       handleCancelCreation()
     },
     [closedCaptionLanguages, handleCancelCreation, onUpdateSubtitles],
+  )
+
+  // Called when retry is triggered for a failed caption.
+  const handleCaptionRetrying = useCallback(
+    (locale: string) => {
+      const updatedSubtitles = subtitlesRef.current.map(s =>
+        s.locale === locale
+          ? {
+              ...s,
+              workflow_state: 'processing' as const,
+              failedOperation: undefined,
+            }
+          : s,
+      )
+      setSubtitles(updatedSubtitles)
+      onUpdateSubtitles(updatedSubtitles)
+    },
+    [onUpdateSubtitles],
   )
 
   return {
     subtitles,
     creationMode,
     announcement,
+    setAnnouncement,
     handleNewButtonClick,
     handleCreationModeSelect,
     handleCancelCreation,
@@ -172,5 +191,6 @@ export function useClosedCaptionState({
     handleCaptionProcessing,
     handleCaptionUploaded,
     handleCaptionUploadFailed,
+    handleCaptionRetrying,
   }
 }

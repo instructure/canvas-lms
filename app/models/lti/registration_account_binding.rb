@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Lti::RegistrationAccountBinding < ActiveRecord::Base
+class Lti::RegistrationAccountBinding < ApplicationRecord
   extend RootAccountResolver
 
   include Workflow
@@ -44,6 +44,8 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
   validate :restrict_federated_child_accounts
   validate :require_root_account
   validate :validate_inherited_registration_in_chain
+
+  scope :enabled, -> { where(workflow_state: "on") }
 
   after_update :clear_cache_if_site_admin
 

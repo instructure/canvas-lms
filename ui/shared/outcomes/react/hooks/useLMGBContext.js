@@ -26,6 +26,7 @@ const useLMGBContext = () => {
   const accountLevelMasteryScalesFF = context?.env?.accountLevelMasteryScalesFF
   const outcomesFriendlyDescriptionFF = context?.env?.outcomesFriendlyDescriptionFF
   const allowDifferentiationTags = context?.env?.allowDifferentiationTags
+  const lmgbStudentReportingFF = context?.env?.lmgbStudentReportingFF
 
   return {
     contextURL,
@@ -33,6 +34,7 @@ const useLMGBContext = () => {
     accountLevelMasteryScalesFF,
     outcomesFriendlyDescriptionFF,
     allowDifferentiationTags,
+    lmgbStudentReportingFF,
   }
 }
 

@@ -321,7 +321,7 @@ class CalendarEventsApiController < ApplicationController
   include CalendarConferencesHelper
   include ::RruleHelper
 
-  before_action :require_user, except: %w[public_feed index]
+  skip_before_action :require_user, only: %w[public_feed index]
   before_action :get_calendar_context, only: :create
   before_action :require_user_or_observer, only: [:user_index]
   before_action :require_authorization, only: %w[index user_index]
@@ -481,6 +481,7 @@ class CalendarEventsApiController < ApplicationController
         calendar_events, assignments = events.partition { |e| e.is_a?(CalendarEvent) }
         ActiveRecord::Associations.preload(calendar_events, [:context, :parent_event])
         ActiveRecord::Associations.preload(assignments, Api::V1::Assignment::PRELOADS)
+        preload_peer_review_sub_assignments(assignments)
         ActiveRecord::Associations.preload(assignments.map(&:context), %i[account grading_period_groups enrollment_term])
         log_event_count(events.count)
 
@@ -648,7 +649,7 @@ class CalendarEventsApiController < ApplicationController
   # @returns CalendarEvent
 
   def show
-    get_event(true)
+    get_event(search_assignments: true)
     if authorized_action(@event, @current_user, :read)
       render json: event_json(@event, @current_user, session, include: includes + [:web_conference])
     end
@@ -777,7 +778,7 @@ class CalendarEventsApiController < ApplicationController
   #        -F 'calendar_event[title]=Epic Paintball Fight!' \
   #        -H "Authorization: Bearer <token>"
   def update
-    get_event(true)
+    get_event(search_assignments: true)
     if authorized_action(@event, @current_user, :update)
       params_for_update = nil
       if @event.is_a?(Assignment)
@@ -1586,7 +1587,7 @@ class CalendarEventsApiController < ApplicationController
     raise ActiveRecord::RecordNotFound unless @context
   end
 
-  def get_event(search_assignments = false)
+  def get_event(search_assignments: false)
     @event = if params[:id] =~ /\Aassignment_(.*)/
                raise ActiveRecord::RecordNotFound unless search_assignments
 
@@ -1684,7 +1685,7 @@ class CalendarEventsApiController < ApplicationController
     @section_codes = []
     if user
       @is_admin = user.roles(@domain_root_account).include?("admin") # if we're an admin - don't try to figure out which sections we belong to; just include all of them
-      @section_codes = user.section_context_codes(@context_codes, @is_admin, include_concluded: false)
+      @section_codes = user.section_context_codes(@context_codes, skip_visibility_filter: @is_admin, include_concluded: false)
     end
 
     if @type == :event && @start_date && user
@@ -1699,7 +1700,7 @@ class CalendarEventsApiController < ApplicationController
       end
       # include manageable appointment group events for the specified contexts
       # and dates
-      ags = manageable_appointment_groups(user).to_a
+      ags = manageable_appointment_groups(user, codes).to_a
       @selected_contexts += ags
       @context_codes += ags.map(&:asset_string)
     end
@@ -1797,9 +1798,9 @@ class CalendarEventsApiController < ApplicationController
 
     courses_to_filter_assignments = other.
                                     # context can sometimes be a user, so must filter those out
-                                    select { |context| context.is_a? Course }
+                                    grep(Course)
                                          .reject do |course|
-                                           courses_to_not_filter.include?(course.id)
+      courses_to_not_filter.include?(course.id)
     end
 
     # in courses with diff assignments on, only show the visible assignments
@@ -1817,7 +1818,7 @@ class CalendarEventsApiController < ApplicationController
         next if contexts.empty?
 
         context_codes = contexts.map(&:asset_string)
-        section_codes = user.section_context_codes(context_codes, @is_admin, include_concluded: false)
+        section_codes = user.section_context_codes(context_codes, skip_visibility_filter: @is_admin, include_concluded: false)
         relation = relation.for_user_and_context_codes(user, context_codes, section_codes)
         relation = yield relation if block_given?
         relation = relation.send(*date_scope_and_args) unless @all_events
@@ -1911,13 +1912,13 @@ class CalendarEventsApiController < ApplicationController
     end
   end
 
-  def manageable_appointment_groups(user)
+  def manageable_appointment_groups(user, restrict_to_codes = nil)
     return [] unless user
 
     user.in_region_associated_shards.flat_map do |shard|
       shard.activate do
         AppointmentGroup
-          .manageable_by(user)
+          .manageable_by(user, restrict_to_codes)
           .intersecting(@start_date, @end_date).to_a
       end
     end
@@ -2197,6 +2198,7 @@ class CalendarEventsApiController < ApplicationController
     end
     # preload data used by assignment_json
     ActiveRecord::Associations.preload(events, :discussion_topic)
+    preload_peer_review_sub_assignments(events)
     Shard.partition_by_shard(events) do |shard_events|
       having_submission = assignment_or_sub_assignment(sub_assignment:).assignment_ids_with_submissions(shard_events.map(&:id))
       shard_events.each do |event|
@@ -2220,5 +2222,10 @@ class CalendarEventsApiController < ApplicationController
     events = Api.paginate(scope, self, route_url)
     ActiveRecord::Associations.preload(events, :child_events)
     events
+  end
+
+  def preload_peer_review_sub_assignments(collection)
+    assignments = collection.grep(Assignment)
+    ActiveRecord::Associations.preload(assignments, :peer_review_sub_assignment) if assignments.present?
   end
 end

@@ -289,6 +289,7 @@ export const resolveAuthorRoles = (isAuthor, discussionRoles) => {
   return discussionRoles
 }
 
+/** @returns {import('@instructure/ui-responsive').BreakpointQueries} */
 export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = false} = {}) => {
   const querySizes = {}
   if (mobile) {

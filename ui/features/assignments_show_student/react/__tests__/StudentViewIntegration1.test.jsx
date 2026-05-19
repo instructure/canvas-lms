@@ -17,7 +17,7 @@
  */
 import $ from 'jquery'
 import * as uploadFileModule from '@canvas/upload-file'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {CREATE_SUBMISSION_DRAFT} from '@canvas/assignments/graphql/student/Mutations'
 import {createCache} from '@canvas/apollo-v3'
 import {fireEvent, render, screen, waitFor, act} from '@testing-library/react'

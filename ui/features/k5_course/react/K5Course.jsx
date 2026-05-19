@@ -22,7 +22,6 @@ import React, {forwardRef, useEffect, useLayoutEffect, useRef, useState} from 'r
 import {Provider, connect} from 'react-redux'
 
 import {store} from '@canvas/planner'
-import {InstUISettingsProvider} from '@instructure/emotion'
 import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -44,9 +43,9 @@ import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {outcomeProficiencyShape} from '@canvas/grade-summary/react/IndividualStudentMastery/shapes'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import GroupsPage from '@canvas/k5/react/GroupsPage'
 import K5Announcement from '@canvas/k5/react/K5Announcement'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
@@ -55,7 +54,6 @@ import ResourcesPage from '@canvas/k5/react/ResourcesPage'
 import SchedulePage from '@canvas/k5/react/SchedulePage'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
-import {getK5ThemeOverrides} from '@canvas/k5/react/k5-theme'
 import {
   DEFAULT_COURSE_COLOR,
   MOBILE_NAV_BREAKPOINT_PX,
@@ -122,6 +120,7 @@ const translateTabId = id => {
   if (id === '7') return TAB_IDS.GROUPS
   if (id === '5') return TAB_IDS.GRADES
   if (String(id).startsWith('context_external_tool_')) return TAB_IDS.RESOURCES
+  if (String(id).startsWith('nav_menu_link_')) return TAB_IDS.RESOURCES
   return TAB_IDS.HOME
 }
 
@@ -462,6 +461,14 @@ export function K5Course({
     : null
 
   const renderTabs = toRenderTabs(tabs, hasSyllabusBody)
+  const customLinks = tabs
+    .filter(tab => String(tab.id).startsWith('nav_menu_link_') && !tab.hidden)
+    .map(tab => ({
+      id: tab.id,
+      label: tab.label,
+      url: Array.isArray(tab.args) ? tab.args[0] : null,
+    }))
+    .filter(link => link.url && /^https?:\/\//i.test(link.url))
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, renderTabs)
   const [tabsRef, setTabsRef] = useState(null)
   const [observedUserId, setObservedUserId] = useState(initialObservedId)
@@ -682,6 +689,7 @@ export function K5Course({
           visible={currentTab === TAB_IDS.RESOURCES}
           showStaff={false}
           isSingleCourse={true}
+          customLinks={customLinks}
         />
         {currentTab === TAB_IDS.MODULES && !modulesExist && !canManage && <EmptyModules />}
         {currentTab === TAB_IDS.GROUPS && (
@@ -745,12 +753,8 @@ K5Course.propTypes = {
 
 const WrappedK5Course = connect(mapStateToProps)(K5Course)
 
-const k5Theme = getK5ThemeOverrides()
-
 export default props => (
-  <InstUISettingsProvider theme={{componentOverrides: k5Theme}}>
-    <Provider store={store}>
-      <WrappedK5Course {...props} />
-    </Provider>
-  </InstUISettingsProvider>
+  <Provider store={store}>
+    <WrappedK5Course {...props} />
+  </Provider>
 )

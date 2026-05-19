@@ -33,7 +33,7 @@ import {
   resolveHideAssignmentGradesStatus,
 } from './Api'
 import {isHideable} from '@canvas/grading/SubmissionHelper'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('hide_assignment_grades_tray')
 

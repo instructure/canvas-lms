@@ -22,7 +22,7 @@ import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Navigator} from './Navigator'
-import TruncateWithTooltip from '@canvas/instui-bindings/react/TruncateWithTooltip'
+import {TruncateWithTooltip} from '@instructure/platform-instui-bindings'
 import {Avatar} from '@instructure/ui-avatar'
 import {Student} from '@canvas/outcomes/react/types/rollup'
 

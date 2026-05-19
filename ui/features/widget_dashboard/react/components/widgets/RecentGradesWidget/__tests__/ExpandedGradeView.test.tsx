@@ -185,6 +185,56 @@ describe('ExpandedGradeView', () => {
     expect(screen.getByTestId('course-grade-label-sub1')).toHaveTextContent('Course grade: 88%')
   })
 
+  it('displays course grade as letter grade when grading scheme is a letter grade scale', () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {queries: {retry: false}, mutations: {retry: false}},
+    })
+    const letterGradeSchemeData = [
+      {
+        ...mockSharedCourseData[0],
+        currentGrade: 88,
+        gradingScheme: [
+          ['A', 0.94],
+          ['B', 0.84],
+          ['C', 0.74],
+          ['D', 0.64],
+          ['F', 0],
+        ] as Array<[string, number]>,
+      },
+    ]
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider sharedCourseData={letterGradeSchemeData}>
+          <ExpandedGradeView submission={mockSubmission} />
+        </WidgetDashboardProvider>
+      </QueryClientProvider>,
+    )
+    expect(screen.getByTestId('course-grade-label-sub1')).toHaveTextContent('Course grade: B')
+  })
+
+  it('floors the percentage when displaying a percentage course grade', () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {queries: {retry: false}, mutations: {retry: false}},
+    })
+    const fractionalGradeData = [
+      {
+        ...mockSharedCourseData[0],
+        currentGrade: 88.7,
+        gradingScheme: 'percentage' as const,
+      },
+    ]
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider sharedCourseData={fractionalGradeData}>
+          <ExpandedGradeView submission={mockSubmission} />
+        </WidgetDashboardProvider>
+      </QueryClientProvider>,
+    )
+    expect(screen.getByTestId('course-grade-label-sub1')).toHaveTextContent('Course grade: 88%')
+  })
+
   it('displays rubric and feedback sections with data', async () => {
     server.use(
       http.post('/api/graphql', () => {
@@ -255,6 +305,45 @@ describe('ExpandedGradeView', () => {
         'View all inline feedback for Test Assignment (3)',
       )
     })
+  })
+
+  // Pre-submission comments appear in recentCommentsConnection but are not counted in
+  // allCommentsConnection, so the "View all inline feedback" link is not shown.
+  it('does not show inline feedback link when allCommentsConnection totalCount is 0', async () => {
+    server.use(
+      http.post('/api/graphql', () => {
+        return HttpResponse.json({
+          data: {
+            legacyNode: {
+              _id: 'sub1',
+              rubricAssessmentsConnection: {nodes: []},
+              recentCommentsConnection: {
+                nodes: [
+                  {
+                    _id: 'pre-comment1',
+                    comment: 'Pre-submission feedback',
+                    htmlComment: '<p>Pre-submission feedback</p>',
+                    author: {_id: 'teacher1', name: 'Mr. Smith'},
+                    createdAt: '2025-11-27T10:00:00Z',
+                  },
+                ],
+              },
+              allCommentsConnection: {
+                pageInfo: {totalCount: 0},
+              },
+            },
+          },
+        })
+      }),
+    )
+
+    renderWithContext(<ExpandedGradeView submission={mockSubmission} />)
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('submission-details-loading-sub1')).not.toBeInTheDocument()
+    })
+
+    expect(screen.queryByTestId('view-inline-feedback-link-sub1')).not.toBeInTheDocument()
   })
 
   it('renders the open assignment link with assignment name', () => {

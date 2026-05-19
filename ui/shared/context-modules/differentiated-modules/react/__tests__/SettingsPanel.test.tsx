@@ -21,7 +21,7 @@ import {render, waitFor} from '@testing-library/react'
 import SettingsPanel, {type SettingsPanelProps} from '../SettingsPanel'
 import * as miscUtils from '../../utils/miscHelpers'
 import * as moduleUtils from '../../utils/moduleHelpers'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import userEvent from '@testing-library/user-event'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
@@ -29,7 +29,7 @@ import {http, HttpResponse} from 'msw'
 const server = setupServer()
 
 vi.mock('../../utils/miscHelpers', async () => {
-  const originalModule = await vi.importActual('../../utils/miscHelpers') as any
+  const originalModule = (await vi.importActual('../../utils/miscHelpers')) as any
 
   return {
     __esModule: true,
@@ -41,7 +41,7 @@ vi.mock('../../utils/miscHelpers', async () => {
 })
 
 vi.mock('../../utils/moduleHelpers', async () => {
-  const originalModule = await vi.importActual('../../utils/moduleHelpers') as any
+  const originalModule = (await vi.importActual('../../utils/moduleHelpers')) as any
 
   return {
     __esModule: true,
@@ -50,7 +50,7 @@ vi.mock('../../utils/moduleHelpers', async () => {
   }
 })
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+vi.mock('@instructure/platform-alerts', () => ({
   showFlashAlert: vi.fn(() => vi.fn(() => {})),
 }))
 
@@ -296,9 +296,7 @@ describe('SettingsPanel', () => {
     })
 
     it('shows a flash alert on failure', async () => {
-      server.use(
-        http.put('/courses/:courseId/modules/:moduleId', () => HttpResponse.error()),
-      )
+      server.use(http.put('/courses/:courseId/modules/:moduleId', () => HttpResponse.error()))
       const {getByRole} = renderComponent()
       getByRole('button', {name: 'Save'}).click()
       await waitFor(() => {

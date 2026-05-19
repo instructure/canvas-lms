@@ -24,7 +24,7 @@ import {TextArea} from '@instructure/ui-text-area'
 import {View} from '@instructure/ui-view'
 import {useRef, useState} from 'react'
 import {SpeedGraderLegacy_CreateCommentBankItem} from '../graphql/mutations'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SpeedGraderLegacy_CreateCommentBankItemMutation} from '@canvas/graphql/codegen/graphql'
 

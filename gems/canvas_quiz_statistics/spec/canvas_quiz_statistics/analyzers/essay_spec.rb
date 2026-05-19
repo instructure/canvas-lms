@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe CanvasQuizStatistics::Analyzers::Essay do
   subject { described_class.new(question_data) }
 
@@ -27,7 +25,7 @@ describe CanvasQuizStatistics::Analyzers::Essay do
   it "does not blow up when no responses are provided" do
     expect do
       expect(subject.run([])).to be_present
-    end.to_not raise_error
+    end.not_to raise_error
   end
 
   it_behaves_like "essay [:responses]"

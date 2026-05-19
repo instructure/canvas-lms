@@ -75,7 +75,6 @@ module LiveAssessments
   class ResultsController < ApplicationController
     include ::Filters::LiveAssessments
 
-    before_action :require_user
     before_action :require_context
     before_action :require_assessment
 

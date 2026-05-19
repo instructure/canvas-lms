@@ -20,11 +20,8 @@ module.exports = {
     },
   },
   rules: {
-    'jest/no-disabled-tests': 'warn',
-    'jest/no-focused-tests': 'error',
+    // jest/no-disabled-tests, jest/no-focused-tests, jest/valid-expect → oxlint
     'jest/no-identical-title': 'warn',
     'jest/prefer-to-have-length': 'warn',
-    'jest/valid-expect': 'error',
-    'react/no-deprecated': 'warn',
   },
 }

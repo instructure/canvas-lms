@@ -24,10 +24,11 @@ import classnames from 'classnames'
 import produce from 'immer'
 import {get, set} from 'es-toolkit/compat'
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import ErrorBoundary from '@canvas/error-boundary'
-import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {showFlashAlert} from '@instructure/platform-alerts'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 import {Alert} from '@instructure/ui-alerts'
 import {Mask} from '@instructure/ui-overlays'
@@ -448,6 +449,8 @@ export default class TeacherView extends React.Component {
         errorComponent={
           <GenericErrorPage
             imageUrl={errorShipUrl}
+            onReportError={reportError}
+            translations={canvasErrorPageTranslations}
             errorCategory={I18n.t('Assignments 2 Teacher View Error Page')}
           />
         }

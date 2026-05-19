@@ -530,7 +530,7 @@ describe('CreateEditAssignmentModal', () => {
         // Try to save
         fireEvent.click(getByTestId('save-button'))
 
-        expect(getAllByText('Due date cannot be after lock date')[0]).toBeInTheDocument()
+        expect(getAllByText('Due date cannot be after until date')[0]).toBeInTheDocument()
         expect(datePicker).toHaveFocus()
       })
 
@@ -548,7 +548,7 @@ describe('CreateEditAssignmentModal', () => {
         // Try to save
         fireEvent.click(getByTestId('save-button'))
 
-        expect(getAllByText('Due date cannot be before unlock date')[0]).toBeInTheDocument()
+        expect(getAllByText('Due date cannot be before available from date')[0]).toBeInTheDocument()
         expect(datePicker).toHaveFocus()
       })
 
@@ -613,6 +613,27 @@ describe('CreateEditAssignmentModal', () => {
         expect(getByTestId('multiple-due-dates-message')).toBeInTheDocument()
         expect(getByTestId('multiple-due-dates-message')).toHaveValue('Differentiated Due Date')
         expect(getByTestId('multiple-due-dates-message')).toBeDisabled()
+      })
+
+      it('Displays "Peer Review Due Date" message when assignment has peer review sub assignment', () => {
+        const assignment = {...assignmentData, peerReviewInGradedMode: true}
+        const {getByTestId} = render(<CreateEditAssignmentModal {...defaultProps({assignment})} />)
+
+        expect(getByTestId('multiple-due-dates-message')).toBeInTheDocument()
+        expect(getByTestId('multiple-due-dates-message')).toHaveValue('Peer Review Due Date')
+        expect(getByTestId('multiple-due-dates-message')).toBeDisabled()
+      })
+
+      it('Displays "Peer Review Due Date" over "Multiple Due Dates" when both apply', () => {
+        const assignment = {
+          ...assignmentData,
+          multipleDueDates: true,
+          differentiatedAssignment: true,
+          peerReviewInGradedMode: true,
+        }
+        const {getByTestId} = render(<CreateEditAssignmentModal {...defaultProps({assignment})} />)
+
+        expect(getByTestId('multiple-due-dates-message')).toHaveValue('Peer Review Due Date')
       })
 
       it('Disables fields when included in frozenFields', () => {

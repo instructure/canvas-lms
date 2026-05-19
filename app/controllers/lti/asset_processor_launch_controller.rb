@@ -54,8 +54,7 @@ module Lti
         return_url: assignment.direct_link,
         adapter_opts: {
           asset_report:,
-          launch_url: report_url,
-          submission_attempt: params[:submission_attempt]
+          launch_url: report_url
         },
         expander_opts: {
           assignment:

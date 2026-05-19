@@ -23,7 +23,7 @@ import {MessageDetailContainer} from './MessageDetailContainer/MessageDetailCont
 import MessageListActionContainer from './MessageListActionContainer'
 import ConversationListContainer from './ConversationListContainer'
 import {NoSelectedConversation} from '../components/NoSelectedConversation/NoSelectedConversation'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useMutation, useQuery} from '@apollo/client'
 import {
@@ -39,7 +39,7 @@ import {
   VIEWABLE_SUBMISSIONS_QUERY,
 } from '../../graphql/Queries'
 import {decodeQueryString} from '@instructure/query-string-encoding'
-import WithBreakpoints from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
@@ -763,11 +763,12 @@ const CanvasInbox = ({breakpoints}) => {
   const renderSettingsButton = () => {
     return (
       <Tooltip key="settings-button" renderTip={I18n.t('Inbox settings')} placement="top">
-        {/* @ts-expect-error TS2769 (typescriptify) */}
         <Button
           color="secondary"
           onClick={() => setInboxSettingsModal(true)}
+          // @ts-expect-error TS7 migration
           renderIcon={IconSettingsLine}
+          // @ts-expect-error TS7 migration
           display={getResponsiveStyles().buttonsDisplay}
           key="settings-button"
         >
@@ -780,10 +781,10 @@ const CanvasInbox = ({breakpoints}) => {
   const renderComposeButton = () => {
     return (
       <Tooltip key="compose-button" renderTip={I18n.t('Compose a new message')} placement="top">
-        {/* @ts-expect-error TS2769 (typescriptify) */}
         <Button
           color="primary"
           margin="none"
+          // @ts-expect-error TS7 migration
           renderIcon={IconComposeLine}
           onClick={() => {
             if (/#filter=type=submission_comments/.test(window.location.hash))
@@ -791,6 +792,7 @@ const CanvasInbox = ({breakpoints}) => {
             setComposeModal(true)
           }}
           testid="compose"
+          // @ts-expect-error TS7 migration
           display={getResponsiveStyles().buttonsDisplay}
           ariaLabel={I18n.t('Compose a new message')}
         >

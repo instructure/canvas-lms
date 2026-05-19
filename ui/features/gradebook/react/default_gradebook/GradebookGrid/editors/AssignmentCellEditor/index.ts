@@ -19,7 +19,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import AssignmentRowCell from './AssignmentRowCell'
 import ReadOnlyCell from './ReadOnlyCell'
 
@@ -50,7 +50,7 @@ export default class AssignmentCellEditor {
     const Component = props.gradeIsEditable ? AssignmentRowCell : ReadOnlyCell
     const element = React.createElement(Component, props, null)
 
-    ReactDOM.render(element, this.container)
+    legacyRender(element, this.container)
   }
 
   handleKeyDown(event) {
@@ -71,7 +71,7 @@ export default class AssignmentCellEditor {
   destroy() {
     this.component = null
     this.options.column.getGridSupport().events.onKeyDown.unsubscribe(this.handleKeyDown)
-    ReactDOM.unmountComponentAtNode(this.container)
+    legacyUnmountComponentAtNode(this.container)
   }
 
   /*

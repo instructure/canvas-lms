@@ -30,7 +30,7 @@ import {useToggleCollapse, useToggleAllCollapse} from '../hooks/mutations/useTog
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {STUDENT} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')

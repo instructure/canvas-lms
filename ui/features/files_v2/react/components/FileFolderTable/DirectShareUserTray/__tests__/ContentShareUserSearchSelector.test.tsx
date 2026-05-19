@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ContentShareUserSearchSelector from '../ContentShareUserSearchSelector'
+import ContentShareUserSearchSelector, {type BasicUser} from '../ContentShareUserSearchSelector'
 import {render, fireEvent, act, waitFor} from '@testing-library/react'
 import useContentShareUserSearchApi from '@canvas/direct-sharing/react/effects/useContentShareUserSearchApi'
 
@@ -102,7 +102,7 @@ describe('ContentShareUserSearchSelector', () => {
   })
 
   it('hides already-selected users from search result options', async () => {
-    const alreadySelectedUsers = [{id: 'bar', name: 'extra shrek'}]
+    const alreadySelectedUsers = [{id: 'bar', name: 'extra shrek'}] as unknown as BasicUser[]
     const {getByText, getByLabelText, queryByText} = render(
       <ContentShareUserSearchSelector
         courseId="42"

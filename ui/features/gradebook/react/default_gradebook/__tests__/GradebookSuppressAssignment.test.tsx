@@ -58,3 +58,86 @@ describe('Gradebook suppressed assignments feature', () => {
     expect(gradebook.has_suppressed_assignments).toBe(false)
   })
 })
+
+describe('Gradebook showSuppressedAssignments toggle', () => {
+  let gradebook
+
+  beforeEach(() => {
+    gradebook = createGradebook()
+    window.ENV.SETTINGS = {suppress_assignments: true}
+  })
+
+  afterEach(() => {
+    window.ENV.SETTINGS = {}
+  })
+
+  describe('gridDisplaySettings.showSuppressedAssignments', () => {
+    it('defaults to false when setting is not provided', () => {
+      expect(gradebook.gridDisplaySettings.showSuppressedAssignments).toBe(false)
+    })
+
+    it('initializes from gridDisplaySettings', () => {
+      gradebook.gridDisplaySettings.showSuppressedAssignments = true
+      expect(gradebook.gridDisplaySettings.showSuppressedAssignments).toBe(true)
+    })
+  })
+
+  describe('filterAssignmentBySuppressStatus', () => {
+    it('returns false for suppressed assignments when showSuppressedAssignments is false and feature is enabled', () => {
+      window.ENV.SETTINGS = {suppress_assignments: true}
+      gradebook.gridDisplaySettings.showSuppressedAssignments = false
+      const assignment = {suppress_assignment: true}
+      expect(gradebook.filterAssignmentBySuppressStatus(assignment)).toBe(false)
+    })
+
+    it('returns true for non-suppressed assignments when showSuppressedAssignments is false and feature is enabled', () => {
+      window.ENV.SETTINGS = {suppress_assignments: true}
+      gradebook.gridDisplaySettings.showSuppressedAssignments = false
+      const assignment = {suppress_assignment: false}
+      expect(gradebook.filterAssignmentBySuppressStatus(assignment)).toBe(true)
+    })
+
+    it('returns true for suppressed assignments when showSuppressedAssignments is true', () => {
+      window.ENV.SETTINGS = {suppress_assignments: true}
+      gradebook.gridDisplaySettings.showSuppressedAssignments = true
+      const assignment = {suppress_assignment: true}
+      expect(gradebook.filterAssignmentBySuppressStatus(assignment)).toBe(true)
+    })
+
+    it('returns true for all assignments when suppress_assignments feature is disabled', () => {
+      window.ENV.SETTINGS = {suppress_assignments: false}
+      gradebook.gridDisplaySettings.showSuppressedAssignments = false
+      const suppressedAssignment = {suppress_assignment: true}
+      const regularAssignment = {suppress_assignment: false}
+      expect(gradebook.filterAssignmentBySuppressStatus(suppressedAssignment)).toBe(true)
+      expect(gradebook.filterAssignmentBySuppressStatus(regularAssignment)).toBe(true)
+    })
+
+    it('returns true for all assignments when suppress_assignments setting is undefined', () => {
+      window.ENV.SETTINGS = {}
+      gradebook.gridDisplaySettings.showSuppressedAssignments = false
+      const suppressedAssignment = {suppress_assignment: true}
+      expect(gradebook.filterAssignmentBySuppressStatus(suppressedAssignment)).toBe(true)
+    })
+
+    it('returns false for peer review when parent assignment is suppressed and showSuppressedAssignments is false', () => {
+      window.ENV.SETTINGS = {suppress_assignments: true}
+      gradebook.gridDisplaySettings.showSuppressedAssignments = false
+      const peerReview = {
+        suppress_assignment: false,
+        parent_assignment: {suppress_assignment: true},
+      }
+      expect(gradebook.filterAssignmentBySuppressStatus(peerReview)).toBe(false)
+    })
+
+    it('returns true for peer review when parent assignment is suppressed and showSuppressedAssignments is true', () => {
+      window.ENV.SETTINGS = {suppress_assignments: true}
+      gradebook.gridDisplaySettings.showSuppressedAssignments = true
+      const peerReview = {
+        suppress_assignment: false,
+        parent_assignment: {suppress_assignment: true},
+      }
+      expect(gradebook.filterAssignmentBySuppressStatus(peerReview)).toBe(true)
+    })
+  })
+})

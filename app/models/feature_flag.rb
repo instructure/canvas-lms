@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class FeatureFlag < ActiveRecord::Base
+class FeatureFlag < ApplicationRecord
   # this field is used for audit logging.
   # if a request is changing the state of a feature
   # flag, it should set this value before persisting
@@ -82,7 +82,7 @@ class FeatureFlag < ActiveRecord::Base
           end
 
           if !::Rails.env.production? && context.is_a?(Account) && Account.all_special_accounts.include?(context)
-            Account.clear_special_account_cache!(true)
+            Account.clear_special_account_cache!(force: true)
           end
         end
       end

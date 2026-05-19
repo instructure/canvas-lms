@@ -806,7 +806,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(@topic.reload.assignment.lti_asset_processors.count).to eq 2
       asset_processors = @topic.assignment.lti_asset_processors
       expect(asset_processors.map(&:id)).to include(ap2.id)
-      expect(asset_processors.map(&:id)).to_not include(ap1.id)
+      expect(asset_processors.map(&:id)).not_to include(ap1.id)
       expect(asset_processors.map(&:title)).to include("Episode IV: A New AP", ap2.title)
       expect(ap1.reload.workflow_state).to eq "deleted"
     end
@@ -1722,7 +1722,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       it "does not trigger accessibility scan when only unrelated columns are saved" do
         topic = DiscussionTopic.create!(title: "Test Topic", message: "Original message", course: @course)
 
-        expect(Accessibility::ResourceScannerService).to_not receive(:call)
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
 
         DiscussionTopic.transaction do
           topic.sort_order = "asc"
@@ -1845,7 +1845,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
         # When a graded discussion's title is updated, it syncs to the assignment,
         # so both the discussion topic and assignment should be scanned
         @assignment.reload
-        expect(Accessibility::ResourceScannerService).to_not receive(:call).with(resource: @topic)
+        expect(Accessibility::ResourceScannerService).not_to receive(:call).with(resource: @topic)
         expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: @assignment).once
 
         result = run_mutation(
@@ -1867,7 +1867,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
         # For graded discussions, message updates sync to the assignment's description,
         # so both the discussion topic and assignment should be scanned
         @assignment.reload
-        expect(Accessibility::ResourceScannerService).to_not receive(:call).with(resource: @topic)
+        expect(Accessibility::ResourceScannerService).not_to receive(:call).with(resource: @topic)
         expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: @assignment).once
 
         result = run_mutation(

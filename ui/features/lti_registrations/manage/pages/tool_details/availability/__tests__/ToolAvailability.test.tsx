@@ -32,8 +32,8 @@ import {ToolAvailability} from '../ToolAvailability'
 import {mockContextControl, mockDeployment} from './helpers'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {createDeployment} from '../../../../api/deployments'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+import {showFlashAlert} from '@instructure/platform-alerts'
+vi.mock('@instructure/platform-alerts', () => ({
   showFlashAlert: vi.fn(),
   showFlashSuccess: vi.fn(() => vi.fn()),
   showFlashError: vi.fn(() => vi.fn()),
@@ -1046,6 +1046,52 @@ describe('ToolAvailability', () => {
         expect(screen.getByText('Deployment ID: default-deployment-id')).toBeInTheDocument()
       })
       expect(document.getElementById(`delete-deployment-${deployment.id}`)).not.toBeInTheDocument()
+    })
+
+    it('calls the delete endpoint with the current account context, not the registration account id', async () => {
+      const mockDelete = vi.fn().mockResolvedValue(success({}))
+      const reg = mockRegistrationWithAllInformation({n: 'Test App', i: 1})
+      const deployment = mockDeployment({
+        id: ZLtiDeploymentId.parse('dep-1'),
+        context_name: 'Test Account',
+        context_id: '2',
+        context_type: 'Account',
+        registration_id: ZLtiRegistrationId.parse(reg.id),
+        root_account_deployment: false,
+        context_controls: [
+          mockContextControl({
+            id: ZLtiContextControlId.parse('cc-1-1'),
+            account_id: ZAccountId.parse('2'),
+            context_name: 'CC-1-1',
+            path: 'a1.a2.',
+          }),
+        ],
+      })
+      // Use a different accountId than reg.account_id
+      const differentAccountId = ZAccountId.parse('999')
+      const fetchControlsByDeployment = vi.fn().mockResolvedValue(success([deployment]))
+      renderAppWithRegistration(reg)(
+        <ToolAvailability
+          deleteDeployment={mockDelete}
+          editContextControl={vi.fn()}
+          accountId={differentAccountId}
+          fetchControlsByDeployment={fetchControlsByDeployment}
+          deleteContextControl={vi.fn()}
+        />,
+      )
+      await waitFor(() => {
+        expect(screen.getByText('Deployment ID: default-deployment-id')).toBeInTheDocument()
+      })
+      fireEvent.click(document.getElementById('delete-deployment-dep-1')!)
+      expect(screen.getByText('Delete Deployment')).toBeInTheDocument()
+      fireEvent.click(document.getElementById('delete-deployment-modal-button')!)
+      await waitFor(() => {
+        expect(mockDelete).toHaveBeenCalledWith({
+          registrationId: reg.id,
+          accountId: differentAccountId,
+          deploymentId: deployment.id,
+        })
+      })
     })
 
     it('lets users cancel deleting a deployment', async () => {

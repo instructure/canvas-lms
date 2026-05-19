@@ -31,6 +31,10 @@ RSpec.describe Mutations::UpdateSubmissionStudentEnteredScore do
           submission {
             _id
             studentEnteredScore
+            user {
+              name
+              email
+            }
           }
           errors {
             attribute
@@ -57,7 +61,7 @@ RSpec.describe Mutations::UpdateSubmissionStudentEnteredScore do
     @account = Account.create!
     @course = @account.courses.create!
     @teacher = @course.enroll_teacher(User.create!, enrollment_state: "active").user
-    @student = @course.enroll_student(User.create!, enrollment_state: "active").user
+    @student = @course.enroll_student(User.create!(name: "Student Learner"), enrollment_state: "active").user
     @assignment = @course.assignments.create!(title: "Example Assignment")
     @submission = @assignment.submit_homework(
       @student,
@@ -79,8 +83,19 @@ RSpec.describe Mutations::UpdateSubmissionStudentEnteredScore do
     expect(result[:data][:updateSubmissionStudentEnteredScore][:submission][:_id]).to eq(@submission.id.to_s)
   end
 
-  it "returns an error if the user is not authorized to read the submission" do
+  it "returns a submission not found error" do
     result = run_mutation(id: "0", entered_score: 5)
     expect(result[:data][:updateSubmissionStudentEnteredScore][:errors][0][:message]).to eq("Submission not found")
+  end
+
+  it "returns no submission when unauthorized" do
+    unenrolled_user = User.create!(name: "Unenrolled User")
+    expect(@submission.grants_right?(unenrolled_user, :read)).to be false
+
+    result = run_mutation({ id: @submission.id, entered_score: 5 }, unenrolled_user)
+
+    mutation_result = result[:data][:updateSubmissionStudentEnteredScore]
+    expect(mutation_result[:submission]).to be_nil
+    expect(mutation_result[:errors][0][:message]).to eq("Not authorized to read Submission")
   end
 end

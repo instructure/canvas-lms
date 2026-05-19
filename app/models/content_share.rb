@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ContentShare < ActiveRecord::Base
+class ContentShare < ApplicationRecord
   TYPE_TO_CLASS = {
     "assignment" => Assignment,
     "attachment" => Attachment,

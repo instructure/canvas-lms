@@ -38,9 +38,13 @@ vi.mock('@canvas/add-people/react/helpers', () => ({
 }))
 
 // Mock flash alerts
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: vi.fn(() => vi.fn()),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn(() => vi.fn()),
+  }
+})
 
 // Mock data fixtures
 const mockMigrationReady: TiiApMigration = {

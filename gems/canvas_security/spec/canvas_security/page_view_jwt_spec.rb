@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe CanvasSecurity::PageViewJwt do
   describe ".generate" do
     it "generates and decodes a valid jwt token" do

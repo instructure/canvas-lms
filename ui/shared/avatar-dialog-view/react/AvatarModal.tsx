@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {useScope as createI18nScope} from '@canvas/i18n'
-import CanvasSelect from '@canvas/instui-bindings/react/Select'
+import {CanvasSelect} from '@instructure/platform-instui-bindings'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -27,7 +27,7 @@ import UploadFileView from '../backbone/views/UploadFileView'
 import GravatarView from '../backbone/views/GravatarView'
 import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {handleUpdatingProfilePicture, updateAvatarInDom, getImage, preflightRequest} from './util'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 

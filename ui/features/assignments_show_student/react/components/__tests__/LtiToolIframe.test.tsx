@@ -29,6 +29,7 @@ describe('LtiToolIframe', () => {
     LTI_TOOL_ID: '1',
     LTI_TOOL_SELECTION_HEIGHT: '500',
     LTI_TOOL_SELECTION_WIDTH: '800',
+    LTI_LAUNCH_FRAME_ALLOWANCES: ['geolocation *', 'microphone *', 'camera *'],
   }
 
   let globalEnv: GlobalEnv
@@ -73,5 +74,12 @@ describe('LtiToolIframe', () => {
 
     const iframe = await screen.findByTestId('lti-external-tool')
     expect(iframe).toHaveStyle({height: '500px', width: '800px'})
+  })
+
+  it('sets iframe allow attribute at render time for microphone and camera permissions', () => {
+    render(<LtiToolIframe submission={mockSubmission} assignment={mockAssignment} />)
+
+    const iframe = screen.getByTestId('lti-external-tool')
+    expect(iframe).toHaveAttribute('allow', ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
   })
 })

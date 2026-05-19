@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {assignLocation} from '@canvas/util/globalUtils'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import {MemoryRouter} from 'react-router-dom'
+import {MemoryRouter, useLocation, useNavigate, useNavigationType} from 'react-router-dom'
 import {NewLoginDataProvider, NewLoginProvider, useNewLoginData} from '../../context'
 import {forgotPassword} from '../../services'
 import ForgotPassword from '../ForgotPassword'
+import {Mock} from 'vitest'
 
 vi.mock('../../context', async () => {
   const actualContext = await vi.importActual<typeof import('../../context')>('../../context')
@@ -39,9 +39,20 @@ vi.mock('../../services/auth', () => ({
   forgotPassword: vi.fn(),
 }))
 
-vi.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: vi.fn(),
-}))
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
+  return {
+    ...actual,
+    useNavigate: vi.fn(),
+    useNavigationType: vi.fn(),
+    useLocation: vi.fn(),
+  }
+})
+
+const mockNavigate = vi.fn()
+const mockNavigationType = useNavigationType as Mock
+const mockedUseNavigate = useNavigate as ReturnType<typeof vi.fn>
+const mockedUseLocation = useLocation as ReturnType<typeof vi.fn>
 
 describe('ForgotPassword', () => {
   const setup = () => {
@@ -59,6 +70,9 @@ describe('ForgotPassword', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.restoreAllMocks()
+    mockedUseNavigate.mockReturnValue(mockNavigate)
+    mockNavigationType.mockReturnValue('PUSH')
+    mockedUseLocation.mockReturnValue({key: 'default'})
     // reset the mock implementation to return the default values
     vi.mocked(useNewLoginData).mockImplementation(() => ({
       isDataLoading: false,
@@ -76,7 +90,7 @@ describe('ForgotPassword', () => {
         setup()
         const submitButton = screen.getByTestId('submit-button')
         await userEvent.click(submitButton)
-        const emailInput = await screen.findByTestId('email-input')
+        const emailInput = await screen.findByTestId('username-input')
         expect(emailInput).toHaveAttribute('aria-invalid', 'true')
       })
 
@@ -84,7 +98,7 @@ describe('ForgotPassword', () => {
         setup()
         const submitButton = screen.getByTestId('submit-button')
         await userEvent.click(submitButton)
-        const errorMessage = await screen.findByText('Please enter a valid email.')
+        const errorMessage = await screen.findByText('Please enter your email.')
         expect(errorMessage).toBeInTheDocument()
       })
 
@@ -107,13 +121,13 @@ describe('ForgotPassword', () => {
         })
       })
 
-      it('shows validation error for invalid email format', async () => {
+      it('shows validation error for whitespace-only input', async () => {
         setup()
-        const emailInput = screen.getByTestId('email-input')
+        const emailInput = screen.getByTestId('username-input')
         const submitButton = screen.getByTestId('submit-button')
-        await userEvent.type(emailInput, 'invalid-email')
+        await userEvent.type(emailInput, '   ')
         await userEvent.click(submitButton)
-        const errorMessage = await screen.findByText('Please enter a valid email.')
+        const errorMessage = await screen.findByText('Please enter your email.')
         expect(errorMessage).toBeInTheDocument()
       })
     })
@@ -122,7 +136,7 @@ describe('ForgotPassword', () => {
       setup()
       const submitButton = screen.getByTestId('submit-button')
       await userEvent.click(submitButton)
-      const emailInput = screen.getByTestId('email-input')
+      const emailInput = screen.getByTestId('username-input')
       expect(document.activeElement).toBe(emailInput)
     })
   })
@@ -130,26 +144,48 @@ describe('ForgotPassword', () => {
   describe('user input', () => {
     it('allows user to enter an email', async () => {
       setup()
-      const emailInput = screen.getByTestId('email-input')
+      const emailInput = screen.getByTestId('username-input')
       await userEvent.type(emailInput, 'test@example.com')
       expect(emailInput).toHaveValue('test@example.com')
     })
 
-    it('trims whitespace from the email input', async () => {
+    it('allows spaces to be typed in the email input', async () => {
       setup()
-      const emailInput = screen.getByTestId('email-input')
-      await userEvent.type(emailInput, '  test@example.com  ')
-      expect(emailInput).toHaveValue('test@example.com')
+      const emailInput = screen.getByTestId('username-input')
+      await userEvent.type(emailInput, 'test user@example.com')
+      expect(emailInput).toHaveValue('test user@example.com')
     })
   })
 
   describe('navigation behavior', () => {
-    it('navigates back to login when the cancel button is clicked', async () => {
-      setup()
-      const backButton = screen.getByTestId('cancel-button')
-      await userEvent.click(backButton)
-      await waitFor(() => {
-        expect(assignLocation).toHaveBeenCalledWith('/login')
+    describe('when the cancel button is clicked', () => {
+      it('navigates back to login when there is no previous history', async () => {
+        setup()
+        const backButton = screen.getByTestId('cancel-button')
+        await userEvent.click(backButton)
+        expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
+        expect(mockNavigate).toHaveBeenCalledTimes(1)
+      })
+
+      it('navigates back to the previous page when history exists', async () => {
+        mockNavigationType.mockReturnValue('PUSH')
+        mockedUseLocation.mockReturnValue({key: 'abc123'})
+        mockedUseNavigate.mockReturnValue(mockNavigate)
+        setup()
+        const backButton = screen.getByTestId('cancel-button')
+        await userEvent.click(backButton)
+        expect(mockNavigate).toHaveBeenCalledWith(-1)
+        expect(mockNavigate).toHaveBeenCalledTimes(1)
+      })
+
+      it('navigates to fallback when navigationType is POP or key is default', async () => {
+        mockNavigationType.mockReturnValue('POP')
+        mockedUseLocation.mockReturnValue({key: 'default'})
+        mockedUseNavigate.mockReturnValue(mockNavigate)
+        setup()
+        const backButton = screen.getByTestId('cancel-button')
+        await userEvent.click(backButton)
+        expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
       })
     })
 
@@ -159,16 +195,15 @@ describe('ForgotPassword', () => {
         data: {requested: true},
       })
       setup()
-      const emailInput = screen.getByTestId('email-input')
+      const emailInput = screen.getByTestId('username-input')
       const submitButton = screen.getByTestId('submit-button')
       await userEvent.type(emailInput, 'test@example.com')
       await userEvent.click(submitButton)
       await waitFor(() => expect(screen.getByTestId('confirmation-heading')).toBeInTheDocument())
       const backButton = screen.getByTestId('confirmation-back-button')
       await userEvent.click(backButton)
-      await waitFor(() => {
-        expect(assignLocation).toHaveBeenCalledWith('/login')
-      })
+      expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
+      expect(mockNavigate).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -185,7 +220,7 @@ describe('ForgotPassword', () => {
         data: {requested: true},
       })
       setup()
-      const emailInput = screen.getByTestId('email-input')
+      const emailInput = screen.getByTestId('username-input')
       const submitButton = screen.getByTestId('submit-button')
       const cancelButton = screen.getByTestId('cancel-button')
       await userEvent.type(emailInput, 'test@example.com')
@@ -208,7 +243,7 @@ describe('ForgotPassword', () => {
         data: {requested: true},
       })
       setup()
-      const emailInput = screen.getByTestId('email-input')
+      const emailInput = screen.getByTestId('username-input')
       await userEvent.type(emailInput, 'test@example.com')
       const submitButton = screen.getByTestId('submit-button')
       await userEvent.click(submitButton)
@@ -226,7 +261,7 @@ describe('ForgotPassword', () => {
         data: {requested: true},
       })
       setup()
-      const emailInput = screen.getByTestId('email-input')
+      const emailInput = screen.getByTestId('username-input')
       const submitButton = screen.getByTestId('submit-button')
       await userEvent.type(emailInput, 'test@example.com')
       await userEvent.click(submitButton)
@@ -240,12 +275,27 @@ describe('ForgotPassword', () => {
   describe('api interactions', () => {
     it('calls forgotPassword API with the entered email', async () => {
       setup()
-      const emailInput = screen.getByTestId('email-input')
+      const emailInput = screen.getByTestId('username-input')
       const submitButton = screen.getByTestId('submit-button')
       await userEvent.type(emailInput, 'test@example.com')
       await userEvent.click(submitButton)
       await waitFor(() => {
         expect(forgotPassword).toHaveBeenCalledWith('test@example.com')
+      })
+    })
+
+    it('calls forgotPassword API with a plain username', async () => {
+      vi.mocked(forgotPassword).mockResolvedValueOnce({
+        status: 200,
+        data: {requested: true},
+      })
+      setup()
+      const emailInput = screen.getByTestId('username-input')
+      const submitButton = screen.getByTestId('submit-button')
+      await userEvent.type(emailInput, 'testuser')
+      await userEvent.click(submitButton)
+      await waitFor(() => {
+        expect(forgotPassword).toHaveBeenCalledWith('testuser')
       })
     })
   })

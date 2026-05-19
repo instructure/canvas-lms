@@ -187,32 +187,36 @@ def copyFromContainer(containerName, containerPath, workspacePath) {
   sh "docker compose -f ${env.COMPOSE_FILE} cp ${containerName}:${containerPath} ${workspacePath}"
 }
 
-// Configure Build stage helper - extracted to reduce Jenkinsfile bytecode
-def configureBuildStage(buildParameters) {
-  def canvasRailsOverrideValue = commitMessageFlag('canvas-rails') as String
-
-  if (canvasRailsOverrideValue) {
-    env.CANVAS_RAILS = canvasRailsOverrideValue
-  }
-
-  // Require valid GERRIT_CHANGE_NUMBER for all builds - many stages will fail without it
+// Pre-pipeline checks - call before pipeline {} in Jenkinsfile to skip
+// builds early without spinning up an agent or running any stages.
+def preBuildChecks() {
+  // Require valid GERRIT_CHANGE_NUMBER - many stages will fail without it
   if (!env.GERRIT_CHANGE_NUMBER || env.GERRIT_CHANGE_NUMBER == '000000') {
     env.SKIP_BUILD = 'true'
     error "GERRIT_CHANGE_NUMBER is not set or invalid (${env.GERRIT_CHANGE_NUMBER}). Cannot proceed with build."
   }
 
   if (env.GERRIT_PATCHSET_UPLOADER_EMAIL == 'svc.cloudjenkins@instructure.com' &&
-    env.GERRIT_CHANGE_SUBJECT =~ /translations?$/) {
+    env.GERRIT_CHANGE_SUBJECT.replaceAll(/\p{Punct}+$/, '') =~ /translations?$/) {
     env.SKIP_BUILD = 'true'
     if (configuration.isChangeMerged()) {
       // Post-merge translation: halt with SUCCESS status
       echo "Translation build from svc.cloudjenkins@instructure.com - post-merge build will be skipped"
-      haltBuildWithResult(Result.SUCCESS, "Skipping translation build from svc.cloudjenkins@instructure.com")
+      haltBuildWithResult(Result.SUCCESS, "svc.cloudjenkins@instructure.com")
     } else {
       // Pre-merge translation: halt with NOT_BUILT status
       echo "Translation build from svc.cloudjenkins@instructure.com - pre-merge build will be skipped"
-      haltBuildWithResult(Result.NOT_BUILT, "Skipping translation build from svc.cloudjenkins@instructure.com")
+      haltBuildWithResult(Result.NOT_BUILT, "svc.cloudjenkins@instructure.com")
     }
+  }
+}
+
+// Configure Build stage helper - extracted to reduce Jenkinsfile bytecode
+def configureBuildStage(buildParameters) {
+  def canvasRailsOverrideValue = commitMessageFlag('canvas-rails') as String
+
+  if (canvasRailsOverrideValue) {
+    env.CANVAS_RAILS = canvasRailsOverrideValue
   }
 
   if (commitMessageFlag('skip-ci') as Boolean) {
@@ -233,8 +237,9 @@ def configureBuildStage(buildParameters) {
   }
 
   // Ensure that all build flags are compatible.
-  if (commitMessageFlag('change-merged') as Boolean && configuration.buildRegistryPath() == configuration.buildRegistryPathDefault()) {
-    error 'Manually triggering the change-merged build path must be combined with a custom build-registry-path'
+  if (commitMessageFlag('change-merged') as Boolean && !(commitMessageFlag('test-tag-suffix') as String)) {
+    env.PUBLISH_PATCHSET_IMAGE = '0' // default to not publishing if the merge flag is set without a test tag suffix
+    error 'Manually triggering the change-merged build path must be combined with test-tag-suffix to avoid overwriting production images'
   }
 
   maybeSlackSendRetrigger()
@@ -288,15 +293,15 @@ def postBuildAlways() {
       dockerUtils.tagRemote(env.KARMA_RUNNER_IMAGE, env.KARMA_MERGE_IMAGE)
     }
 
+    try {
+      buildDockerImageStage.mirrorToStarlord()
+    } catch (e) {
+      echo "Starlord mirror failed (non-fatal): ${e.message}"
+    }
+
     if (isStartedByUser()) {
       submitGerritReview((status == 'SUCCESS' ? '--verified +1' : '--verified -1'), "${env.BUILD_URL}/build-summary-report/")
     }
-
-    build(job: '/Canvas/helpers/junit-uploader', parameters: [
-      string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
-      string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
-      string(name: 'SOURCE', value: "${env.JOB_NAME}/${env.BUILD_NUMBER}"),
-    ], propagate: false, wait: false)
   } catch (Exception e) {
     echo "Post-build operations failed: ${e.message}"
   }

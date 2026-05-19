@@ -31,8 +31,6 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 
-require_relative "../../spec_helper"
-
 module Utils
   describe RelativeDate do
     let(:today) { Date.parse("2014-10-1") }

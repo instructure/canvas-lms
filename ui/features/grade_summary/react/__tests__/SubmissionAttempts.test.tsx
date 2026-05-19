@@ -16,8 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import SubmissionAttempts, {type SubmissionAttemptsProps} from '../SubmissionAttempts'
 import {render} from '@testing-library/react'
+import SubmissionAttempts, {type SubmissionAttemptsProps} from '../SubmissionAttempts'
+
+vi.mock('@instructure/studio-player', () => ({
+  StudioPlayer: vi.fn().mockImplementation(() => {
+    return <div>StudioPlayer</div>
+  }),
+}))
 
 describe('SubmissionAttempts', () => {
   const props: SubmissionAttemptsProps = {

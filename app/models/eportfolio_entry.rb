@@ -20,7 +20,7 @@
 
 require "sanitize"
 
-class EportfolioEntry < ActiveRecord::Base
+class EportfolioEntry < ApplicationRecord
   attr_readonly :eportfolio_id, :eportfolio_category_id
   belongs_to :eportfolio, touch: true
   belongs_to :eportfolio_category

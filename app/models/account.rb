@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Account < ActiveRecord::Base
+class Account < ApplicationRecord
   include Context
   include OutcomeImportContext
   include Pronouns
@@ -100,6 +100,7 @@ class Account < ActiveRecord::Base
   has_many :calendar_events, -> { where("calendar_events.workflow_state<>'cancelled'") }, as: :context, inverse_of: :context, dependent: :destroy
 
   has_many :account_reports, inverse_of: :account
+  has_many :institutional_tag_categories
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context, inverse_of: :context
   has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context, inverse_of: :context
   has_many :assessment_questions, through: :assessment_question_banks
@@ -155,7 +156,7 @@ class Account < ActiveRecord::Base
   belongs_to :course_template, class_name: "Course", inverse_of: :templated_accounts
   belongs_to :grading_standard
 
-  def inherited_assessment_question_banks(include_self = false, *additional_contexts)
+  def inherited_assessment_question_banks(*additional_contexts, include_self: false)
     sql, conds = [], []
     contexts = additional_contexts + account_chain
     contexts.delete(self) unless include_self
@@ -215,6 +216,7 @@ class Account < ActiveRecord::Base
   validates :name, length: { maximum: maximum_string_length, allow_blank: true }
   validate :account_chain_loop, if: :parent_account_id_changed?
   validate :validate_auth_discovery_url
+  validate :validate_login_help_url
   validates :workflow_state, presence: true
   validate :no_active_courses, if: ->(a) { a.workflow_state_changed? && !a.active? }
   validate :no_active_sub_accounts, if: ->(a) { a.workflow_state_changed? && !a.active? }
@@ -321,6 +323,7 @@ class Account < ActiveRecord::Base
   add_setting :login_handle_name, root_only: true
   add_setting :change_password_url, root_only: true
   add_setting :unknown_user_url, root_only: true
+  add_setting :login_help_url, root_only: true
   add_setting :fft_registration_url, root_only: true
 
   add_setting :restrict_student_future_view, boolean: true, default: false, inheritable: true
@@ -398,7 +401,8 @@ class Account < ActiveRecord::Base
   add_setting :usage_rights_required, boolean: true, default: false, inheritable: true
   add_setting :limit_parent_app_web_access, boolean: true, default: false, root_only: true
   add_setting :kill_joy, boolean: true, default: false, root_only: true
-  add_setting :suppress_notifications, boolean: true, default: false, root_only: true
+  # Value is set directly in AccountsController; does not flow through settings= coercion
+  add_setting :suppress_notifications, root_only: true
   add_setting :smart_alerts_threshold, default: 36, root_only: true
 
   add_setting :disable_post_to_sis_when_grading_period_closed, boolean: true, root_only: true, default: false
@@ -461,6 +465,29 @@ class Account < ActiveRecord::Base
   add_setting :thousand_separator, inheritable: true
   add_setting :early_access_program, boolean: true, default: false, root_only: true, inheritable: true
   add_setting :discovery_page, root_only: true
+  add_setting :onetrust_consent_domain_id, root_only: true
+  add_setting :has_underage_users, boolean: true, root_only: true, default: false
+
+  # suppress_notifications can be:
+  #   true          - suppress all notifications (backward compatible)
+  #   false/nil     - suppress none (backward compatible)
+  #   Array<String> - suppress only notifications whose category_slug matches an entry
+  def suppress_notifications?
+    settings[:suppress_notifications] == true
+  end
+
+  # Returns true if the given notification should be suppressed for this account.
+  # Supports both the legacy blanket suppression (true) and granular per-category suppression.
+  def suppress_notification?(notification)
+    case settings[:suppress_notifications]
+    when true
+      true
+    when Array
+      settings[:suppress_notifications].include?(notification.category_slug)
+    else
+      false
+    end
+  end
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
@@ -862,7 +889,7 @@ class Account < ActiveRecord::Base
         (preloaded_accounts[account.parent_account_id] ||= []) << account
       end
     end
-    res = [[("&nbsp;&nbsp;" * indent).html_safe + name, id]]
+    res = [[("&nbsp;&nbsp;".html_safe * indent) + name, id]]
     preloaded_accounts[id]&.each do |account|
       res += account.sub_accounts_as_options(indent + 1, preloaded_accounts)
     end
@@ -998,7 +1025,7 @@ class Account < ActiveRecord::Base
           # Prevent subsequent code using a stale Account object whose cached associations
           # or inherited settings were just invalidated.
           reload_if_cache_stale
-          Account.delay_if_production(singleton: "Account.invalidate_inherited_caches_#{global_id}")
+          Account.delay(singleton: "Account.invalidate_inherited_caches_#{global_id}")
                  .invalidate_inherited_caches(self, @invalidations)
         end
       end
@@ -1180,7 +1207,8 @@ class Account < ActiveRecord::Base
         end
 
         if starting_account_id
-          GuardRail.activate(:secondary) do
+          guard_rail_env = (Account.connection.open_transactions == 0) ? :secondary : GuardRail.environment
+          GuardRail.activate(guard_rail_env) do
             ids = Account.connection.select_values(<<~SQL.squish)
               WITH RECURSIVE t AS (
                 SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
@@ -1324,9 +1352,7 @@ class Account < ActiveRecord::Base
     Account.limit(limit).offset(offset).sub_accounts_recursive(id)
   end
 
-  def self.sub_accounts_recursive(parent_account_id, pluck = false)
-    raise ArgumentError unless [false, :pluck].include?(pluck)
-
+  def self.sub_accounts_recursive(parent_account_id, pluck: false)
     original_shard = Shard.current
     result = Shard.shard_for(parent_account_id).activate do
       parent_account_id = Shard.relative_id_for(parent_account_id, original_shard, Shard.current)
@@ -1384,7 +1410,7 @@ class Account < ActiveRecord::Base
 
   # a common helper
   def self.sub_account_ids_recursive(parent_account_id)
-    active.select(:id).sub_accounts_recursive(parent_account_id, :pluck)
+    active.select(:id).sub_accounts_recursive(parent_account_id, pluck: true)
   end
 
   # compat for reports
@@ -1469,12 +1495,12 @@ class Account < ActiveRecord::Base
     account_users.active.where(user_id: user).first if user
   end
 
-  def available_custom_account_roles(include_inactive = false)
-    available_custom_roles(include_inactive).for_accounts.to_a
+  def available_custom_account_roles(include_inactive: false)
+    available_custom_roles(include_inactive:).for_accounts.to_a
   end
 
-  def available_account_roles(include_inactive = false, user = nil)
-    account_roles = available_custom_account_roles(include_inactive)
+  def available_account_roles(include_inactive: false, user: nil)
+    account_roles = available_custom_account_roles(include_inactive:)
     account_roles << Role.get_built_in_role("AccountAdmin", root_account_id: resolved_root_account_id)
     if user
       account_roles.select! do |role|
@@ -1489,8 +1515,8 @@ class Account < ActiveRecord::Base
   # returns active roles first, then ordered by their place in the account chain.
   # this provides determinism when multiple roles with the same name exist
   # in the account chain - just pick the first matching one you find
-  def available_custom_course_roles(include_inactive = false)
-    roles = available_custom_roles(include_inactive).for_courses.to_a
+  def available_custom_course_roles(include_inactive: false)
+    roles = available_custom_roles(include_inactive:).for_courses.to_a
 
     shard.activate do
       account_positions = account_chain_ids(include_federated_parent_id: true).each_with_index.to_h
@@ -1501,13 +1527,13 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def available_course_roles(include_inactive = false)
-    course_roles = available_custom_course_roles(include_inactive)
+  def available_course_roles(include_inactive: false)
+    course_roles = available_custom_course_roles(include_inactive:)
     course_roles += Role.built_in_course_roles(root_account_id: resolved_root_account_id)
     course_roles
   end
 
-  def available_custom_roles(include_inactive = false)
+  def available_custom_roles(include_inactive: false)
     scope = if root_account.primary_settings_root_account?
               Role.where(account_id: account_chain_ids)
             else
@@ -1516,8 +1542,8 @@ class Account < ActiveRecord::Base
     include_inactive ? scope.not_deleted : scope.active
   end
 
-  def available_roles(include_inactive = false)
-    available_account_roles(include_inactive) + available_course_roles(include_inactive)
+  def available_roles(include_inactive: false)
+    available_account_roles(include_inactive:) + available_course_roles(include_inactive:)
   end
 
   def get_account_role_by_name(role_name)
@@ -1858,6 +1884,20 @@ class Account < ActiveRecord::Base
     settings[:unknown_user_url]
   end
 
+  def login_help_url=(url)
+    settings[:login_help_url] = url
+  end
+
+  def login_help_url
+    settings[:login_help_url]
+  end
+
+  def validate_login_help_url
+    validate_url_setting(:login_help_url, :login_help_url) do
+      t("errors.invalid_login_help_url", "The login help URL is not valid")
+    end
+  end
+
   def discovery_page_active=(active)
     settings[:discovery_page] ||= {}
     settings[:discovery_page][:active] = Canvas::Plugin.value_to_boolean(active)
@@ -1867,14 +1907,51 @@ class Account < ActiveRecord::Base
     settings.dig(:discovery_page, :active) == true
   end
 
-  def validate_auth_discovery_url
-    return if settings[:auth_discovery_url].blank?
+  def discovery_page_allowed?
+    false
+  end
 
-    begin
-      value, _uri = CanvasHttp.validate_url(settings[:auth_discovery_url])
-      self.auth_discovery_url = value
-    rescue URI::Error, ArgumentError
-      errors.add(:discovery_url, t("errors.invalid_discovery_url", "The discovery URL is not valid"))
+  def discovery_page_url
+    nil
+  end
+
+  def discovery_page_claims_for(user, config)
+    providers = authentication_providers.active.load
+    build_links = lambda do |entries|
+      (entries || []).filter_map do |entry|
+        provider = providers.find { |p| p.id == entry[:authentication_provider_id].to_i }
+        next if provider.nil?
+
+        discovery_page_link_for(provider, entry)
+      end
+    end
+
+    {
+      sub: user.global_id.to_s,
+      org: uuid,
+      primary: build_links.call(config[:primary]),
+      secondary: build_links.call(config[:secondary]),
+      customMessageDiscovery: discovery_page_custom_message
+    }
+  end
+
+  def discovery_page_link_for(provider, entry)
+    { label: Sanitize.clean(entry[:label].to_s), icon: entry[:icon], path: provider.login_authentication_provider_path }.compact
+  end
+
+  def discovery_page_custom_message
+    return nil unless Account.site_admin.feature_enabled?(:new_login_ui_custom_labels)
+    return nil unless discovery_page_allowed?
+
+    value = brand_config&.get_value("ic-brand-Discovery-custom-message").presence
+    return nil if value.nil?
+
+    value.gsub(/[\r\n]+/, " ").strip
+  end
+
+  def validate_auth_discovery_url
+    validate_url_setting(:auth_discovery_url, :discovery_url) do
+      t("errors.invalid_discovery_url", "The discovery URL is not valid")
     end
   end
 
@@ -1912,6 +1989,17 @@ class Account < ActiveRecord::Base
 
     if decimal_sep.present? && thousand_sep.present? && decimal_sep == thousand_sep
       errors.add(:separators_cannot_be_the_same, t("Decimal and thousand separators cannot be the same."))
+    end
+  end
+
+  def validate_url_setting(setting, error_field)
+    return if settings[setting].blank?
+
+    begin
+      value, _uri = CanvasHttp.validate_url(settings[setting])
+      public_send(:"#{setting}=", value)
+    rescue URI::Error, ArgumentError
+      errors.add(error_field, yield)
     end
   end
 
@@ -1958,16 +2046,28 @@ class Account < ActiveRecord::Base
       @special_account_list ||= []
     end
 
-    def clear_special_account_cache!(force = false)
-      special_account_timed_cache.clear(force)
+    def clear_special_account_cache!(force: false)
+      special_account_timed_cache.clear(force:)
     end
 
     def define_special_account(key, name = nil)
       name ||= key.to_s.titleize
       special_account_list << key
       instance_eval <<~RUBY, __FILE__, __LINE__ + 1
-        def self.#{key}(force_create = false)
-          get_special_account(:#{key}, #{name.inspect}, force_create)
+        def self.#{key}(force_create: false)
+          get_special_account(:#{key}, #{name.inspect}, force_create:)
+        end
+      RUBY
+    end
+
+    def define_special_account_exists(key)
+      special_account_list << key
+      instance_eval <<~RUBY, __FILE__, __LINE__ + 1
+        # def site_admin_exists?
+        #   special_account_exists?(:site_admin)
+        # end
+        def self.#{key}_exists?
+          special_account_exists?(:#{key})
         end
       RUBY
     end
@@ -1978,10 +2078,12 @@ class Account < ActiveRecord::Base
   end
   define_special_account(:default, "Default Account") # Account.default
   define_special_account(:site_admin) # Account.site_admin
+  define_special_account_exists(:default) # Account.default_exists?
+  define_special_account_exists(:site_admin) # Account.site_admin_exists?
 
   def clear_special_account_cache_if_special
     if shard == Shard.birth && Account.special_account_ids.values.map(&:to_i).include?(id)
-      Account.clear_special_account_cache!(true)
+      Account.clear_special_account_cache!(force: true)
     end
   end
 
@@ -2009,7 +2111,15 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def self.get_special_account(special_account_type, default_account_name, force_create = false)
+  # We can't just call get_special_account.present? because in non-production
+  # environments, that actually creates the account, which we want to avoid!
+  def self.special_account_exists?(special_account_type)
+    special_accounts[special_account_type].present? ||
+      special_account_ids[special_account_type] ||
+      Setting.get("#{special_account_type}_account_id", nil).present?
+  end
+
+  def self.get_special_account(special_account_type, default_account_name, force_create: false)
     Shard.birth.activate do
       account = special_accounts[special_account_type]
       unless account
@@ -2223,7 +2333,7 @@ class Account < ActiveRecord::Base
       tabs << { id: TAB_AUTHENTICATION, label: t("#account.tab_authentication", "Authentication"), css_class: "authentication", href: :account_authentication_providers_path } if root_account? && manage_settings
       tabs << { id: TAB_PLUGINS, label: t("#account.tab_plugins", "Plugins"), css_class: "plugins", href: :plugins_path, no_args: true } if root_account? && grants_right?(user, :manage_site_settings)
       tabs << { id: TAB_RELEASE_NOTES, label: t("Release Notes"), css_class: "release_notes", href: :account_release_notes_manage_path } if root_account? && ReleaseNote.enabled? && grants_right?(user, :manage_release_notes)
-      tabs << { id: TAB_RATE_LIMITING, label: t("#account.tab_rate_limiting", "Rate Limiting"), css_class: "rate_limiting", href: :account_rate_limiting_path } if user && feature_enabled?(:api_rate_limits) && grants_right?(user, :manage_rate_limiting)
+      tabs << { id: TAB_RATE_LIMITING, label: t("#account.tab_rate_limiting", "Rate Limiting"), css_class: "rate_limiting", href: :account_rate_limiting_path } if user && grants_right?(user, :manage_rate_limiting)
       tabs << { id: TAB_JOBS, label: t("#account.tab_jobs", "Jobs"), css_class: "jobs", href: :jobs_path, no_args: true } if root_account? && grants_right?(user, :view_jobs)
     else
       tabs << { id: TAB_COURSES, label: t("#account.tab_courses", "Courses"), css_class: "courses", href: :account_path } if user && grants_right?(user, :read_course_list)
@@ -2250,7 +2360,7 @@ class Account < ActiveRecord::Base
       tabs << { id: TAB_ACCOUNT_CALENDARS, label: t("Account Calendars"), css_class: "account_calendars", href: :account_calendar_settings_path } if user && grants_right?(user, :manage_account_calendar_visibility)
       tabs << { id: TAB_TERMS, label: t("#account.tab_terms", "Terms"), css_class: "terms", href: :account_terms_path } if root_account? && manage_settings
       tabs << { id: TAB_AUTHENTICATION, label: t("#account.tab_authentication", "Authentication"), css_class: "authentication", href: :account_authentication_providers_path } if root_account? && manage_settings
-      tabs << { id: TAB_RATE_LIMITING, label: t("#account.tab_rate_limiting", "Rate Limiting"), css_class: "rate_limiting", href: :account_rate_limiting_path } if user && feature_enabled?(:api_rate_limits) && grants_right?(user, :manage_rate_limiting)
+      tabs << { id: TAB_RATE_LIMITING, label: t("#account.tab_rate_limiting", "Rate Limiting"), css_class: "rate_limiting", href: :account_rate_limiting_path } if user && grants_right?(user, :manage_rate_limiting)
       if root_account? && allow_sis_import && user && grants_any_right?(user, :manage_sis, :import_sis)
         tabs << { id: TAB_SIS_IMPORT,
                   label: t("#account.tab_sis_import", "SIS Import"),
@@ -2265,12 +2375,12 @@ class Account < ActiveRecord::Base
       tabs << { id: TAB_DEVELOPER_KEYS, label: t("#account.tab_developer_keys", "Developer Keys"), css_class: "developer_keys", href: :account_developer_keys_path, account_id: root_account.id }
     end
 
-    if user && grants_right?(user, :view_analytics_hub)
+    if !root_account.site_admin? && user && grants_right?(user, :view_analytics_hub)
       tabs << { id: TAB_ANALYTICS_HUB, label: t("#account.tab_analytics_hub", "Analytics Hub"), css_class: "analytics_hub", href: :account_analytics_hub_path }
     end
 
     if root_account? && grants_right?(user, :manage_developer_keys)
-      registrations_path = root_account.feature_enabled?(:lti_registrations_discover_page) ? :account_lti_registrations_path : :account_lti_manage_registrations_path
+      registrations_path = :account_lti_registrations_path
       tabs << { id: TAB_APPS, label: t("#account.tab_apps", "Apps"), css_class: "apps", href: registrations_path, account_id: root_account.id }
     elsif root_account.feature_enabled?(:canvas_apps_sub_account_access) && root_account.feature_enabled?(:lti_registrations_usage_data) && !root_account? && grants_right?(user, :manage_lti_registrations)
       # Sub-account admins can access Canvas Apps when feature flag is enabled
@@ -2279,6 +2389,7 @@ class Account < ActiveRecord::Base
 
     tabs += external_tool_tabs(opts, user)
     tabs += Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::ACCOUNT_NAVIGATION], opts)
+    tabs += NavMenuLinkTabs.account_tabs(self) if root_account.feature_enabled?(:nav_menu_links)
     Lti::ResourcePlacement.update_tabs_and_return_item_banks_tab(tabs)
 
     if feature_enabled?(:new_quizzes_native_experience)
@@ -2574,7 +2685,7 @@ class Account < ActiveRecord::Base
     work = lambda do
       default_enrollment_term
       enable_canvas_authentication
-      TermsOfService.ensure_terms_for_account(self, true) if root_account? && !TermsOfService.skip_automatic_terms_creation
+      TermsOfService.ensure_terms_for_account(self, is_new_account: true) if root_account? && !TermsOfService.skip_automatic_terms_creation
       create_built_in_roles if root_account?
     end
     return work.call if Rails.env.test?
@@ -2745,7 +2856,7 @@ class Account < ActiveRecord::Base
   def roles_with_enabled_permission(permission)
     roles = available_roles
     roles.select do |role|
-      RoleOverride.permission_for(self, permission, role, self, true)[:enabled]
+      RoleOverride.permission_for(self, permission, role, self, caching: false)[:enabled]
     end
   end
 
@@ -2891,6 +3002,12 @@ class Account < ActiveRecord::Base
     sub_accounts.where(grading_standard: nil).find_each do |sub_account|
       sub_account.recompute_assignments_using_account_default(grading_standard_id, grading_standard)
     end
+  end
+
+  def horizon_block_content_editor?
+    horizon_account? &&
+      root_account.feature_enabled?(:horizon_block_content_editor) &&
+      ContentServiceClient.enabled?
   end
 
   def horizon_account_locked?

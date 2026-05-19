@@ -512,7 +512,6 @@ describe GroupsController do
     it "requires authorization" do
       @group = Account.default.groups.create!(name: "some group")
       get "show", params: { id: @group.id }
-      expect(assigns[:group]).to eql(@group)
       assert_unauthorized
     end
 

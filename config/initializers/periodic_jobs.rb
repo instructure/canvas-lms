@@ -168,6 +168,10 @@ Rails.configuration.after_initialize do
   end
 
   unless ApplicationController.test_cluster?
+    Delayed::Periodic.cron "AccessToken.send_expiration_reminders", "0 6 * * *", priority: Delayed::LOW_PRIORITY do
+      with_each_shard_by_database(AccessToken, :send_expiration_reminders, local_offset: true)
+    end
+
     Delayed::Periodic.cron "Attachments::GarbageCollector::ContentExportAndMigrationContextType.delete_content", "37 1 * * *" do
       with_each_shard_by_database(Attachments::GarbageCollector::ContentExportAndMigrationContextType, :delete_content, jitter: 30.minutes, local_offset: true)
     end

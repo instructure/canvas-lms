@@ -17,10 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-require_relative "../../lib/llm_conversation"
-require_relative "../../lib/llm_conversation/errors"
-
 describe AiExperiencesController do
   before :once do
     course_with_teacher(active_all: true)
@@ -122,6 +118,99 @@ describe AiExperiencesController do
         expect(published_exp["facts"]).to eq("Teacher facts")
         expect(published_exp["pedagogical_guidance"]).to eq("Teacher guidance")
         expect(published_exp["learning_objective"]).to eq("Test objective")
+      end
+
+      context "with ai_experiences_context_file_upload feature flag" do
+        before do
+          @course.enable_feature!(:ai_experiences_context_file_upload)
+        end
+
+        context "when experiences have in_progress index status" do
+          before do
+            @ai_experience.update_columns(
+              llm_conversation_context_id: "context-uuid",
+              context_index_status: "in_progress"
+            )
+          end
+
+          it "syncs index status for in_progress experiences" do
+            service_double = instance_double(AiExperiences::ConversationContextDocumentsService)
+            allow(AiExperiences::ConversationContextDocumentsService).to receive(:new).and_return(service_double)
+            expect(service_double).to receive(:sync_index_status).with(ai_experience: @ai_experience)
+            get :index, params: { course_id: @course.id }, format: :json
+          end
+        end
+
+        context "when experiences have completed status" do
+          before do
+            @ai_experience.update_columns(
+              llm_conversation_context_id: "context-uuid",
+              context_index_status: "completed"
+            )
+          end
+
+          it "does not sync index status for completed experiences" do
+            expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).not_to receive(:sync_index_status)
+            get :index, params: { course_id: @course.id }, format: :json
+          end
+        end
+
+        context "when experiences have failed status" do
+          before do
+            @ai_experience.update_columns(
+              llm_conversation_context_id: "context-uuid",
+              context_index_status: "failed"
+            )
+          end
+
+          it "does not sync index status for failed experiences" do
+            expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).not_to receive(:sync_index_status)
+            get :index, params: { course_id: @course.id }, format: :json
+          end
+        end
+
+        context "when experiences have not_started status" do
+          before do
+            @ai_experience.update_columns(
+              llm_conversation_context_id: "context-uuid",
+              context_index_status: "not_started"
+            )
+          end
+
+          it "does not sync index status for not_started experiences" do
+            expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).not_to receive(:sync_index_status)
+            get :index, params: { course_id: @course.id }, format: :json
+          end
+        end
+
+        context "when feature flag is disabled" do
+          before do
+            @course.disable_feature!(:ai_experiences_context_file_upload)
+            @ai_experience.update_columns(
+              llm_conversation_context_id: "context-uuid",
+              context_index_status: "in_progress"
+            )
+          end
+
+          it "does not sync index status" do
+            expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).not_to receive(:sync_index_status)
+            get :index, params: { course_id: @course.id }, format: :json
+          end
+        end
+
+        context "when context_id is not present" do
+          before do
+            @ai_experience.update_columns(
+              llm_conversation_context_id: nil,
+              context_index_status: "in_progress"
+            )
+          end
+
+          it "does not sync index status" do
+            expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).not_to receive(:sync_index_status)
+            get :index, params: { course_id: @course.id }, format: :json
+          end
+        end
       end
     end
 
@@ -409,12 +498,64 @@ describe AiExperiencesController do
         expect(assigns(:page_title)).to eq(@ai_experience.title)
       end
 
+      it "sets ai_experiences_context_file_upload feature flag in js_env when enabled" do
+        @course.enable_feature!(:ai_experiences_context_file_upload)
+        get :show, params: { course_id: @course.id, id: @ai_experience.id }
+        expect(assigns[:js_env][:FEATURES][:ai_experiences_context_file_upload]).to be true
+      end
+
+      it "sets ai_experiences_context_file_upload feature flag in js_env when disabled" do
+        @course.disable_feature!(:ai_experiences_context_file_upload)
+        get :show, params: { course_id: @course.id, id: @ai_experience.id }
+        expect(assigns[:js_env][:FEATURES][:ai_experiences_context_file_upload]).to be false
+      end
+
       it "includes facts and pedagogical_guidance in JSON response for teachers" do
         get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
         json_response = json_parse(response.body)
         expect(json_response["facts"]).to eq(@ai_experience.facts)
         expect(json_response["pedagogical_guidance"]).to eq(@ai_experience.pedagogical_guidance)
         expect(json_response["learning_objective"]).to eq(@ai_experience.learning_objective)
+      end
+
+      context "with ai_experiences_context_file_upload feature flag" do
+        context "when enabled and context_id is present" do
+          before do
+            @course.enable_feature!(:ai_experiences_context_file_upload)
+            @ai_experience.update_column(:llm_conversation_context_id, "context-uuid")
+          end
+
+          it "calls sync_index_status before rendering" do
+            service_double = instance_double(AiExperiences::ConversationContextDocumentsService)
+            allow(AiExperiences::ConversationContextDocumentsService).to receive(:new).and_return(service_double)
+            expect(service_double).to receive(:sync_index_status).with(ai_experience: @ai_experience)
+            get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+          end
+        end
+
+        context "when disabled" do
+          before do
+            @course.disable_feature!(:ai_experiences_context_file_upload)
+            @ai_experience.update_column(:llm_conversation_context_id, "context-uuid")
+          end
+
+          it "does not call sync_index_status" do
+            expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).not_to receive(:sync_index_status)
+            get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+          end
+        end
+
+        context "when context_id is not present" do
+          before do
+            @course.enable_feature!(:ai_experiences_context_file_upload)
+            @ai_experience.update_column(:llm_conversation_context_id, nil)
+          end
+
+          it "does not call sync_index_status" do
+            expect_any_instance_of(AiExperiences::ConversationContextDocumentsService).not_to receive(:sync_index_status)
+            get :show, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+          end
+        end
       end
     end
 
@@ -648,6 +789,72 @@ describe AiExperiencesController do
       end
     end
 
+    context "metrics" do
+      before { user_session(@teacher) }
+
+      let(:expected_tags) do
+        { aws_region: Canvas.region, root_account_id: @course.root_account.uuid, course_id: @course.id }
+      end
+
+      it "increments total_created on success" do
+        expect(InstStatsd::Statsd).to receive(:increment).with("ai_experiences.total_created", tags: expected_tags)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        post :create,
+             params: { course_id: @course.id, ai_experience: { title: "New", learning_objective: "obj", pedagogical_guidance: "guidance" } },
+             format: :json
+      end
+
+      it "increments total_published when created as published" do
+        expect(InstStatsd::Statsd).to receive(:increment).with("ai_experiences.total_published", tags: expected_tags)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        post :create,
+             params: { course_id: @course.id, ai_experience: { title: "New", learning_objective: "obj", pedagogical_guidance: "guidance", workflow_state: "published" } },
+             format: :json
+      end
+
+      it "does not increment total_published when created as unpublished" do
+        expect(InstStatsd::Statsd).not_to receive(:increment).with("ai_experiences.total_published", anything)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        post :create,
+             params: { course_id: @course.id, ai_experience: { title: "New", learning_objective: "obj", pedagogical_guidance: "guidance" } },
+             format: :json
+      end
+
+      it "increments total_with_source_files when created with files" do
+        @course.enable_feature!(:ai_experiences_context_file_upload)
+        attachment = attachment_model(context: @course, size: 1.megabyte)
+        expect(InstStatsd::Statsd).to receive(:increment).with("ai_experiences.total_with_source_files", tags: expected_tags)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        post :create,
+             params: { course_id: @course.id, ai_experience: { title: "New", learning_objective: "obj", pedagogical_guidance: "guidance", context_file_ids: [attachment.id] } },
+             format: :json
+      end
+
+      it "does not increment total_with_source_files when created without files" do
+        expect(InstStatsd::Statsd).not_to receive(:increment).with("ai_experiences.total_with_source_files", anything)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        post :create,
+             params: { course_id: @course.id, ai_experience: { title: "New", learning_objective: "obj", pedagogical_guidance: "guidance" } },
+             format: :json
+      end
+
+      it "does not emit metrics on failure" do
+        expect(InstStatsd::Statsd).not_to receive(:increment)
+        post :create,
+             params: { course_id: @course.id, ai_experience: { title: "" } },
+             format: :json
+      end
+
+      it "does not emit metrics when context is not a Course" do
+        expect(InstStatsd::Statsd).not_to receive(:increment)
+        allow(controller).to receive(:require_context)
+        controller.instance_variable_set(:@context, @course.account)
+        post :create,
+             params: { course_id: @course.id, ai_experience: { title: "New", learning_objective: "obj", pedagogical_guidance: "guidance" } },
+             format: :json
+      end
+    end
+
     context "as student" do
       before { user_session(@student) }
 
@@ -766,6 +973,49 @@ describe AiExperiencesController do
       end
     end
 
+    context "metrics" do
+      before { user_session(@teacher) }
+
+      let(:expected_tags) do
+        { aws_region: Canvas.region, root_account_id: @course.root_account.uuid, course_id: @course.id }
+      end
+
+      it "increments total_published when transitioning to published" do
+        expect(InstStatsd::Statsd).to receive(:increment).with("ai_experiences.total_published", tags: expected_tags)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        put :update,
+            params: { course_id: @course.id, id: @ai_experience.id, ai_experience: { workflow_state: "published" } },
+            format: :json
+      end
+
+      it "decrements total_published when transitioning away from published" do
+        @ai_experience.update!(workflow_state: "published")
+        expect(InstStatsd::Statsd).to receive(:decrement).with("ai_experiences.total_published", tags: expected_tags)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        put :update,
+            params: { course_id: @course.id, id: @ai_experience.id, ai_experience: { workflow_state: "unpublished" } },
+            format: :json
+      end
+
+      it "does not emit publish metrics when workflow_state is unchanged" do
+        expect(InstStatsd::Statsd).not_to receive(:increment).with("ai_experiences.total_published", anything)
+        expect(InstStatsd::Statsd).not_to receive(:decrement).with("ai_experiences.total_published", anything)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        put :update,
+            params: { course_id: @course.id, id: @ai_experience.id, ai_experience: { title: "New Title" } },
+            format: :json
+      end
+
+      it "does not emit metrics on failure" do
+        expect(InstStatsd::Statsd).not_to receive(:increment)
+        expect(InstStatsd::Statsd).not_to receive(:decrement)
+        put :update,
+            params: { course_id: @course.id, id: @ai_experience.id, ai_experience: { title: "" } },
+            format: :json
+      end
+    end
+
     context "as student" do
       before { user_session(@student) }
 
@@ -815,6 +1065,48 @@ describe AiExperiencesController do
       end
     end
 
+    context "metrics" do
+      before { user_session(@teacher) }
+
+      let(:expected_tags) do
+        { aws_region: Canvas.region, root_account_id: @course.root_account.uuid, course_id: @course.id }
+      end
+
+      it "decrements total_created on success" do
+        expect(InstStatsd::Statsd).to receive(:decrement).with("ai_experiences.total_created", tags: expected_tags)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        delete :destroy, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+      end
+
+      it "decrements total_published when destroying a published experience" do
+        @ai_experience.update!(workflow_state: "published")
+        expect(InstStatsd::Statsd).to receive(:decrement).with("ai_experiences.total_published", tags: expected_tags)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        delete :destroy, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+      end
+
+      it "does not decrement total_published when destroying an unpublished experience" do
+        expect(InstStatsd::Statsd).not_to receive(:decrement).with("ai_experiences.total_published", anything)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        delete :destroy, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+      end
+
+      it "decrements total_with_source_files when destroying an experience with files" do
+        @course.enable_feature!(:ai_experiences_context_file_upload)
+        attachment = attachment_model(context: @course, size: 1.megabyte)
+        @ai_experience.update!(context_file_ids: [attachment.id])
+        expect(InstStatsd::Statsd).to receive(:decrement).with("ai_experiences.total_with_source_files", tags: expected_tags)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        delete :destroy, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+      end
+
+      it "does not decrement total_with_source_files when destroying an experience without files" do
+        expect(InstStatsd::Statsd).not_to receive(:decrement).with("ai_experiences.total_with_source_files", anything)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        delete :destroy, params: { course_id: @course.id, id: @ai_experience.id }, format: :json
+      end
+    end
+
     context "as student" do
       before { user_session(@student) }
 
@@ -854,6 +1146,11 @@ describe AiExperiencesController do
         get :new, params: { course_id: @course.id }
         expect(assigns[:js_env][:FEATURES][:ai_experiences_context_file_upload]).to be false
       end
+
+      it "sets CONTEXT_FILE_MAX_SIZE_MB in js_env" do
+        get :new, params: { course_id: @course.id }
+        expect(assigns[:js_env][:CONTEXT_FILE_MAX_SIZE_MB]).to eq(AiExperienceContextFile::MAX_FILE_SIZE / 1.megabyte)
+      end
     end
 
     context "as student" do
@@ -892,6 +1189,11 @@ describe AiExperiencesController do
         @course.disable_feature!(:ai_experiences_context_file_upload)
         get :edit, params: { course_id: @course.id, id: @ai_experience.id }
         expect(assigns[:js_env][:FEATURES][:ai_experiences_context_file_upload]).to be false
+      end
+
+      it "sets CONTEXT_FILE_MAX_SIZE_MB in js_env" do
+        get :edit, params: { course_id: @course.id, id: @ai_experience.id }
+        expect(assigns[:js_env][:CONTEXT_FILE_MAX_SIZE_MB]).to eq(AiExperienceContextFile::MAX_FILE_SIZE / 1.megabyte)
       end
     end
 
@@ -1110,14 +1412,15 @@ describe AiExperiencesController do
     context "as teacher" do
       before do
         user_session(@teacher)
-        # Mock the LLM client
-        allow_any_instance_of(LLMConversationClient).to receive(:messages_with_conversation_progress).and_return({
-                                                                                                                   messages: [
-                                                                                                                     { role: "assistant", content: "Hello!" },
-                                                                                                                     { role: "user", content: "Hi there!" }
-                                                                                                                   ],
-                                                                                                                   progress: { status: "in_progress" }
-                                                                                                                 })
+        mock_service = instance_double(AiExperiences::ConversationMessagesService)
+        allow(AiExperiences::ConversationMessagesService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:fetch_with_progress).and_return({
+                                                                          messages: [
+                                                                            { role: "assistant", content: "Hello!" },
+                                                                            { role: "user", content: "Hi there!" }
+                                                                          ],
+                                                                          progress: { status: "in_progress" }
+                                                                        })
       end
 
       it "returns conversation with messages" do
@@ -1163,7 +1466,9 @@ describe AiExperiencesController do
       end
 
       it "returns service unavailable when LLM service fails" do
-        allow_any_instance_of(LLMConversationClient).to receive(:messages_with_conversation_progress)
+        mock_service = instance_double(AiExperiences::ConversationMessagesService)
+        allow(AiExperiences::ConversationMessagesService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:fetch_with_progress)
           .and_raise(LlmConversation::Errors::ConversationError.new("Service unavailable"))
 
         get :ai_conversation_show, params: { course_id: @course.id, id: @ai_experience.id, conversation_id: @conversation.id }, format: :json

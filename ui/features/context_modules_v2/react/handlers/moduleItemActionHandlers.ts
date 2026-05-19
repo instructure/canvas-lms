@@ -17,7 +17,7 @@
  */
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess, showFlashError} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getItemType, renderItemAssignToManager} from '../utils/assignToUtils'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'

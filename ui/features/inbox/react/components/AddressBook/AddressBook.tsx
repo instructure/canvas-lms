@@ -29,6 +29,7 @@ import {
   IconArrowOpenEndLine,
   IconAddressBookLine,
   IconSearchLine,
+  IconUserLine,
 } from '@instructure/ui-icons'
 import {
   ScreenReaderContent,
@@ -46,7 +47,7 @@ import React, {useEffect, useMemo, useState, useRef, useCallback, useContext} fr
 import {TOTAL_RECIPIENTS} from '../../../graphql/Queries'
 import {useQuery} from '@apollo/client'
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -300,6 +301,7 @@ export const AddressBook = ({
       id: menuId,
       totalRecipientCount,
       observerEnrollments,
+      sisId,
     } = menuItem
 
     const isSubmenu = itemType === SUBMENU_TYPE
@@ -365,7 +367,30 @@ export const AddressBook = ({
             ENV?.SETTINGS?.can_add_pronouns && itemType === USER_TYPE ? menuItem.pronouns : null
           }
         >
-          {menuItemName}
+          {itemType === USER_TYPE && sisId ? (
+            <Flex gap="small" alignItems="center" wrap="no-wrap">
+              <Flex.Item shouldGrow={false} shouldShrink={true}>
+                <TruncateText>{menuItemName}</TruncateText>
+              </Flex.Item>
+              <Flex.Item shouldShrink={false}>
+                <Flex gap="xx-small" alignItems="center">
+                  <Flex.Item>
+                    <IconUserLine
+                      color={isSelected ? 'secondary-inverse' : 'secondary'}
+                      size="x-small"
+                    />
+                  </Flex.Item>
+                  <Flex.Item>
+                    <Text size="small" color={isSelected ? 'secondary-inverse' : 'secondary'}>
+                      {sisId}
+                    </Text>
+                  </Flex.Item>
+                </Flex>
+              </Flex.Item>
+            </Flex>
+          ) : (
+            menuItemName
+          )}
         </AddressBookItem>
       </View>
     )

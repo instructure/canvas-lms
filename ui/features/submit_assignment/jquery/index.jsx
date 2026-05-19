@@ -35,8 +35,7 @@ import '@canvas/media-comments'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/tabs'
 import React from 'react'
-import ReactDOM from 'react-dom'
-import {createRoot} from 'react-dom/client'
+import {legacyRender, render, rerender} from '@canvas/react'
 import FileBrowser from '@canvas/rce/FileBrowser'
 import {ProgressCircle} from '@instructure/ui-progress'
 import {Alert} from '@instructure/ui-alerts'
@@ -113,7 +112,7 @@ ready(function () {
   const uploadPledgeMount = document.getElementById('turnitin_pledge_container_online_upload')
 
   if (alertMount()) {
-    ReactDOM.render(
+    legacyRender(
       <Alert screenReaderOnly={true} liveRegion={alertMount} liveRegionPoliteness="assertive">
         {accessibilityAlert}
       </Alert>,
@@ -122,24 +121,22 @@ ready(function () {
   }
 
   const renderPledge = (mount, type) => {
-    let pledgeRoot = null
-    if (pledgeRoots[type]) {
-      pledgeRoot = pledgeRoots[type]
-    } else {
-      pledgeRoot = createRoot(mount)
-      pledgeRoots[type] = pledgeRoot
-    }
     const eulaUrl = mount.dataset.eulaurl
     const pledgeText = mount.dataset.pledge
-    pledgeRoot.render(
+    const element = (
       <SimilarityPledge
         setShouldShowPledgeError={setShouldShowPledgeError}
         getShouldShowPledgeError={getShouldShowPledgeError}
         eulaUrl={eulaUrl}
         pledgeText={pledgeText}
         type={type}
-      />,
+      />
     )
+    if (pledgeRoots[type]) {
+      rerender(pledgeRoots[type], element)
+    } else {
+      pledgeRoots[type] = render(element, mount)
+    }
   }
 
   const checkPledgeCheck = (checkbox, type) => {
@@ -192,8 +189,7 @@ ready(function () {
       const onlineUrlHiddenInput = document.getElementById('submission_url')
       onlineUrlHiddenInput.value = url
     }
-    const root = createRoot(urlInput)
-    root.render(
+    render(
       <Flex as="div" margin="small 0">
         <Flex.Item width="100%">
           <OnlineUrlSubmission
@@ -203,6 +199,7 @@ ready(function () {
           />
         </Flex.Item>
       </Flex>,
+      urlInput,
     )
   }
 
@@ -218,13 +215,13 @@ ready(function () {
 
       const $emojiPicker = $container.find('.emoji-picker-container')
       if ($emojiPicker.length) {
-        ReactDOM.render(<EmojiPicker insertEmoji={insertEmoji.bind(this)} />, $emojiPicker[0])
+        legacyRender(<EmojiPicker insertEmoji={insertEmoji.bind(this)} />, $emojiPicker[0])
         $emojiPicker.show()
       }
 
       const $emojiQuickPicker = $container.find('.emoji-quick-picker-container')
       if ($emojiQuickPicker.length) {
-        ReactDOM.render(
+        legacyRender(
           <EmojiQuickPicker insertEmoji={insertEmoji.bind(this)} />,
           $emojiQuickPicker[0],
         )
@@ -345,15 +342,18 @@ ready(function () {
             // changing css property sometimes trigger internal textarea change event
             // which causes error message to disappear, wrapping in a setTimeout helps
             // to solve that
-            const root = errorRoot ?? createRoot(errorsContainer)
-            errorRoot = root
-            root.render(
+            const errorElement = (
               <FormattedErrorMessage
                 message={I18n.t('%{errorText}', {errorText: error})}
                 margin="0 0 xx-small 0"
                 iconMargin="0 xx-small xxx-small 0"
-              />,
+              />
             )
+            if (errorRoot) {
+              rerender(errorRoot, errorElement)
+            } else {
+              errorRoot = render(errorElement, errorsContainer)
+            }
           })
           checkPledgeCheck(textPledgeCheckbox, PLEDGE_TYPES.TEXT)
           document
@@ -397,7 +397,7 @@ ready(function () {
             const mountPoint = document.getElementById('progress_indicator')
 
             if (mountPoint) {
-              ReactDOM.render(
+              legacyRender(
                 <ProgressCircle
                   screenReaderLabel={I18n.t('Uploading Progress')}
                   size="x-small"
@@ -654,7 +654,7 @@ ready(function () {
     if (fileEl.is(':hidden')) {
       $.screenReaderFlashMessage(I18n.t('File tree expanded'))
 
-      ReactDOM.render(fileBrowser, document.getElementById('uploaded_files'))
+      legacyRender(fileBrowser, document.getElementById('uploaded_files'))
     } else {
       $.screenReaderFlashMessage(I18n.t('File tree collapsed'))
     }
@@ -682,7 +682,7 @@ ready(function () {
         if (wrapperDom) {
           const index = ++submissionAttachmentIndex
 
-          ReactDOM.render(
+          legacyRender(
             <Attachment
               id={`file_attachment_${index}`}
               index={index}

@@ -25,7 +25,7 @@ import {SpeedGraderLegacy_UpdateCommentBankItem} from '../../graphql/mutations'
 import * as shave from '@canvas/shave'
 
 vi.mock('@canvas/shave')
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 describe('CommentRouterView', () => {
   const defaultProps = {

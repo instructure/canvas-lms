@@ -21,7 +21,7 @@
 describe Quizzes::QuizUserFinder do
   before :once do
     course_with_teacher(course: @course, active_all: true)
-    course_quiz(true)
+    course_quiz(active: true)
     course_with_student(active_all: true, course: @course)
     @submitted_student = @student
     course_with_student(active_all: true, course: @course)
@@ -49,7 +49,7 @@ describe Quizzes::QuizUserFinder do
   end
 
   it "doesn't find submissions from teachers for preview submissions" do
-    sub = @quiz.generate_submission(@teacher, true)
+    sub = @quiz.generate_submission(@teacher, preview: true)
     Quizzes::SubmissionGrader.new(sub).grade_submission
     sub.save!
     expect(@finder.submitted_students).not_to include @teacher

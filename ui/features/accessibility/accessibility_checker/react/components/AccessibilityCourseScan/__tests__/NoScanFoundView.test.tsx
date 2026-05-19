@@ -23,13 +23,13 @@ import {NoScanFoundView} from '../components/NoScanFoundView'
 
 describe('NoScanFoundView', () => {
   it('renders empty state with message', () => {
-    render(<NoScanFoundView />)
+    render(<NoScanFoundView buttonLabel="Scan Course" />)
 
     expect(screen.getByText("You haven't scanned your course yet")).toBeInTheDocument()
   })
 
   it('renders scan button in center', () => {
-    render(<NoScanFoundView />)
+    render(<NoScanFoundView buttonLabel="Scan Course" />)
 
     const centerButtons = screen.getAllByRole('button', {name: /scan course/i})
     expect(centerButtons).toHaveLength(2) // One in header, one in center
@@ -39,7 +39,7 @@ describe('NoScanFoundView', () => {
     const user = userEvent.setup()
     const handleCourseScan = vi.fn()
 
-    render(<NoScanFoundView handleCourseScan={handleCourseScan} />)
+    render(<NoScanFoundView buttonLabel="Scan Course" handleCourseScan={handleCourseScan} />)
 
     const centerButton = screen.getAllByRole('button', {name: /scan course/i})[1]
     await user.click(centerButton)
@@ -48,7 +48,7 @@ describe('NoScanFoundView', () => {
   })
 
   it('disables button when request is loading', () => {
-    render(<NoScanFoundView isRequestLoading={true} />)
+    render(<NoScanFoundView buttonLabel="Scan Course" isRequestLoading={true} />)
 
     const buttons = screen.getAllByRole('button', {name: /scan course/i})
     buttons.forEach(button => {
@@ -57,7 +57,7 @@ describe('NoScanFoundView', () => {
   })
 
   it('enables button when request is not loading', () => {
-    render(<NoScanFoundView isRequestLoading={false} />)
+    render(<NoScanFoundView buttonLabel="Scan Course" isRequestLoading={false} />)
 
     const buttons = screen.getAllByRole('button', {name: /scan course/i})
     buttons.forEach(button => {

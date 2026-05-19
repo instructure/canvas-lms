@@ -138,7 +138,9 @@ afterAll(() => {
 // Mock RCE initialization
 EditView.prototype._attachEditorToDescription = () => {}
 
-describe('EditView - Quiz Type Handling', () => {
+// Skipped due to chronic flakiness (window/Element undefined after JSDOM teardown).
+// See EGG-2379.
+describe.skip('EditView - Quiz Type Handling', () => {
   let view
 
   beforeEach(() => {

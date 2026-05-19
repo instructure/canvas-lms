@@ -17,14 +17,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module K5Common
-  def toggle_k5_setting(account, enable = true)
+  def toggle_k5_setting(account, enable: true)
     account.settings[:enable_as_k5_account] = { value: enable, locked: enable }
     account.root_account.settings[:k5_accounts] = enable ? [account.id] : []
     account.root_account.save!
     account.save!
   end
 
-  def toggle_classic_font_setting(account, enable = true)
+  def toggle_classic_font_setting(account, enable: true)
     account.settings[:use_classic_font_in_k5] = { value: enable, locked: enable }
     account.root_account.settings[:k5_classic_font_accounts] = enable ? [account.id] : []
     account.root_account.save!

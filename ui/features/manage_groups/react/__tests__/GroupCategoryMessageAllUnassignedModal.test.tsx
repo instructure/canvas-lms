@@ -21,13 +21,17 @@ import {setupServer} from 'msw/node'
 import stubEnv from '@canvas/stub-env'
 import GroupCategoryMessageAllUnassignedModal from '../GroupCategoryMessageAllUnassignedModal'
 import {userEvent} from '@testing-library/user-event'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess} from '@instructure/platform-alerts'
 
 // Mock the flash alert module
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: vi.fn(() => vi.fn()),
-  showFlashError: vi.fn(() => vi.fn()),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashSuccess: vi.fn(() => vi.fn()),
+    showFlashError: vi.fn(() => vi.fn()),
+  }
+})
 
 const server = setupServer()
 

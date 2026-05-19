@@ -96,7 +96,6 @@
 #     }
 class MicrosoftSync::GroupsController < ApplicationController
   before_action :require_context
-  before_action :require_user
   before_action :validate_user_permissions
   before_action :require_feature
   before_action :require_integration_available
@@ -175,7 +174,7 @@ class MicrosoftSync::GroupsController < ApplicationController
       )
     end
 
-    render json: { message: error_msg }, status: :unprocessable_entity if error_msg
+    render json: { message: error_msg }, status: :unprocessable_content if error_msg
   end
 
   # Don't allow scheduling a new job

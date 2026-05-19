@@ -20,7 +20,7 @@
 
 require "sanitize"
 
-class Quizzes::QuizSubmission < ActiveRecord::Base
+class Quizzes::QuizSubmission < ApplicationRecord
   extend RootAccountResolver
 
   self.table_name = "quiz_submissions"
@@ -100,14 +100,14 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       .where(context_type: "Quizzes::QuizQuestion", context_id: non_aq_question_ids)
       .or(AttachmentAssociation.where(context_type: "Quizzes::Quiz", context_id: quiz_id))
       .find_each do |assoc|
-        to_create << {
-          context_type: "Quizzes::QuizSubmission",
-          context_id: id,
-          attachment_id: assoc.attachment_id,
-          user_id: assoc.user_id,
-          context_concern: nil,
-          root_account_id:
-        }
+      to_create << {
+        context_type: "Quizzes::QuizSubmission",
+        context_id: id,
+        attachment_id: assoc.attachment_id,
+        user_id: assoc.user_id,
+        context_concern: nil,
+        root_account_id:
+      }
     end
 
     AttachmentAssociation.insert_all(to_create, returning: false) if to_create.any?
@@ -238,7 +238,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     raise "Cannot view data for uncompleted quiz" unless completed?
     raise "Cannot view data for uncompleted quiz" unless graded?
 
-    Utf8Cleaner.recursively_strip_invalid_utf8!(submission_data, true)
+    Utf8Cleaner.recursively_strip_invalid_utf8!(submission_data, force_utf8: true)
   end
 
   def results_visible?(user: nil)
@@ -287,12 +287,12 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   # There is also a needs_grading scope which needs to replicate this logic
-  def needs_grading?(strict = false)
-    overdue_and_needs_submission?(strict) || (completed? && !graded?)
+  def needs_grading?(strict: false)
+    overdue_and_needs_submission?(strict:) || (completed? && !graded?)
   end
 
-  def overdue_and_needs_submission?(strict = false)
-    return true if strict && untaken? && overdue?(true)
+  def overdue_and_needs_submission?(strict: false)
+    return true if strict && untaken? && overdue?(strict: true)
 
     if untaken? && end_at && end_at < Time.zone.now
       return true unless quiz&.timer_autosubmit_disabled?
@@ -309,7 +309,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def end_date_is_valid?
-    quiz.grants_right?(user, :submit) && !overdue_and_needs_submission?(true) && !end_date_needs_recalculated?
+    quiz.grants_right?(user, :submit) && !overdue_and_needs_submission?(strict: true) && !end_date_needs_recalculated?
   end
 
   def has_seen_results?
@@ -331,7 +331,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def questions
-    Utf8Cleaner.recursively_strip_invalid_utf8!(quiz_data, true) || []
+    Utf8Cleaner.recursively_strip_invalid_utf8!(quiz_data, force_utf8: true) || []
   end
 
   def backup_submission_data(params)
@@ -412,7 +412,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   #
   # @return [QuizSubmissionSnapshot]
   #   The latest, newly-created snapshot.
-  def snapshot!(submission_data = {}, full_snapshot = false)
+  def snapshot!(submission_data = {}, full_snapshot: false)
     snapshot_data = submission_data || {}
 
     if full_snapshot
@@ -618,7 +618,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     complete? || pending_review?
   end
 
-  def overdue?(strict = false)
+  def overdue?(strict: false)
     now = (Time.zone.now - ((strict ? 1 : 5) * 60))
     return false unless end_at && end_at.localtime < now
 
@@ -637,6 +637,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def submitted_attempts
     attempts.version_models
+  end
+
+  def quiz_submission_histories(versions:)
+    Quizzes::QuizSubmissionHistory.from_preloaded_versions(self, versions)
   end
 
   def latest_submitted_attempt
@@ -699,7 +703,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   #
   # @return [QuizSubmission] self
   def complete!(submission_data = {})
-    snapshot!(submission_data, true)
+    snapshot!(submission_data, full_snapshot: true)
     mark_completed
     Quizzes::SubmissionGrader.new(self).grade_submission
     self
@@ -922,7 +926,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   # TODO: this could probably be put in as a convenience method in simply_versioned
   def save_with_versioning!
-    with_versioning(true) { save! }
+    with_versioning { save! }
   end
 
   # evizitei: these 3 delegations allow quiz submissions to be used in
@@ -979,7 +983,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       if untaken?
         save!
       else
-        with_versioning(true, &:save!)
+        with_versioning(&:save!)
       end
     end
   end
@@ -1014,7 +1018,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def end_at_without_time_limit
-    quiz.build_submission_end_at(self, false)
+    quiz.build_submission_end_at(self, with_time_limit: false)
   end
 
   def filter_attributes_for_user(hash, user, session)

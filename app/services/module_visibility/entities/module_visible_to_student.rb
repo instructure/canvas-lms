@@ -20,6 +20,6 @@
 module ModuleVisibility
   module Entities
     # When a module is visible to a (student) user
-    ModuleVisibleToStudent = Struct.new(:course_id, :user_id, :context_module_id, keyword_init: true)
+    ModuleVisibleToStudent = Struct.new(:course_id, :user_id, :context_module_id)
   end
 end

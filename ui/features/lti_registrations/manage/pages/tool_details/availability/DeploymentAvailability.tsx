@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {showFlashAlert, showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {confirm} from '@canvas/instui-bindings/react/Confirm'
+import {confirm} from '@instructure/platform-instui-bindings'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -39,7 +39,6 @@ import {
   type UpdateContextControl,
 } from '../../../api/contextControls'
 import {type AccountId, ZAccountId} from '../../../model/AccountId'
-import {ZCourseId} from '../../../model/CourseId'
 import type {LtiContextControl, LtiContextControlId} from '../../../model/LtiContextControl'
 import type {LtiDeployment} from '../../../model/LtiDeployment'
 import type {LtiRegistrationWithAllInformation} from '../../../model/LtiRegistration'
@@ -55,6 +54,7 @@ import {ExceptionModal, type ExceptionModalOpenState} from './exception_modal/Ex
 import {renderExceptionCounts} from './renderExceptionCounts'
 import {buildControlsByPath, nearestParentControl} from './nearestParentControl'
 import {DeleteDeploymentModal} from './deployment_modal/DeleteDeploymentModal'
+import {refreshRegistrationHistory} from '../../../api/registrations'
 import type {DeleteDeployment} from '../../../api/deployments'
 
 import {Tag} from '@instructure/ui-tag'
@@ -73,8 +73,15 @@ export type DeploymentAvailabilityProps = {
 }
 
 export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
-  const {registration, deleteDeployment, deployment, refetchControls, deleteControl, editControl} =
-    props
+  const {
+    registration,
+    deleteDeployment,
+    deployment,
+    refetchControls,
+    deleteControl,
+    editControl,
+    accountId,
+  } = props
 
   const controls_with_ids = React.useMemo(
     () => buildControlsByPath(deployment.context_controls || []),
@@ -237,6 +244,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
         registrationId={registration.id}
         openState={exceptionModalOpenState}
         onClose={() => setExceptionModalOpenState({open: false})}
+        onSettled={() => refreshRegistrationHistory(accountId, registration.id)}
         onConfirm={contextControls => {
           const onError = showFlashError(
             I18n.t('There was an error adding the exceptions. Please try again later.'),
@@ -410,6 +418,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
         <EditExceptionModal
           {...editControlInfo}
           onClose={() => setEditControlInfo(null)}
+          onSettled={() => refreshRegistrationHistory(accountId, registration.id)}
           onSave={async (...args) => {
             const result = await editControl(...args)
             if (isSuccessful(result)) {
@@ -421,10 +430,12 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
       )}
       {openDeleteDeploymentModal && (
         <DeleteDeploymentModal
+          accountId={accountId}
           deployment={deployment}
           registration={registration}
           controlsByPath={controls_with_ids}
           onClose={() => setOpenDeleteDeploymentModal(false)}
+          onSettled={() => refreshRegistrationHistory(accountId, registration.id)}
           onDelete={async (...args) => {
             const result = await deleteDeployment(...args)
             if (isSuccessful(result)) {

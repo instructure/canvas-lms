@@ -36,6 +36,15 @@ import {
   FETCH_APPS_URL,
 } from './K5CourseTestHelpers'
 
+import {showFlashError} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
 vi.mock('@canvas/util/globalUtils', () => ({
   reloadWindow: vi.fn(),
 }))
@@ -149,11 +158,10 @@ describe('K-5 Subject Course', () => {
 
       it('shows an error if syllabus content fails to load', async () => {
         fetchMock.get(FETCH_IMPORTANT_INFO_URL, 400, {overwriteRoutes: true})
-        const {findAllByText} = render(
-          <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />,
+        render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
+        await waitFor(() =>
+          expect(showFlashError).toHaveBeenCalledWith('Failed to load important info.'),
         )
-        const errors = await findAllByText('Failed to load important info.')
-        expect(errors[0]).toBeInTheDocument()
       })
     })
 
@@ -181,8 +189,8 @@ describe('K-5 Subject Course', () => {
 
       it('shows an error if apps fail to load', async () => {
         fetchMock.get(FETCH_APPS_URL, 400, {overwriteRoutes: true})
-        const {getAllByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
-        await waitFor(() => expect(getAllByText('Failed to load apps.')[0]).toBeInTheDocument())
+        render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
+        await waitFor(() => expect(showFlashError).toHaveBeenCalledWith('Failed to load apps.'))
       })
     })
 
@@ -197,6 +205,58 @@ describe('K-5 Subject Course', () => {
       expect(await findByText('This is really important.')).toBeInTheDocument()
       expect(fetchMock.called(FETCH_IMPORTANT_INFO_URL)).toBeTruthy()
       expect(fetchMock.called(FETCH_APPS_URL)).toBeTruthy()
+    })
+
+    describe('nav_menu_link custom links', () => {
+      it('shows nav_menu_link tabs as an Other Resources section on the Resources tab', async () => {
+        const tabsWithNavLink = [
+          ...defaultProps.tabs,
+          {id: 'nav_menu_link_1', label: 'School Website', args: ['https://example.com']},
+        ]
+        const {findByText} = render(
+          <K5Course {...defaultProps} tabs={tabsWithNavLink} defaultTab={TAB_IDS.RESOURCES} />,
+        )
+        expect(await findByText('Other Resources')).toBeInTheDocument()
+        const link = (await findByText('School Website')).closest('a')
+        expect(link).toHaveAttribute('href', 'https://example.com')
+        expect(link).toHaveAttribute('target', '_blank')
+      })
+
+      it('does not show hidden nav_menu_link tabs in the Other Resources section', async () => {
+        const tabsWithHiddenNavLink = [
+          ...defaultProps.tabs,
+          {
+            id: 'nav_menu_link_2',
+            label: 'Hidden Link',
+            args: ['https://hidden.example.com'],
+            hidden: true,
+          },
+        ]
+        const {queryByText} = render(
+          <K5Course
+            {...defaultProps}
+            tabs={tabsWithHiddenNavLink}
+            defaultTab={TAB_IDS.RESOURCES}
+          />,
+        )
+        expect(queryByText('Hidden Link')).not.toBeInTheDocument()
+        expect(queryByText('Other Resources')).not.toBeInTheDocument()
+      })
+
+      it('does not show nav_menu_link tabs with non-http URLs', async () => {
+        const tabsWithBadNavLink = [
+          ...defaultProps.tabs,
+          {
+            id: 'nav_menu_link_3',
+            label: 'Bad Link',
+            args: ['javascript:alert(1)'],
+          },
+        ]
+        const {queryByText} = render(
+          <K5Course {...defaultProps} tabs={tabsWithBadNavLink} defaultTab={TAB_IDS.RESOURCES} />,
+        )
+        expect(queryByText('Bad Link')).not.toBeInTheDocument()
+      })
     })
   })
 })

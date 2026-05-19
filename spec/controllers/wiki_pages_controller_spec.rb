@@ -96,6 +96,25 @@ describe WikiPagesController do
     end
   end
 
+  context "unauthenticated user in public course" do
+    before do
+      @course.update!(is_public: true)
+      @page = @course.wiki_pages.create!(title: "a-page", body: "hello")
+      remove_user_session
+    end
+
+    it "allows access to the pages index" do
+      get "index", params: { course_id: @course.id }
+      expect(response).to have_http_status :ok
+    end
+
+    it "allows access to the front page" do
+      @course.wiki.set_front_page_url!(@page.url)
+      get "front_page", params: { course_id: @course.id }
+      expect(response).to have_http_status :ok
+    end
+  end
+
   context "with page" do
     before do
       @page = @course.wiki_pages.create!(title: "ponies5ever", body: "")
@@ -195,6 +214,151 @@ describe WikiPagesController do
         end
 
         it_behaves_like "pages enforcing differentiation"
+      end
+
+      context "study_assist feature" do
+        context "when enabled" do
+          before { @course.enable_feature!(:study_assist) }
+
+          context "as a student" do
+            before do
+              student_in_course(active_all: true)
+              user_session(@student)
+            end
+
+            it "sets study_assist in FEATURES" do
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:FEATURES][:study_assist]).to be true
+            end
+
+            it "sets WIKI_PAGE_ID to the page url" do
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:WIKI_PAGE_ID]).to eq @page.url
+            end
+
+            it "sets STUDY_ASSIST_TOOLS with all tools enabled by default" do
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:STUDY_ASSIST_TOOLS]).to eq ["Summarize", "Quiz me", "Flashcards"]
+            end
+
+            it "excludes tools when their feature flag is disabled" do
+              @course.disable_feature!(:study_assist_summarize)
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:STUDY_ASSIST_TOOLS]).to eq ["Quiz me", "Flashcards"]
+            end
+
+            it "returns empty array when all tool flags are disabled" do
+              @course.disable_feature!(:study_assist_summarize)
+              @course.disable_feature!(:study_assist_quiz_me)
+              @course.disable_feature!(:study_assist_flashcards)
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:STUDY_ASSIST_TOOLS]).to eq []
+            end
+          end
+
+          it "does not set study_assist for teachers" do
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env][:FEATURES]).not_to have_key(:study_assist)
+          end
+
+          context "in a group context" do
+            before do
+              student_in_course(active_all: true)
+              user_session(@student)
+              @group = group_model(context: @course)
+              @group.add_user(@student)
+              @group_page = @group.wiki_pages.create!(title: "group page", body: "content")
+            end
+
+            it "does not enable study_assist" do
+              get "show", params: { group_id: @group.id, id: @group_page.url }
+              expect(assigns[:js_env][:FEATURES]).not_to have_key(:study_assist)
+            end
+          end
+        end
+
+        context "when disabled" do
+          it "does not set WIKI_PAGE_ID" do
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env]).not_to have_key :WIKI_PAGE_ID
+          end
+
+          it "does not set STUDY_ASSIST_TOOLS" do
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env]).not_to have_key :STUDY_ASSIST_TOOLS
+          end
+        end
+      end
+
+      context "notebook feature" do
+        before do
+          config = instance_double(CanvasCareer::Config)
+          allow(CanvasCareer::Config).to receive(:new).and_return(config)
+          allow(config).to receive(:public_app_config).and_return({ "hosts" => { "journey" => "http://journey.test" } })
+        end
+
+        context "when enabled" do
+          before { @course.account.enable_feature!(:notebook) }
+
+          context "as a student" do
+            before do
+              student_in_course(active_all: true)
+              user_session(@student)
+            end
+
+            it "sets notebook in FEATURES" do
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:FEATURES][:notebook]).to be true
+            end
+
+            it "sets WIKI_PAGE_ID to the page url" do
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:WIKI_PAGE_ID]).to eq @page.url
+            end
+
+            it "sets WIKI_PAGE_UPDATED_AT to the page updated_at" do
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:WIKI_PAGE_UPDATED_AT]).to eq @page.updated_at.iso8601
+            end
+
+            it "sets JOURNEY_URL from CanvasCareer config" do
+              get "show", params: { course_id: @course.id, id: @page.url }
+              expect(assigns[:js_env][:JOURNEY_URL]).to eq "http://journey.test"
+            end
+          end
+
+          it "does not set notebook for teachers" do
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env][:FEATURES]).not_to have_key(:notebook)
+          end
+
+          context "in a group context" do
+            before do
+              student_in_course(active_all: true)
+              user_session(@student)
+              @group = group_model(context: @course)
+              @group.add_user(@student)
+              @group_page = @group.wiki_pages.create!(title: "group page", body: "content")
+            end
+
+            it "does not enable notebook" do
+              get "show", params: { group_id: @group.id, id: @group_page.url }
+              expect(assigns[:js_env][:FEATURES]).not_to have_key(:notebook)
+            end
+          end
+        end
+
+        context "when disabled" do
+          it "does not set WIKI_PAGE_UPDATED_AT" do
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env]).not_to have_key :WIKI_PAGE_UPDATED_AT
+          end
+
+          it "does not set notebook in FEATURES" do
+            get "show", params: { course_id: @course.id, id: @page.url }
+            expect(assigns[:js_env][:FEATURES]).not_to have_key(:notebook)
+          end
+        end
       end
 
       context "permanent_page_links enabled" do

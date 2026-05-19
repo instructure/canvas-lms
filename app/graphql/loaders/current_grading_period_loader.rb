@@ -19,15 +19,15 @@
 #
 
 class Loaders::CurrentGradingPeriodLoader < GraphQL::Batch::Loader
-  # NOTE: this isn't really doing any batch loading currently. it's just here
-  # to avoid re-computing which grading period goes to the same course (like
-  # when fetching grades for all students in a course)
-  # (if someone wants to modify the grading period stuff for batching then
-  # thank you)
   def perform(courses)
-    ActiveRecord::Associations.preload(courses, :enrollment_term)
+    ActiveRecord::Associations.preload(courses, grading_period_groups: :active_grading_periods)
+    ActiveRecord::Associations.preload(courses, enrollment_term: { grading_period_group: :active_grading_periods })
+
     courses.each do |course|
-      grading_periods = GradingPeriod.for(course)
+      grading_periods = course.grading_period_groups.flat_map(&:active_grading_periods)
+      if grading_periods.empty? && course.enrollment_term&.grading_period_group
+        grading_periods = course.enrollment_term.grading_period_group.active_grading_periods
+      end
       current_grading_period = grading_periods.find(&:current?)
 
       fulfill course, [current_grading_period, grading_periods.any?]

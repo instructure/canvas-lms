@@ -125,6 +125,26 @@ describe('RubricTab - General Tests', () => {
     expect(queryByText('View Rubric')).not.toBeInTheDocument()
   })
 
+  it('outer content wrapper has maxWidth of 100%', async () => {
+    const props = await makeProps({graded: false})
+    makeStore(props)
+    const {getByTestId} = renderRubricTab(props)
+
+    const wrapper = getByTestId('rubric-content-wrapper')
+    expect(wrapper).toBeInTheDocument()
+    expect(wrapper).toHaveStyle({maxWidth: '100%'})
+  })
+
+  it('rubric preview container has maxWidth of 100% and overflowX of scroll', async () => {
+    const props = await makeProps({graded: false})
+    makeStore(props)
+    const {getByTestId} = renderRubricTab(props)
+
+    const preview = getByTestId('rubric-preview')
+    expect(preview).toBeInTheDocument()
+    expect(preview).toHaveStyle({maxWidth: '100%', overflowX: 'scroll'})
+  })
+
   it('disables interactions in the Rubric component by default', async () => {
     const props = await makeProps({graded: false})
     props.rubric.criteria[0].ratings[0].points = 9

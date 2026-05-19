@@ -104,30 +104,24 @@ describe UsersController do
       end
     end
 
-    context "when 'open_tools_in_new_tab' feature flag is enabled" do
-      before do
-        Account.default.enable_feature! :open_tools_in_new_tab
-      end
+    it "uses borderless display type when windowTarget is _blank" do
+      tool.settings[:user_navigation][:windowTarget] = "_blank"
+      tool.save!
 
-      it "uses borderless display type when windowTarget is _blank" do
-        tool.settings[:user_navigation][:windowTarget] = "_blank"
-        tool.save!
+      get :external_tool, params: { id: tool.id, user_id: user.id }
 
-        get :external_tool, params: { id: tool.id, user_id: user.id }
+      expect(assigns[:lti_launch]).not_to be_nil
+      expect(assigns[:display_override]).to eq "borderless"
+    end
 
-        expect(assigns[:lti_launch]).not_to be_nil
-        expect(assigns[:display_override]).to eq "borderless"
-      end
+    it "renders with default display type when windowTarget is not _blank" do
+      tool.settings[:user_navigation][:windowTarget] = "_self"
+      tool.save!
 
-      it "renders with default display type when windowTarget is not _blank" do
-        tool.settings[:user_navigation][:windowTarget] = "_self"
-        tool.save!
+      get :external_tool, params: { id: tool.id, user_id: user.id }
 
-        get :external_tool, params: { id: tool.id, user_id: user.id }
-
-        expect(assigns[:lti_launch]).not_to be_nil
-        expect(assigns[:display_override]).to be_nil
-      end
+      expect(assigns[:lti_launch]).not_to be_nil
+      expect(assigns[:display_override]).to be_nil
     end
 
     it "removes query string when post_only = true" do
@@ -230,47 +224,6 @@ describe UsersController do
           lti_deployment_id
           lti_storage_target
         ]
-      end
-
-      context "when lti_deployment_id_in_login_request FF is off" do
-        let(:oidc_initiation_url) { "http://lti13testtool.docker/blti_launch" }
-        let(:tool) do
-          reg = lti_registration_with_tool(
-            account:,
-            configuration_params: {
-              oidc_initiation_url:,
-              placements: [
-                {
-                  placement: "user_navigation",
-                  enabled: true,
-                  text: "example",
-                }
-              ]
-            }
-          )
-          reg.deployments.first
-        end
-
-        before do
-          user.account.root_account.disable_feature!(:lti_deployment_id_in_login_request)
-          allow(SecureRandom).to receive(:hex).and_return(verifier)
-          get :external_tool, params: { id: tool.id, user_id: user.id }
-        end
-
-        it "creates a login message" do
-          expect(assigns[:lti_launch].params.keys).to match_array %w[
-            iss
-            login_hint
-            target_link_uri
-            lti_message_hint
-            canvas_region
-            canvas_environment
-            client_id
-            deployment_id
-            lti_deployment_id
-            lti_storage_target
-          ]
-        end
       end
 
       it 'sets the "login_hint" to the current user lti id' do
@@ -919,7 +872,7 @@ describe UsersController do
         expect(CommunicationChannel.last.confirmation_redirect).to be_nil
       end
 
-      it "creates a registered user if the skip_registration flag is passed in" do
+      it "ignores skip_registration flag for unauthenticated self-registering users" do
         post("create", params: {
                pseudonym: { unique_id: "jacob@instructure.com" },
                user: { name: "Jacob Fugal", terms_of_use: "1", skip_registration: "1" }
@@ -928,12 +881,26 @@ describe UsersController do
 
         p = Pseudonym.where(unique_id: "jacob@instructure.com").first
         expect(p).to be_active
-        expect(p.user).to be_registered
+        expect(p.user).to be_pre_registered
         expect(p.user.name).to eq "Jacob Fugal"
         expect(p.user.communication_channels.length).to eq 1
         expect(p.user.communication_channels.first).to be_unconfirmed
         expect(p.user.communication_channels.first.path).to eq "jacob@instructure.com"
         expect(p.user.associated_accounts).to eq [Account.default]
+      end
+
+      it "allows skip_registration for admin users with manage_user_logins" do
+        account_admin_user(account: Account.default)
+        user_session(@admin)
+        post("create", params: {
+               pseudonym: { unique_id: "jacob@instructure.com" },
+               user: { name: "Jacob Fugal", skip_registration: "1" }
+             })
+        expect(response).to be_successful
+
+        p = Pseudonym.where(unique_id: "jacob@instructure.com").first
+        expect(p).to be_active
+        expect(p.user).to be_registered
       end
 
       it "complains about conflicting unique_ids" do
@@ -1807,7 +1774,7 @@ describe UsersController do
         course.enroll_student(snooping_student, active_all: true)
         user_session(snooping_student)
         get_grades!(grading_period.id)
-        expect(response).to_not be_ok
+        expect(response).not_to be_ok
       end
     end
   end
@@ -3092,6 +3059,67 @@ describe UsersController do
   end
 
   describe "#user_dashboard" do
+    context "learning agent env" do
+      before(:once) do
+        course_with_student(active_all: true)
+        @course.root_account.allow_feature!(:athena_learning_agent_button)
+      end
+
+      before do
+        Rails.cache.clear
+        user_session(@student)
+      end
+
+      it "does not set ATHENA when no course has the flag enabled" do
+        @course.disable_feature!(:athena_learning_agent_button)
+        get :user_dashboard
+        expect(assigns[:js_env]).not_to have_key(:ATHENA)
+      end
+
+      it "sets ATHENA when at least one course has the flag enabled" do
+        @course.enable_feature!(:athena_learning_agent_button)
+        get :user_dashboard
+        expect(assigns[:js_env]).to have_key(:ATHENA)
+      end
+
+      it "caches the enrollment check with enrollment-aware batched keys" do
+        @course.enable_feature!(:athena_learning_agent_button)
+        allow(Rails.cache).to receive(:fetch_with_batched_keys).and_call_original
+        expect(Rails.cache).to receive(:fetch_with_batched_keys)
+          .with("learning_agent_dashboard/v1",
+                batch_object: @student,
+                batched_keys: :enrollments,
+                expires_in: 5.minutes)
+          .and_call_original
+        get :user_dashboard
+      end
+
+      it "does not set ATHENA for a teacher enrollment in a flagged course" do
+        course_with_teacher(active_all: true, user: @student)
+        @course.enable_feature!(:athena_learning_agent_button)
+        # student has no student enrollment in this new course
+        @student.enrollments.where(type: "StudentEnrollment").destroy_all
+        get :user_dashboard
+        expect(assigns[:js_env]).not_to have_key(:ATHENA)
+      end
+
+      it "does not set ATHENA when the student enrollment is concluded" do
+        @course.enable_feature!(:athena_learning_agent_button)
+        @course.update!(workflow_state: :completed)
+        get :user_dashboard
+        expect(assigns[:js_env]).not_to have_key(:ATHENA)
+      end
+
+      it "sets ATHENA when only one of multiple courses has the flag enabled" do
+        course2 = course_with_student(active_all: true, user: @student).course
+        course2.root_account.allow_feature!(:athena_learning_agent_button)
+        @course.disable_feature!(:athena_learning_agent_button)
+        course2.enable_feature!(:athena_learning_agent_button)
+        get :user_dashboard
+        expect(assigns[:js_env]).to have_key(:ATHENA)
+      end
+    end
+
     context "with student planner feature enabled" do
       before(:once) do
         @account = Account.default
@@ -3149,7 +3177,7 @@ describe UsersController do
 
       it "loads nicknames" do
         @user.set_preference(:course_nicknames, @course1.id, "some nickname or whatever")
-        expect_any_instance_of(User).to_not receive(:course_nickname)
+        expect_any_instance_of(User).not_to receive(:course_nickname)
         get "user_dashboard"
         course_data = assigns[:js_env][:STUDENT_PLANNER_COURSES]
         expect(course_data.detect { |h| h[:id] == @course1.id }[:shortName]).to eq "some nickname or whatever"
@@ -3195,7 +3223,7 @@ describe UsersController do
 
       context "disabled" do
         before(:once) do
-          toggle_k5_setting(@account, false)
+          toggle_k5_setting(@account, enable: false)
         end
 
         it_behaves_like "observer list"
@@ -3214,7 +3242,7 @@ describe UsersController do
 
       context "enabled" do
         before(:once) do
-          toggle_k5_setting(@account, true)
+          toggle_k5_setting(@account)
         end
 
         it_behaves_like "observer list"
@@ -3342,7 +3370,7 @@ describe UsersController do
           end
 
           it "does not include classic accounts in the list" do
-            toggle_k5_setting(@account2, false)
+            toggle_k5_setting(@account2, enable: false)
             get "user_dashboard"
             account_contexts = assigns[:js_env][:ACCOUNT_CALENDAR_CONTEXTS]
             expect(account_contexts.length).to be 1
@@ -3366,6 +3394,7 @@ describe UsersController do
         get "user_dashboard"
         expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be(:teacher)
         expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_falsey
+        expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:VIEWABLE_ACCOUNT_IDS]).to be_nil
       end
 
       it "sets correctly for a user with no enrollments" do
@@ -3374,6 +3403,7 @@ describe UsersController do
         get "user_dashboard"
         expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be_nil
         expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_truthy
+        expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:VIEWABLE_ACCOUNT_IDS]).to be_nil
       end
 
       it "sets correctly for a student with enrollments in a sub-account" do
@@ -3383,6 +3413,7 @@ describe UsersController do
         get "user_dashboard"
         expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be(:student)
         expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_falsey
+        expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:VIEWABLE_ACCOUNT_IDS]).to be_nil
       end
 
       it "sets correctly for an admin user" do
@@ -3392,6 +3423,7 @@ describe UsersController do
         get "user_dashboard"
         expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be(:admin)
         expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_falsey
+        expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:VIEWABLE_ACCOUNT_IDS]).to include(Account.default.id.to_s)
       end
     end
 
@@ -3410,24 +3442,6 @@ describe UsersController do
         @current_user = @user
         get "user_dashboard"
         expect(assigns[:js_env][:SHARED_COURSE_DATA].length).to eq 1
-      end
-
-      it "includes widget_dashboard_customization in DASHBOARD_FEATURES when enabled" do
-        course_with_student_logged_in(active_all: true)
-        @user.preferences[:widget_dashboard_user_preference] = true
-        @user.save!
-        Account.site_admin.enable_feature!(:widget_dashboard_customization)
-        get "user_dashboard"
-        expect(assigns[:js_env][:DASHBOARD_FEATURES][:widget_dashboard_customization]).to be true
-      end
-
-      it "does not include widget_dashboard_customization in DASHBOARD_FEATURES when disabled" do
-        course_with_student_logged_in(active_all: true)
-        @user.preferences[:widget_dashboard_user_preference] = true
-        @user.save!
-        Account.site_admin.disable_feature!(:widget_dashboard_customization)
-        get "user_dashboard"
-        expect(assigns[:js_env][:DASHBOARD_FEATURES][:widget_dashboard_customization]).to be false
       end
 
       it "includes platform_ui_unified_widgets_dashboard in DASHBOARD_FEATURES when enabled" do
@@ -3516,6 +3530,16 @@ describe UsersController do
           expect(assigns[:css_bundles].flatten).to include :dashboard
         end
 
+        it "shows legacy dashboard to account admins even when opted in" do
+          account_admin_user
+          @admin.preferences[:widget_dashboard_user_preference] = true
+          @admin.save!
+          user_session(@admin)
+          get "user_dashboard"
+          expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+          expect(assigns[:js_bundles].flatten).to include :dashboard
+        end
+
         it "respects user preference when feature is allowed (can override)" do
           user_session(@student)
           @student.preferences[:widget_dashboard_user_preference] = false
@@ -3553,6 +3577,184 @@ describe UsersController do
           get "user_dashboard"
           expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
           expect(assigns[:js_bundles].flatten).to include :dashboard
+        end
+      end
+    end
+  end
+
+  describe "#should_show_educator_dashboard?" do
+    let(:account) { Account.default }
+
+    before do
+      account.enable_feature!(:educator_dashboard)
+    end
+
+    it "returns true for teacher" do
+      course_with_teacher_logged_in(active_all: true)
+      get "user_dashboard"
+      expect(assigns(:js_env)[:DASHBOARD_FEATURES][:educator_dashboard]).to be true
+    end
+
+    it "does not load widget_dashboard bundle for TA" do
+      course_with_ta(active_all: true)
+      user_session(@ta)
+      get "user_dashboard"
+      expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+    end
+
+    it "returns true for multi-role user with teacher and student enrollments" do
+      course_with_teacher_logged_in(active_all: true)
+      @course.enroll_student(@user, enrollment_state: "active")
+      get "user_dashboard"
+      expect(assigns(:js_env)[:DASHBOARD_FEATURES][:educator_dashboard]).to be true
+    end
+
+    it "does not load widget_dashboard bundle for teacher with only completed enrollments" do
+      course_with_teacher_logged_in(active_all: true)
+      @enrollment.update!(workflow_state: "completed")
+      get "user_dashboard"
+      expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+    end
+
+    context "routing to widget_dashboard bundle" do
+      it "loads widget_dashboard bundle for teacher" do
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).to include :widget_dashboard
+      end
+
+      it "sets educator_dashboard in DASHBOARD_FEATURES for teacher" do
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns(:js_env)[:DASHBOARD_FEATURES][:educator_dashboard]).to be true
+      end
+
+      it "loads educator_dashboard css bundle for teacher" do
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns[:css_bundles].flatten).to include :educator_dashboard
+      end
+
+      it "does not include student-only data for educator" do
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns(:js_env)).not_to have_key(:SHARED_COURSE_DATA)
+        expect(assigns(:js_env)).not_to have_key(:OBSERVED_USERS_LIST)
+      end
+
+      it "does not load widget_dashboard bundle when feature flag is off" do
+        account.disable_feature!(:educator_dashboard)
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+      end
+
+      it "does not load widget_dashboard bundle for K5 teacher" do
+        course_with_teacher_logged_in(active_all: true)
+        allow(controller).to receive(:k5_user?).and_return(true)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+      end
+
+      it "does not load widget_dashboard bundle for student-only user" do
+        course_with_student_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+      end
+
+      it "adds educator-dashboard body class for educator" do
+        course_with_teacher_logged_in(active_all: true)
+        get "user_dashboard"
+        expect(assigns(:body_classes)).to include("educator-dashboard")
+      end
+
+      it "loads educator dashboard for designer" do
+        course = course_factory(active_all: true)
+        designer = user_factory(active_all: true)
+        course.enroll_user(designer, "DesignerEnrollment", enrollment_state: :active)
+        user_session(designer)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).to include :widget_dashboard
+        expect(assigns(:js_env)[:DASHBOARD_FEATURES][:educator_dashboard]).to be true
+      end
+
+      it "does not load educator dashboard for designer when flag is off" do
+        account.disable_feature!(:educator_dashboard)
+        course = course_factory(active_all: true)
+        designer = user_factory(active_all: true)
+        course.enroll_user(designer, "DesignerEnrollment", enrollment_state: :active)
+        user_session(designer)
+        get "user_dashboard"
+        expect(assigns[:js_bundles].flatten).not_to include :widget_dashboard
+      end
+
+      describe "RCE js_env" do
+        context "for a teacher" do
+          before do
+            course_with_teacher_logged_in(active_all: true)
+            get "user_dashboard"
+          end
+
+          it "sets RICH_CONTENT_APP_HOST" do
+            expect(assigns(:js_env)).to have_key(:RICH_CONTENT_APP_HOST)
+          end
+
+          it "disables file uploads" do
+            expect(assigns(:js_env)[:RICH_CONTENT_CAN_UPLOAD_FILES]).to be false
+          end
+
+          it "sets context_asset_string to user" do
+            expect(assigns(:js_env)[:context_asset_string]).to eq(@user.asset_string)
+          end
+
+          it "pins file, media, and AI toggles off" do
+            env = assigns(:js_env)
+            expect(env[:RICH_CONTENT_CAN_EDIT_FILES]).to be false
+            expect(env[:RICH_CONTENT_FILES_TAB_DISABLED]).to be true
+            expect(env[:RICH_CONTENT_INST_RECORD_TAB_DISABLED]).to be true
+            expect(env[:RICH_CONTENT_AI_TEXT_TOOLS]).to be false
+          end
+        end
+
+        context "for a designer" do
+          before do
+            course = course_factory(active_all: true)
+            @user = user_factory(active_all: true)
+            course.enroll_user(@user, "DesignerEnrollment", enrollment_state: :active)
+            user_session(@user)
+            get "user_dashboard"
+          end
+
+          it "sets RICH_CONTENT_APP_HOST" do
+            expect(assigns(:js_env)).to have_key(:RICH_CONTENT_APP_HOST)
+          end
+
+          it "disables file uploads" do
+            expect(assigns(:js_env)[:RICH_CONTENT_CAN_UPLOAD_FILES]).to be false
+          end
+
+          it "sets context_asset_string to user" do
+            expect(assigns(:js_env)[:context_asset_string]).to eq(@user.asset_string)
+          end
+
+          it "pins file, media, and AI toggles off" do
+            env = assigns(:js_env)
+            expect(env[:RICH_CONTENT_CAN_EDIT_FILES]).to be false
+            expect(env[:RICH_CONTENT_FILES_TAB_DISABLED]).to be true
+            expect(env[:RICH_CONTENT_INST_RECORD_TAB_DISABLED]).to be true
+            expect(env[:RICH_CONTENT_AI_TEXT_TOOLS]).to be false
+          end
+        end
+
+        context "when educator dashboard is inactive" do
+          before do
+            course_with_student_logged_in(active_all: true)
+            get "user_dashboard"
+          end
+
+          it "does not set RICH_CONTENT_APP_HOST" do
+            expect(assigns(:js_env)).not_to have_key(:RICH_CONTENT_APP_HOST)
+          end
         end
       end
     end
@@ -3599,6 +3801,17 @@ describe UsersController do
 
         get "dashboard_stream_items", params: { observed_user_id: @another_student.id }
         expect(response).to be_unauthorized
+      end
+
+      it "filters out conversation stream items when observing a student" do
+        conversation_item = instance_double(StreamItem, asset_type: "Conversation", course: nil)
+        announcement_item = instance_double(StreamItem, asset_type: "Announcement", course: nil)
+        allow_any_instance_of(User).to receive(:cached_recent_stream_items).and_return([conversation_item, announcement_item])
+
+        get "dashboard_stream_items", params: { observed_user_id: @student.id }
+
+        expect(assigns[:stream_items]).not_to include(conversation_item)
+        expect(assigns[:stream_items]).to include(announcement_item)
       end
     end
   end

@@ -25,10 +25,27 @@ export type MediaInfo = {
   media_sources: any[]
   media_tracks: MediaTrack[]
   media_type: string
+  status?:
+    | 'ERROR_IMPORTING'
+    | 'ERROR_CONVERTING'
+    | 'SCAN_FAILURE'
+    | 'IMPORT'
+    | 'INFECTED'
+    | 'PRECONVERT'
+    | 'READY'
+    | 'DELETED'
+    | 'PENDING'
+    | 'MODERATE'
+    | 'BLOCKED'
+    | 'NO_CONTENT'
   title: string
+  viewer_restrictions: {
+    show_rolling_transcript?: boolean
+  }
 }
 
 export type MediaTrack = {
+  asr: boolean
   created_at: string
   id: string
   inherited: boolean
@@ -36,4 +53,5 @@ export type MediaTrack = {
   locale: string
   updated_at: string
   url: string
+  workflow_state: 'ready' | 'failed' | 'processing'
 }

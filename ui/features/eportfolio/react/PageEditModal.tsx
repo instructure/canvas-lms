@@ -31,7 +31,7 @@ import {useForm, Controller} from 'react-hook-form'
 import * as z from 'zod'
 import {zodResolver} from '@hookform/resolvers/zod'
 import type {ePortfolioPage, ePortfolio} from './types'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('eportfolio')
 

@@ -19,6 +19,8 @@
 #
 
 class LearnPlatformController < ApplicationController
+  skip_before_action :require_user
+
   def learnplatform_api
     @learnplatform_api ||= LearnPlatform::Api.new
   end
@@ -95,7 +97,7 @@ class LearnPlatformController < ApplicationController
 
   # Set the translate_lang option if needed.
   def configure_translation_lang(options)
-    if @domain_root_account.feature_enabled?(:lti_apps_page_ai_translation) && I18n.locale.present? && I18n.locale != :en
+    if I18n.locale.present? && I18n.locale != :en
       options[:translate_lang] = I18n.locale.to_s
     end
   end

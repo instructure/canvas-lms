@@ -26,17 +26,17 @@ import OutcomesContext, {
 } from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo-v3'
 import {findModalMocks} from '@canvas/outcomes/mocks/Outcomes'
-import {
-  findOutcomesMocks,
-  groupMocks,
-  importOutcomeMocks,
-} from '@canvas/outcomes/mocks/Management'
+import {findOutcomesMocks, groupMocks, importOutcomeMocks} from '@canvas/outcomes/mocks/Management'
 import {clickEl} from '@canvas/outcomes/react/helpers/testHelpers'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 vi.mock('@canvas/progress/resolve_progress')
 
@@ -91,12 +91,7 @@ describe('FindOutcomesModal - Import to Different Contexts', () => {
 
   const render = (
     children,
-    {
-      contextType = 'Account',
-      contextId = '1',
-      mocks = findModalMocks(),
-      renderer = rtlRender,
-    } = {},
+    {contextType = 'Account', contextId = '1', mocks = findModalMocks(), renderer = rtlRender} = {},
   ) => {
     return renderer(
       <OutcomesContext.Provider

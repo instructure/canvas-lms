@@ -954,6 +954,65 @@ describe "Modules API", type: :request do
         expect(@wiki_page.active?).to be true
       end
 
+      context "when some items cannot be published" do
+        before do
+          hidden_folder = @course.folders.create!(
+            name: "hidden folder",
+            parent_folder: Folder.root_folders(@course).first,
+            workflow_state: "hidden"
+          )
+          @hidden_attachment = attachment_model(
+            context: @course,
+            folder: hidden_folder,
+            uploaded_data: fixture_file_upload("a_file.txt", "text/plain")
+          )
+          @module1.add_item(id: @hidden_attachment.id, type: "attachment")
+        end
+
+        it "returns publish_warning: true" do
+          json = api_call(:put,
+                          "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
+                          { controller: "context_modules_api",
+                            action: "update",
+                            format: "json",
+                            course_id: @course.id.to_s,
+                            id: @module1.id.to_s },
+                          { module: { published: "1" } })
+          expect(json["publish_warning"]).to be true
+        end
+
+        it "returns publish_warning_items with title and reason" do
+          json = api_call(:put,
+                          "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
+                          { controller: "context_modules_api",
+                            action: "update",
+                            format: "json",
+                            course_id: @course.id.to_s,
+                            id: @module1.id.to_s },
+                          { module: { published: "1" } })
+          items = json["publish_warning_items"]
+          expect(items).to be_an(Array)
+          tag = @module1.content_tags.find_by(content_id: @hidden_attachment.id)
+          item = items.find { |i| i["id"] == tag.id }
+          expect(item).to be_present
+          expect(item["title"]).to be_present
+          expect(item["reason"]).to eq("file_in_hidden_folder")
+        end
+
+        it "omits publish_warning_items when all items publish successfully" do
+          json = api_call(:put,
+                          "/api/v1/courses/#{@course.id}/modules/#{@module2.id}",
+                          { controller: "context_modules_api",
+                            action: "update",
+                            format: "json",
+                            course_id: @course.id.to_s,
+                            id: @module2.id.to_s },
+                          { module: { published: "1" } })
+          expect(json["publish_warning"]).to be_falsey
+          expect(json.key?("publish_warning_items")).to be false
+        end
+      end
+
       it "publishes module tag items even if the tag itself is already published" do
         # surreptitiously set up a terrible pre-DS => post-DS transition state
         ContentTag.where(id: @wiki_page_tag.id).update_all(workflow_state: "active")
@@ -1917,6 +1976,73 @@ describe "Modules API", type: :request do
                { module: { name: "new name" } },
                {},
                { expected_status: 403 })
+    end
+  end
+
+  context "as an anonymous user on a public horizon course" do
+    before :once do
+      @course.account.enable_feature!(:horizon_course_setting)
+      @course.update!(is_public: true, horizon_course: true)
+    end
+
+    it "allows listing modules without authentication" do
+      @user = nil
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/modules",
+                      { controller: "context_modules_api",
+                        action: "index",
+                        format: "json",
+                        course_id: @course.id.to_s },
+                      {},
+                      {},
+                      { expected_status: 200 })
+      expect(json.pluck("name")).to include(@module1.name, @module2.name)
+      expect(json.pluck("name")).not_to include(@module3.name)
+    end
+
+    it "allows viewing a single module without authentication" do
+      @user = nil
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
+                      { controller: "context_modules_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        id: @module1.id.to_s },
+                      {},
+                      {},
+                      { expected_status: 200 })
+      expect(json["name"]).to eq(@module1.name)
+    end
+
+    it "rejects anonymous access to non-public horizon course modules" do
+      @course.update!(is_public: false)
+      @user = nil
+      api_call(:get,
+               "/api/v1/courses/#{@course.id}/modules",
+               { controller: "context_modules_api",
+                 action: "index",
+                 format: "json",
+                 course_id: @course.id.to_s },
+               {},
+               {},
+               { expected_status: 401 })
+    end
+
+    it "rejects anonymous access to public non-horizon course modules" do
+      non_horizon_course = course_factory(active_all: true)
+      non_horizon_course.update!(is_public: true)
+      non_horizon_course.context_modules.create!(name: "visible module")
+      @user = nil
+      api_call(:get,
+               "/api/v1/courses/#{non_horizon_course.id}/modules",
+               { controller: "context_modules_api",
+                 action: "index",
+                 format: "json",
+                 course_id: non_horizon_course.id.to_s },
+               {},
+               {},
+               { expected_status: 401 })
     end
   end
 end

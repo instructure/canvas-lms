@@ -17,10 +17,8 @@
  */
 
 import {useLocation, useNavigate, useNavigationType} from 'react-router-dom'
-import {assignLocation} from '@canvas/util/globalUtils'
-import {LOGIN_ENTRY_URL} from '../routes/routes'
 
-export function useSafeBackNavigation() {
+export function useSafeBackNavigation(fallbackPath: string) {
   const navigate = useNavigate()
   const navigationType = useNavigationType()
   const location = useLocation()
@@ -29,8 +27,7 @@ export function useSafeBackNavigation() {
     if (navigationType === 'PUSH' && location.key !== 'default') {
       navigate(-1)
     } else {
-      // if no meaningful history then redirect to branded login entry point
-      assignLocation(LOGIN_ENTRY_URL)
+      navigate(fallbackPath)
     }
   }
 }

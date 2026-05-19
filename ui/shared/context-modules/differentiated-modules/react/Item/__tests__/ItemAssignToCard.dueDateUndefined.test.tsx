@@ -23,7 +23,7 @@ import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import fakeEnv from '@canvas/test-utils/fakeENV'
 
@@ -103,13 +103,16 @@ describe('ItemAssignToCard - Due Date Undefined Defaults', () => {
     onCardDatesChangeMock.mockClear()
     await userEvent.type(dateInput, 'Nov 10, 2020')
     await userEvent.tab()
-    await waitFor(() => {
-      expect(onCardDatesChangeMock).toHaveBeenCalledWith(
-        expect.any(String),
-        'due_at',
-        '2020-11-10T23:59:59.000Z',
-      )
-    }, {timeout: 30000})
+    await waitFor(
+      () => {
+        expect(onCardDatesChangeMock).toHaveBeenCalledWith(
+          expect.any(String),
+          'due_at',
+          '2020-11-10T23:59:59.000Z',
+        )
+      },
+      {timeout: 30000},
+    )
     const timeInputs = await findAllByLabelText('Time')
     expect(timeInputs[0]).toHaveValue('11:59 PM')
   }, 30000)

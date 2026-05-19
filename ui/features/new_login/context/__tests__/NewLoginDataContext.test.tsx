@@ -55,6 +55,12 @@ const TestComponent = () => {
       <span data-testid="invalidLoginFaqUrl">{context.invalidLoginFaqUrl || ''}</span>
       <span data-testid="helpLink">{JSON.stringify(context.helpLink) || ''}</span>
       <span data-testid="requireAup">{context.requireAup || ''}</span>
+      <span data-testid="discoveryEnabled">{context.discoveryEnabled?.toString()}</span>
+      <span data-testid="customMessageLogin">{context.customMessageLogin || ''}</span>
+      <span data-testid="customMessageRegistration">{context.customMessageRegistration || ''}</span>
+      <span data-testid="customMessageRegistrationParent">
+        {context.customMessageRegistrationParent || ''}
+      </span>
     </div>
   )
 }
@@ -93,6 +99,11 @@ describe('NewLoginDataContext', () => {
       'invalidLoginFaqUrl',
       'helpLink',
       'requireAup',
+      'discoveryEnabled',
+      'customMessageLogin',
+      'customMessageRegistration',
+      'customMessageRegistrationParent',
+      'freeForTeacherRegistrationUrl',
     ]
     mockUseFetchNewLoginData.mockReturnValue({
       isDataLoading: false,
@@ -145,6 +156,10 @@ describe('NewLoginDataContext', () => {
         invalidLoginFaqUrl: 'https://example.com/faq',
         helpLink: {url: 'https://example.com/help', label: 'Need Help?'},
         requireAup: 'true',
+        discoveryEnabled: true,
+        customMessageLogin: 'Custom login message',
+        customMessageRegistration: 'Custom registration message',
+        customMessageRegistrationParent: 'Custom registration parent message',
       },
     })
     render(
@@ -178,6 +193,14 @@ describe('NewLoginDataContext', () => {
       JSON.stringify({url: 'https://example.com/help', label: 'Need Help?'}),
     )
     expect(screen.getByTestId('requireAup')).toHaveTextContent('true')
+    expect(screen.getByTestId('discoveryEnabled')).toHaveTextContent('true')
+    expect(screen.getByTestId('customMessageLogin')).toHaveTextContent('Custom login message')
+    expect(screen.getByTestId('customMessageRegistration')).toHaveTextContent(
+      'Custom registration message',
+    )
+    expect(screen.getByTestId('customMessageRegistrationParent')).toHaveTextContent(
+      'Custom registration parent message',
+    )
   })
 
   it('handles undefined optional values gracefully', () => {
@@ -209,6 +232,10 @@ describe('NewLoginDataContext', () => {
     expect(screen.getByTestId('invalidLoginFaqUrl')).toBeEmptyDOMElement()
     expect(screen.getByTestId('helpLink')).toBeEmptyDOMElement()
     expect(screen.getByTestId('requireAup')).toBeEmptyDOMElement()
+    expect(screen.getByTestId('discoveryEnabled')).toBeEmptyDOMElement()
+    expect(screen.getByTestId('customMessageLogin')).toBeEmptyDOMElement()
+    expect(screen.getByTestId('customMessageRegistration')).toBeEmptyDOMElement()
+    expect(screen.getByTestId('customMessageRegistrationParent')).toBeEmptyDOMElement()
   })
 
   it('throws an error if useNewLoginData is used outside NewLoginDataProvider', () => {

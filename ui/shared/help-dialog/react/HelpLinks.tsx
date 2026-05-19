@@ -32,7 +32,7 @@ import type {HelpLink} from '../../../api.d'
 import helpLinksQuery from '../queries/helpLinksQuery'
 import FeaturedHelpLink from './FeaturedHelpLink'
 import {useQuery} from '@tanstack/react-query'
-import {sessionStoragePersister} from '@canvas/query'
+import {sessionStoragePersister} from '@instructure/platform-query'
 
 const I18n = createI18nScope('HelpLinks')
 
@@ -44,7 +44,7 @@ export default function HelpLinks({onClick}: Props) {
   const {data, isLoading, isSuccess} = useQuery<HelpLink[]>({
     queryKey: ['helpLinks'],
     queryFn: helpLinksQuery,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
     // 1 hour
     staleTime: 60 * 60 * 1000,
   })

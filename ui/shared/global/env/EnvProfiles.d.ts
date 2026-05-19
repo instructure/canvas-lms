@@ -22,5 +22,18 @@ export interface EnvProfiles {
   google_drive_oauth_url: string
   PERMISSIONS: {
     can_update_tokens: boolean
+    can_view_user_generated_access_tokens: boolean
+    can_manage_dsr_requests: boolean
+    can_read_sis: boolean
+    can_add_temporary_enrollments: boolean
+    can_edit_temporary_enrollments: boolean
+    can_delete_temporary_enrollments: boolean
+    can_add_teacher: boolean
+    can_add_ta: boolean
+    can_add_student: boolean
+    can_add_observer: boolean
+    can_add_designer: boolean
   }
+  USER_ID: string
+  CONTEXT_USER_DISPLAY_NAME: string
 }

@@ -161,6 +161,30 @@ export const useRegistrationUpdateRequest = (
 }
 
 /**
+ * React Query hook to fetch the latest registration update request for a registration
+ * @param accountId
+ * @param registrationId
+ * @returns React Query result
+ */
+export const useLatestRegistrationUpdateRequest = (
+  accountId: AccountId,
+  registrationId: LtiRegistrationId,
+) => {
+  return useQuery({
+    queryKey: [accountId, 'latest_lti_registration_update_request', registrationId],
+    queryFn: () =>
+      doFetchWithSchema(
+        {
+          path: `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}/latest_update_request`,
+        },
+        ZLtiRegistrationUpdateRequest,
+      ),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: false, // Don't retry if no update request exists (404)
+  })
+}
+
+/**
  * Retrieve a registration by its ID. Useful for managing a registration
  * after it's been created.
  *

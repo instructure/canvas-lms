@@ -1322,12 +1322,6 @@ describe "Folders API", type: :request do
       api_call(:get, @folders_files_path, @folders_files_path_options, {}, {}, expected_status: 403)
     end
 
-    it "returns unauthorized if user is logged out" do
-      @user = nil
-      api_call(:get, @folders_files_path, @folders_files_path_options, {}, {}, expected_status: 401)
-      expect(session[:return_to]).not_to be_nil
-    end
-
     it "returns X-Total-Items header with correct count" do
       api_call(:get, @folders_files_path, @folders_files_path_options, {})
       expect(response.headers["X-Total-Items"]).to eq("5")
@@ -1617,11 +1611,164 @@ describe "Folders API", type: :request do
       end
       expect(result_names).to eq ["course files", "file1.txt", "file2.txt", "file3.txt"]
     end
+  end
 
-    it "returns unauthorized if user is logged out" do
+  describe "#duplicates" do
+    before :once do
+      @parent_folder = @root.sub_folders.create!(name: "parent", context: @course)
+      @test_folder = @parent_folder.sub_folders.create!(name: "test_folder", context: @course)
+    end
+
+    def duplicates_path(context_type, context_id, folder_id)
+      "/api/v1/#{context_type}s/#{context_id}/folders/#{folder_id}/duplicates"
+    end
+
+    def duplicates_params(context_type, context_id, folder_id)
+      {
+        controller: "folders",
+        action: "duplicates",
+        format: "json",
+        "#{context_type}_id": context_id.to_s,
+        id: folder_id.to_s
+      }
+    end
+
+    context "without feature flags" do
+      before do
+        Account.site_admin.disable_feature! :files_a11y_folder_duplicates
+      end
+
+      it "returns forbidden without folder duplicates feature flag" do
+        Account.site_admin.enable_feature! :files_a11y_rewrite
+        raw_api_call(:get,
+                     duplicates_path("course", @course.id, @test_folder.id),
+                     duplicates_params("course", @course.id, @test_folder.id))
+        expect(response).to have_http_status :forbidden
+      end
+
+      it "returns forbidden without files a11y rewrite feature flag" do
+        Account.site_admin.disable_feature! :files_a11y_rewrite
+        Account.site_admin.enable_feature! :files_a11y_folder_duplicates
+        raw_api_call(:get,
+                     duplicates_path("course", @course.id, @test_folder.id),
+                     duplicates_params("course", @course.id, @test_folder.id))
+        expect(response).to have_http_status :forbidden
+      end
+    end
+
+    context "with feature flags" do
+      before do
+        Account.site_admin.enable_feature! :files_a11y_rewrite
+        Account.site_admin.enable_feature! :files_a11y_folder_duplicates
+      end
+
+      it "returns empty array for folder without duplicates" do
+        json = api_call(:get,
+                        duplicates_path("course", @course.id, @test_folder.id),
+                        duplicates_params("course", @course.id, @test_folder.id))
+
+        expect(json["duplicates"]).to eq []
+      end
+
+      it "returns empty array for root folder" do
+        json = api_call(:get,
+                        duplicates_path("course", @course.id, @root.id),
+                        duplicates_params("course", @course.id, @root.id))
+
+        expect(json["duplicates"]).to eq []
+      end
+
+      it "requires read_contents permission" do
+        locked_folder = @parent_folder.sub_folders.create!(name: "locked", context: @course, locked: true)
+        student_in_course
+
+        raw_api_call(:get,
+                     duplicates_path("course", @course.id, locked_folder.id),
+                     duplicates_params("course", @course.id, locked_folder.id))
+
+        expect(response).to have_http_status :forbidden
+      end
+
+      it "find_duplicate_folders returns empty array for folder without parent" do
+        controller = FoldersController.new
+        result = controller.send(:find_duplicate_folders, @root)
+        expect(result).to eq []
+      end
+
+      it "uses folders_json serializer for response" do
+        json = api_call(:get,
+                        duplicates_path("course", @course.id, @test_folder.id),
+                        duplicates_params("course", @course.id, @test_folder.id))
+
+        expect(json).to have_key("duplicates")
+        expect(json["duplicates"]).to be_an(Array)
+      end
+
+      it "rejects folder from wrong context" do
+        other_course = course_factory
+        other_root = Folder.root_folders(other_course).first
+        other_folder = other_root.sub_folders.create!(name: "other", context: other_course)
+
+        raw_api_call(:get,
+                     duplicates_path("course", @course.id, other_folder.id),
+                     duplicates_params("course", @course.id, other_folder.id))
+
+        expect(response).to have_http_status :forbidden
+      end
+
+      it "works in user context" do
+        user_root = Folder.root_folders(@user).first
+        user_parent = user_root.sub_folders.create!(name: "parent", context: @user)
+        user_folder = user_parent.sub_folders.create!(name: "my_folder", context: @user)
+
+        json = api_call(:get,
+                        duplicates_path("user", @user.id, user_folder.id),
+                        duplicates_params("user", @user.id, user_folder.id))
+
+        expect(json["duplicates"]).to eq []
+      end
+
+      it "works in group context" do
+        group_model(context: @course)
+        group_root = Folder.root_folders(@group).first
+        group_parent = group_root.sub_folders.create!(name: "parent", context: @group)
+        group_folder = group_parent.sub_folders.create!(name: "group_folder", context: @group)
+
+        json = api_call(:get,
+                        duplicates_path("group", @group.id, group_folder.id),
+                        duplicates_params("group", @group.id, group_folder.id))
+
+        expect(json["duplicates"]).to eq []
+      end
+    end
+  end
+
+  context "unauthenticated user in public course" do
+    before :once do
+      @course.update!(is_public: true)
       @user = nil
-      api_call(:get, @folders_files_path, @folders_files_path_options, {}, {}, expected_status: 401)
-      expect(session[:return_to]).not_to be_nil
+    end
+
+    it "allows api_index on a folder" do
+      raw_api_call(:get,
+                   "/api/v1/folders/#{@root.id}/folders",
+                   { controller: "folders", action: "api_index", format: "json", id: @root.id.to_param })
+      assert_status(200)
+    end
+
+    it "allows resolve_path" do
+      raw_api_call(:get,
+                   "/api/v1/courses/#{@course.id}/folders/by_path",
+                   { controller: "folders", action: "resolve_path", format: "json", course_id: @course.id.to_param })
+      assert_status(200)
+    end
+
+    it "allows list_all_folders_and_files" do
+      Account.site_admin.enable_feature!(:files_a11y_rewrite)
+      raw_api_call(:get,
+                   "/api/v1/courses/#{@course.id}/folders_and_files",
+                   { controller: "folders", action: "list_all_folders_and_files", format: "json", course_id: @course.id.to_param })
+      assert_status(200)
     end
   end
 end

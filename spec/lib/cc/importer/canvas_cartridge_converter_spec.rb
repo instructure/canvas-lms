@@ -423,6 +423,7 @@ describe "Canvas Cartridge importing" do
 
     rubric = @copy_from.rubrics.new
     rubric.title = "Rubric"
+    rubric.rating_order = "ascending"
     rubric.data = [{ ratings: [{ criterion_id: "309_6312", points: 5, description: "Full Marks", id: "blank", long_description: "" }, { criterion_id: "309_6312", points: 0, description: "No Marks", id: "blank_2", long_description: "" }], points: 5, description: "Description of criterion", id: "309_6312", long_description: "" }, { ignore_for_scoring: false, mastery_points: 3, learning_outcome_id: lo.id, ratings: [{ criterion_id: "309_343", points: 5, description: "Exceeds Expectations", id: "309_6516", long_description: "" }, { criterion_id: "309_343", points: 0, description: "Does Not Meet Expectations", id: "309_9962", long_description: "" }], points: 5, description: "Learning Outcome", id: "309_343", long_description: "<p>Outcome</p>" }]
     rubric.save!
     rubric.associate_with(@copy_from, @copy_from)
@@ -454,10 +455,12 @@ describe "Canvas Cartridge importing" do
     expect(lo_2).not_to be_nil
     rubric_2 = @copy_to.rubrics.where(migration_id: CC::CCHelper.create_key(rubric)).first
     expect(rubric_2.title).to eq rubric.title
+    expect(rubric_2.rating_order).to eq "ascending"
     expect(rubric_2.data[1][:learning_outcome_id]).to eq lo_2.id
 
     rubric2_2 = @copy_to.rubrics.where(migration_id: CC::CCHelper.create_key(rubric2)).first
     expect(rubric2_2.title).to eq rubric2.title
+    expect(rubric2_2.rating_order).to eq "descending"
   end
 
   it "imports context info" do

@@ -80,7 +80,7 @@ also specify a custom name by passing `n_plus_one_name=<name>` which will make
 the filename `n_plus_one_detection-<name>-<iso8601 timestamp>`.
 
 Note that you must be logged in as a Site Admin user to enable this
-functionality. This is to prevent abuse of the feature by regular users.
+functionality. This is to prevent abuse of the feature by regular users. However, a Site Admin user can masquerade as any non-site-admin user and generate an N+1 report (the resulting report will be in the Site Admin user's Canvas Files).
 
 ### Limitations
 

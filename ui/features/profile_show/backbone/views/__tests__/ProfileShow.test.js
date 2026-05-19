@@ -19,7 +19,16 @@
 import ProfileShow from '../ProfileShow'
 import $ from 'jquery'
 import 'jquery-migrate'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer, showFlashAlert} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    destroyContainer: vi.fn(),
+    showFlashAlert: vi.fn(),
+  }
+})
 
 describe('ProfileShow', () => {
   let view
@@ -208,19 +217,15 @@ describe('ProfileShow', () => {
   describe('profile update notifications', () => {
     it('shows success message when success container is present', () => {
       view.renderAlert('Profile has been saved successfully', 'error')
-      // Advance timers to allow the alert to render
-      vi.advanceTimersByTime(100)
-      expect(document.querySelector('#flashalert_message_holder').textContent).toContain(
-        'Profile has been saved successfully',
+      expect(showFlashAlert).toHaveBeenCalledWith(
+        expect.objectContaining({message: 'Profile has been saved successfully'}),
       )
     })
 
     it('shows failure message when failed container is present', () => {
       view.renderAlert('Profile save was unsuccessful', 'error')
-      // Advance timers to allow the alert to render
-      vi.advanceTimersByTime(100)
-      expect(document.querySelector('#flashalert_message_holder').textContent).toContain(
-        'Profile save was unsuccessful',
+      expect(showFlashAlert).toHaveBeenCalledWith(
+        expect.objectContaining({message: 'Profile save was unsuccessful'}),
       )
     })
   })

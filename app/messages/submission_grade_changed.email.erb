@@ -29,7 +29,7 @@
     <%= t :excused, "This assignment has been excused." %>
   <% elsif asset.score %>
     <% if assignment.restrict_quantitative_data?(user)%>
-      <%=t :grade, "grade: %{letter_grade}", :letter_grade => assignment.score_to_grade(asset.score, asset.grade, true)%>
+      <%=t :grade, "grade: %{letter_grade}", :letter_grade => assignment.score_to_grade(asset.score, asset.grade, force_letter_grade: true)%>
     <% else %>
       <%= t :score, "score: %{score} out of %{total}", :score => asset.score, :total => (assignment.points_possible || t(:not_applicable, "N/A")) %>
     <% end %>

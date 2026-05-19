@@ -23,6 +23,8 @@ module Api::V1::MediaTrack
       id: media_track.id,
       locale: media_track.locale,
       kind: media_track.kind,
+      workflow_state: media_track.workflow_state,
+      asr: media_track.asr?,
       media_object_id: media_track.media_object_id,
       user_id: media_track.user_id
     }

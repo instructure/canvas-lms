@@ -34,6 +34,9 @@ export interface AIExperience {
   learning_objective: string
   pedagogical_guidance: string
   workflow_state?: string
+  context_files?: ContextFile[]
+  context_ready?: boolean
+  failed_context_file_names?: string[]
 }
 
 export interface AIExperienceFormData {
@@ -43,6 +46,7 @@ export interface AIExperienceFormData {
   learning_objective: string
   pedagogical_guidance: string
   workflow_state?: string
+  context_file_ids?: string[]
 }
 
 export interface AIExperienceEditProps {

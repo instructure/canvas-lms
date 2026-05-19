@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AlertManager from '@canvas/alerts/react/AlertManager'
-import ErrorBoundary from '@canvas/error-boundary'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {AlertManager} from '@instructure/platform-alerts'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {AIExperienceEditProps} from '../types'
@@ -33,11 +34,13 @@ export const AIExperiencesEdit: React.FC<AIExperienceEditProps> = props => {
       errorComponent={
         <GenericErrorPage
           imageUrl={errorShipUrl}
+          onReportError={reportError}
+          translations={canvasErrorPageTranslations}
           errorCategory={I18n.t('AI Experience Edit Error Page')}
         />
       }
     >
-      <AlertManager breakpoints={{}}>
+      <AlertManager>
         <AIExperienceManager aiExperience={props.aiExperience} navbarHeight={props.navbarHeight} />
       </AlertManager>
     </ErrorBoundary>

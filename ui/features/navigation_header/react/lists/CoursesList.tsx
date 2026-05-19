@@ -25,7 +25,7 @@ import coursesQuery, {hideHomeroomCourseIfK5Student} from '../queries/coursesQue
 import {Text} from '@instructure/ui-text'
 import {ActiveText} from './utils'
 import {useQuery} from '@tanstack/react-query'
-import {sessionStoragePersister} from '@canvas/query'
+import {sessionStoragePersister} from '@instructure/platform-query'
 
 const I18n = createI18nScope('CoursesTray')
 
@@ -33,7 +33,7 @@ export default function CoursesList() {
   const {data, isLoading, isSuccess} = useQuery({
     queryKey: ['courses'],
     queryFn: coursesQuery,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
     select: courses => courses.filter(hideHomeroomCourseIfK5Student),
   })
 

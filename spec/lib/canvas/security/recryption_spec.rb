@@ -24,13 +24,13 @@ describe Canvas::Security::Recryption do
       key_val = "abcdefg1234567"
       user = user_model(otp_secret_key: key_val)
       first_salt = user.otp_secret_key_salt
-      expect(first_salt).to_not be_nil
+      expect(first_salt).not_to be_nil
       expect(user.otp_secret_key).to eq(key_val)
       Canvas::Security::Recryption.execute(Shard.current.settings[:encryption_key])
       user.reload
       expect(user.otp_secret_key).to eq(key_val)
       other_salt = user.otp_secret_key_salt
-      expect(first_salt).to_not eq(other_salt)
+      expect(first_salt).not_to eq(other_salt)
     end
   end
 end

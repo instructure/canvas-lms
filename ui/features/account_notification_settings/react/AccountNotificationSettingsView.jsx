@@ -23,7 +23,7 @@ import {
 import AccountNotificationSettingsQuery from './AccountNotificationSettingsQuery'
 import CourseNotificationSettingsQuery from '@canvas/notification-preferences-course/react/CourseNotificationSettingsQuery'
 import React from 'react'
-import AlertManager from '@canvas/alerts/react/AlertManager'
+import {AlertManager} from '@instructure/platform-alerts'
 import {string} from 'prop-types'
 
 export default function AccountNotificationSettingsView({accountId, userId}) {

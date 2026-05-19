@@ -38,6 +38,7 @@ export type AssignmentPeerReview = Pick<
   peer_review_count?: number | null
   peer_review_points_possible?: number | null
   peer_review_due_at?: string | null
+  peer_review_sub_assignment?: Record<string, unknown> | null
 }
 
 export type StudentViewPeerReviewsProps = {
@@ -52,7 +53,9 @@ type PeerReviewProps = {
 }
 
 export const StudentViewPeerReviews = ({assignment}: StudentViewPeerReviewsProps) => {
-  if (ENV.FEATURES.peer_review_allocation_and_grading) {
+  // Only use the graded peer review UI when the assignment has a peer_review_sub_assignment.
+  // Legacy peer reviews (no sub-assignment) should render the default individual review items.
+  if (ENV.FEATURES.peer_review_allocation_and_grading && assignment.peer_review_sub_assignment) {
     return <PeerReview assignment={assignment} isSubAssignment />
   }
 
@@ -137,7 +140,7 @@ const PeerReview = ({assessment, assignment, index, isSubAssignment}: PeerReview
             </View>
             <View as="span" margin="0 0 0 small">
               {isSubAssignment || workflow_state !== 'completed' ? (
-                <IconPeerReviewLine />
+                <IconPeerReviewLine aria-label={I18n.t('Peer Review')} />
               ) : (
                 <IconPeerGradedLine />
               )}

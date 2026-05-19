@@ -22,9 +22,9 @@ import userEvent from '@testing-library/user-event'
 import ZipFileImporter from '../zip_file'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 const server = setupServer()
 

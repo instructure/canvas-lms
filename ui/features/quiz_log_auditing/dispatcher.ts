@@ -19,4 +19,5 @@
 import CoreDispatcher from '@canvas/quiz-legacy-client-apps/dispatcher'
 import config from './config'
 
+// @ts-expect-error TS7 migration
 export default new CoreDispatcher(config)

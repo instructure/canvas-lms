@@ -195,7 +195,7 @@ describe "context modules" do
         # and also make sure the form remembers that it's gone
         manage_module_button(smodule).click
         module_index_menu_tool_link("Edit").click
-        expect(element_exists?(remove_requirement_button_selector, true)).to be_falsey
+        expect(element_exists?(remove_requirement_button_selector, xpath: true)).to be_falsey
       end
 
       context "course_pace_time_selection is enabled" do

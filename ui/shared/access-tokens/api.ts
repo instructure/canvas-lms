@@ -21,7 +21,7 @@ import {useInfiniteQuery, useMutation} from '@tanstack/react-query'
 import {doFetchWithSchema} from '@canvas/do-fetch-api-effect'
 import {type Token, ZToken} from './Token'
 import {z} from 'zod'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const ZTokensResponse = z.array(ZToken)
 

@@ -19,21 +19,9 @@
 import {render, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import MediaAttempt from '../MediaAttempt'
-// eslint-disable-next-line import/default
-import MediaPlayer from '@instructure/ui-media-player'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React, {createRef} from 'react'
 import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
-
-// We need to set up a mock, as for some reason, vi.spyOn does not work on the original MediaPlayer
-vi.mock('@instructure/ui-media-player', () => {
-  const mockPlayer = vi.fn(() => null)
-  mockPlayer.propTypes = {}
-  return {
-    MediaPlayer: mockPlayer,
-    default: mockPlayer, // Export as default for default imports
-  }
-})
 
 const submissionDraftOverrides = {
   Submission: {
@@ -70,8 +58,6 @@ const makeProps = async overrides => {
 describe('MediaAttempt', () => {
   beforeEach(() => {
     global.ENV = {current_user: {id: '1'}}
-    global.ENV.FEATURES = {}
-    global.ENV.FEATURES.consolidated_media_player = false
   })
 
   describe('unsubmitted', () => {
@@ -218,41 +204,6 @@ describe('MediaAttempt', () => {
       expect(queryByTestId('remove-media-recording')).not.toBeInTheDocument()
       expect(getByTestId('media-recording')).toBeInTheDocument()
     })
-
-    // TODO: vi->vitest - Need to rethink MediaPlayer mocking strategy for spying
-    it.skip('sets default cc when auto_show_cc is enabled', async () => {
-      const playerSpy = vi.spyOn(MediaPlayer, 'MediaPlayer')
-      const props = await makeProps({
-        Submission: {
-          mediaObject: {
-            _id: 'm-123456',
-            id: '1',
-            title: 'dope_vid.mov',
-            mediaTracks: [
-              {
-                _id: 3,
-                locale: 'fr',
-                kind: 'captions',
-              },
-              {
-                _id: 1,
-                locale: 'en',
-                kind: 'captions',
-              },
-              {
-                _id: 2,
-                locale: 'es',
-                kind: 'captions',
-              },
-            ],
-          },
-          state: 'submitted',
-        },
-      })
-      global.ENV = {auto_show_cc: true, current_user: {id: '1'}}
-      render(<MediaAttempt {...props} uploadingFiles={false} />)
-      expect(playerSpy).toHaveBeenCalledWith(expect.objectContaining({autoShowCaption: 'en'}), {})
-    })
   })
 
   describe('graded', () => {
@@ -269,48 +220,8 @@ describe('MediaAttempt', () => {
     })
   })
 
-  describe('MediaPlayer', () => {
-    it('renders MediaPlayer', async () => {
-      const props = await makeProps({
-        Submission: {
-          mediaObject: {
-            _id: 'm-123456',
-            id: '1',
-            title: 'dope_vid.mov',
-            mediaTracks: [
-              {
-                _id: 1,
-                locale: 'en',
-                kind: 'captions',
-              },
-              {
-                _id: 2,
-                locale: 'es',
-                kind: 'captions',
-              },
-            ],
-          },
-          state: 'submitted',
-        },
-      })
-      const {getByTestId} = render(<MediaAttempt {...props} />)
-      expect(getByTestId('media-recording')).toBeInTheDocument()
-    })
-
-    it('does not render MediaPlayer when mediaObject is null', async () => {
-      const props = await makeProps({
-        Submission: {
-          mediaObject: null,
-        },
-      })
-      const {queryByTestId} = render(<MediaAttempt {...props} />)
-      expect(queryByTestId('media-recording')).not.toBeInTheDocument()
-    })
-  })
-
   describe('StudioPlayer', () => {
     it('renders StudioPlayer', async () => {
-      global.ENV.FEATURES.consolidated_media_player = true
       const props = await makeProps({
         Submission: {
           mediaObject: {

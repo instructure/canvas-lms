@@ -432,6 +432,28 @@ describe('CanvasStudioPlayer', () => {
           {timeout: 3000},
         )
       })
+      it('shows error message if media processing has failed', async () => {
+        server.use(
+          http.get('/media_objects/dummy_media_id/info', () => {
+            return HttpResponse.json({status: 'ERROR_IMPORTING'})
+          }),
+        )
+
+        const component = render(<CanvasStudioPlayer media_id="dummy_media_id" />, {
+          container: document.getElementById('here')!.firstElementChild as HTMLElement,
+        })
+
+        await waitFor(
+          () => {
+            expect(
+              component.getByText(
+                "This file couldn't be processed. It may be corrupted or in an unsupported format. Please upload a different file.",
+              ),
+            ).toBeInTheDocument()
+          },
+          {timeout: 3000},
+        )
+      })
       it.skip('tries ajax call up to MAX times if no media_sources', async () => {
         // MAT-885 - Complex timing test with retry behavior that relies heavily on fake timers.
         // This test verifies retry behavior with specific timing intervals, which is difficult

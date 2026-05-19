@@ -30,7 +30,7 @@ import {TranslationTriggerModal} from '../../components/TranslationTriggerModal/
 import {useTranslationStore} from '../../hooks/useTranslationStore'
 import {useTranslation} from '../../hooks/useTranslation'
 import {useObserverContext} from '../../utils/ObserverContext'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 // @ts-expect-error TS7031 (typescriptify)
 export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {

@@ -55,6 +55,7 @@ class LiveEventsObserver < ActiveRecord::Observer
           :wiki_page,
           "Quizzes::Quiz",
           "Quizzes::QuizQuestion",
+          "Lti::ResourceLink",
           "MasterCourses::MasterTemplate",
           "MasterCourses::MasterMigration",
           "MasterCourses::ChildSubscription",

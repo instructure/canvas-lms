@@ -277,7 +277,7 @@ module Canvas::Migration::Helpers
               content_list << course_item_hash(type, item)
             end
           when "learning_outcomes"
-            root = source.root_outcome_group(false)
+            root = source.root_outcome_group(force: false)
             if root
               add_learning_outcome_group_content(root, content_list)
             end
@@ -371,7 +371,7 @@ module Canvas::Migration::Helpers
       end
     end
 
-    def course_item_hash(type, item, include_linked_resource = true)
+    def course_item_hash(type, item, include_linked_resource: true)
       title = nil
       title ||= item.title if item.respond_to?(:title)
       title ||= item.full_name if item.respond_to?(:full_name)
@@ -397,22 +397,22 @@ module Canvas::Migration::Helpers
       lr = nil
       if item.is_a?(Assignment)
         if item.quiz
-          lr = course_item_hash("quizzes", item.quiz, false)
+          lr = course_item_hash("quizzes", item.quiz, include_linked_resource: false)
           lr[:message] = I18n.t("linked_quiz_message",
                                 "linked with Quiz '%{title}'",
                                 title: item.quiz.title)
         elsif item.discussion_topic
-          lr = course_item_hash("discussion_topics", item.discussion_topic, false)
+          lr = course_item_hash("discussion_topics", item.discussion_topic, include_linked_resource: false)
           lr[:message] = I18n.t("linked_discussion_topic_message",
                                 "linked with Discussion Topic '%{title}'",
                                 title: item.discussion_topic.title)
         elsif item.wiki_page
-          lr = course_item_hash("wiki_pages", item.wiki_page, false)
+          lr = course_item_hash("wiki_pages", item.wiki_page, include_linked_resource: false)
           lr[:message] = I18n.t("linked with Wiki Page '%{title}'",
                                 title: item.wiki_page.title)
         end
       elsif [DiscussionTopic, WikiPage, Quizzes::Quiz].any? { |t| item.is_a?(t) } && item.assignment
-        lr = course_item_hash("assignments", item.assignment, false)
+        lr = course_item_hash("assignments", item.assignment, include_linked_resource: false)
         lr[:message] = I18n.t("linked_assignment_message",
                               "linked with Assignment '%{title}'",
                               title: item.assignment.title)

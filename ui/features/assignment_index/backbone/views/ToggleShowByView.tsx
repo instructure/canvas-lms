@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {difference, flatten, each, filter} from 'es-toolkit/compat'
@@ -103,24 +103,28 @@ export default class ToggleShowByView extends Backbone.View {
           break
       }
     })
+    // @ts-expect-error TS7 migration
     const overdue_group = new AssignmentGroup({
       id: 'overdue',
       name: I18n.t('overdue_assignments', 'Overdue Assignments'),
       // @ts-expect-error
       assignments: overdue,
     })
+    // @ts-expect-error TS7 migration
     const upcoming_group = new AssignmentGroup({
       id: 'upcoming',
       name: I18n.t('upcoming_assignments', 'Upcoming Assignments'),
       // @ts-expect-error
       assignments: upcoming,
     })
+    // @ts-expect-error TS7 migration
     const undated_group = new AssignmentGroup({
       id: 'undated',
       name: I18n.t('undated_assignments', 'Undated Assignments'),
       // @ts-expect-error
       assignments: undated,
     })
+    // @ts-expect-error TS7 migration
     const past_group = new AssignmentGroup({
       id: 'past',
       name: I18n.t('past_assignments', 'Past Assignments'),
@@ -185,7 +189,7 @@ export default class ToggleShowByView extends Backbone.View {
   }
 
   renderToggle() {
-    ReactDOM.render(
+    legacyRender(
       ENV.FEATURES?.instui_nav ? (
         <Menu trigger={this.showByMenuTrigger()} onToggle={() => this.toggleMenu()}>
           <Menu.Group label="" selected={[this.showByDate() ? 'date' : 'type']}>

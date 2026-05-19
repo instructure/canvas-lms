@@ -19,8 +19,28 @@
 
 module Accessibility
   class Rule
+    CATEGORY_MAP = {
+      "img-alt" => :images,
+      "img-alt-filename" => :images,
+      "img-alt-length" => :images,
+      "adjacent-links" => :links,
+      "headings-sequence" => :headers,
+      "headings-start-at-h2" => :headers,
+      "paragraphs-for-headings" => :headers,
+      "large-text-contrast" => :contrast,
+      "small-text-contrast" => :contrast,
+      "list-structure" => :lists,
+      "table-caption" => :tables,
+      "table-header" => :tables,
+      "table-header-scope" => :tables,
+    }.freeze
+
     class << self
       attr_accessor :id, :link
+
+      def category_for(rule_type)
+        CATEGORY_MAP[rule_type]
+      end
 
       def registry
         [

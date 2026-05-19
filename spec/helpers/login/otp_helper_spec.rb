@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 describe Login::OtpHelper do
   let(:dummy_class) { Class.new { include Login::OtpHelper } }
   let(:dummy_instance) { dummy_class.new }

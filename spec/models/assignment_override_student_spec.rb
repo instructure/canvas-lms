@@ -193,7 +193,7 @@ describe AssignmentOverrideStudent do
       teacher_in_course(active_all: true)
       notification_policy_model
 
-      expect(DelayedNotification).to_not receive(:process)
+      expect(DelayedNotification).not_to receive(:process)
       AssignmentOverrideStudent.clean_up_for_assignment(@assignment)
       expect(@ao.reload).to be_deleted
     end

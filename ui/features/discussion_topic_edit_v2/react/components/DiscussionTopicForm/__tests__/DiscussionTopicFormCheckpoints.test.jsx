@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {fireEvent, waitFor} from '@testing-library/react'
 import {Assignment} from '../../../../graphql/Assignment'
 import {DiscussionTopic} from '../../../../graphql/DiscussionTopic'
 import {setup, setupDefaultEnv} from './DiscussionTopicFormTestHelpers'
@@ -33,7 +34,7 @@ describe('DiscussionTopicForm Checkpoints Disabled', () => {
     mockOnSubmit.mockClear()
   })
 
-  it('uses regular due date validation when checkpoints are disabled', () => {
+  it('uses regular due date validation when checkpoints are disabled', async () => {
     window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = false
     window.ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT = true
 
@@ -50,14 +51,12 @@ describe('DiscussionTopicForm Checkpoints Disabled', () => {
     })
 
     const titleInput = queryByLabelText('Topic Title')
-    titleInput.value = 'Test Checkpoint Discussion'
-    titleInput.dispatchEvent(new Event('change', {bubbles: true}))
+    fireEvent.change(titleInput, {target: {value: 'Test Checkpoint Discussion'}})
 
     expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
 
     const submitButton = queryByRole('button', {name: /save/i})
-    submitButton.click()
-
-    expect(mockOnSubmit).not.toHaveBeenCalled()
+    fireEvent.click(submitButton)
+    await waitFor(() => expect(mockOnSubmit).not.toHaveBeenCalled())
   })
 })

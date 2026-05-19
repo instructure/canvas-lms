@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import customPropTypes from '../modules/customPropTypes'
@@ -109,7 +109,7 @@ const PublishCloud = ({
       width: 800,
       minHeight: 300,
       close() {
-        ReactDOM.unmountComponentAtNode(this)
+        legacyUnmountComponentAtNode(this)
         $(this).remove()
         setTimeout(() => {
           originatorButton?.focus()
@@ -120,7 +120,7 @@ const PublishCloud = ({
     })
 
     import('./RestrictedDialogForm').then(({default: RestrictedDialogForm}) => {
-      ReactDOM.render(
+      legacyRender(
         <RestrictedDialogForm
           usageRightsRequiredForContext={usageRightsRequiredForContext}
           models={[model]}

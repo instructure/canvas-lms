@@ -98,6 +98,6 @@ class CoursePacing::PacePresenter
                                a.module_item.position <=> b.module_item.position
                              end
                            end.group_by { |ppmi| ppmi.module_item.context_module }
-                           .sort_by { |context_module, _items| context_module.position }
+                              .sort_by { |context_module, _items| context_module.position }
   end
 end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class SubmissionVersion < ActiveRecord::Base
+class SubmissionVersion < ApplicationRecord
   belongs_to :assignment, class_name: "AbstractAssignment"
   belongs_to :context, polymorphic: [:course]
   belongs_to :root_account, class_name: "Account"

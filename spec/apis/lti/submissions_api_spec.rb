@@ -234,7 +234,7 @@ module Lti
 
         get endpoint, headers: request_headers
         json = JSON.parse(response.body)
-        expect(json[0]["attachments"].first["id"]).to_not equal json[1]["attachments"].first["id"]
+        expect(json[0]["attachments"].first["id"]).not_to equal json[1]["attachments"].first["id"]
       end
     end
 

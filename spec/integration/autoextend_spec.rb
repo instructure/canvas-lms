@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 describe Autoextend do
   it "all extensions get used" do
     Autoextend.extensions.each do |extension|

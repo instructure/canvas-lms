@@ -708,10 +708,9 @@ RSpec.describe Lti::ToolConfigurationsApiController do
     end
 
     context "when the tool configuration exists" do
-      it "destroys the tool configuration" do
-        id = tool_configuration.id
+      it "soft deletes the tool configuration" do
         subject
-        expect(Lti::ToolConfiguration.find_by(id:)).to be_nil
+        expect(tool_configuration.reload).to be_deleted
       end
 
       it { is_expected.to be_no_content }

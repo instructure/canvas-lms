@@ -19,13 +19,13 @@
 #
 
 require "net-ldap"
-require "net_ldap_extensions"
 NetLdapExtensions.apply
 
-class AuthenticationProvider < ActiveRecord::Base
+class AuthenticationProvider < ApplicationRecord
   include Workflow
 
   validates :auth_filter, length: { maximum: maximum_text_length, allow_blank: true }
+  validate :not_in_discovery_page
 
   DEBUG_EXPIRE = 30.minutes
 
@@ -102,6 +102,7 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   scope :active, -> { where.not(workflow_state: "deleted") }
+  scope :valid_for_discovery_page, -> { active }
   belongs_to :account
   include ::Canvas::RootAccountCacher
 
@@ -158,6 +159,21 @@ class AuthenticationProvider < ActiveRecord::Base
     return unless provider_class.singleton? && provider_class.restorable?
 
     root_account.authentication_providers.where.not(workflow_state: :active).find_by(auth_type:)
+  end
+
+  def used_on_discovery_page?
+    return false unless persisted?
+    return false unless account.discovery_page_allowed?
+    return false unless account.discovery_page_active?
+
+    provider_used = ->(configured_provider) { configured_provider[:authentication_provider_id]&.to_i == id }
+    discovery_configuration = account.settings[:discovery_page]
+
+    discovery_configuration[:primary].any?(&provider_used) || discovery_configuration[:secondary].any?(&provider_used)
+  end
+
+  def creation_timeout_options
+    { raise_on_timeout: true, fallback_timeout_length: 10.seconds, exception_class: Timeout::Error }
   end
 
   def login_authentication_provider_path
@@ -250,6 +266,11 @@ class AuthenticationProvider < ActiveRecord::Base
 
   def federated_attributes
     settings["federated_attributes"] ||= {}
+  end
+
+  def show_mfa_configuration_options?
+    account.mfa_settings != :disabled &&
+      (auth_type != "canvas" || account.mfa_settings != :required)
   end
 
   def mfa_required?
@@ -488,6 +509,14 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   private
+
+  def not_in_discovery_page
+    return unless workflow_state == "deleted" && workflow_state_was == "active"
+
+    if used_on_discovery_page?
+      errors.add(:base, t("Please remove the authentication provider from the discovery page before deleting it"))
+    end
+  end
 
   BOOLEAN_ATTRIBUTE_PROPERTIES = %w[provisioning_only autoconfirm].freeze
   private_constant :BOOLEAN_ATTRIBUTE_PROPERTIES

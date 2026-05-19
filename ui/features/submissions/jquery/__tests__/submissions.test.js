@@ -58,7 +58,7 @@ describe('submissions', () => {
             <div class='save_rubric_button'>
             </div>
             <a class='update_submission_url' href='submission_data_url.com' title='POST'></a>
-            <textarea class='grading_value'>A</textarea>
+            <input type='text' class='grading_value' placeholder='-' />
             <div class='submission_header'>
             </div>
             <div class='comments_link'>
@@ -243,5 +243,138 @@ describe('submissions', () => {
     const commentContent = formattedComment.querySelector('span')
     expect(commentContent).not.toBeNull()
     expect(commentContent.innerHTML).toBe('My<br>\nformatted<br>\ncomment')
+  })
+
+  test('grading_change submits the grade via ajaxJSON', async () => {
+    let capturedRequest
+    server.use(
+      http.post('http://localhost/submission_data_url.com', async ({request}) => {
+        capturedRequest = await request.formData()
+        return HttpResponse.json({
+          submission: {
+            user_id: '1',
+            assignment_id: 27,
+            submission_comments: [],
+          },
+        })
+      }),
+    )
+
+    const input = document.querySelector('input.grading_value')
+    // jsdom has no layout engine so :visible always returns false.
+    // Give the element dimensions so jQuery's :visible selector matches.
+    Object.defineProperty(input, 'offsetWidth', {value: 100, configurable: true})
+    input.value = '95'
+    $(document).triggerHandler('grading_change')
+
+    await waitFor(() => {
+      expect(capturedRequest).toBeDefined()
+      expect(capturedRequest.get('submission[grade]')).toBe('95')
+      expect(capturedRequest.get('submission[assignment_id]')).toBe('27')
+    })
+  })
+
+  test('grading_change submits letter grades via ajaxJSON', async () => {
+    let capturedRequest
+    server.use(
+      http.post('http://localhost/submission_data_url.com', async ({request}) => {
+        capturedRequest = await request.formData()
+        return HttpResponse.json({
+          submission: {
+            user_id: '1',
+            assignment_id: 27,
+            submission_comments: [],
+          },
+        })
+      }),
+    )
+
+    const input = document.querySelector('input.grading_value')
+    Object.defineProperty(input, 'offsetWidth', {value: 100, configurable: true})
+    input.value = 'A'
+    $(document).triggerHandler('grading_change')
+
+    await waitFor(() => {
+      expect(capturedRequest).toBeDefined()
+      expect(capturedRequest.get('submission[grade]')).toBe('A')
+    })
+  })
+
+  test('grading_change submits percent grades via ajaxJSON', async () => {
+    let capturedRequest
+    server.use(
+      http.post('http://localhost/submission_data_url.com', async ({request}) => {
+        capturedRequest = await request.formData()
+        return HttpResponse.json({
+          submission: {
+            user_id: '1',
+            assignment_id: 27,
+            submission_comments: [],
+          },
+        })
+      }),
+    )
+
+    const input = document.querySelector('input.grading_value')
+    Object.defineProperty(input, 'offsetWidth', {value: 100, configurable: true})
+    input.value = '85%'
+    $(document).triggerHandler('grading_change')
+
+    await waitFor(() => {
+      expect(capturedRequest).toBeDefined()
+      expect(capturedRequest.get('submission[grade]')).toBe('85%')
+    })
+  })
+
+  test('grading_change submits negative grades via ajaxJSON', async () => {
+    let capturedRequest
+    server.use(
+      http.post('http://localhost/submission_data_url.com', async ({request}) => {
+        capturedRequest = await request.formData()
+        return HttpResponse.json({
+          submission: {
+            user_id: '1',
+            assignment_id: 27,
+            submission_comments: [],
+          },
+        })
+      }),
+    )
+
+    const input = document.querySelector('input.grading_value')
+    Object.defineProperty(input, 'offsetWidth', {value: 100, configurable: true})
+    input.value = '-5'
+    $(document).triggerHandler('grading_change')
+
+    await waitFor(() => {
+      expect(capturedRequest).toBeDefined()
+      expect(capturedRequest.get('submission[grade]')).toBe('-5')
+    })
+  })
+
+  test('grading_change submits empty grade to clear it on the server', async () => {
+    let capturedRequest
+    server.use(
+      http.post('http://localhost/submission_data_url.com', async ({request}) => {
+        capturedRequest = await request.formData()
+        return HttpResponse.json({
+          submission: {
+            user_id: '1',
+            assignment_id: 27,
+            submission_comments: [],
+          },
+        })
+      }),
+    )
+
+    const input = document.querySelector('input.grading_value')
+    Object.defineProperty(input, 'offsetWidth', {value: 100, configurable: true})
+    input.value = ''
+    $(document).triggerHandler('grading_change')
+
+    await waitFor(() => {
+      expect(capturedRequest).toBeDefined()
+      expect(capturedRequest.get('submission[grade]')).toBe('')
+    })
   })
 })

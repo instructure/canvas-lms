@@ -15,5 +15,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "canvas_cache"
   spec.add_dependency "canvas_errors"
   spec.add_dependency "dynamic_settings"
+  spec.add_dependency "inst_statsd"
   spec.add_dependency "json-jwt"
 end

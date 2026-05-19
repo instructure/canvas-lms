@@ -21,9 +21,6 @@ module CC::Importer::Canvas
   module LtiResourceLinkConverter
     include CC::Importer
 
-    FLOAT_REGEX = /^[-+]?\d+[.]\d+$/
-    INTEGER_REGEX = /^[-+]?(?:0|[1-9]\d*)$/
-
     def convert_lti_resource_links
       resource_links = []
 
@@ -50,12 +47,8 @@ module CC::Importer::Canvas
           next if key.empty?
 
           # As `el.content` returns a String, we're trying to convert the
-          # custom parameter value to the orignal data type
-          value = if Account.site_admin.feature_enabled?(:import_numeric_lti_custom_params_as_string)
-                    convert_bool_custom_param(value)
-                  else
-                    convert_custom_param(value)
-                  end
+          # custom parameter value to the original data type
+          value = convert_bool_custom_param(value)
 
           custom[key.to_sym] = value
         end
@@ -80,20 +73,6 @@ module CC::Importer::Canvas
       end
 
       resource_links
-    end
-
-    def convert_custom_param(value)
-      if FLOAT_REGEX.match? value
-        value.to_f
-      elsif INTEGER_REGEX.match? value
-        value.to_i
-      elsif value == "true"
-        true
-      elsif value == "false"
-        false
-      else
-        value
-      end
     end
 
     def convert_bool_custom_param(value)

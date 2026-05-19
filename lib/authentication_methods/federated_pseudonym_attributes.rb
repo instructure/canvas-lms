@@ -24,7 +24,7 @@ module AuthenticationMethods
   # available throughout the request lifecycle for features like
   # live events, etc.
   class FederatedPseudonymAttributes < ActiveSupport::CurrentAttributes
-    attribute :sis_user_id, :unique_id
+    attribute :sis_user_id, :unique_id, :target_auth_provider_id
 
     def load_from(session)
       federated_pseudonym_attributes = session[:federated_pseudonym_attributes]
@@ -32,6 +32,7 @@ module AuthenticationMethods
 
       self.sis_user_id = federated_pseudonym_attributes.dig("sis", "user_id")
       self.unique_id = federated_pseudonym_attributes["username"]
+      self.target_auth_provider_id = federated_pseudonym_attributes["target_auth_provider_id"]
 
       attributes.compact_blank!
 

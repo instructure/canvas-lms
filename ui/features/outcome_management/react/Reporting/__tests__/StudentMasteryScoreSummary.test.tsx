@@ -110,14 +110,14 @@ describe('StudentMasteryScoreSummary', () => {
     expect(wrapper.getByText('4')).toBeInTheDocument() // Exceeds Mastery
   })
 
-  it('renders Traditional Grade Export text', () => {
+  it('renders mastery section when masteryLevel is provided', () => {
     const wrapper = renderStudentMasteryScoreSummary({masteryLevel})
-    expect(wrapper.getByText('Traditional Grade Export')).toBeInTheDocument()
+    expect(wrapper.getByTestId('student-mastery-score')).toBeInTheDocument()
   })
 
   it('does not render mastery section when masteryLevel is not provided', () => {
     const wrapper = renderStudentMasteryScoreSummary()
-    expect(wrapper.queryByText('Traditional Grade Export')).not.toBeInTheDocument()
+    expect(wrapper.queryByTestId('student-mastery-score')).not.toBeInTheDocument()
   })
 
   it('renders buckets in correct order (reversed)', () => {

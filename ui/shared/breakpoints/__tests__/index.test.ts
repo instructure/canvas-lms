@@ -114,8 +114,8 @@ describe('@canvas/breakpoints', () => {
     describe('breakpoint boundaries', () => {
       it('ensures mobile and tablet do not overlap when both are specified', () => {
         const result = responsiveQuerySizes({mobile: true, tablet: true})
-        const mobileMax = parseInt(result.mobile!.maxWidth!)
-        const tabletMin = parseInt(result.tablet!.minWidth!)
+        const mobileMax = parseInt(String(result.mobile!.maxWidth!))
+        const tabletMin = parseInt(String(result.tablet!.minWidth!))
 
         // Mobile max should be 767, tablet min should be 768 (no overlap)
         expect(tabletMin).toBe(mobileMax + 1)
@@ -123,8 +123,8 @@ describe('@canvas/breakpoints', () => {
 
       it('ensures tablet and desktop do not overlap when both are specified', () => {
         const result = responsiveQuerySizes({tablet: true, desktop: true})
-        const tabletMax = parseInt(result.tablet!.maxWidth!)
-        const desktopMin = parseInt(result.desktop!.minWidth!)
+        const tabletMax = parseInt(String(result.tablet!.maxWidth!))
+        const desktopMin = parseInt(String(result.desktop!.minWidth!))
 
         // Tablet max should be 1023, desktop min should be 1024 (no overlap)
         expect(desktopMin).toBe(tabletMax + 1)

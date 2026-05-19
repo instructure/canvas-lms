@@ -32,7 +32,7 @@ import {InheritedKeyRegistrationReview} from './InheritedKeyRegistrationReview'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {formatApiResultError, UnsuccessfulApiResult} from '../../common/lib/apiResult/ApiResult'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Footer} from '../registration_wizard_forms/Footer'
 import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
@@ -45,8 +45,9 @@ import {NamingConfirmationWrapper} from '../lti_1p3_registration_form/components
 import {ReviewScreenWrapper} from '../lti_1p3_registration_form/components/ReviewScreenWrapper'
 import {Header} from '../registration_wizard_forms/Header'
 import {PermissionConfirmationWrapper} from '../lti_1p3_registration_form/components/PermissionConfirmationWrapper'
-import GenericErrorPage from '@canvas/generic-error-page/react'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -231,6 +232,7 @@ const renderCustomizationBody = (
         <PrivacyConfirmationWrapper
           overlayStore={state.overlayStore}
           internalConfig={state.registration.overlaid_configuration}
+          originalConfig={state.registration.overlaid_configuration}
         />
       )
 
@@ -282,9 +284,10 @@ const renderCustomizationBody = (
       const message = formatApiResultError(state.result as UnsuccessfulApiResult)
       return (
         <GenericErrorPage
-          image={errorShipUrl}
-          title={I18n.t('Error')}
-          message={message}
+          imageUrl={errorShipUrl}
+          onReportError={reportError}
+          translations={canvasErrorPageTranslations}
+          errorSubject={I18n.t('Error')}
           errorMessage={message}
         />
       )
@@ -321,9 +324,10 @@ const renderBody = (state: InheritedKeyWizardState) => {
       const message = formatApiResultError(state.result as UnsuccessfulApiResult)
       return (
         <GenericErrorPage
-          image={errorShipUrl}
-          title={I18n.t('Error')}
-          message={message}
+          imageUrl={errorShipUrl}
+          onReportError={reportError}
+          translations={canvasErrorPageTranslations}
+          errorSubject={I18n.t('Error')}
           errorMessage={message}
         />
       )

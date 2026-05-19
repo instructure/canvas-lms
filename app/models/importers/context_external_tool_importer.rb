@@ -97,6 +97,16 @@ module Importers
 
       return if item.new_record? && ContextExternalTool.where(identity_hash: item.calculate_identity_hash).exists?
 
+      if persist &&
+         context.root_account.feature_enabled?(:lock_lti_registrations) &&
+         item&.lti_registration&.lock_deploying?
+        migration&.add_warning(
+          t("The app \"%{name}\" was not imported because it has been locked for deployment by an administrator. Please ask your administrator to unlock it before importing.",
+            name: item.name)
+        )
+        return item
+      end
+
       if persist && persist_tool(item, migration, associated_control_from_migration).present?
         migration&.add_imported_item(item)
         item
@@ -196,7 +206,7 @@ module Importers
 
       Lti::ContextToolFinder.all_tools_for(migration.context).each do |tool|
         # check if tool is compatible
-        next unless matching_settings?(migration, hash, tool, settings, true)
+        next unless matching_settings?(migration, hash, tool, settings, preexisting_tool: true)
 
         if tool.url.blank? && tool.domain.present?
           if domain && domain == tool.domain
@@ -236,7 +246,7 @@ module Importers
       end
     end
 
-    def self.matching_settings?(migration, hash, tool, settings, preexisting_tool = false)
+    def self.matching_settings?(migration, hash, tool, settings, preexisting_tool: false)
       return false if hash[:privacy_level] && tool.privacy_level != hash[:privacy_level]
       return false if migration.migration_type == "canvas_cartridge_importer" && hash[:title] && tool.name != hash[:title]
 

@@ -1508,6 +1508,29 @@ describe('assitnToHelper', () => {
         unassign_item: false,
       })
     })
+
+    it('preserves lock_at from peer_review_available_to when due date is cleared', () => {
+      const override: DateDetailsOverride = {
+        peer_review_override_id: '456',
+        course_section_id: '2',
+        peer_review_due_at: null,
+        peer_review_available_from: null,
+        peer_review_available_to: '2024-01-25T12:00:00Z',
+        due_at: null,
+        unlock_at: null,
+        lock_at: '2024-01-25T12:00:00Z',
+        reply_to_topic_due_at: null,
+        required_replies_due_at: null,
+        unassign_item: false,
+      }
+
+      const result = getPeerReviewOverride(override)
+
+      expect(result.id).toBe('456')
+      expect(result.due_at).toBeNull()
+      expect(result.unlock_at).toBeNull()
+      expect(result.lock_at).toBe('2024-01-25T12:00:00Z')
+    })
   })
 
   describe('getAssignmentAndPeerReviewOverrides', () => {
@@ -1750,7 +1773,7 @@ describe('assitnToHelper', () => {
       expect(result.peerReview?.lock_at).toBeNull()
     })
 
-    it('sends empty peer_review_overrides when existing override has all dates cleared', () => {
+    it('excludes existing override when all dates are nil', () => {
       const overrides: DateDetailsOverride[] = [
         {
           id: '123',
@@ -1771,21 +1794,17 @@ describe('assitnToHelper', () => {
       const result = getAssignmentAndPeerReviewOverrides(overrides)
 
       expect(result.assignmentOverrides).toHaveLength(1)
-      expect(result.peerReview).toBeDefined()
       expect(result.peerReview?.peer_review_overrides).toEqual([])
-      expect(result.peerReview?.due_at).toBeNull()
-      expect(result.peerReview?.unlock_at).toBeNull()
-      expect(result.peerReview?.lock_at).toBeNull()
     })
 
-    it('sends empty peer_review_overrides when multiple existing overrides have dates cleared', () => {
+    it('includes existing overrides when peer review due date is cleared but assignment due date is still set', () => {
       const overrides: DateDetailsOverride[] = [
         {
           id: '123',
           course_section_id: '2',
           peer_review_override_id: '456',
           peer_review_due_at: null,
-          peer_review_available_from: null,
+          peer_review_available_from: '2024-01-20T12:00:00Z',
           peer_review_available_to: null,
           due_at: '2024-01-20T12:00:00Z',
           unlock_at: null,
@@ -1799,7 +1818,7 @@ describe('assitnToHelper', () => {
           student_ids: ['789'],
           peer_review_override_id: '789',
           peer_review_due_at: null,
-          peer_review_available_from: null,
+          peer_review_available_from: '2024-01-21T12:00:00Z',
           peer_review_available_to: null,
           due_at: '2024-01-21T12:00:00Z',
           unlock_at: null,
@@ -1813,17 +1832,19 @@ describe('assitnToHelper', () => {
       const result = getAssignmentAndPeerReviewOverrides(overrides)
 
       expect(result.assignmentOverrides).toHaveLength(2)
-      expect(result.peerReview?.peer_review_overrides).toEqual([])
+      expect(result.peerReview?.peer_review_overrides).toHaveLength(2)
+      expect(result.peerReview?.peer_review_overrides?.[0].id).toBe('456')
+      expect(result.peerReview?.peer_review_overrides?.[1].id).toBe('789')
     })
 
-    it('includes only overrides with dates when some are cleared and some have dates', () => {
+    it('includes all existing overrides when some have dates and some are cleared', () => {
       const overrides: DateDetailsOverride[] = [
         {
           id: '123',
           course_section_id: '2',
           peer_review_override_id: '456',
           peer_review_due_at: null,
-          peer_review_available_from: null,
+          peer_review_available_from: '2024-01-20T12:00:00Z',
           peer_review_available_to: null,
           due_at: '2024-01-20T12:00:00Z',
           unlock_at: null,
@@ -1837,7 +1858,7 @@ describe('assitnToHelper', () => {
           course_section_id: '3',
           peer_review_override_id: '789',
           peer_review_due_at: '2024-01-25T12:00:00Z',
-          peer_review_available_from: null,
+          peer_review_available_from: '2024-01-21T12:00:00Z',
           peer_review_available_to: null,
           due_at: '2024-01-21T12:00:00Z',
           unlock_at: null,
@@ -1851,9 +1872,38 @@ describe('assitnToHelper', () => {
       const result = getAssignmentAndPeerReviewOverrides(overrides)
 
       expect(result.assignmentOverrides).toHaveLength(2)
+      expect(result.peerReview?.peer_review_overrides).toHaveLength(2)
+      expect(result.peerReview?.peer_review_overrides?.[0].course_section_id).toBe('2')
+      expect(result.peerReview?.peer_review_overrides?.[0].due_at).toBeNull()
+      expect(result.peerReview?.peer_review_overrides?.[1].course_section_id).toBe('3')
+      expect(result.peerReview?.peer_review_overrides?.[1].due_at).toBe('2024-01-25T12:00:00Z')
+    })
+
+    it('preserves lock_at from parent override when due date is cleared', () => {
+      const overrides: DateDetailsOverride[] = [
+        {
+          id: '123',
+          course_section_id: '2',
+          peer_review_override_id: '456',
+          peer_review_due_at: null,
+          peer_review_available_from: null,
+          peer_review_available_to: '2024-01-25T12:00:00Z',
+          due_at: null,
+          unlock_at: null,
+          lock_at: '2024-01-25T12:00:00Z',
+          reply_to_topic_due_at: null,
+          required_replies_due_at: null,
+          unassign_item: false,
+        },
+      ]
+
+      const result = getAssignmentAndPeerReviewOverrides(overrides)
+
       expect(result.peerReview?.peer_review_overrides).toHaveLength(1)
-      expect(result.peerReview?.peer_review_overrides?.[0].course_section_id).toBe('3')
-      expect(result.peerReview?.peer_review_overrides?.[0].due_at).toBe('2024-01-25T12:00:00Z')
+      expect(result.peerReview?.peer_review_overrides?.[0].id).toBe('456')
+      expect(result.peerReview?.peer_review_overrides?.[0].due_at).toBeNull()
+      expect(result.peerReview?.peer_review_overrides?.[0].unlock_at).toBeNull()
+      expect(result.peerReview?.peer_review_overrides?.[0].lock_at).toBe('2024-01-25T12:00:00Z')
     })
   })
 })

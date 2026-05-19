@@ -124,7 +124,7 @@ describe GradebookHistoryApiController do
 
       it "excludes deleted submissions in the response" do
         response_ids = json_body.pluck("id")
-        expect(response_ids).to_not include @submission1.id
+        expect(response_ids).not_to include @submission1.id
       end
     end
   end

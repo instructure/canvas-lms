@@ -107,12 +107,13 @@ export default class RSSFeedList extends React.Component {
           >
             <Grid.Row>
               <Grid.Col>
-                {/* @ts-expect-error TS2769 (typescriptify) */}
                 <Link
                   margin="0 small"
+                  // @ts-expect-error TS7 migration
                   size="small"
                   href={url}
                   isWithinText={false}
+                  // @ts-expect-error TS7 migration
                   themeOverride={{smallPadding: '0', smallHeight: '1rem'}}
                 >
                   {display_name}

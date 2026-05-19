@@ -60,7 +60,6 @@ class Event extends React.Component<EventProps> {
       <div>
         <span className="ic-ActionLog__EntryTimestamp">{secondsToTime(secondsSinceStart)}</span>
 
-        {/* @ts-expect-error - Legacy SightedUserContent component, not worth typing fully */}
         <SightedUserContent className="ic-ActionLog__EntryFlag">
           {this.renderFlag(e.flag)}
         </SightedUserContent>

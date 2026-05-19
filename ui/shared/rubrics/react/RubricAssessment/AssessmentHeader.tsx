@@ -106,7 +106,7 @@ export const AssessmentHeader = ({
         {showTraditionalView() && (
           <>
             {!hidePoints && (
-              <Flex.Item>
+              <Flex.Item align="end">
                 <View as="div" margin="0 large 0 0" themeOverride={{marginLarge: '2.938rem'}}>
                   <InstructorScore
                     isPeerReview={isPeerReview}

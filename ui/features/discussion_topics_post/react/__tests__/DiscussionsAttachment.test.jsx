@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {updateDiscussionEntryMock} from '../../graphql/Mocks'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {MockedProvider} from '@apollo/client/testing'
@@ -37,7 +37,7 @@ vi.mock('@canvas/util/globalUtils', () => ({
 injectGlobalAlertContainers()
 
 vi.mock('../utils', async () => ({
-  ...await vi.importActual('../utils'),
+  ...(await vi.importActual('../utils')),
   responsiveQuerySizes: vi.fn(),
 }))
 

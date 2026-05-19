@@ -21,7 +21,15 @@
 # `group` values are keys into PERMISSION_GROUPS defined in permissions_groups.rb.
 # help text can be provided in `details` or `considerations` (which will apply in both account and course contexts)
 # and or `account_` / `course_` prefixed versions, which will only apply in those contexts.
+# NOTE: if `not_for_masquerading` is set, the permission will be denied unless checked against @current_user
+# and the user is not being impersonated (so for the time being, such permissions can't be checked in jobs)
 BASE_PERMISSIONS = {
+  site_admin_self_token_create: {
+    label: -> { I18n.t("Site Admins - create personal access tokens") },
+    account_only: :site_admin,
+    true_for: %w[AccountAdmin AccountMembership],
+    available_to: %w[AccountAdmin AccountMembership]
+  },
   become_user: {
     label: -> { I18n.t("Users - act as") },
     account_only: :root,
@@ -73,13 +81,16 @@ BASE_PERMISSIONS = {
     account_only: :root,
     true_for: %w[AccountAdmin],
     available_to: %w[AccountAdmin AccountMembership],
-    account_allows: ->(a) { a.feature_enabled?(:admin_manage_access_tokens) },
     group: :users_manage_access_tokens,
     account_details: [
       {
         title: -> { I18n.t("Access Tokens") },
         description: -> { I18n.t("Allows user to create and update other user's access tokens.") }
       }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Not available at the subaccount level") } }
     ]
   },
   delete_access_tokens: {
@@ -87,15 +98,16 @@ BASE_PERMISSIONS = {
     account_only: :root,
     true_for: %w[AccountAdmin],
     available_to: %w[AccountAdmin AccountMembership],
-    # Doesn't make a ton of sense for admins to be able to view access tokens but not delete them, hence the
-    # site admin check.
-    account_allows: ->(a) { Account.site_admin.feature_enabled?(:student_access_token_management) || a.feature_enabled?(:admin_manage_access_tokens) },
     group: :users_manage_access_tokens,
     account_details: [
       {
         title: -> { I18n.t("Access Tokens") },
         description: -> { I18n.t("Allows user to delete other user's access tokens.") }
       }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Not available at the subaccount level") } }
     ]
   },
   view_user_generated_access_tokens: {
@@ -103,13 +115,16 @@ BASE_PERMISSIONS = {
     account_only: :root,
     true_for: %w[AccountAdmin],
     available_to: %w[AccountAdmin AccountMembership],
-    account_allows: ->(_) { Account.site_admin.feature_enabled?(:student_access_token_management) },
     group: :users_manage_access_tokens,
     account_details: [
       {
         title: -> { I18n.t("Access Tokens") },
         description: -> { I18n.t("Allows user to view other user's manually generated access tokens. This does not let them read the actual token value itself, just the information about it.") }
       }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Not available at the subaccount level") } }
     ]
   },
   manage_account_memberships: {
@@ -379,6 +394,34 @@ BASE_PERMISSIONS = {
       { description: -> { I18n.t("To manage lock settings for object types, Courses - manage must also be enabled.") } }
     ]
   },
+  manage_nav_menu_links: {
+    label: -> { I18n.t("Custom Links - manage") },
+    available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment],
+    true_for: %w[AccountAdmin],
+    account_allows: ->(a) { a.root_account.feature_enabled?(:nav_menu_links) },
+    account_details: [
+      { title: -> { I18n.t("Custom Links (Account)") },
+        description: -> { I18n.t("Allows user to add and remove custom links in Account Navigation, User Navigation, and Course Navigation from the account settings page.") } }
+    ],
+    account_considerations: [
+      { title: -> { I18n.t("Custom Links (Account)") },
+        description: -> { I18n.t("Users can still rearrange custom links without this permission.") } },
+      { description: -> { I18n.t("To access account settings, Account-level settings - manage must also be enabled.") } },
+      { title: -> { I18n.t("Feature Flag") },
+        description: -> { I18n.t("This permission requires the Custom Links feature flag to be enabled.") } }
+    ],
+    course_details: [
+      { title: -> { I18n.t("Custom Links (Course)") },
+        description: -> { I18n.t("Allows user to add and remove custom links in Course Navigation.") } }
+    ],
+    course_considerations: [
+      { title: -> { I18n.t("Custom Links (Course)") },
+        description: -> { I18n.t("Users can still rearrange and hide custom links without this permission.") } },
+      { description: -> { I18n.t("To access course settings, Courses - manage must be enabled.") } },
+      { title: -> { I18n.t("Feature Flag") },
+        description: -> { I18n.t("This permission requires the Custom Links feature flag to be enabled.") } }
+    ]
+  },
   manage_role_overrides: {
     label: -> { I18n.t("Permissions - manage") },
     account_only: true,
@@ -443,7 +486,6 @@ BASE_PERMISSIONS = {
     account_only: :site_admin,
     available_to: %w[AccountAdmin AccountMembership],
     true_for: [],
-    account_allows: ->(a) { a.feature_enabled?(:api_rate_limits) },
     account_details: [
       { title: -> { I18n.t("Rate Limiting Management") },
         description: -> { I18n.t("Allows user to manage API rate limits for external tools and integrations.") } }
@@ -1752,8 +1794,6 @@ BASE_PERMISSIONS = {
       { title: -> { I18n.t("People (Course)") },
         description: -> { I18n.t("Allows user to view list of users in the course People page.") } },
       { description: -> { I18n.t("Allows user to view the Prior Enrollments button in the course People page.") } },
-      { title: -> { I18n.t("Subaccounts") },
-        description: -> { I18n.t("Not available at the subaccount level.") } }
     ],
     account_considerations: [
       { title: -> { I18n.t("Account Groups") },
@@ -1960,8 +2000,6 @@ BASE_PERMISSIONS = {
         description: -> { I18n.t("To access the Student Interactions report, Reports - manage must also be enabled.") } },
       { title: -> { I18n.t("Student Context Card") },
         description: -> { I18n.t("Student Context Cards must be enabled for an account by an admin.") } },
-      { title: -> { I18n.t("Subaccounts") },
-        description: -> { I18n.t("Not available at the subaccount level.") } }
     ],
     course_details: [
       { title: -> { I18n.t("Analytics") },
@@ -2079,8 +2117,8 @@ BASE_PERMISSIONS = {
         description: -> { I18n.t("Allows user to open Analytics Hub, the central library of all things Data, Analytics and Insights.") } }
     ]
   },
-  view_ask_questions_analytics: {
-    label: -> { I18n.t("Ask Your Data") },
+  view_ask_questions_pinboards: {
+    label: -> { I18n.t("Pinboards - view") },
     group: :view_advanced_analytics,
     available_to: %w[AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
@@ -2088,13 +2126,27 @@ BASE_PERMISSIONS = {
     account_allows: ->(a) { a.feature_enabled?(:advanced_analytics_ask_questions) },
     account_details: [
       { title: -> { I18n.t("Account Settings") },
-        description: -> { I18n.t("Allows users to access the Ask Your Data feature of Intelligent Insights.") } },
+        description: -> { I18n.t("Allows view access to Ask Your Data's Pinboards feature of Intelligent Insights. Does not include access to Ask Your Data's Chat feature or AI.") } },
+      { title: -> { I18n.t("Subaccounts") },
+        description: -> { I18n.t("Provides a scoped access to the Ask Your Data feature.") } }
+    ]
+  },
+  view_ask_questions_analytics: {
+    label: -> { I18n.t("Ask Your Data - use") },
+    group: :view_advanced_analytics,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_only: true,
+    account_allows: ->(a) { a.feature_enabled?(:advanced_analytics_ask_questions) },
+    account_details: [
+      { title: -> { I18n.t("Account Settings") },
+        description: -> { I18n.t("Allows users to access, interact with, and use the Ask Your Data feature of Intelligent Insights.") } },
       { title: -> { I18n.t("Subaccounts") },
         description: -> { I18n.t("Provides a scoped access to the Ask Your Data feature.") } }
     ]
   },
   manage_ask_questions_analytics_context: {
-    label: -> { I18n.t("Ask Your Data - Context Library") },
+    label: -> { I18n.t("Ask Your Data's Context Library - modify") },
     group: :view_advanced_analytics,
     available_to: %w[AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
@@ -2102,7 +2154,7 @@ BASE_PERMISSIONS = {
     account_allows: ->(a) { a.feature_enabled?(:advanced_analytics_ask_questions) },
     account_details: [
       { title: -> { I18n.t("Account Settings") },
-        description: -> { I18n.t("Allows Ask Your Data users to access and manage the product's Context Library feature, to influence and tailor AI responses for all users.") } },
+        description: -> { I18n.t("Allows Ask Your Data users to access and modify the product's Context Library feature, to influence and tailor AI responses for all users.") } },
       { title: -> { I18n.t("Subaccounts") },
         description: -> { I18n.t("Not available at the subaccount level.") } }
     ],
@@ -2208,6 +2260,39 @@ BASE_PERMISSIONS = {
         description: -> { I18n.t("Impact is an add-on to Canvas LMS. Contact your CSM if interested.") } }
     ]
   },
+  manage_institutional_tags_view: {
+    label: -> { I18n.t("Institutional Tags - view") },
+    group: :manage_institutional_tags,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_allows: ->(a) { a.feature_enabled?(:institutional_tags) },
+    account_details: [
+      { title: -> { I18n.t("Institutional Tags") },
+        description: -> { I18n.t("Allows user to view institutional tags.") } }
+    ]
+  },
+  manage_institutional_tags_create: {
+    label: -> { I18n.t("Institutional Tags - create") },
+    group: :manage_institutional_tags,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_allows: ->(a) { a.feature_enabled?(:institutional_tags) },
+    account_details: [
+      { title: -> { I18n.t("Institutional Tags") },
+        description: -> { I18n.t("Allows user to create institutional tags.") } }
+    ]
+  },
+  manage_institutional_tags_edit: {
+    label: -> { I18n.t("Institutional Tags - edit") },
+    group: :manage_institutional_tags,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_allows: ->(a) { a.feature_enabled?(:institutional_tags) },
+    account_details: [
+      { title: -> { I18n.t("Institutional Tags") },
+        description: -> { I18n.t("Allows user to edit institutional tags.") } }
+    ]
+  },
   access_oak: {
     label: -> { I18n.t("IgniteAI Agent - Admins") },
     available_to: %w[AccountAdmin AccountMembership],
@@ -2225,7 +2310,7 @@ BASE_PERMISSIONS = {
   access_oak_teacher: {
     label: -> { I18n.t("IgniteAI Agent - Faculty & Support") },
     available_to: %w[TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin AccountMembership],
-    true_for: %w[AccountAdmin],
+    true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
     account_allows: ->(a) { a.feature_enabled?(:oak_for_teachers) },
     details: [
       { title: -> { I18n.t("IgniteAI Agent - Faculty & Support") },
@@ -2277,6 +2362,124 @@ BASE_PERMISSIONS = {
     account_details: [
       { title: -> { I18n.t("Bulk actions - People page") },
         description: -> { I18n.t("Allows the user to perform bulk actions (enroll, delete, or suspend) on users listed on the People page.") } }
+    ]
+  },
+  manage_rules_view: {
+    label: -> { I18n.t("Automation Rules - view") },
+    group: :manage_rules,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_allows: ->(a) { a.horizon_account? && a.root_account.feature_enabled?(:horizon_autopilot) },
+    account_details: [
+      { title: -> { I18n.t("Automation Rules") },
+        description: -> { I18n.t("Allows user to view the account's automation rules.") } }
+    ]
+  },
+  manage_rules_add: {
+    label: -> { I18n.t("Automation Rules - add") },
+    group: :manage_rules,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_allows: ->(a) { a.horizon_account? && a.root_account.feature_enabled?(:horizon_autopilot) },
+    account_details: [
+      { title: -> { I18n.t("Automation Rules") },
+        description: -> { I18n.t("Allows user to create automation rules on the account.") } }
+    ]
+  },
+  manage_rules_edit: {
+    label: -> { I18n.t("Automation Rules - edit") },
+    group: :manage_rules,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_allows: ->(a) { a.horizon_account? && a.root_account.feature_enabled?(:horizon_autopilot) },
+    account_details: [
+      { title: -> { I18n.t("Automation Rules") },
+        description: -> { I18n.t("Allows user to edit automation rules on the account.") } }
+    ]
+  },
+  manage_rules_delete: {
+    label: -> { I18n.t("Automation Rules - delete") },
+    group: :manage_rules,
+    available_to: %w[AccountAdmin AccountMembership],
+    true_for: %w[AccountAdmin],
+    account_allows: ->(a) { a.horizon_account? && a.root_account.feature_enabled?(:horizon_autopilot) },
+    account_details: [
+      { title: -> { I18n.t("Automation Rules") },
+        description: -> { I18n.t("Allows user to delete automation rules on the account.") } }
+    ]
+  },
+  manage_course_details: {
+    label: -> { I18n.t("Manage Course Details") },
+    available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment],
+    true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
+    account_allows: ->(a) { a.root_account.feature_enabled?(:course_navigation_and_feature_options_permissions) },
+    course_details: [
+      { title: -> { I18n.t("Manage Course Details") },
+        description: -> { I18n.t("Allows the user to edit the Course Details tab in the Course Settings page.") } }
+    ]
+  },
+  manage_course_navigation: {
+    label: -> { I18n.t("Manage Course Navigation") },
+    available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment],
+    true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
+    account_allows: ->(a) { a.root_account.feature_enabled?(:course_navigation_and_feature_options_permissions) },
+    course_details: [
+      { title: -> { I18n.t("Manage Course Navigation") },
+        description: -> { I18n.t("Allows the user to reorder, enable, or disable items in the Course Navigation.") } }
+    ]
+  },
+  manage_course_feature_options: {
+    label: -> { I18n.t("Manage Course Feature Options") },
+    available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment],
+    true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
+    account_allows: ->(a) { a.root_account.feature_enabled?(:course_navigation_and_feature_options_permissions) },
+    course_details: [
+      { title: -> { I18n.t("Manage Course Feature Options") },
+        description: -> { I18n.t("Allows the user to toggle the state of feature options in the Course Settings.") } }
+    ]
+  },
+  edit_discussion_anonymity: {
+    label: -> { I18n.t("Discussions - edit anonymous discussion") },
+    available_to: %w[TeacherEnrollment AccountAdmin AccountMembership],
+    true_for: %w[TeacherEnrollment AccountAdmin],
+    account_allows: ->(a) { a.root_account.feature_enabled?(:default_discussion_options) },
+    course_details: [
+      { title: -> { I18n.t("Discussions - edit anonymous discussion") },
+        description: -> { I18n.t("Allows the user to edit anonymous discussion settings.") } }
+    ]
+  },
+  edit_discussion_options: {
+    label: -> { I18n.t("Discussions - edit options") },
+    available_to: %w[TeacherEnrollment AccountAdmin AccountMembership],
+    true_for: %w[TeacherEnrollment AccountAdmin],
+    account_allows: ->(a) { a.root_account.feature_enabled?(:default_discussion_options) },
+    course_details: [
+      { title: -> { I18n.t("Discussions - edit options") },
+        description: -> { I18n.t("Allows the user to edit discussion options (threaded replies, podcast, liking, etc.).") } }
+    ]
+  },
+  edit_discussion_views: {
+    label: -> { I18n.t("Discussions - edit view") },
+    available_to: %w[TeacherEnrollment AccountAdmin AccountMembership],
+    true_for: %w[TeacherEnrollment AccountAdmin],
+    account_allows: ->(a) { a.root_account.feature_enabled?(:default_discussion_options) },
+    course_details: [
+      { title: -> { I18n.t("Discussions - edit view") },
+        description: -> { I18n.t("Allows the user to edit discussion view settings (sort order, thread state).") } }
+    ]
+  },
+  apply_default_discussion_options: {
+    label: -> { I18n.t("Discussions - apply default options") },
+    available_to: %w[TeacherEnrollment AccountAdmin AccountMembership],
+    true_for: %w[TeacherEnrollment AccountAdmin],
+    account_allows: ->(a) { a.root_account.feature_enabled?(:default_discussion_options) },
+    course_details: [
+      { title: -> { I18n.t("Discussions - apply default options") },
+        description: -> { I18n.t("Allows the user to toggle whether or not a newly created discussion will have the selected default options applied to it.") } }
+    ],
+    course_considerations: [
+      # tbd - we may want to apply defaults to imported discussions
+      { description: -> { I18n.t("Importing a Discussion via the 'Import Course Content' feature will keep its original options selected.") } },
     ]
   }
 }.freeze

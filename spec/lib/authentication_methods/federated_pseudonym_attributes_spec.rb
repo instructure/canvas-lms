@@ -30,18 +30,20 @@ describe AuthenticationMethods::FederatedPseudonymAttributes do
       before do
         session[:federated_pseudonym_attributes] = {
           "username" => "federated_user",
-          "sis" => { "user_id" => "sis_12345" }
+          "sis" => { "user_id" => "sis_12345" },
+          "target_auth_provider_id" => 10_000_000_000_001
         }
       end
 
-      it "loads both attributes" do
+      it "loads all attributes" do
         described_class.load_from(session)
         expect(described_class.unique_id).to eq "federated_user"
         expect(described_class.sis_user_id).to eq "sis_12345"
+        expect(described_class.target_auth_provider_id).to eq 10_000_000_000_001
       end
 
       it "logs the loaded attributes" do
-        expect(Rails.logger).to receive(:info).with("[AUTH] Loaded federated pseudonym attributes: sis_user_id, unique_id")
+        expect(Rails.logger).to receive(:info).with("[AUTH] Loaded federated pseudonym attributes: sis_user_id, unique_id, target_auth_provider_id")
         described_class.load_from(session)
       end
     end
@@ -67,6 +69,19 @@ describe AuthenticationMethods::FederatedPseudonymAttributes do
         described_class.load_from(session)
         expect(described_class.unique_id).to be_nil
         expect(described_class.sis_user_id).to eq "sis_12345"
+      end
+    end
+
+    context "with only target_auth_provider_id" do
+      before do
+        session[:federated_pseudonym_attributes] = { "target_auth_provider_id" => 10_000_000_000_001 }
+      end
+
+      it "loads only target_auth_provider_id" do
+        described_class.load_from(session)
+        expect(described_class.unique_id).to be_nil
+        expect(described_class.sis_user_id).to be_nil
+        expect(described_class.target_auth_provider_id).to eq 10_000_000_000_001
       end
     end
 

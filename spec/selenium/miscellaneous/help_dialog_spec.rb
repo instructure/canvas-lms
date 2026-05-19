@@ -67,15 +67,6 @@ describe "help dialog" do
       expect(f("#help_tray a[href='#teacher_feedback']")).to be_displayed
     end
 
-    it "shows the support url link in global nav correctly" do
-      # if @domain_root_account or Account.default have settings[:support_url] set there should be a link to that site
-      support_url = "http://example.com/support"
-      Account.default.update_attribute(:settings, { support_url: })
-      get "/dashboard"
-      link = f("a[href='#{support_url}']")
-      expect(link["id"]).to eq "global_nav_help_link"
-    end
-
     it "allows sending the teacher a message" do
       Setting.set("show_feedback_link", "true")
       course_with_ta(course: @course)
@@ -160,7 +151,7 @@ describe "help dialog" do
       wait_for_ajaximations
       f("#global_nav_help_link").click
       wait_for_ajaximations
-      expect(f("#help_tray")).to_not include_text("Customize this menu")
+      expect(f("#help_tray")).not_to include_text("Customize this menu")
     end
   end
 

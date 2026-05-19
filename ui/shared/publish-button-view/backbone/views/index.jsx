@@ -24,7 +24,7 @@ import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.instructure_forms'
 import * as tz from '@instructure/moment-utils'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render as canvasRender} from '@canvas/react'
 import DelayedPublishDialog from '../../react/components/DelayedPublishDialog'
 import {Spinner} from '@instructure/ui-spinner'
 import {Mask, Overlay} from '@instructure/ui-overlays'
@@ -159,14 +159,13 @@ export default (function (superClass) {
   PublishButton.prototype.renderOverlayLoadingSpinner = function (loadingSpinnerStatus) {
     const loadingSpinnerContainer = $('#overlay-loading-spinner')[0]
     if (loadingSpinnerContainer) {
-      const root = createRoot(loadingSpinnerContainer)
-      this.loadingSpinnerRoot['root'] = root
-      root.render(
+      this.loadingSpinnerRoot['root'] = canvasRender(
         <Overlay open={true} label={loadingSpinnerStatus} shouldReturnFocus shouldContainFocus>
           <Mask>
             <Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />
           </Mask>
         </Overlay>,
+        loadingSpinnerContainer,
       )
     }
   }
@@ -500,8 +499,10 @@ export default (function (superClass) {
     if (this.dpdRoot) {
       this.dpdRoot.unmount()
     }
-    this.dpdRoot = createRoot(this.$dpd_mount[0])
-    return this.dpdRoot.render(React.createElement(DelayedPublishDialog, props))
+    this.dpdRoot = canvasRender(
+      React.createElement(DelayedPublishDialog, props),
+      this.$dpd_mount[0],
+    )
   }
 
   return PublishButton

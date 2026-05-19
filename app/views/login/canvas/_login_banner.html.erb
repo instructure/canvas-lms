@@ -20,8 +20,10 @@
 
 <% if @domain_root_account && @domain_root_account.self_registration? && !hide_self_reg_banner %>
   <% if @domain_root_account.self_registration_type == 'observer' %>
-    <% js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings']),
-              :PASSWORD_POLICY => @domain_root_account.password_policy %>
+    <% js_env({
+         ACCOUNT: account_json(@domain_root_account, nil, session, ['registration_settings']),
+         PASSWORD_POLICY: @domain_root_account.password_policy
+       }) %>
     <%= link_to '#',
           :id => 'coenrollment_link',
           :class =>  "ic-Login__link ic-Login__register-banner",

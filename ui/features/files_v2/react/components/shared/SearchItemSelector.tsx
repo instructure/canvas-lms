@@ -26,7 +26,10 @@ import React, {
   SyntheticEvent,
   useMemo,
 } from 'react'
-import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
+import {CanvasAsyncSelect as PlatformCanvasAsyncSelect} from '@instructure/platform-instui-bindings'
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const CanvasAsyncSelect: any = PlatformCanvasAsyncSelect
+import type {FormMessage} from '@instructure/ui-form-field'
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
 
 const I18n = createI18nScope('files_v2')
@@ -190,10 +193,9 @@ export default function SearchItemSelector<T extends SearchItem>({
     onOptionSelected: handleItemSelected,
     mountNode: mountNodeRef?.current,
     inputRef,
-    messages:
-      error && fetchErrorMessage
-        ? [...messages, {text: fetchErrorMessage, type: 'newError'}]
-        : messages,
+    messages: (error && fetchErrorMessage
+      ? [...messages, {text: fetchErrorMessage, type: 'newError'}]
+      : messages) as FormMessage[],
     onFocus,
     id,
   }

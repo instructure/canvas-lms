@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {COURSES_QUERY} from '../../graphql/Queries'
 import CourseSelect, {ALL_COURSES_ID} from '../components/CourseSelect/CourseSelect'
 import {Flex} from '@instructure/ui-flex'
@@ -128,7 +128,6 @@ const MessageListActionContainer = props => {
   return (
     <Responsive
       match="media"
-      // @ts-expect-error TS2769 (typescriptify)
       query={responsiveQuerySizes({mobile: true, tablet: true, desktop: true})}
       props={{
         tablet: {
@@ -260,6 +259,11 @@ const MessageListActionContainer = props => {
                 showComposeButton={props.showComposeButton}
               />
             </Flex.Item>
+            {ENV.add_oak_mount_point && (
+              <Flex.Item>
+                <div id="oak-mount-point"></div>
+              </Flex.Item>
+            )}
           </Flex>
         </View>
       )}

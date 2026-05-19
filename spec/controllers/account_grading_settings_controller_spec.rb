@@ -18,11 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 describe AccountGradingSettingsController, type: :request do
-  require_relative "../spec_helper"
-
   context "account admin" do
     before(:once) do
       @root_account = Account.default

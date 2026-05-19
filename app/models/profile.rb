@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Profile < ActiveRecord::Base
+class Profile < ApplicationRecord
   belongs_to :context, polymorphic: [:course], exhaustive: false
   belongs_to :root_account, class_name: "Account"
 

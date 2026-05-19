@@ -27,7 +27,7 @@ import {
 } from '../AccountStatusManagement'
 import {setupGraphqlMocks} from './fixtures'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer as destroyFlashAlertContainer} from '@instructure/platform-alerts'
 
 describe('Account Grading Status Management', () => {
   const renderGradingStatusManagement = (props: Partial<AccountStatusManagementProps>) => {

@@ -22,14 +22,13 @@ import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {useQuery, gql} from '@apollo/client'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
-import AlertManager from '@canvas/alerts/react/AlertManager'
+import {AlertManager, showFlashAlert} from '@instructure/platform-alerts'
 import StudentViewContext, {
   StudentViewContextDefaults,
 } from '@canvas/assignments/react/StudentViewContext'
 import CommentRow from '@canvas/assignments/react/CommentsTray/CommentRow'
 import CommentTextArea from '@canvas/assignments/react/CommentsTray/CommentTextArea'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
@@ -146,7 +145,7 @@ const CommentsSectionContent: React.FC<CommentsSectionProps> = ({
     <StudentViewContext.Provider
       value={{...StudentViewContextDefaults, allowPeerReviewComments: true}}
     >
-      <AlertManager breakpoints={{}}>
+      <AlertManager>
         <View as="div" className="learning-mastery-comments">
           {commentsLoading && <LoadingSpinner />}
           {!commentsLoading && (

@@ -52,7 +52,7 @@ describe MasterCourses::MasterContentTag do
     it "touches when the tag has any restriction tighted" do
       tag = @template.create_content_tag_for!(@topic, restrictions: { content: true })
       tag.update_attribute(:restrictions, { lock_settings: true })
-      expect(@topic.reload.updated_at.to_i).to_not eq @time.to_i
+      expect(@topic.reload.updated_at.to_i).not_to eq @time.to_i
     end
 
     it "does not touch when the tag has restrictions loosened" do

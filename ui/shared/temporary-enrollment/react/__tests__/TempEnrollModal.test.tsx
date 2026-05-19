@@ -142,9 +142,13 @@ const USER_LIST_URI = encodeURI(`/accounts/1/user_lists.json?${userListsParams}`
 const userDetailsUriMock = (userId: string, response: object) =>
   server.use(http.get(`/api/v1/users/${userId}/profile`, () => HttpResponse.json(response)))
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: vi.fn(() => vi.fn(() => {})),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashSuccess: vi.fn(() => vi.fn(() => {})),
+  }
+})
 
 describe('TempEnrollModal', () => {
   beforeAll(() => {

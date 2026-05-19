@@ -737,11 +737,11 @@ module K5DashboardPageObject
   #----------------------------Element Management---------------------#
 
   def announcement_button_exists?
-    element_exists?(announcement_button_selector, true)
+    element_exists?(announcement_button_selector, xpath: true)
   end
 
   def announcement_title_exists?(announcement_heading)
-    element_exists?(announcement_title_xpath_selector(announcement_heading), true)
+    element_exists?(announcement_title_xpath_selector(announcement_heading), xpath: true)
   end
 
   def assignment_link_exists?(course_id, assignment_id)

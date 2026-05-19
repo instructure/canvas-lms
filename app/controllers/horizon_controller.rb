@@ -20,7 +20,6 @@
 class HorizonController < ApplicationController
   include Api::V1::Progress
 
-  before_action :require_user
   before_action :require_context
 
   def validate_course

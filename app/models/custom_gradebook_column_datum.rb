@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CustomGradebookColumnDatum < ActiveRecord::Base
+class CustomGradebookColumnDatum < ApplicationRecord
   belongs_to :custom_gradebook_column
 
   validates :content, length: { maximum: maximum_string_length,

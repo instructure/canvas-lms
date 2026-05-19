@@ -17,12 +17,11 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {MediaCapture, canUseMediaCapture} from '@instructure/media-capture'
-import {ScreenCapture, canUseScreenCapture} from '@instructure/media-capture-new'
+import {ScreenCapture, canUseScreenCapture, canUseMediaCapture} from '@instructure/media-capture'
 import $ from 'jquery'
 import {func, string} from 'prop-types'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {render} from '@canvas/react'
 import {mediaExtension} from '../../mimetypes'
 
 import {Spinner} from '@instructure/ui-spinner'
@@ -126,6 +125,7 @@ export function fileWithExtension(file) {
 
 export default class CanvasMediaRecorder extends React.Component {
   dialogRef = React.createRef()
+  _indicatorRoot = null
 
   static propTypes = {
     onSaveFile: func,
@@ -152,7 +152,7 @@ export default class CanvasMediaRecorder extends React.Component {
       dialogContent.innerHTML = ''
       dialogContent.appendChild(spinnerContainer)
 
-      ReactDOM.render(
+      render(
         <div style={{padding: '2rem', textAlign: 'center'}}>
           <div style={{marginBottom: '1rem'}}>
             <Spinner renderTitle={I18n.t('Saving media file')} size="large" />
@@ -191,7 +191,7 @@ export default class CanvasMediaRecorder extends React.Component {
     if (!indicatorBarMountPointId) return
     const mountPoint = document.getElementById(indicatorBarMountPointId)
     if (mountPoint) {
-      ReactDOM.render(
+      this._indicatorRoot = render(
         <ScreenCaptureIndicatorBar
           onFinishClick={this.handleFinishClick}
           onCancelClick={this.handleCancelClick}
@@ -202,9 +202,10 @@ export default class CanvasMediaRecorder extends React.Component {
   }
 
   removeIndicatorBar = () => {
-    const {indicatorBarMountPointId} = this.props
-    const mountPoint = document.getElementById(indicatorBarMountPointId)
-    ReactDOM.unmountComponentAtNode(mountPoint)
+    if (this._indicatorRoot) {
+      this._indicatorRoot.unmount()
+      this._indicatorRoot = null
+    }
   }
 
   handleCancelClick = () => {
@@ -281,7 +282,11 @@ export default class CanvasMediaRecorder extends React.Component {
     return (
       <div>
         {canUseMediaCapture() && (
-          <MediaCapture translations={translations} onCompleted={this.saveFile} />
+          <ScreenCapture
+            translations={translations}
+            onCompleted={this.saveFile}
+            noScreenSharing={true}
+          />
         )}
       </div>
     )

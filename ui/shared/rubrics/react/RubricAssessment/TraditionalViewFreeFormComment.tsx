@@ -99,6 +99,7 @@ export const TraditionalViewFreeFormComment: FC<TraditionalViewFreeFormCommentPr
             ) : (
               <TextArea
                 label={<ScreenReaderContent>{I18n.t('Criterion Comment')}</ScreenReaderContent>}
+                data-criterion-comment-id={criterion.id}
                 data-testid={`free-form-comment-area-${criterion.id}`}
                 width="100%"
                 height="38px"

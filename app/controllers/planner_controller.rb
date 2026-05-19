@@ -25,7 +25,7 @@
 class PlannerController < ApplicationController
   include Api::V1::PlannerItem
 
-  before_action :require_user, unless: :public_access?
+  skip_before_action :require_user, if: :public_access?
   before_action :check_limited_access_for_students, only: %i[index]
   before_action :set_user
   before_action :set_date_range
@@ -135,6 +135,7 @@ class PlannerController < ApplicationController
   #   }
   #  ]
   def index
+    @user&.clear_checkpoint_data_cache!
     GuardRail.activate(:secondary) do
       # fetch a meta key so we can invalidate just this info and not the whole of the user's cache
       planner_overrides_meta_key = get_planner_cache_id(@current_user)
@@ -231,7 +232,8 @@ class PlannerController < ApplicationController
                    ungraded_discussion_collection(completion_filter:),
                    calendar_events_collection(completion_filter:),
                    peer_reviews_collection(completion_filter:),
-                   sub_assignment_collection(completion_filter:)]
+                   sub_assignment_collection(completion_filter:),
+                   peer_review_sub_assignment_collection(completion_filter:)]
     BookmarkedCollection.merge(*collections)
   end
 
@@ -279,6 +281,17 @@ class PlannerController < ApplicationController
     item_collection("sub_assignment_viewing",
                     scope,
                     SubAssignment,
+                    [{ submissions: :cached_due_date }, :due_at, :created_at],
+                    :id)
+  end
+
+  def peer_review_sub_assignment_collection(completion_filter: nil)
+    scope = @user.assignments_for_student("viewing", is_peer_review_sub_assignment: true, **default_opts)
+                 .preload(:parent_assignment)
+    scope = apply_completion_filter(scope, @user, completion_filter)
+    item_collection("peer_review_sub_assignment_viewing",
+                    scope,
+                    PeerReviewSubAssignment,
                     [{ submissions: :cached_due_date }, :due_at, :created_at],
                     :id)
   end
@@ -373,7 +386,7 @@ class PlannerController < ApplicationController
   end
 
   def calendar_events_collection(completion_filter: nil)
-    section_codes = @user.section_context_codes(@context_codes, false, include_concluded: false)
+    section_codes = @user.section_context_codes(@context_codes, skip_visibility_filter: false, include_concluded: false)
     scope = CalendarEvent.active.not_hidden.for_user_and_context_codes(@user, @context_codes, section_codes)
                          .between(@start_date, @end_date)
     scope = apply_completion_filter(scope, @user, completion_filter)
@@ -386,6 +399,22 @@ class PlannerController < ApplicationController
 
   def peer_reviews_collection(completion_filter: nil)
     scope = @user.submissions_needing_peer_review(**default_opts.except(:include_locked))
+
+    # Exclude AssessmentRequests that have non-null peer_review_sub_assignment_id
+    # in courses where peer_review_allocation_and_grading feature is enabled
+    # (those are handled in peer_review_sub_assignment_collection)
+    if @course_ids.present?
+      courses_with_feature = Course.where(id: @course_ids)
+                                   .select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }
+                                   .pluck(:id)
+      if courses_with_feature.present?
+        scope = scope.where.not(
+          "peer_review_sub_assignment_id IS NOT NULL AND submissions.course_id IN (?)",
+          courses_with_feature
+        )
+      end
+    end
+
     scope = apply_completion_filter(scope, @user, completion_filter)
     item_collection("peer_reviews",
                     scope,
@@ -457,19 +486,25 @@ class PlannerController < ApplicationController
       @user_ids = [@user.id] if params.key?(:observed_user_id) && @user.grants_right?(@current_user, session, :read_as_parent)
     end
 
-    allowed_account_calendars = @user&.all_account_calendars&.map(&:id) || []
-    enabled_account_calendars = @user&.enabled_account_calendars&.map(&:id) || []
+    # Lazily evaluate account calendars to avoid expensive queries when not needed
+    lazy_allowed = nil
+    lazy_enabled = nil
+    allowed_account_calendars_proc = -> { lazy_allowed ||= @user&.all_account_calendars&.map(&:id) || [] }
+    enabled_account_calendars_proc = -> { lazy_enabled ||= @user&.enabled_account_calendars&.map(&:id) || [] }
     if @include_account_calendars && !context_ids.nil? && context_ids["Account"].nil?
-      @account_ids = enabled_account_calendars
+      @account_ids = enabled_account_calendars_proc.call
     end
 
     # make IDs relative to the user's shard
     @course_ids, @group_ids, @user_ids, @account_ids = transpose_ids(Shard.current, @user.shard) if @user
 
-    # Also transpose allowed/enabled account calendars to match @user.shard format
+    # Transpose allowed/enabled account calendars to match @user.shard format (lazily evaluated)
     if @user
-      allowed_account_calendars = allowed_account_calendars.map { |id| Shard.relative_id_for(id, Shard.current, @user.shard) }
-      enabled_account_calendars = enabled_account_calendars.map { |id| Shard.relative_id_for(id, Shard.current, @user.shard) }
+      transposed_allowed = -> { allowed_account_calendars_proc.call.map { |id| Shard.relative_id_for(id, Shard.current, @user.shard) } }
+      transposed_enabled = -> { enabled_account_calendars_proc.call.map { |id| Shard.relative_id_for(id, Shard.current, @user.shard) } }
+    else
+      transposed_allowed = -> { [] }
+      transposed_enabled = -> { [] }
     end
 
     (@user&.shard || Shard.current).activate do
@@ -480,8 +515,8 @@ class PlannerController < ApplicationController
       if @user
         @course_ids = @user.course_ids_for_todo_lists(:student, course_ids: @course_ids, include_concluded:)
         @group_ids = @user.group_ids_for_todo_lists(group_ids: @group_ids)
-        @account_ids ||= enabled_account_calendars
-        @account_ids &= allowed_account_calendars
+        @account_ids ||= transposed_enabled.call
+        @account_ids &= transposed_allowed.call
         @user_ids ||= [@user.id]
         @user_ids &= [@user.id]
       else

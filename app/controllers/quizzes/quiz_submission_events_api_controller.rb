@@ -45,7 +45,7 @@ class Quizzes::QuizSubmissionEventsApiController < ApplicationController
   include ::Filters::Quizzes
   include ::Filters::QuizSubmissions
 
-  before_action :require_user, only: [:index]
+  skip_before_action :require_user, only: :create
   before_action :require_context,
                 :require_quiz,
                 :require_active_quiz_submission

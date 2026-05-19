@@ -19,7 +19,7 @@
 import {QueryClientProvider} from '@tanstack/react-query'
 import {View} from '@instructure/ui-view'
 
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {AccessibilityCheckerApp} from './components/AccessibilityCheckerApp/AccessibilityCheckerApp'
 import {AccessibilityCourseScan} from './components/AccessibilityCourseScan'
 import AccessibilityWizard from '../../shared/react/components/AccessibilityIssuesContent'

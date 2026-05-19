@@ -24,7 +24,7 @@ import {View} from '@instructure/ui-view'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 import {addAccountsToTree} from '../utils'
 import {AccountCalendarItemToggleGroup} from './AccountCalendarItemToggleGroup'

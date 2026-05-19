@@ -43,6 +43,14 @@ function SecondaryDetailLine(props: SecondaryDetailLineProps) {
         <Text color="danger" size="x-small" transform="uppercase" weight="bold">
           {unpublished ? I18n.t('Unpublished') : I18n.t('Anonymous')}
         </Text>
+        {unpublished && props.assignment.postManually && (
+          <span>
+            &nbsp;
+            <Text size="x-small" transform="uppercase" weight="bold">
+              {I18n.t('Manual')}
+            </Text>
+          </span>
+        )}
       </span>
     )
   }

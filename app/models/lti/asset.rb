@@ -51,7 +51,9 @@ class Lti::Asset < ApplicationRecord
   belongs_to :submission,
              inverse_of: :lti_assets,
              class_name: "Submission",
-             optional: false
+             optional: true # submission can be hard deleted when "test student" got a reset
+
+  validates :submission, presence: true, on: :create
 
   belongs_to :discussion_entry_version,
              inverse_of: :lti_asset,
@@ -119,6 +121,34 @@ class Lti::Asset < ApplicationRecord
     end
   end
 
+  # Returns the submission claim ID for this asset.
+  # Discussion entries use DiscussionEntryVersion#lti_submission_claim_id.
+  # All other types delegate to Submission#lti_attempt_id with the asset's attempt number.
+  def submission_lti_claim_id
+    return nil unless submission
+
+    # Discussion Entry
+    if discussion_entry?
+      discussion_entry_version.lti_submission_claim_id(submission)
+    # Attachment of discussion entry
+    elsif attachment_id.present? && submission.submission_type == "discussion_topic"
+      # attachment is stored on discussion_entry not discussion_entry_version,
+      # so we find the most recent entry and version for the submission that contains the attachment
+      # and send that submission in the claim (also that is what we show in SG)
+      entry = DiscussionEntry.where(
+        discussion_topic_id: submission.assignment.discussion_topic&.id,
+        attachment_id:,
+        user_id: submission.user_id
+      ).order(id: :desc).first
+
+      entry&.discussion_entry_versions&.order(version: :desc)&.first
+           &.lti_submission_claim_id(submission)
+    # Regular Assignment
+    else
+      submission.lti_attempt_id(attempt_number)
+    end
+  end
+
   def text_entry?
     asset_type == TYPE_TEXT_ENTRY
   end
@@ -146,6 +176,21 @@ class Lti::Asset < ApplicationRecord
   end
 
   private
+
+  # Returns the submission attempt number this asset was submitted with.
+  # For text entry assets, this is stored directly in submission_attempt.
+  # For attachment assets, we find which submission version contained this attachment.
+  # For other types (discussion), falls back to the submission's current attempt.
+  def attempt_number
+    if submission_attempt.present?
+      submission_attempt
+    elsif attachment_id.present? && submission
+      submission.submission_history.find { |v| v.attachment_ids_for_version.include?(attachment_id) }&.attempt ||
+        submission.attempt
+    else
+      submission&.attempt
+    end
+  end
 
   def generate_uuid
     self.uuid ||= SecureRandom.uuid

@@ -23,7 +23,7 @@ import listFormatterPolyfill from '@canvas/util/listFormatter'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useMutation} from '@tanstack/react-query'
 import {isUnsuccessful} from '../../../../../common/lib/apiResult/ApiResult'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -38,6 +38,7 @@ import {findRootContextControl} from '../findRootContextControl'
 import type {LtiContextControl} from '../../../../model/LtiContextControl'
 import type {LtiRegistration} from '../../../../model/LtiRegistration'
 import {Text} from '@instructure/ui-text'
+import {AccountId} from '../../../../model/AccountId'
 
 const listFormatter = Intl.ListFormat
   ? new Intl.ListFormat(ENV.LOCALE || navigator.language)
@@ -46,11 +47,13 @@ const listFormatter = Intl.ListFormat
 const I18n = createI18nScope('lti_registrations')
 
 export type DeleteDeploymentModalProps = {
+  accountId: AccountId
   deployment: LtiDeployment
   registration: LtiRegistration
   controlsByPath: Map<string, LtiContextControl>
   onClose: () => void
   onDelete: DeleteDeployment
+  onSettled?: () => void
 }
 
 export const DeleteDeploymentModal = ({
@@ -59,6 +62,8 @@ export const DeleteDeploymentModal = ({
   deployment,
   registration,
   controlsByPath,
+  accountId,
+  onSettled,
 }: DeleteDeploymentModalProps) => {
   const cancelRef = useRef<Element | null>(null)
 
@@ -67,9 +72,10 @@ export const DeleteDeploymentModal = ({
     mutationFn: async (deployment: LtiDeployment) =>
       onDelete({
         registrationId: registration.id,
-        accountId: registration.account_id,
+        accountId: accountId,
         deploymentId: deployment.id,
       }),
+    onSettled,
     // We don't need an onError handler here because ApiResult is meant to be a discriminated union
     // that indicates success or failure within the result object itself.
     onSuccess: result => {

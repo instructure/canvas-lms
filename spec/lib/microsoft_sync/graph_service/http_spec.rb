@@ -65,7 +65,7 @@ describe MicrosoftSync::GraphService::Http do
       end
 
       def expect_quota_not_counted(read_or_write)
-        expect(InstStatsd::Statsd).to_not have_received(:count)
+        expect(InstStatsd::Statsd).not_to have_received(:count)
           .with("microsoft_sync.graph_service.quota_#{read_or_write}", anything, anything)
       end
 
@@ -153,7 +153,7 @@ describe MicrosoftSync::GraphService::Http do
           expect(InstStatsd::Statsd).to have_received(:increment)
             .with("microsoft_sync.graph_service.expected",
                   tags: { extra_tag: "abc", msft_endpoint: "get_foo", status_code: "409" })
-          expect(InstStatsd::Statsd).to_not have_received(:increment)
+          expect(InstStatsd::Statsd).not_to have_received(:increment)
             .with("microsoft_sync.graph_service.error", anything)
         end
 
@@ -165,7 +165,7 @@ describe MicrosoftSync::GraphService::Http do
             expect(InstStatsd::Statsd).to have_received(:increment)
               .with("microsoft_sync.graph_service.expected",
                     tags: { extra_tag: "abc", msft_endpoint: "get_foo", status_code: "409" })
-            expect(InstStatsd::Statsd).to_not have_received(:increment)
+            expect(InstStatsd::Statsd).not_to have_received(:increment)
               .with("microsoft_sync.graph_service.error", anything)
           end
         end
@@ -191,7 +191,7 @@ describe MicrosoftSync::GraphService::Http do
           expect(InstStatsd::Statsd).to have_received(:increment)
             .with("microsoft_sync.graph_service.error",
                   tags: { extra_tag: "abc", msft_endpoint: "get_foo", status_code: "409" })
-          expect(InstStatsd::Statsd).to_not have_received(:increment)
+          expect(InstStatsd::Statsd).not_to have_received(:increment)
             .with("microsoft_sync.graph_service.expected", anything)
         end
       end

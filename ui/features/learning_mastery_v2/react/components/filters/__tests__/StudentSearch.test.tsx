@@ -23,7 +23,7 @@ import {Student} from '@canvas/outcomes/react/types/rollup'
 
 vi.mock('../../../hooks/useStudents')
 vi.mock('../../../apiClient')
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 afterEach(() => {
   cleanup()

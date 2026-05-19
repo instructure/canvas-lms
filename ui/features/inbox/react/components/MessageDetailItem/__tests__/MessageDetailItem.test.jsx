@@ -30,6 +30,12 @@ vi.mock('../../../../util/utils', async () => {
   }
 })
 
+vi.mock('@canvas/canvas-studio-player', () => ({
+  default: props => {
+    return <div>Player with media_id: {props.media_id}</div>
+  },
+}))
+
 const defaultProps = {
   conversationMessage: {
     author: {name: 'Tom Thompson', shortName: 'Tom Thompson', pronouns: 'he/him'},
@@ -213,7 +219,7 @@ describe('MessageDetailItem', () => {
     expect(getByText('attachment1.jpeg')).toBeInTheDocument()
   })
 
-  it('shows media attachment link if it exists', () => {
+  it('shows media player if it exists', () => {
     const props = {
       conversationMessage: {
         author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
@@ -241,7 +247,7 @@ describe('MessageDetailItem', () => {
     }
 
     const {getByText} = render(<MessageDetailItem {...props} />)
-    expect(getByText('Course Video')).toBeInTheDocument()
+    expect(getByText('Player with media_id: 123')).toBeInTheDocument()
   })
 
   it('does not render the reply or reply all options when function is not provided', () => {

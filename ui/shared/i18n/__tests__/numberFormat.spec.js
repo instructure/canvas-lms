@@ -20,10 +20,11 @@ import numberFormat from '../numberFormat'
 import I18n from '@canvas/i18n'
 
 describe('numberFormat _format', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
   afterEach(() => {
-    if (I18n.n.restore) {
-      I18n.n.restore()
-    }
+    vi.restoreAllMocks()
   })
 
   test('passes through non-numbers', () => {

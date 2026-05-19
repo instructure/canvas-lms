@@ -18,7 +18,7 @@ module Canvas::OAuth
       end
 
       def generate_token
-        @_token.create_access_token_if_needed(Canvas::Plugin.value_to_boolean(@opts[:replace_tokens]))
+        @_token.create_access_token_if_needed(replace_tokens: Canvas::Plugin.value_to_boolean(@opts[:replace_tokens]))
         Canvas::OAuth::Token.expire_code(@opts[:code])
         @_token
       end

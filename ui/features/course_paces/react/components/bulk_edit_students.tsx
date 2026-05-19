@@ -18,7 +18,7 @@
 
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -27,7 +27,7 @@ import {BulkEditStudentsTable} from './bulk_edit_students_table'
 import {actions} from '../actions/ui'
 import {connect} from 'react-redux'
 import {PaceContext} from '../types'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('bulk_edit_students')
 

@@ -36,9 +36,12 @@ describe('GetLtiAssetProcessorsAndReportsForStudentResult', () => {
     __typename: 'Query',
     submission: {
       __typename: 'Submission',
-      attempt: 1,
       ltiAssetReportsConnection: {
         __typename: 'LtiAssetReportConnection',
+        pageInfo: {
+          __typename: 'PageInfo',
+          hasNextPage: false,
+        },
         nodes: [
           {
             __typename: 'LtiAssetReport',

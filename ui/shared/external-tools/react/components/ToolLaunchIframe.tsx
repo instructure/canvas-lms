@@ -18,6 +18,7 @@
 
 import React, {IframeHTMLAttributes} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 
 const I18n = createI18nScope('external_toolsModalLauncher')
 
@@ -26,8 +27,10 @@ const I18n = createI18nScope('external_toolsModalLauncher')
  * Works just like all existing usages of the LTI \<iframe\> element, including
  * extracting a ref of the \<iframe\> directly and setting things on it later.
  *
- * TODO: include more common usages in this instead of in callers, including:
- * - allow: iframeAllowances
+ * IMPORTANT: The `allow` attribute is set at render time (not via setAttribute after mount)
+ * because browsers require certain permissions (microphone, camera) to be present at initial
+ * iframe creation time. Setting these permissions later via setAttribute is ignored by
+ * modern browsers for security reasons.
  */
 const ToolLaunchIframe = React.forwardRef<
   HTMLIFrameElement,
@@ -38,6 +41,7 @@ const ToolLaunchIframe = React.forwardRef<
       title={I18n.t('External tool frame')}
       ref={ref}
       className="tool_launch"
+      allow={iframeAllowances()}
       {...props}
       data-lti-launch="true"
     />

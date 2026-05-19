@@ -72,7 +72,7 @@ describe User do
       it "fails validation if lti_id changes" do
         user.short_name = "chewie"
         user.lti_id = "changedToThis"
-        expect(user).to_not be_valid
+        expect(user).not_to be_valid
       end
 
       it "passes validation if lti_id is not changed" do
@@ -171,7 +171,7 @@ describe User do
     user = User.new
     expect(user.lti_id).to be_blank
     user.save!
-    expect(user.lti_id).to_not be_blank
+    expect(user.lti_id).not_to be_blank
   end
 
   it "gets the first email from communication_channel" do
@@ -1570,6 +1570,13 @@ describe User do
       account = instance_double(Account, root_account?: true, cached_all_account_users_for: [instance_double(AccountUser, is_subset_of?: false)])
       expect(user.has_subset_of_account_permissions?(other_user, account)).to be_falsey
     end
+
+    it "forwards `exclude_non_masquerading_permissions` to AccountUser.is_subset_of?" do
+      account_user = instance_double(AccountUser)
+      account = instance_double(Account, root_account?: true, cached_all_account_users_for: [account_user])
+      expect(account_user).to receive(:is_subset_of?).with(other_user, exclude_non_masquerading_permissions: true)
+      user.has_subset_of_account_permissions?(other_user, account, exclude_non_masquerading_permissions: true)
+    end
   end
 
   context "check_courses_right?" do
@@ -2939,12 +2946,12 @@ describe User do
         context_codes = ["course_#{@course.id}"]
 
         # With include_concluded: false, should only see section 1
-        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        section_codes = @student.section_context_codes(context_codes, skip_visibility_filter: false, include_concluded: false)
         expect(section_codes).to include(section1.asset_string)
         expect(section_codes).not_to include(section2.asset_string)
 
         # With include_concluded: true (default), should see both sections
-        section_codes = @student.section_context_codes(context_codes, false, include_concluded: true)
+        section_codes = @student.section_context_codes(context_codes, skip_visibility_filter: false, include_concluded: true)
         expect(section_codes).to include(section1.asset_string)
         expect(section_codes).to include(section2.asset_string)
       end
@@ -2973,7 +2980,7 @@ describe User do
         context_codes = ["course_#{@course.id}"]
 
         # With include_concluded: false, should only see section 1
-        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        section_codes = @student.section_context_codes(context_codes, skip_visibility_filter: false, include_concluded: false)
         expect(section_codes).to include(section1.asset_string)
         expect(section_codes).not_to include(section2.asset_string)
       end
@@ -3002,7 +3009,7 @@ describe User do
         context_codes = ["course_#{@course.id}"]
 
         # With include_concluded: false, should only see section 1
-        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        section_codes = @student.section_context_codes(context_codes, skip_visibility_filter: false, include_concluded: false)
         expect(section_codes).to include(section1.asset_string)
         expect(section_codes).not_to include(section2.asset_string)
       end
@@ -3031,7 +3038,7 @@ describe User do
         context_codes = ["course_#{@course.id}"]
 
         # With include_concluded: false, should only see section 1
-        section_codes = @student.section_context_codes(context_codes, false, include_concluded: false)
+        section_codes = @student.section_context_codes(context_codes, skip_visibility_filter: false, include_concluded: false)
         expect(section_codes).to include(section1.asset_string)
         expect(section_codes).not_to include(section2.asset_string)
       end
@@ -3057,7 +3064,7 @@ describe User do
         # user instead of failing.
         expect do
           events = @user.upcoming_events(end_at: 1.week.from_now)
-        end.to_not raise_error
+        end.not_to raise_error
 
         expect(events.first).to eq assignment2
         expect(events.second).to eq assignment
@@ -3113,6 +3120,46 @@ describe User do
         events_a = @user.upcoming_events(context_codes: context_codes_a)
         expect(events_a).to include(reply_to_topic_a)
         expect(events_a).to include(reply_to_entry_a)
+      end
+
+      it "includes peer review sub assignments when peer review feature is enabled" do
+        @course.account.enable_feature!(:peer_review_allocation_and_grading)
+        peer_review = peer_review_model(course: @course, due_at: 2.days.from_now)
+
+        events = @user.upcoming_events(end_at: 1.week.from_now)
+        expect(events).to include(peer_review)
+      end
+
+      it "does not include peer review sub assignments when peer review feature is disabled" do
+        @course.account.disable_feature!(:peer_review_allocation_and_grading)
+        assignment = assignment_model(
+          course: @course,
+          title: "Parent Assignment",
+          points_possible: 20,
+          peer_reviews: true,
+          submission_types: "online_text_entry",
+          due_at: 1.day.from_now
+        )
+        # Create directly since the feature is disabled (service won't work)
+        peer_review = PeerReviewSubAssignment.create!(
+          parent_assignment: assignment,
+          context: @course,
+          title: "Parent Assignment Peer Review",
+          due_at: 2.days.from_now,
+          workflow_state: "published"
+        )
+
+        events = @user.upcoming_events(end_at: 1.week.from_now)
+        expect(events).not_to include(peer_review)
+      end
+
+      it "does not include unpublished peer review sub assignments" do
+        @course.account.enable_feature!(:peer_review_allocation_and_grading)
+        peer_review = peer_review_model(course: @course, due_at: 2.days.from_now)
+        peer_review.unpublish!
+
+        events = @user.upcoming_events(end_at: 1.week.from_now)
+        expect(events).not_to include(peer_review)
       end
 
       it "doesn't include events for enrollments that are inactive due to date" do
@@ -3731,6 +3778,150 @@ describe User do
     end
   end
 
+  describe "#adminable_horizon_accounts_scope" do
+    it "returns horizon accounts the user can administer" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account2 = Account.create!(name: "Account 2")
+      account3 = Account.create!(name: "Account 3")
+
+      account1.account_users.create!(user:)
+      account2.account_users.create!(user:)
+      # User does not have access to account3
+
+      # Mark account1 and account2 as horizon accounts
+      account1.settings[:horizon_account_ids] = [account1.id]
+      account1.save!
+      account2.settings[:horizon_account_ids] = [account2.id]
+      account2.save!
+      # Mark account3 as horizon account, but user doesn't have access
+      account3.settings[:horizon_account_ids] = [account3.id]
+      account3.save!
+
+      result = user.adminable_horizon_accounts_scope
+      expect(result).to match_array [account1, account2]
+    end
+
+    it "returns empty when no horizon_account_ids are configured" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account1.account_users.create!(user:)
+
+      result = user.adminable_horizon_accounts_scope
+      expect(result).to be_empty
+    end
+
+    it "includes site admin when user has access and there are horizon accounts" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account1.account_users.create!(user:)
+      account1.settings[:horizon_account_ids] = [account1.id]
+      account1.save!
+
+      Account.site_admin.account_users.create!(user:)
+
+      result = user.adminable_horizon_accounts_scope
+      expect(result).to include(Account.site_admin)
+      expect(result).to include(account1)
+    end
+
+    it "does not include site admin when user has access but no horizon accounts" do
+      user = user_model
+      Account.site_admin.account_users.create!(user:)
+
+      result = user.adminable_horizon_accounts_scope
+      expect(result).to be_empty
+    end
+
+    it "does not include site admin when user does not have access" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account1.account_users.create!(user:)
+      account1.settings[:horizon_account_ids] = [account1.id]
+      account1.save!
+
+      result = user.adminable_horizon_accounts_scope
+      expect(result).not_to include(Account.site_admin)
+      expect(result).to include(account1)
+    end
+
+    it "includes sub-accounts when user is admin on a sub-account of horizon-enabled parent" do
+      user = user_model
+      root = Account.create!(name: "Root")
+      sub_account = Account.create!(name: "Sub Account", parent_account: root, root_account: root)
+
+      # Enable horizon on root
+      root.settings[:horizon_account_ids] = [root.id]
+      root.save!
+
+      # User is admin on sub-account (not on root)
+      sub_account.account_users.create!(user:)
+
+      result = user.adminable_horizon_accounts_scope
+
+      # User should see the sub-account because it inherits horizon from root
+      expect(result).to include(sub_account)
+      expect(result).not_to include(root) # User is NOT admin on root
+    end
+
+    it "includes multiple levels of sub-accounts in horizon hierarchy" do
+      user = user_model
+      root = Account.create!(name: "Root")
+      sub1 = Account.create!(name: "Sub 1", parent_account: root, root_account: root)
+      sub2 = Account.create!(name: "Sub 2", parent_account: sub1, root_account: root)
+
+      # Enable horizon on root
+      root.settings[:horizon_account_ids] = [root.id]
+      root.save!
+
+      # User is admin on multiple levels
+      sub1.account_users.create!(user:)
+      sub2.account_users.create!(user:)
+
+      result = user.adminable_horizon_accounts_scope
+
+      # User should see both sub-accounts
+      expect(result).to include(sub1, sub2)
+      expect(result.size).to eq(2)
+    end
+  end
+
+  describe "adminable_horizon_accounts" do
+    it "returns cached horizon accounts" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account1.account_users.create!(user:)
+      account1.settings[:horizon_account_ids] = [account1.id]
+      account1.save!
+
+      expect(user.adminable_horizon_accounts.map(&:id)).to eq [account1.id]
+    end
+
+    it "excludes deleted accounts" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account1.account_users.create!(user:)
+      account1.settings[:horizon_account_ids] = [account1.id]
+      account1.save!
+      account1.destroy
+
+      expect(user.adminable_horizon_accounts).to be_empty
+    end
+
+    it "only includes accounts in horizon_account_ids that user has admin access to" do
+      user = user_model
+      account1 = Account.create!(name: "Account 1")
+      account2 = Account.create!(name: "Account 2")
+      account1.account_users.create!(user:)
+      # User does not have access to account2
+      account1.settings[:horizon_account_ids] = [account1.id, account2.id]
+      account1.save!
+
+      # User only has access to account1, not account2, so only account1 should be returned
+      expect(user.adminable_horizon_accounts.map(&:id)).to eq [account1.id]
+    end
+  end
+
   describe "all_pseudonyms" do
     specs_require_sharding
 
@@ -4309,7 +4500,7 @@ describe User do
 
     it "optionally does not include concluded courses" do
       @enrollment.update_attribute(:workflow_state, "completed")
-      expect(@user.conversation_context_codes(false)).not_to include(@course.asset_string)
+      expect(@user.conversation_context_codes(include_concluded_codes: false)).not_to include(@course.asset_string)
     end
 
     it "includes groups" do
@@ -4338,7 +4529,7 @@ describe User do
       it "optionally does not include concluded courses on other shards" do
         course_with_student(account: @shard1_account, user: @user, active_all: true)
         @enrollment.update_attribute(:workflow_state, "completed")
-        expect(@user.conversation_context_codes(false)).not_to include(@course.asset_string)
+        expect(@user.conversation_context_codes(include_concluded_codes: false)).not_to include(@course.asset_string)
       end
 
       it "includes groups on other shards" do
@@ -4796,6 +4987,89 @@ describe User do
     end
   end
 
+  describe "#educator_dashboard_user?" do
+    let(:user) { User.create! }
+
+    it "returns false by default" do
+      expect(user.educator_dashboard_user?).to be false
+    end
+
+    it "returns true for an active teacher enrollment" do
+      course_with_teacher(user:, active_all: true)
+      expect(user.educator_dashboard_user?).to be true
+    end
+
+    it "returns true for an active designer enrollment" do
+      course_with_designer(user:, active_all: true)
+      expect(user.educator_dashboard_user?).to be true
+    end
+
+    it "returns true for an invited (pending) teacher enrollment" do
+      course_factory(active_course: true).enroll_teacher(user)
+      expect(user.educator_dashboard_user?).to be true
+    end
+
+    it "returns true when the user is a teacher in one course and a student in another" do
+      course_with_student(user:, active_all: true)
+      course_with_teacher(user:, active_all: true)
+      expect(user.educator_dashboard_user?).to be true
+    end
+
+    it "returns false when the user only has a student enrollment" do
+      course_with_student(user:, active_all: true)
+      expect(user.educator_dashboard_user?).to be false
+    end
+
+    it "returns false when the user only has a TA enrollment" do
+      course_with_ta(user:, active_all: true)
+      expect(user.educator_dashboard_user?).to be false
+    end
+
+    it "returns false when the user only has an observer enrollment" do
+      course_with_observer(user:, active_all: true)
+      expect(user.educator_dashboard_user?).to be false
+    end
+
+    it "returns false when the only teacher enrollment is concluded" do
+      course_with_teacher(user:, active_all: true)
+      user.enrollments.find_by(type: "TeacherEnrollment").complete!
+      expect(user.educator_dashboard_user?).to be false
+    end
+
+    it "returns false when the only teacher enrollment is inactive" do
+      course_with_teacher(user:, active_all: true)
+      user.enrollments.find_by(type: "TeacherEnrollment").deactivate
+      expect(user.educator_dashboard_user?).to be false
+    end
+
+    it "returns false when the only teacher enrollment is deleted" do
+      course_with_teacher(user:, active_all: true)
+      user.enrollments.find_by(type: "TeacherEnrollment").destroy
+      expect(user.educator_dashboard_user?).to be false
+    end
+
+    describe "caching" do
+      it "memoizes a true result for the lifetime of the instance" do
+        course_with_teacher(user:, active_all: true)
+        expect(Rails.cache).to receive(:fetch_with_batched_keys).once.and_call_original
+        2.times { user.educator_dashboard_user? }
+      end
+
+      it "memoizes a false result for the lifetime of the instance" do
+        expect(Rails.cache).to receive(:fetch_with_batched_keys).once.and_call_original
+        2.times { user.educator_dashboard_user? }
+      end
+
+      it "includes ApplicationController.region in the cache key" do
+        allow(ApplicationController).to receive(:region).and_return("test-region-1")
+        expect(Rails.cache).to receive(:fetch_with_batched_keys)
+          .with(a_string_including("test-region-1"), hash_including(batch_object: user, batched_keys: :enrollments))
+          .and_call_original
+        user.educator_dashboard_user?
+      end
+    end
+  end
+
   describe "#participating_student_current_and_concluded_course_ids" do
     let(:user) { User.create! }
 
@@ -5148,6 +5422,65 @@ describe User do
         user.preferences[:custom_colors] = { user_1: "#757777" }
         expect(user.custom_colors[:user_1]).to eq("#757777")
       end
+    end
+  end
+
+  describe "#educator_dashboard_config" do
+    let(:user) { user_model }
+
+    it "returns the default layout when no preference is set" do
+      widget_types = user.educator_dashboard_config["layout"]["widgets"].pluck("type")
+      expect(widget_types).to contain_exactly(
+        "educator_announcement_creation",
+        "educator_todo_list",
+        "educator_content_quality"
+      )
+    end
+
+    it "drops non-educator widget types from a saved layout" do
+      user.set_preference(:educator_dashboard_config, {
+                            "layout" => {
+                              "columns" => 2,
+                              "widgets" => [
+                                { "type" => "educator_announcement_creation" },
+                                { "type" => "course_work_combined" },
+                                { "type" => "course_grades" },
+                                { "type" => "educator_todo_list" }
+                              ]
+                            }
+                          })
+
+      widget_types = user.educator_dashboard_config["layout"]["widgets"].pluck("type")
+      expect(widget_types).to contain_exactly(
+        "educator_announcement_creation",
+        "educator_todo_list"
+      )
+    end
+
+    it "does not mutate the stored preference" do
+      stored = {
+        "layout" => {
+          "columns" => 2,
+          "widgets" => [{ "type" => "course_grades" }]
+        }
+      }
+      user.set_preference(:educator_dashboard_config, stored)
+
+      user.educator_dashboard_config
+
+      expect(user.get_preference(:educator_dashboard_config)["layout"]["widgets"])
+        .to eq([{ "type" => "course_grades" }])
+    end
+
+    it "returns the default layout when the stored layout is not a hash" do
+      user.set_preference(:educator_dashboard_config, { "layout" => "garbage" })
+
+      widget_types = user.educator_dashboard_config["layout"]["widgets"].pluck("type")
+      expect(widget_types).to contain_exactly(
+        "educator_announcement_creation",
+        "educator_todo_list",
+        "educator_content_quality"
+      )
     end
   end
 
@@ -5661,6 +5994,61 @@ describe User do
       expect(permissions[:can_create]).to be(:student)
       expect(permissions[:restrict_to_mcc]).to be_falsey
     end
+
+    describe "viewable_account_ids" do
+      it "includes the account ID when admin has read_course_list" do
+        @user = user_factory(active_all: true)
+        account_admin_user(account: @account, user: @user)
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:viewable_account_ids]).to include(@account.id.to_s)
+      end
+
+      it "is nil when user has only course enrollments (no account role)" do
+        @user = user_factory(active_all: true)
+        course_with_teacher(user: @user, active_all: true, account: @account)
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:viewable_account_ids]).to be_nil
+      end
+
+      it "is empty when admin role has read_course_list disabled" do
+        @user = user_factory(active_all: true)
+        role = custom_account_role("no_course_list", account: @account)
+        @account.role_overrides.create!(
+          permission: :read_course_list,
+          role:,
+          enabled: false
+        )
+        @account.account_users.create!(user: @user, role:)
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:viewable_account_ids]).to be_empty
+      end
+
+      it "includes only accounts where admin has read_course_list" do
+        @user = user_factory(active_all: true)
+        account_admin_user(account: @account, user: @user)
+
+        # A separate root account where the user lacks read_course_list.
+        other_account = Account.create!(name: "Other Root Account")
+        restricted_role = custom_account_role("no_course_list", account: other_account)
+        other_account.role_overrides.create!(
+          permission: :read_course_list,
+          role: restricted_role,
+          enabled: false
+        )
+        other_account.account_users.create!(user: @user, role: restricted_role)
+
+        permissions = @user.create_courses_permissions(@account)
+
+        expect(permissions[:viewable_account_ids]).to include(@account.id.to_s)
+        expect(permissions[:viewable_account_ids]).not_to include(other_account.id.to_s)
+      end
+    end
   end
 
   it "destroys associated gradebook filters when the user is soft-deleted" do
@@ -6028,6 +6416,54 @@ describe User do
       private_course = course_factory
       private_course.update!(sis_source_id: "private_sis")
       expect(user.accessible_courses_by_sis_ids(["private_sis"])).to eq([])
+    end
+  end
+
+  describe "#current_course_ids_for_dashboard" do
+    before do
+      @student = user_factory(active_all: true)
+      @active_course = course_factory(active_all: true)
+      @active_course.enroll_student(@student, enrollment_state: "active")
+    end
+
+    it "includes courses with active enrollments" do
+      result = @student.current_course_ids_for_dashboard
+      expect(result).to include(@active_course.id)
+    end
+
+    it "excludes courses with past enrollment term" do
+      past_term = @active_course.account.enrollment_terms.create!(
+        name: "Past Term",
+        start_at: 6.months.ago,
+        end_at: 1.month.ago
+      )
+      past_course = course_factory(active_all: true, account: @active_course.account)
+      past_course.update!(enrollment_term: past_term)
+      past_course.enroll_student(@student, enrollment_state: "active")
+
+      result = @student.current_course_ids_for_dashboard
+      expect(result).to include(@active_course.id)
+      expect(result).not_to include(past_course.id)
+    end
+
+    it "excludes courses with conclude_at in past" do
+      concluded_course = course_factory(active_all: true)
+      concluded_course.update!(conclude_at: 1.week.ago)
+      concluded_course.enroll_student(@student, enrollment_state: "active")
+
+      result = @student.current_course_ids_for_dashboard
+      expect(result).to include(@active_course.id)
+      expect(result).not_to include(concluded_course.id)
+    end
+
+    it "excludes formally concluded courses" do
+      concluded_course = course_factory(active_all: true)
+      concluded_course.enroll_student(@student, enrollment_state: "active")
+      concluded_course.complete!
+
+      result = @student.current_course_ids_for_dashboard
+      expect(result).to include(@active_course.id)
+      expect(result).not_to include(concluded_course.id)
     end
   end
 end

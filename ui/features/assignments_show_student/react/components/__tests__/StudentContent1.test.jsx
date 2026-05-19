@@ -20,7 +20,7 @@ import {MockedProvider} from '@apollo/client/testing'
 import {render} from '@testing-library/react'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {
   mockAssignmentAndSubmission,
   mockQuery,
@@ -121,6 +121,18 @@ describe('Assignment Student Content View', () => {
     )
     expect(getByTestId('assignment-student-header')).toBeInTheDocument()
   })
+  it('content wrapper div has maxWidth of 100%', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {getByTestId} = render(
+      <MockedQueryProvider>
+        <StudentContent {...props} />
+      </MockedQueryProvider>,
+    )
+    const contentDiv = getByTestId('student-content-flex-container')
+    expect(contentDiv).toBeInTheDocument()
+    expect(contentDiv.style.maxWidth).toBe('100%')
+  })
+
   it('renders the assignment details and student content if the assignment is unlocked', async () => {
     const props = await mockAssignmentAndSubmission()
     const {getByText, queryByText} = render(

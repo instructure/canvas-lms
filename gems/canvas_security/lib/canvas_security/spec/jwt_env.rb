@@ -23,7 +23,7 @@ RSpec.shared_context "services JWT wrapper" do
   def build_wrapped_token(user_id, real_user_id: nil, encoding_secret: fake_signing_secret)
     payload = { sub: user_id }
     payload[:masq_sub] = real_user_id if real_user_id
-    crypted_token = CanvasSecurity::ServicesJwt.generate(payload, false, symmetric: true)
+    crypted_token = CanvasSecurity::ServicesJwt.generate(payload, base64: false, symmetric: true)
     payload = {
       iss: "some other service",
       user_token: crypted_token

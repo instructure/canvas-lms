@@ -626,6 +626,26 @@ describe Rubric do
     )
   end
 
+  describe ".normalize long_description line endings" do
+    it "normalizes \\r\\n to \\n in criterion long_description" do
+      criteria = [{ id: "c1", description: "Criterion", long_description: "line1\r\nline2\r\nline3", points: 5, ratings: [] }]
+      result = Rubric.normalize(criteria)
+      expect(result[0]["long_description"]).to eq("line1\nline2\nline3")
+    end
+
+    it "leaves \\n-only long_description unchanged" do
+      criteria = [{ id: "c1", description: "Criterion", long_description: "line1\nline2", points: 5, ratings: [] }]
+      result = Rubric.normalize(criteria)
+      expect(result[0]["long_description"]).to eq("line1\nline2")
+    end
+
+    it "treats criteria with \\r\\n and \\n long_descriptions as equal after normalization" do
+      with_crlf = [{ id: "c1", description: "Criterion", long_description: "line1\r\nline2", points: 5, ratings: [] }]
+      with_lf   = [{ id: "c1", description: "Criterion", long_description: "line1\nline2", points: 5, ratings: [] }]
+      expect(Rubric.normalize(with_crlf)).to eq(Rubric.normalize(with_lf))
+    end
+  end
+
   describe "#update_criteria" do
     context "populates blank titles" do
       before do
@@ -961,7 +981,6 @@ describe Rubric do
       end
 
       it "handles feature flag inheritance from root account" do
-        # Enable at root account level but not course level
         course.root_account.enable_feature!(:enhanced_rubrics)
         course.root_account.enable_feature!(:ai_rubrics)
         course.disable_feature!(:enhanced_rubrics)
@@ -992,17 +1011,14 @@ describe Rubric do
 
     context "feature flag edge cases" do
       it "raises NoMethodError when course doesn't have feature_enabled method" do
-        # Create a mock object that responds to is_a?(Course) but doesn't have feature_enabled?
         mock_course = instance_double(Course)
         allow(mock_course).to receive(:is_a?).with(Course).and_return(true)
         allow(mock_course).to receive(:feature_enabled?).and_raise(NoMethodError)
 
-        # The method should raise the NoMethodError since there's no error handling
         expect { Rubric.ai_rubrics_enabled?(mock_course) }.to raise_error(NoMethodError)
       end
 
       it "handles course subclasses" do
-        # Test with a class that inherits from Course
         course_subclass = Class.new(Course) do
           def self.name
             "CourseSubclass"
@@ -1025,7 +1041,6 @@ describe Rubric do
         rubric_params = { title: "Test LLM Rubric", criteria_via_llm: "true" }
         association_params = { association_object: assignment, purpose: "grading", use_for_grading: "1" }
 
-        # Mock the service and feature flag check
         service = instance_double(RubricLLMService)
         expect(RubricLLMService).to receive(:new).with(llm_rubric).and_return(service)
         expect(service).to receive(:generate_criteria_via_llm).with(assignment).and_return([
@@ -1064,7 +1079,6 @@ describe Rubric do
         }
         association_params = { association_object: assignment, purpose: "grading", use_for_grading: "1" }
 
-        # Should not call RubricLLMService
         expect(RubricLLMService).not_to receive(:new)
 
         association = llm_rubric.update_with_association(teacher, rubric_params, course, association_params)
@@ -1129,7 +1143,6 @@ describe Rubric do
           other_user = User.create!(name: "Other User")
           course.enroll_teacher(other_user, active_all: true)
 
-          # Don't give the other user rubric permissions
           allow_any_instance_of(Rubric).to receive(:grants_right?).with(other_user, :update).and_return(false)
 
           if method_name == :process_generate_criteria_via_llm
@@ -1215,6 +1228,114 @@ describe Rubric do
           it_behaves_like "handles LLM service errors", :process_regenerate_criteria_via_llm
         end
       end
+    end
+  end
+
+  describe "#alignments_need_update?" do
+    let_once(:course) { Course.create! }
+    let(:rubric) do
+      Rubric.create!(
+        title: "Test Rubric",
+        context: course,
+        data: [{
+          description: "Criterion 1",
+          points: 10,
+          id: "crit1",
+          ratings: [
+            { description: "Good", points: 10, id: "rat1", criterion_id: "crit1" },
+            { description: "Bad", points: 0, id: "rat2", criterion_id: "crit1" }
+          ]
+        }]
+      )
+    end
+
+    it "returns true when workflow_state changes" do
+      rubric.update!(workflow_state: "deleted")
+      expect(rubric.alignments_need_update?).to be true
+    end
+
+    it "returns true when criteria content changes" do
+      changed_data = [{
+        description: "Changed Criterion",
+        points: 10,
+        id: "crit1",
+        ratings: [
+          { description: "Good", points: 10, id: "rat1", criterion_id: "crit1" },
+          { description: "Bad", points: 0, id: "rat2", criterion_id: "crit1" }
+        ]
+      }]
+      rubric.update!(data: changed_data)
+      expect(rubric.alignments_need_update?).to be true
+    end
+
+    it "returns false when data is saved but criteria are semantically unchanged" do
+      rubric.update!(data: rubric.data)
+      expect(rubric.alignments_need_update?).to be false
+    end
+
+    it "returns false when neither workflow_state nor data changes" do
+      rubric.update!(title: "New Title")
+      expect(rubric.alignments_need_update?).to be false
+    end
+  end
+
+  describe "#criteria_has_changed?" do
+    let_once(:course) { Course.create! }
+    let(:original_data) do
+      [{
+        description: "Criterion 1",
+        points: 10,
+        id: "crit1",
+        ratings: [
+          { description: "Good", points: 10, id: "rat1", criterion_id: "crit1" },
+          { description: "Bad", points: 0, id: "rat2", criterion_id: "crit1" }
+        ]
+      }]
+    end
+    let(:rubric) { Rubric.create!(title: "Test Rubric", context: course, data: original_data) }
+
+    it "returns false when criteria are identical" do
+      expect(rubric.criteria_has_changed?(original_data)).to be false
+    end
+
+    it "returns true when criterion description changes" do
+      changed = original_data.deep_dup
+      changed[0][:description] = "Different Description"
+      expect(rubric.criteria_has_changed?(changed)).to be true
+    end
+
+    it "returns true when criterion points change" do
+      changed = original_data.deep_dup
+      changed[0][:points] = 20
+      expect(rubric.criteria_has_changed?(changed)).to be true
+    end
+
+    it "returns true when a rating is added" do
+      changed = original_data.deep_dup
+      changed[0][:ratings] << { description: "Okay", points: 5, id: "rat3", criterion_id: "crit1" }
+      expect(rubric.criteria_has_changed?(changed)).to be true
+    end
+
+    it "returns true when a rating description changes" do
+      changed = original_data.deep_dup
+      changed[0][:ratings][0][:description] = "Excellent"
+      expect(rubric.criteria_has_changed?(changed)).to be true
+    end
+
+    it "returns false when criterion_use_range is false and previous criterion_use_range was not set" do
+      data_with_range = original_data.deep_dup
+      data_with_range[0][:criterion_use_range] = false
+      rubric.update!(data: data_with_range)
+      expect(rubric.criteria_has_changed?(data_with_range)).to be false
+    end
+
+    it "returns false when long_description differs only in \\r\\n vs \\n line endings" do
+      crlf_data = original_data.deep_dup
+      crlf_data[0][:long_description] = "line1\r\nline2"
+      rubric.update!(data: crlf_data)
+      lf_data = original_data.deep_dup
+      lf_data[0][:long_description] = "line1\nline2"
+      expect(rubric.criteria_has_changed?(lf_data)).to be false
     end
   end
 end

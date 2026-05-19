@@ -35,7 +35,7 @@ import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Transition} from '@instructure/ui-motion'
 import {Pill} from '@instructure/ui-pill'
-import {showFlashSuccess, showFlashWarning} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess, showFlashWarning} from '@instructure/platform-alerts'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 import {AccountReportInfo, AccountReport} from '@canvas/account_reports/types'

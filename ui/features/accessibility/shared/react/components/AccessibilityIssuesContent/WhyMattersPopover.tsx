@@ -28,6 +28,7 @@ import {AccessibilityIssue} from '../../types'
 import {Link} from '@instructure/ui-link'
 import canvas from '@instructure/ui-themes'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {COMMUNITY_LINKS} from '../../util/communityLinks'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -81,6 +82,18 @@ const WhyMattersPopover = ({issue}: WhyMattersPopoverProps) => {
         {why.map((paragraph, index) => (
           <Flex.Item key={index} margin="0 0 x-small 0">
             <Text variant="content">{paragraph}</Text>
+            {COMMUNITY_LINKS[issue.ruleId] && (
+              <Link
+                href={COMMUNITY_LINKS[issue.ruleId].url}
+                target="_blank"
+                rel="noopener noreferrer"
+                iconPlacement="end"
+                renderIcon={<IconExternalLinkLine size="x-small" />}
+              >
+                {COMMUNITY_LINKS[issue.ruleId].label}
+                <ScreenReaderContent>{I18n.t('- Opens in a new tab.')}</ScreenReaderContent>
+              </Link>
+            )}
           </Flex.Item>
         ))}
         {issue.issueUrl && (

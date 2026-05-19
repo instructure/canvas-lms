@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {replaceLocation} from '@canvas/util/globalUtils'
 import {fireEvent, render as testingLibraryRender, waitFor} from '@testing-library/react'
@@ -84,9 +84,7 @@ describe('HelpLinks', () => {
 
   beforeEach(() => {
     // Default handler for any help links API calls
-    server.use(
-      http.get('/api/v1/accounts/*/help_links', () => HttpResponse.json([])),
-    )
+    server.use(http.get('/api/v1/accounts/*/help_links', () => HttpResponse.json([])))
     queryClient.setQueryData(['helpLinks'], [featuredLink, newLink, regularLink])
   })
 

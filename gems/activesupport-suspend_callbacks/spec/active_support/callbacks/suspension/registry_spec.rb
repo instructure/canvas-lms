@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 module ActiveSupport::Callbacks::Suspension
   describe Registry do
     describe "#any_registered?" do

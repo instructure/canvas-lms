@@ -159,7 +159,7 @@ describe "selective_release module set up" do
       click_complete_one_radio
       expect(is_checked(complete_one_radio_checked)).to be true
       expect(module_requirement_card.length).to eq(1)
-      expect(element_exists?(sequential_order_checkbox_selector, true)).to be false
+      expect(element_exists?(sequential_order_checkbox_selector, xpath: true)).to be false
     end
 
     it "does not show Requirements button for module with no items" do

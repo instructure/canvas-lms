@@ -17,6 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {getActiveCanvasTheme} from '@canvas/react'
 import React from 'react'
 import PropTypes from 'prop-types'
 import page from 'page'
@@ -24,7 +25,7 @@ import page from 'page'
 import {IconButton} from '@instructure/ui-buttons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconEditLine, IconEyeLine, IconOffLine, IconTrashLine} from '@instructure/ui-icons'
-import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
+import {confirmDanger} from '@instructure/platform-instui-bindings'
 
 const I18n = createI18nScope('react_developer_keys')
 
@@ -54,6 +55,9 @@ class DeveloperKeyActionButtons extends React.Component {
           )
         : I18n.t('Are you sure you want to delete this developer key?'),
       confirmButtonLabel: I18n.t('Delete'),
+      cancelButtonLabel: I18n.t('Cancel'),
+      closeButtonLabel: I18n.t('Close'),
+      theme: getActiveCanvasTheme(),
     })
   }
 

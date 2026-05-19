@@ -41,7 +41,7 @@ module CC::Exporter::Epub
       "WikiPage" => :pages
     }.freeze
 
-    def initialize(cartridge, sort_by_content = false, export_type = :epub, global_identifiers: false)
+    def initialize(cartridge, sort_by_content: false, export_type: :epub, global_identifiers: false)
       @cartridge = cartridge
       @export_type = export_type
       @sort_by_content = sort_by_content || cartridge_json[:modules].empty?

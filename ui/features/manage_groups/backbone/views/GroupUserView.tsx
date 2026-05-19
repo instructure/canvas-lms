@@ -19,7 +19,7 @@ import {View} from '@canvas/backbone'
 import template from '../../jst/groupUser.handlebars'
 import {GroupUserMenu} from '../../react/GroupUserMenu'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -86,7 +86,7 @@ export default class GroupUserView extends View {
       )
       // @ts-expect-error - Backbone View property
       if (this.canEditGroupAssignment && groupUserMenuSelector) {
-        ReactDOM.render(
+        legacyRender(
           <GroupUserMenu
             userId={userId}
             userName={userName}

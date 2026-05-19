@@ -26,11 +26,12 @@ import {Flex} from '@instructure/ui-flex'
 import {IconCompleteSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {AccessibilityResourceScan} from '../../types'
 import {useAccessibilityScansFetchUtils} from '../../hooks/useAccessibilityScansFetchUtils'
 import {NextResource} from '../../stores/AccessibilityScansStore'
+import {useA11yTracking} from '../../hooks/useA11yTracking'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -52,6 +53,7 @@ const CloseRemediationView: React.FC<CloseRemediationViewProps> = ({
   const [isClosed, setIsClosed] = useState(false)
   const {doFetchAccessibilityScanData, doFetchAccessibilityIssuesSummary} =
     useAccessibilityScansFetchUtils()
+  const {trackA11yEvent} = useA11yTracking()
 
   const closeRemediationMutation = useMutation({
     mutationFn: async () => {
@@ -88,6 +90,10 @@ const CloseRemediationView: React.FC<CloseRemediationViewProps> = ({
 
   const handleCloseRemediation = () => {
     if (closeRemediationMutation.isPending) return
+    trackA11yEvent('ResourceClosed', {
+      resourceId: scan.id,
+      courseId: scan.courseId,
+    })
     closeRemediationMutation.mutate()
   }
 
@@ -101,7 +107,7 @@ const CloseRemediationView: React.FC<CloseRemediationViewProps> = ({
                 {I18n.t('Closing remediation, please wait...')}
               </ScreenReaderContent>
             )}
-            <Heading level="h2" margin="0 0 small 0">
+            <Heading level="h3" margin="0 0 small 0">
               {I18n.t('%{count} outstanding issues remaining', {count: scan.issueCount})}
             </Heading>
             <View as="div" margin="medium 0">

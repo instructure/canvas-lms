@@ -39,7 +39,7 @@ module Api::V1::Tab
     hash = {}
     hash[:id] = tab[:css_class]
     hash[:html_url] = html_url(tab, context)
-    hash[:full_url] = html_url(tab, context, true)
+    hash[:full_url] = html_url(tab, context, full_url: true)
     hash[:position] = tab[:position]
     hash[:hidden] = true if tab[:hidden]
     hash[:unused] = true if tab[:hidden_unused]
@@ -53,7 +53,7 @@ module Api::V1::Tab
     api_json(hash, user, session)
   end
 
-  def html_url(tab, context, full_url = false)
+  def html_url(tab, context, full_url: false)
     if full_url
       method = tab[:href].to_s.sub(/_path$/, "_url").to_sym
       opts = { host: HostUrl.context_host(context, request.try(:host_with_port)) }

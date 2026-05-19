@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class Purgatory < ActiveRecord::Base
+class Purgatory < ApplicationRecord
   belongs_to :attachment
   belongs_to :deleted_by_user, class_name: "User"
 

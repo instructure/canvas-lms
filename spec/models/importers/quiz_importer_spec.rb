@@ -325,7 +325,7 @@ describe "Importers::QuizImporter" do
 
     quiz = Quizzes::Quiz.where(migration_id: quiz_hash[:migration_id]).first
     expect(quiz.unpublished?).to be true
-    expect(quiz.assignment).to_not be_nil
+    expect(quiz.assignment).not_to be_nil
   end
 
   it "does not create an extra assignment if it already references one (but not set unpublished)" do
@@ -389,7 +389,7 @@ describe "Importers::QuizImporter" do
     Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
 
     expect(quiz.reload.quiz_data).to include(hash_including("question_name" => "Not Rocket Bee?"))
-    expect(quiz.quiz_data).to_not include(hash_including("question_name" => "Rocket Bee!"))
+    expect(quiz.quiz_data).not_to include(hash_including("question_name" => "Rocket Bee!"))
   end
 
   it "does not clear dates if these are null in the source hash" do
@@ -445,7 +445,7 @@ describe "Importers::QuizImporter" do
 
     context "when FF pre_date_shift_for_assignment_importing disabled" do
       it "should not use the try_to_save_with_date_shift method" do
-        expect(Importers::QuizImporter).to_not receive(:try_to_save_with_date_shift)
+        expect(Importers::QuizImporter).not_to receive(:try_to_save_with_date_shift)
         subject
       end
     end

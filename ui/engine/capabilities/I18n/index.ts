@@ -20,6 +20,7 @@ import IntlPolyfills from '../IntlPolyfills'
 import type {Capability} from '@instructure/updown'
 import {oncePerPage} from '@instructure/updown'
 import {registerTranslations} from '@canvas/i18n'
+import {initI18next, loadI18nextTranslations} from '@canvas/i18next'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import fallbacks from 'translations/en.json'
 import {captureException} from '@sentry/browser'
@@ -52,6 +53,9 @@ const Translations: Capability = {
   up: oncePerPage('translations', async () => {
     const locale = ENV.LOCALE || navigator.language || 'en'
 
+    // Sync i18next locale with Canvas locale
+    initI18next(locale)
+
     if (ENV.RAILS_ENVIRONMENT === 'test' || locale === 'en') {
       registerTranslations(locale, fallbacks)
     } else {
@@ -64,6 +68,19 @@ const Translations: Capability = {
         })
         if (typeof json === 'object' && json !== null) {
           registerTranslations(locale, json)
+        }
+
+        // Load i18next namespace translations for this locale.
+        // Dynamic import creates a separate lazy chunk per locale — only the
+        // matching one is fetched at runtime.
+        try {
+          const i18nextModule = await import(
+            /* webpackChunkName: "i18next-[request]" */
+            `@instructure/translations/lib/canvas-lms/${locale}.json`
+          )
+          loadI18nextTranslations(locale, i18nextModule.default || i18nextModule)
+        } catch {
+          console.warn(`[i18next] No translations for locale "${locale}" — using English fallback`)
         }
       } catch {
         registerTranslations(locale, fallbacks)

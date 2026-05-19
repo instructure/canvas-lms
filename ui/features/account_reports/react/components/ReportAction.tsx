@@ -25,7 +25,7 @@ import ReportProgress from './ReportProgress'
 import {AccountReportInfo, AccountReport, reportRunning} from '@canvas/account_reports/types'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 const I18n = createI18nScope('account_reports')
 
 type Props = {

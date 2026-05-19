@@ -238,7 +238,7 @@
 class Quizzes::QuizStatisticsController < ApplicationController
   include ::Filters::Quizzes
 
-  before_action :require_user, :require_context, :require_quiz, :prepare_service
+  before_action :require_context, :require_quiz, :prepare_service
 
   # @API Fetching the latest quiz statistics
   #
@@ -272,7 +272,7 @@ class Quizzes::QuizStatisticsController < ApplicationController
       else
         json = Rails.cache.fetch(cache_key) do
           all_versions = value_to_boolean(params[:all_versions])
-          statistics = @service.generate_aggregate_statistics(all_versions, include_sis_ids?, { section_ids: params[:section_ids] })
+          statistics = @service.generate_aggregate_statistics(all_versions, includes_sis_ids: include_sis_ids?, section_ids: params[:section_ids])
           serialize(statistics)
         end
 

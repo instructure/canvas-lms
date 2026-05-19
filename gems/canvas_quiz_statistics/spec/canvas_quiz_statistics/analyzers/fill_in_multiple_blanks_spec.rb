@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
   subject { described_class.new(question_data) }
 
@@ -27,7 +25,7 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
   it "does not blow up when no responses are provided" do
     expect do
       subject.run([])
-    end.to_not raise_error
+    end.not_to raise_error
   end
 
   describe "[:answer_sets]" do

@@ -21,11 +21,8 @@
 require_relative "../../views_helper"
 
 describe "quizzes/quizzes/new" do
-  def course_quiz(active = false)
-    @quiz = @course.quizzes.create
-    @quiz.workflow_state = "available" if active
-    @quiz.save!
-    @quiz
+  def course_quiz
+    @quiz = @course.quizzes.create!
   end
 
   def quiz_question

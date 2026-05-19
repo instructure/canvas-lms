@@ -29,9 +29,10 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import PortfolioPortal from '../react/PortfolioPortal'
-import ReactDOM from 'react-dom/client'
+import type {Root} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import userSettings from '@canvas/user-settings'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {fetchContent} from './eportfolio_section'
@@ -210,12 +211,12 @@ function renderCreateForm() {
   }
 }
 
-function renderPortal(portfolio_id: number) {
+export function renderPortal(portfolio_id: number) {
   const sectionListContainer = document.getElementById('section_list_mount')
   const submissionContainer = document.getElementById('recent_submission_mount')
   const pageListContainer = document.getElementById('page_list_mount')
 
-  if (sectionListContainer && submissionContainer && pageListContainer) {
+  if (sectionListContainer && pageListContainer) {
     return (
       <QueryClientProvider client={queryClient}>
         <PortfolioPortal
@@ -235,25 +236,22 @@ $(document).ready(function () {
   const showDeprecation = ENV.show_eportfolio_deprecation_notice
   // formRoot is for the name field in the edit page form and renders dynamically
   // root is for everything else and should always be rendered
-  let formRoot: ReactDOM.Root | null = null
+  let formRoot: Root | null = null
   const pageNameMount = document.getElementById('page_name_mount')
-  if (pageNameMount) {
-    formRoot = ReactDOM.createRoot(pageNameMount)
-  }
   const portalMount = document.getElementById('eportfolio_portal_mount')
   if (portalMount) {
-    const root = ReactDOM.createRoot(portalMount)
     if (portfolio_id) {
-      root.render(renderPortal(portfolio_id))
+      const portalElement = renderPortal(portfolio_id)
+      if (portalElement) render(portalElement, portalMount)
     } else {
-      root.render(renderCreateForm())
+      const createFormElement = renderCreateForm()
+      if (createFormElement) render(createFormElement, portalMount)
     }
   }
   if (showDeprecation) {
     const mount = document.getElementById('eportfolio_deprecation_notice_mount')
     if (mount) {
-      const noticeRoot = ReactDOM.createRoot(mount)
-      noticeRoot.render(<DeprecationNoticeAlert open={true} />)
+      render(<DeprecationNoticeAlert open={true} />, mount)
     }
   }
   // Add ePortfolio related
@@ -302,13 +300,13 @@ $(document).ready(function () {
         RichContentEditor.loadNewEditor($richText, {defaultContent: sectionData.section_content})
       }
     })
-    if (formRoot) {
+    if (pageNameMount) {
       const currentPageName = $('#content h2 .name').text()
       const pageButtonContainer = document.getElementById('page_button_mount')
       const sideButtonContainer = document.getElementById('side_button_mount')
 
       if (pageButtonContainer && sideButtonContainer) {
-        formRoot.render(
+        const element = (
           <PageNameContainer
             pageName={currentPageName}
             contentBtnNode={pageButtonContainer}
@@ -318,8 +316,13 @@ $(document).ready(function () {
             onSave={submitPage}
             onKeepEditing={keepEditing}
             setHidden={setHidden}
-          />,
+          />
         )
+        if (formRoot) {
+          rerender(formRoot, element)
+        } else {
+          formRoot = render(element, pageNameMount)
+        }
       }
     }
 

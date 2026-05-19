@@ -20,7 +20,6 @@
 
 module Lti::IMS
   # @API Asset Processor
-  # @internal
   #
   # 1EdTech Asset Processor services: Eula Service and Eula Acceptance Service.
   #

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class CanvasMetadatum < ActiveRecord::Base
+class CanvasMetadatum < ApplicationRecord
   class MetadataArgumentError < ArgumentError; end
   # The Metadatum class is intended to be a place for storing
   # bits of state the are not really part of the canvas data itself.

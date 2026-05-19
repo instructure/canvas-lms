@@ -49,13 +49,13 @@ module Api::V1::SisAssignment
     only: %i[user_id].freeze
   }.freeze
 
-  def sis_assignments_json(assignments, includes = {})
-    assignments.map { |a| sis_assignment_json(a, includes) }
+  def sis_assignments_json(assignments, includes: {}, current_user: nil)
+    assignments.map { |a| sis_assignment_json(a, includes:, current_user:) }
   end
 
   private
 
-  def sis_assignment_json(assignment, includes)
+  def sis_assignment_json(assignment, includes: {}, current_user: nil)
     json = api_json(assignment, nil, nil, API_SIS_ASSIGNMENT_JSON_OPTS)
     json[:due_at] = default_due_date(assignment)
     json[:course_id] = assignment.context_id if assignment.context_type == "Course"
@@ -64,7 +64,7 @@ module Api::V1::SisAssignment
     add_sis_assignment_group_json(assignment, json)
     add_sis_course_sections_json(assignment, json)
 
-    json[:user_overrides] = assignment_user_overrides_json(assignment) if includes[:student_overrides]
+    json[:user_overrides] = assignment_user_overrides_json(assignment, current_user:) if includes[:student_overrides]
     json
   end
 
@@ -95,21 +95,21 @@ module Api::V1::SisAssignment
     json.merge!(sections: sis_assignment_course_sections_json(course_sections, assignment))
   end
 
-  def assignment_user_overrides_json(assignment)
+  def assignment_user_overrides_json(assignment, current_user: nil)
     overrides = active_assignment_overrides_for(assignment)
     raise UnloadedAssociationError if overrides.nil?
 
-    overrides.filter_map { |o| assignment_user_override_json(o) }
+    overrides.filter_map { |o| assignment_user_override_json(o, current_user:) }
   end
 
-  def assignment_user_override_json(override)
+  def assignment_user_override_json(override, current_user: nil)
     raise UnloadedAssociationError unless override.association(:assignment_override_students).loaded?
     return nil if override.assignment_override_students.empty?
 
     assignment_override_students_json = override.assignment_override_students.map do |student_override|
       json = api_json(student_override, nil, nil, API_SIS_ASSIGNMENT_STUDENT_OVERRIDES_JSON_OPTS)
       if student_override.association(:user).loaded?
-        pseudonym = SisPseudonym.for(student_override.user, override.assignment.context)
+        pseudonym = SisPseudonym.for(student_override.user, override.assignment.context, current_user:)
         json[:sis_user_id] = pseudonym&.sis_user_id
       end
 

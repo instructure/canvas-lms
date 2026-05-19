@@ -18,11 +18,11 @@
 
 import * as contentRendering from '../contentRendering'
 import {audioFromTray, audioFromUpload, videoFromTray, videoFromUpload} from './contentHelpers'
-import { videoDefaultSize } from '../plugins/instructure_record/VideoOptionsTray/TrayController'
+import {videoDefaultSize} from '../plugins/instructure_record/VideoOptionsTray/TrayController'
 
 jest.mock('../plugins/instructure_record/VideoOptionsTray/TrayController', () => {
   const originalModule = jest.requireActual(
-    '../plugins/instructure_record/VideoOptionsTray/TrayController'
+    '../plugins/instructure_record/VideoOptionsTray/TrayController',
   )
   return {
     ...originalModule,
@@ -264,8 +264,8 @@ describe('contentRendering', () => {
   })
 
   describe('renderVideo', () => {
-    const expectedVideoSize = { width: '200px', height: '100px' }
-    const { width, height } = expectedVideoSize
+    const expectedVideoSize = {width: '200px', height: '100px'}
+    const {width, height} = expectedVideoSize
 
     beforeEach(() => {
       videoDefaultSize.mockReturnValue(expectedVideoSize)
@@ -293,7 +293,7 @@ describe('contentRendering', () => {
       const audio = audioFromTray()
       const rendered = contentRendering.renderAudio(audio, canvasOrigin)
       expect(rendered).toEqual(
-        '<iframe data-media-id="29" data-media-type="audio" loading="lazy" src="/media_attachments_iframe/29?type=audio&embedded=true" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
+        '<iframe data-media-id="29" data-media-type="audio" loading="lazy" src="/media_attachments_iframe/29?type=audio&embedded=true" style="width:320px;height:228px;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
       )
     })
 
@@ -301,7 +301,7 @@ describe('contentRendering', () => {
       const audio = audioFromUpload()
       const rendered = contentRendering.renderAudio(audio, canvasOrigin)
       expect(rendered).toEqual(
-        '<iframe data-media-id="m-media-id" data-media-type="audio" loading="lazy" src="/media_attachments_iframe/maybe?type=audio&embedded=true" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
+        '<iframe data-media-id="m-media-id" data-media-type="audio" loading="lazy" src="/media_attachments_iframe/maybe?type=audio&embedded=true" style="width:320px;height:228px;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
       )
     })
   })

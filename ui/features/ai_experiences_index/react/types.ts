@@ -27,5 +27,6 @@ export type AiExperience = {
   created_at: string
   can_manage?: boolean
   can_unpublish?: boolean
+  context_ready?: boolean
   submission_status?: 'not_started' | 'in_progress' | 'submitted'
 }

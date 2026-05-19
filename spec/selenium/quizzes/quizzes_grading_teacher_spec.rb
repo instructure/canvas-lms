@@ -55,26 +55,29 @@ describe "Grading quizzes" do
 
         it "shows the regrade options", priority: "1" do
           # verify presence of regrade alert
-          expect(fj(".ui-dialog:visible .alert")).to include_text "Choose a regrade option " \
-                                                                  "for students who have already taken the quiz"
+          expect(f("[data-testid='regrade-warning']")).to include_text "Choose a regrade option " \
+                                                                       "for students who have already taken the quiz"
 
           # verify all regrade options are present
           expect(visible_regrade_options.count).to eq 4
         end
 
         it "displays the selected regrade option on the correct answer" do
-          option_text = f(".regrade_enabled .regrade_option_text").text
+          option_text = visible_regrade_options[0].text
+
           select_regrade_option
+
           expect(f(".correct_answer #regrade_info_span").text).to eq option_text
         end
 
         it "remembers the selected regrade option", priority: "1" do
           select_regrade_option
           save_question
-
           edit_first_question
+
           select_different_correct_answer(1)
-          expect(find_radio_button_by_value("current_and_previous_correct", ".regrade_enabled").selected?).to be_truthy
+
+          expect(find_radio_button_by_value("current_and_previous_correct", "[aria-label='Regrade options modal']").selected?).to be_truthy
         end
       end
 
@@ -95,9 +98,9 @@ describe "Grading quizzes" do
           select_different_correct_answer(1)
 
           # verify explanation message
-          expect(fj(".ui-dialog:visible .regrade_option_text")).to include_text "Regrading is not allowed " \
-                                                                                "on this question because either an answer was removed or the " \
-                                                                                "question type was changed after a student completed a submission."
+          expect(f("[aria-label='Regrade options modal']")).to include_text "Regrading is not allowed " \
+                                                                            "on this question because either an answer was removed or the " \
+                                                                            "question type was changed after a student completed a submission."
 
           expect(f("#content")).not_to contain_jqcss(".regrade_enabled label.checkbox:visible")
         end

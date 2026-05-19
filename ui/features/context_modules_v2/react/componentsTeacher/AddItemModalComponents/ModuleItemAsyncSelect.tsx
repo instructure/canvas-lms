@@ -18,7 +18,8 @@
 
 import React, {useState, useCallback, useEffect, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
+import {CanvasAsyncSelect} from '@instructure/platform-instui-bindings'
+import type {FormMessage} from '@instructure/ui-form-field'
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
 import {
   useModuleItemContent,
@@ -155,7 +156,7 @@ export default function ModuleItemAsyncSelect({
       placeholder={I18n.t('Begin typing to search')}
       onInputChange={handleInputChange}
       onOptionSelected={handleItemSelected}
-      messages={messages}
+      messages={messages as FormMessage[]}
       isRequired={isRequired}
     >
       {itemOptions}

@@ -22,7 +22,7 @@ class Quizzes::QuizSubmissionEventsController < ApplicationController
   include ::Filters::Quizzes
   include ::Filters::QuizSubmissions
 
-  before_action :require_user, :require_context
+  before_action :require_context
   before_action :require_quiz, only: [:index]
   before_action :require_quiz_submission, only: [:index]
 

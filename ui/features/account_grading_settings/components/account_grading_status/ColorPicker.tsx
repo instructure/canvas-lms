@@ -24,7 +24,7 @@ import type {Color} from '@canvas/grading-status-list-item'
 import '@canvas/rails-flash-notifications'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconWarningSolid, IconCheckSolid} from '@instructure/ui-icons'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 

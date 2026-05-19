@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Checkpoints::DiscussionCheckpointDeleterService < ApplicationService
-  require_relative "discussion_checkpoint_error"
-
   def initialize(discussion_topic:)
     super()
     @discussion_topic = discussion_topic

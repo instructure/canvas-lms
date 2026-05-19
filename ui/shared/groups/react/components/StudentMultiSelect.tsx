@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasMultiSelect from '@canvas/multi-select'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {debounce} from '@instructure/debounce'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {Tag} from '@instructure/ui-tag'
@@ -44,13 +44,14 @@ const StudentMultiSelect: React.FC<StudentMultiSelectProps> = ({
   onSelect,
 }: StudentMultiSelectProps) => {
   const [searchText, setSearchText] = useState('')
-  const [students, setStudents] = useState<Student[]>([])
   const loadedStudents = useRef<Student[]>([])
 
   const useStudentsQuery = useQuery({
     queryKey: ['courses', {courseId: ENV.course_id!, searchText}],
     queryFn: studentsQuery,
   })
+
+  const students = useStudentsQuery.data || []
 
   const onSearch = debounce((searchText: string) => {
     // currently the api has limitation on search text length
@@ -61,19 +62,16 @@ const StudentMultiSelect: React.FC<StudentMultiSelectProps> = ({
   }, SEARCH_DELAY_MS)
 
   const options = students
-    ?.filter(student => student.id !== ENV.current_user_id)
+    .filter(student => student.id !== ENV.current_user_id)
     .filter(student => !selectedOptionIds?.includes(student.id))
     .slice(0, VISIBLE_USERS_COUNT)
 
   useEffect(() => {
-    const data = useStudentsQuery.data || []
-    setStudents(data)
+    if (useStudentsQuery.isLoading || !useStudentsQuery.data) return
 
-    if (useStudentsQuery.isLoading) return
-
-    const combinedLoadedOptions = [...loadedStudents.current, ...(data || [])]
+    const combinedLoadedOptions = [...loadedStudents.current, ...useStudentsQuery.data]
     loadedStudents.current = [
-      ...new Map([...combinedLoadedOptions].map(item => [item.id, item])).values(),
+      ...new Map(combinedLoadedOptions.map(item => [item.id, item])).values(),
     ]
   }, [useStudentsQuery.data, useStudentsQuery.isLoading])
 

@@ -27,7 +27,7 @@ import '@canvas/media-comments' /* mediaComment */
 import axios from '@canvas/axios'
 import {camelizeProperties} from '@canvas/convert-case'
 import React from 'react'
-import ReactDOM from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import gradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import {htmlEscape} from '@instructure/html-escape'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -732,18 +732,21 @@ let clearBadgeCountsRoot = null
 
 function renderSelectMenuGroup() {
   const container = document.getElementById('GradeSummarySelectMenuGroup')
+  const element = <SelectMenuGroup {...GradeSummary.getSelectMenuGroupProps()} />
   if (!selectMenuRoot) {
-    selectMenuRoot = ReactDOM.createRoot(container)
+    selectMenuRoot = render(element, container)
+  } else {
+    rerender(selectMenuRoot, element)
   }
-  selectMenuRoot.render(<SelectMenuGroup {...GradeSummary.getSelectMenuGroupProps()} />)
 }
 
 function renderGradeSummaryTable() {
   const container = document.getElementById('grade-summary-react')
   if (!gradeSummaryRoot) {
-    gradeSummaryRoot = ReactDOM.createRoot(container)
+    gradeSummaryRoot = render(<GradeSummaryManager />, container)
+  } else {
+    rerender(gradeSummaryRoot, <GradeSummaryManager />)
   }
-  gradeSummaryRoot.render(<GradeSummaryManager />)
 }
 
 function handleSubmissionsCommentTray(assignmentId) {
@@ -790,28 +793,32 @@ function getSubmissionCommentsTrayProps(assignmentId) {
 
 function renderSubmissionCommentsTray() {
   const container = document.getElementById('GradeSummarySubmissionCommentsTray')
-  if (!submissionCommentsTrayRoot) {
-    submissionCommentsTrayRoot = ReactDOM.createRoot(container)
-  }
-  submissionCommentsTrayRoot.render(
+  const trayElement = (
     <SubmissionCommentsTray
       onDismiss={() => {
         const {submissionTrayAssignmentId} = useStore.getState()
         $(`#comments_thread_${submissionTrayAssignmentId}`).removeClass('comment_thread_show_print')
         $(`#submission_${submissionTrayAssignmentId}`).removeClass('selected-assignment')
       }}
-    />,
+    />
   )
+  if (!submissionCommentsTrayRoot) {
+    submissionCommentsTrayRoot = render(trayElement, container)
+  } else {
+    rerender(submissionCommentsTrayRoot, trayElement)
+  }
 }
 
 function renderClearBadgeCountsButton() {
   const container = document.getElementById('ClearBadgeCountsButton')
-  if (!clearBadgeCountsRoot) {
-    clearBadgeCountsRoot = ReactDOM.createRoot(container)
-  }
   const userId = ENV.student_id
   const courseId = ENV.course_id ?? ENV.context_asset_string.replace('course_', '')
-  clearBadgeCountsRoot.render(<ClearBadgeCountsButton userId={userId} courseId={courseId} />)
+  const badgeElement = <ClearBadgeCountsButton userId={userId} courseId={courseId} />
+  if (!clearBadgeCountsRoot) {
+    clearBadgeCountsRoot = render(badgeElement, container)
+  } else {
+    rerender(clearBadgeCountsRoot, badgeElement)
+  }
 }
 
 function addAssetProcessorToLegacyTable() {

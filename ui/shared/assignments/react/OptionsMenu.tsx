@@ -17,7 +17,7 @@
  */
 
 import {useMutation} from '@apollo/client'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {SET_WORKFLOW} from '@canvas/assignments/graphql/teacher/Mutations'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
@@ -26,7 +26,7 @@ import DownloadSubmissionsModal from '@canvas/download-submissions-modal'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
 import {assignLocation} from '@canvas/util/globalUtils'
-import {BREAKPOINTS, type Breakpoints} from '@canvas/with-breakpoints'
+import {BREAKPOINTS, type Breakpoints} from '@instructure/platform-with-breakpoints'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {
   IconCommonsLine,

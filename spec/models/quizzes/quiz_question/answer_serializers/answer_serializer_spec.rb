@@ -29,11 +29,11 @@ describe Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer do
                Class.new(Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer))
 
     serializer = nil
-    expect { serializer = ases.serializer_for(qq) }.to_not raise_error
+    expect { serializer = ases.serializer_for(qq) }.not_to raise_error
     expect(serializer.is_a?(ases::AnswerSerializer)).to be_truthy
   end
 
   it "has Error constant" do
-    expect { Quizzes::QuizQuestion::AnswerSerializers::Error.new("message") }.to_not raise_error
+    expect { Quizzes::QuizQuestion::AnswerSerializers::Error.new("message") }.not_to raise_error
   end
 end

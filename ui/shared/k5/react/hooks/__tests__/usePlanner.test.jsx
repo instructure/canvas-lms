@@ -24,15 +24,19 @@ if (typeof vi !== 'undefined') {
   vi.mock('@canvas/planner', () => ({
     initializePlanner: vi.fn(options => Promise.resolve(options)),
   }))
-  vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-    showFlashAlert: vi.fn(),
-    showFlashError: vi.fn(() => () => {}),
-  }))
+  vi.mock('@instructure/platform-alerts', async () => {
+    const actual = await vi.importActual('@instructure/platform-alerts')
+    return {
+      ...actual,
+      showFlashAlert: vi.fn(),
+      showFlashError: vi.fn(() => () => {}),
+    }
+  })
 }
 vi.mock('@canvas/planner', () => ({
   initializePlanner: vi.fn(options => Promise.resolve(options)),
 }))
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
+vi.mock('@instructure/platform-alerts', () => ({
   showFlashAlert: vi.fn(),
   showFlashError: vi.fn(() => () => {}),
 }))
@@ -42,7 +46,7 @@ import PropTypes from 'prop-types'
 import {render, waitFor} from '@testing-library/react'
 import usePlanner from '../usePlanner'
 import {initializePlanner} from '@canvas/planner'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const PLANNER_CONFIG_KEYS = [
   'getActiveApp',

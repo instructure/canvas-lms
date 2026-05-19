@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React, {Suspense} from 'react'
 import {render} from '@canvas/react'
 import NavigationView from './backbone/views/NavigationView'
-import ErrorBoundary from '@canvas/error-boundary'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import CourseColorSelector from './react/components/CourseColorSelector'
@@ -56,6 +56,7 @@ const CourseApps = React.lazy(() => import('./react/components/CourseApps'))
 const CourseNavigationSettings = React.lazy(
   () => import('./react/components/CourseNavigationSettings'),
 )
+const CanvasCourseCriteria = React.lazy(() => import('./react/components/CanvasCourseCriteria'))
 
 const Loading = () => <Spinner size="x-small" renderTitle={I18n.t('Loading')} />
 const ErrorMessage = () => (
@@ -65,7 +66,9 @@ const ErrorMessage = () => (
 )
 
 ready(() => {
-  const canEditContent = ENV.PERMISSIONS?.manage_course_content_edit !== false
+  const canEditContent = ENV.FEATURES?.course_navigation_and_feature_options_permissions
+    ? ENV.PERMISSIONS?.manage_course_details === true
+    : ENV.PERMISSIONS?.manage_course_content_edit !== false
 
   const blueprint = document.getElementById('blueprint_menu')
   if (blueprint) {
@@ -259,6 +262,30 @@ ready(() => {
         </ErrorBoundary>
       </Suspense>,
       navSettingsContainer,
+    )
+  }
+
+  const criteriaContainer = document.getElementById('tab-criteria-mount')
+  if (criteriaContainer) {
+    render(
+      <Suspense fallback={<Loading />}>
+        <ErrorBoundary errorComponent={<ErrorMessage />}>
+          <CanvasCourseCriteria />
+        </ErrorBoundary>
+      </Suspense>,
+      criteriaContainer,
+    )
+  }
+
+  const sidebarCriteriaContainer = document.getElementById('criteria-mount')
+  if (sidebarCriteriaContainer) {
+    render(
+      <Suspense fallback={<Loading />}>
+        <ErrorBoundary errorComponent={<ErrorMessage />}>
+          <CanvasCourseCriteria />
+        </ErrorBoundary>
+      </Suspense>,
+      sidebarCriteriaContainer,
     )
   }
 })

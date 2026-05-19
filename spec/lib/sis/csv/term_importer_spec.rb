@@ -119,7 +119,7 @@ describe SIS::CSV::TermImporter do
     )
 
     t1.reload
-    expect(t1).to_not be_deleted
+    expect(t1).not_to be_deleted
     expect(importer.errors.map(&:last).first).to include "Cannot delete a term with active courses"
 
     @course.destroy

@@ -17,11 +17,12 @@
  */
 
 import {useQuery} from '@apollo/client'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {AlertManagerContext} from '@instructure/platform-alerts'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import {usePathTransform, whenPendoReady} from '@canvas/pendo'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
 import {Mask} from '@instructure/ui-overlays'
@@ -523,9 +524,11 @@ const DiscussionTopicManager = props => {
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject={I18n.t('Discussion Topic initial query error')}
         errorCategory={I18n.t('Discussion Topic Post Error Page')}
-        errorMessage={discussionTopicQuery.error}
+        errorMessage={discussionTopicQuery.error?.message}
       />
     )
   }
@@ -538,7 +541,6 @@ const DiscussionTopicManager = props => {
         <DiscussionManagerUtilityContext.Provider value={discussionManagerUtilities}>
           <Responsive
             match="media"
-            // @ts-expect-error TS2769 (typescriptify)
             query={responsiveQuerySizes({mobile: true, desktop: true})}
             props={{
               mobile: {
@@ -716,7 +718,6 @@ const DiscussionTopicManager = props => {
 
 DiscussionTopicManager.propTypes = {
   discussionTopicId: PropTypes.string.isRequired,
-  breakpoints: breakpointsShape,
   navbarHeight: PropTypes.number,
 }
 

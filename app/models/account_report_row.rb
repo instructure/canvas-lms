@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AccountReportRow < ActiveRecord::Base
+class AccountReportRow < ApplicationRecord
   belongs_to :account_report, inverse_of: :account_report_rows
   belongs_to :account_report_runner, inverse_of: :account_report_rows
 end

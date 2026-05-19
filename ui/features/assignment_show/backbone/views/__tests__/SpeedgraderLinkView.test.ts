@@ -22,6 +22,7 @@ import {cleanup} from '@testing-library/react'
 import {isAccessible} from '@canvas/test-utils/assertions'
 
 describe('SpeedgraderLinkView', () => {
+  // @ts-expect-error TS7 migration
   let model: InstanceType<typeof Assignment>, container: HTMLDivElement
 
   beforeEach(() => {
@@ -35,6 +36,7 @@ describe('SpeedgraderLinkView', () => {
       document.documentElement.setAttribute('lang', 'en')
     }
 
+    // @ts-expect-error TS7 migration
     model = new Assignment({published: false})
     container = document.createElement('div')
     container.id = 'fixtures'
@@ -65,10 +67,8 @@ describe('SpeedgraderLinkView', () => {
   it('toggles visibility of speedgrader link on change', () => {
     const speedgraderLink = document.querySelector('#assignment-speedgrader-link')
     expect(speedgraderLink!.classList.contains('hidden')).toBe(true)
-    // @ts-expect-error - Backbone model .set() not in Assignment type declarations
     model.set('published', true)
     expect(speedgraderLink!.classList.contains('hidden')).toBe(false)
-    // @ts-expect-error - Backbone model .set() not in Assignment type declarations
     model.set('published', false)
     expect(speedgraderLink!.classList.contains('hidden')).toBe(true)
   })

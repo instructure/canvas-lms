@@ -20,6 +20,6 @@
 module UngradedDiscussionVisibility
   module Entities
     # When a discussion topic is visible to a (student) user
-    UngradedDiscussionVisibleToStudent = Struct.new(:course_id, :user_id, :discussion_topic_id, keyword_init: true)
+    UngradedDiscussionVisibleToStudent = Struct.new(:course_id, :user_id, :discussion_topic_id)
   end
 end

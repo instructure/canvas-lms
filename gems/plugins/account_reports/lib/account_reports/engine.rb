@@ -169,6 +169,15 @@ module AccountReports
               admins: {
                 description: "Get the Provisioning file for admins"
               },
+              institutional_tag_categories: {
+                description: "Get the Provisioning file for institutional tag categories"
+              },
+              institutional_tags: {
+                description: "Get the Provisioning file for institutional tags"
+              },
+              institutional_tag_associations: {
+                description: "Get the Provisioning file for institutional tag associations"
+              },
               created_by_sis: {
                 description: "Only include objects that were created by sis"
               },
@@ -240,6 +249,15 @@ module AccountReports
               },
               admins: {
                 description: "Get the SIS file for admins"
+              },
+              institutional_tag_categories: {
+                description: "Get the SIS file for institutional tag categories"
+              },
+              institutional_tags: {
+                description: "Get the SIS file for institutional tags"
+              },
+              institutional_tag_associations: {
+                description: "Get the SIS file for institutional tag associations"
               },
               created_by_sis: {
                 description: "Only include objects that were created by sis"

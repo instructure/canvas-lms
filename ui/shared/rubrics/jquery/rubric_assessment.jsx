@@ -18,7 +18,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import htmlEscape from '@instructure/html-escape'
 import {truncateText} from '@canvas/util/TextHelper'
 import round from '@canvas/round'
@@ -358,7 +358,7 @@ window.rubricAssessment = {
       rubricAssessment.currentAssociation = association
 
       const render = currentAssessment => {
-        ReactDOM.render(
+        legacyRender(
           <Rubric
             allowExtraCredit={ENV.outcome_extra_credit_enabled}
             onAssessmentChange={assessing ? setCurrentAssessment : null}
@@ -495,7 +495,7 @@ window.rubricAssessment = {
   populateNewRubricSummary(container, assessment, rubricAssociation, editData) {
     const el = container.get(0)
     if (ENV.nonScoringRubrics && ENV.rubric) {
-      ReactDOM.unmountComponentAtNode(el)
+      legacyUnmountComponentAtNode(el)
       if (assessment) {
         const filled = rubricAssessment.fillAssessment(
           ENV.rubric,
@@ -503,7 +503,7 @@ window.rubricAssessment = {
           ENV.RUBRIC_ASSESSMENT,
         )
 
-        ReactDOM.render(
+        legacyRender(
           <Rubric
             customRatings={ENV.outcome_proficiency ? ENV.outcome_proficiency.ratings : []}
             rubric={ENV.rubric}

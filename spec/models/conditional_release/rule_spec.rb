@@ -65,6 +65,34 @@ module ConditionalRelease
         expect(@rule.assignment_sets_for_score(91).length).to eq(3)
       end
 
+      it "returns only the top range's sets when overlapping ranges share a boundary at 100%" do
+        rule = create(:rule)
+        top = create(:scoring_range_with_assignments,
+                     rule:,
+                     lower_bound: 1.0,
+                     upper_bound: 1.0,
+                     assignment_set_count: 1)
+        create(:scoring_range_with_assignments,
+               rule:,
+               lower_bound: 0.0,
+               upper_bound: 1.0,
+               assignment_set_count: 2)
+        result = rule.assignment_sets_for_score(1.0)
+        expect(result.length).to eq(1)
+        expect(result.first.scoring_range).to eq(top)
+      end
+
+      it "returns [] when the top range at 100% has no assignment sets" do
+        rule = create(:rule)
+        create(:scoring_range, rule:, lower_bound: 1.0, upper_bound: 1.0)
+        create(:scoring_range_with_assignments,
+               rule:,
+               lower_bound: 0.0,
+               upper_bound: 1.0,
+               assignment_set_count: 2)
+        expect(rule.assignment_sets_for_score(1.0)).to eq([])
+      end
+
       it "must return [] if no assignments match" do
         expect(@rule.assignment_sets_for_score(10)).to eq([])
       end
@@ -72,6 +100,59 @@ module ConditionalRelease
       it "must return [] if no scoring ranges are defined" do
         rule = create(:rule)
         expect(rule.assignment_sets_for_score(10)).to eq([])
+      end
+    end
+
+    describe "#top_matching_range" do
+      before :once do
+        @rule = create(:rule)
+      end
+
+      it "returns the range with the highest lower_bound when ranges overlap" do
+        high = create(:scoring_range, rule: @rule, lower_bound: 90, upper_bound: nil)
+        create(:scoring_range, rule: @rule, lower_bound: 80, upper_bound: 95)
+        expect(@rule.top_matching_range(91)).to eq(high)
+      end
+
+      it "returns the single matching range when only one range matches" do
+        create(:scoring_range, rule: @rule, lower_bound: 90, upper_bound: nil)
+        match = create(:scoring_range, rule: @rule, lower_bound: 70, upper_bound: 90)
+        expect(@rule.top_matching_range(75)).to eq(match)
+      end
+
+      it "returns nil when no range matches the score" do
+        create(:scoring_range, rule: @rule, lower_bound: 80, upper_bound: 95)
+        expect(@rule.top_matching_range(50)).to be_nil
+      end
+
+      it "returns nil when the rule has no scoring ranges" do
+        expect(@rule.top_matching_range(75)).to be_nil
+      end
+
+      it "breaks ties by lowest position when lower_bounds are equal" do
+        first = create(:scoring_range, rule: @rule, lower_bound: 70, upper_bound: 90)
+        create(:scoring_range, rule: @rule, lower_bound: 70, upper_bound: 95)
+        expect(@rule.top_matching_range(75)).to eq(first)
+      end
+
+      it "prefers a range with a concrete lower_bound over one with nil lower_bound" do
+        create(:scoring_range, rule: @rule, lower_bound: nil, upper_bound: 100)
+        bounded = create(:scoring_range, rule: @rule, lower_bound: 80, upper_bound: 100)
+        expect(@rule.top_matching_range(85)).to eq(bounded)
+      end
+
+      it "returns the same result with preloaded: true as with a DB query" do
+        high = create(:scoring_range, rule: @rule, lower_bound: 90, upper_bound: nil)
+        create(:scoring_range, rule: @rule, lower_bound: 80, upper_bound: 95)
+        @rule.scoring_ranges.load
+        expect(@rule.top_matching_range(91, preloaded: true)).to eq(high)
+        expect(@rule.top_matching_range(91, preloaded: false)).to eq(high)
+      end
+
+      it "auto-assigns the top range when ranges share a boundary at 100%" do
+        top = create(:scoring_range, rule: @rule, lower_bound: 1.0, upper_bound: 1.0)
+        create(:scoring_range, rule: @rule, lower_bound: 0.0, upper_bound: 1.0)
+        expect(@rule.top_matching_range(1.0)).to eq(top)
       end
     end
 

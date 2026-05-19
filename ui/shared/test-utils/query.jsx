@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 
 export function MockedQueryProvider({children}) {

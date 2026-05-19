@@ -24,7 +24,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {ActiveText} from './utils'
 import groupsQuery from '../queries/groupsQuery'
 import {useQuery} from '@tanstack/react-query'
-import {sessionStoragePersister} from '@canvas/query'
+import {sessionStoragePersister} from '@instructure/platform-query'
 
 const I18n = createI18nScope('CoursesTray')
 
@@ -32,7 +32,7 @@ export default function CoursesList() {
   const {data, isLoading, isSuccess} = useQuery({
     queryKey: ['groups', 'self', 'can_access'],
     queryFn: groupsQuery,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
   })
 
   return (

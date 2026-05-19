@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AlertManager from '@canvas/alerts/react/AlertManager'
+import {AlertManager} from '@instructure/platform-alerts'
 import {ApolloProvider, createClient, createPersistentCache} from '@canvas/apollo-v3'
 import CanvasInbox from './containers/CanvasInbox'
-import ErrorBoundary from '@canvas/error-boundary'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import React, {useEffect, useState} from 'react'
 
 export const CanvasInboxApp = () => {
@@ -52,7 +53,12 @@ export const CanvasInboxApp = () => {
     <ApolloProvider client={client}>
       <ErrorBoundary
         errorComponent={
-          <GenericErrorPage imageUrl={errorShipUrl} errorCategory="Canvas Inbox Error Page" />
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            onReportError={reportError}
+            translations={canvasErrorPageTranslations}
+            errorCategory="Canvas Inbox Error Page"
+          />
         }
       >
         <AlertManager>

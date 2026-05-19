@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Canvadoc < ActiveRecord::Base
+class Canvadoc < ApplicationRecord
   class UploadTimeout < StandardError; end
 
   include Canvadocs::Session

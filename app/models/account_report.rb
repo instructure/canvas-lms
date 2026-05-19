@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AccountReport < ActiveRecord::Base
+class AccountReport < ApplicationRecord
   include Workflow
   include LocaleSelection
   include CaptureJobIds
@@ -159,7 +159,7 @@ class AccountReport < ActiveRecord::Base
       AccountReport.from("unnest('{#{available_reports.keys.join(",")}}'::text[]) report_types (name),
                 LATERAL (#{scope.to_sql}) account_reports ")
                    .order("report_types.name")
-                   .preload(:attachment)
+                   .preload(attachment: :last_attachment_upload_status)
                    .index_by(&:report_type)
     end
   end
@@ -170,6 +170,7 @@ class AccountReport < ActiveRecord::Base
       AccountReport.from("unnest('{#{available_reports.keys.join(",")}}'::text[]) report_types (name),
                 LATERAL (#{scope.to_sql}) account_reports ")
                    .order("report_types.name")
+                   .preload(attachment: :last_attachment_upload_status)
                    .index_by(&:report_type)
     end
   end

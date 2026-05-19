@@ -19,7 +19,7 @@
 import {useContext} from 'react'
 import {CREATE_DISCUSSION_ENTRY} from '../../graphql/Mutations'
 import {useMutation} from '@apollo/client'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {captureException} from '@sentry/react'
 

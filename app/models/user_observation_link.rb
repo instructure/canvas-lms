@@ -22,7 +22,7 @@
 # on the same shard as the observee, but a duplicate record is also created on the
 # other shard
 
-class UserObservationLink < ActiveRecord::Base
+class UserObservationLink < ApplicationRecord
   self.table_name = "user_observers"
 
   belongs_to :student, class_name: "User", inverse_of: :as_student_observation_links, foreign_key: :user_id

@@ -24,6 +24,7 @@ import {EnvAiExperiences} from './EnvAiExperiences'
 import {EnvAlerts} from './EnvAlerts'
 import {EnvAms} from './EnvAms'
 import {EnvAssignments} from './EnvAssignments'
+import {EnvAthena} from './EnvAthena'
 import {EnvChangePassword} from './EnvChangePassword'
 import {EnvCommon} from './EnvCommon'
 import {EnvContextModules} from './EnvContextModules'
@@ -49,6 +50,8 @@ import {EnvWikiPages} from './EnvWikiPages'
 import {EnvAuthentication} from './EnvAuthentication'
 import {EnvWidgetDashboard} from './EnvWidgetDashboard'
 import {EnvUsageMetrics} from './EnvUsageMetrics'
+import {EnvOak} from './EnvOak'
+import {EnvPageViews} from './EnvPageViews'
 
 /**
  * Top level ENV variable.
@@ -71,6 +74,7 @@ export type GlobalEnv =
         EnvAms &
         EnvAccessibilityChecker &
         EnvAssignments &
+        EnvAthena &
         EnvCourse &
         EnvCourseLinkValidator &
         EnvCoursePaces &
@@ -96,5 +100,7 @@ export type GlobalEnv =
         EnvWidgetDashboard &
         EnvNewQuizzes &
         EnvNotices &
-        EnvUsageMetrics
+        EnvUsageMetrics &
+        EnvOak &
+        EnvPageViews
     >

@@ -273,10 +273,10 @@ describe "new groups" do
       @group_category.first.update_attribute(:group_limit, 2)
 
       2.times do |n|
-        add_user_to_group(@students[n], @testgroup.first, false)
+        add_user_to_group(@students[n], @testgroup.first, is_leader: false)
       end
 
-      add_user_to_group(@students.last, @testgroup[1], false)
+      add_user_to_group(@students.last, @testgroup[1], is_leader: false)
       get "/courses/#{@course.id}/groups"
 
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full")).to be_displayed
@@ -312,10 +312,10 @@ describe "new groups" do
       @group_category.first.update_attribute(:group_limit, 2)
 
       2.times do |n|
-        add_user_to_group(@students[n], @testgroup.first, false)
+        add_user_to_group(@students[n], @testgroup.first, is_leader: false)
       end
 
-      add_user_to_group(@students.last, @testgroup[1], false)
+      add_user_to_group(@students.last, @testgroup[1], is_leader: false)
       get "/courses/#{@course.id}/groups"
 
       expect(f(".unassigned-users-heading")).to include_text("Unassigned Students (1)")
@@ -339,9 +339,9 @@ describe "new groups" do
 
     it "moves group leader", priority: "1" do
       group_test_setup(4, 1, 2)
-      add_user_to_group(@students[0], @testgroup.first, true)
+      add_user_to_group(@students[0], @testgroup.first, is_leader: true)
       2.times do |n|
-        add_user_to_group(@students[n + 1], @testgroup.first, false)
+        add_user_to_group(@students[n + 1], @testgroup.first, is_leader: false)
       end
       get "/courses/#{@course.id}/groups"
 
@@ -363,11 +363,11 @@ describe "new groups" do
 
     it "removes group leader", priority: "1" do
       group_test_setup(4, 1, 2)
-      add_user_to_group(@students[0], @testgroup.first, true)
+      add_user_to_group(@students[0], @testgroup.first, is_leader: true)
       2.times do |n|
-        add_user_to_group(@students[n + 1], @testgroup.first, false)
+        add_user_to_group(@students[n + 1], @testgroup.first, is_leader: false)
       end
-      add_user_to_group(@students[3], @testgroup.last, false)
+      add_user_to_group(@students[3], @testgroup.last, is_leader: false)
 
       get "/courses/#{@course.id}/groups"
 
@@ -443,8 +443,8 @@ describe "new groups" do
 
     it "moves student using drag and drop", priority: "1" do
       group_test_setup(2, 1, 2)
-      add_user_to_group(@students[0], @testgroup.first, false)
-      add_user_to_group(@students[1], @testgroup.last, false)
+      add_user_to_group(@students[0], @testgroup.first, is_leader: false)
+      add_user_to_group(@students[1], @testgroup.last, is_leader: false)
 
       drag_item1 = '.group-user-name:contains("Test Student 2")'
       drop_target1 = '.group:contains("Test Group 1")'
@@ -470,7 +470,7 @@ describe "new groups" do
 
     it "removes student using drag and drop", priority: "1" do
       group_test_setup(1, 1, 1)
-      add_user_to_group(@students[0], @testgroup.first, false)
+      add_user_to_group(@students[0], @testgroup.first, is_leader: false)
 
       drag_item1 = '.group-user-name:contains("Test Student 1")'
       drop_target1 = ".ui-cnvs-scrollable"
@@ -495,7 +495,7 @@ describe "new groups" do
       group_test_setup(5, 1, 1)
       @group_category.first.update_attribute(:group_limit, 5)
       5.times do |n|
-        add_user_to_group(@students[n], @testgroup.first, false)
+        add_user_to_group(@students[n], @testgroup.first, is_leader: false)
       end
 
       drag_item1 = '.group-user-name:contains("Test Student 3")'
@@ -522,7 +522,7 @@ describe "new groups" do
     it "shows the users within a group one per line in 320px" do
       group_test_setup(3, 1, 1)
       3.times do |n|
-        add_user_to_group(@students[n], @testgroup.first, false)
+        add_user_to_group(@students[n], @testgroup.first, is_leader: false)
       end
       driver.manage.window.resize_to(320, 900)
       get "/courses/#{@course.id}/groups"
@@ -538,10 +538,10 @@ describe "new groups" do
     it "moves leader via drag and drop", priority: "1" do
       group_test_setup(5, 1, 2)
       2.times do |n|
-        add_user_to_group(@students[n], @testgroup.first, false)
-        add_user_to_group(@students[n + 2], @testgroup.last, false)
+        add_user_to_group(@students[n], @testgroup.first, is_leader: false)
+        add_user_to_group(@students[n + 2], @testgroup.last, is_leader: false)
       end
-      add_user_to_group(@students[4], @testgroup.last, true)
+      add_user_to_group(@students[4], @testgroup.last, is_leader: true)
 
       get "/courses/#{@course.id}/groups"
 
@@ -723,7 +723,7 @@ describe "new groups" do
             drag_and_drop_element(f(".unassigned-students .group-user"), f(".toggle-group"))
             wait_for_ajaximations
 
-            set_cloned_groupset_name(@cloned_group_set_name, true)
+            set_cloned_groupset_name(@cloned_group_set_name, page_reload: true)
 
             # Verifies student has not changed groups in group set
             expect(f(".unassigned-users-heading")).to include_text("Unassigned Students (1)")
@@ -750,7 +750,7 @@ describe "new groups" do
             drag_and_drop_element(ff(".group-users .group-user").first, ff(".toggle-group .group-name").last)
             wait_for_ajaximations
 
-            set_cloned_groupset_name(@cloned_group_set_name, true)
+            set_cloned_groupset_name(@cloned_group_set_name, page_reload: true)
 
             toggle_group_collapse_arrow
 
@@ -778,7 +778,7 @@ describe "new groups" do
             drag_and_drop_element(ff(".group-users .group-user").first, ff(".toggle-group .group-name").last)
             wait_for_ajaximations
 
-            set_cloned_groupset_name(@cloned_group_set_name, true)
+            set_cloned_groupset_name(@cloned_group_set_name, page_reload: true)
 
             toggle_group_collapse_arrow
 
@@ -804,7 +804,7 @@ describe "new groups" do
             drag_and_drop_element(ff(".group-users .group-user").first, f(".ui-cnvs-scrollable"))
             wait_for_ajaximations
 
-            set_cloned_groupset_name(@cloned_group_set_name, true)
+            set_cloned_groupset_name(@cloned_group_set_name, page_reload: true)
 
             toggle_group_collapse_arrow
 

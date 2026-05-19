@@ -347,7 +347,6 @@ export const AssignedTo = ({
 
   return (
     <View as="span" data-testid="assign-to-select-span">
-      {/* @ts-expect-error TS2769 (typescriptify) */}
       <Select
         renderLabel={I18n.t('Assign To')}
         assistiveText={I18n.t(
@@ -363,7 +362,9 @@ export const AssignedTo = ({
         onInputChange={handleInputChange}
         onRequestShowOptions={handleShowOptions}
         onRequestHideOptions={handleHideOptions}
+        // @ts-expect-error TS7 migration
         onRequestHighlightOption={handleHighlightOption}
+        // @ts-expect-error TS7 migration
         onRequestSelectOption={handleSelectOption}
         renderBeforeInput={selectedOptionAssetCode.length > 0 ? renderTags() : null}
         messages={errorMessage}

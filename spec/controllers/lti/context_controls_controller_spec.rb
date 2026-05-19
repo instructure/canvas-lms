@@ -34,7 +34,6 @@ describe Lti::ContextControlsController, type: :request do
       created_by: admin,
       registration_params:,
       configuration_params:,
-      binding_params: { workflow_state: "on" }
     }
   end
 
@@ -73,6 +72,36 @@ describe Lti::ContextControlsController, type: :request do
       Lti::ContextControl.create!(account: context, registration:, deployment:)
     else
       raise ArgumentError, "Context must be a Course or Account"
+    end
+  end
+
+  # Shared setup for cross-shard site admin template tests.
+  # Verifies that helper methods (control, root_account_deployment) route
+  # through app_id when lti_registrations_templates is ON, not registration_id.
+  shared_context "cross-shard SA template" do
+    specs_require_sharding
+
+    let_once(:xshard_account) { @shard2.activate { account_model } }
+    let_once(:xshard_admin) { @shard2.activate { account_admin_user(account: xshard_account) } }
+    let_once(:sa_registration) do
+      Account.site_admin.shard.activate { lti_registration_with_tool(account: Account.site_admin) }
+    end
+    let_once(:local_copy) do
+      @shard2.activate do
+        Lti::InstallTemplateRegistrationService.call(
+          account: xshard_account, user: xshard_admin, template: sa_registration
+        )[:local_copy]
+      end
+    end
+    let_once(:local_deployment) { local_copy.deployments.first }
+    let_once(:primary_control) { local_deployment.primary_context_control }
+
+    before do
+      @shard2.activate do
+        xshard_account.enable_feature!(:lti_registrations_next)
+        xshard_account.enable_feature!(:lti_registrations_templates)
+      end
+      user_session(xshard_admin)
     end
   end
 
@@ -233,9 +262,19 @@ describe Lti::ContextControlsController, type: :request do
         )
       end
 
-      it "sorts deployments by account hierarchy" do
+      it "sorts deployments: root account first, then subaccounts, then courses" do
         subject
-        expect(response_json.pluck("id")).to eq([deployment.id, course_deployment.id, subaccount_deployment.id])
+        expect(response_json.pluck("id")).to eq([deployment.id, subaccount_deployment.id, course_deployment.id])
+      end
+
+      it "sorts by context type, not by deployment id" do
+        # course_deployment has a lower id than subaccount_deployment
+        # (created first in the before block), so without explicit sorting
+        # it would appear before subaccount_deployment in the response
+        expect(course_deployment.id).to be < subaccount_deployment.id
+        subject
+        ids = response_json.pluck("id")
+        expect(ids.index(subaccount_deployment.id)).to be < ids.index(course_deployment.id)
       end
 
       context "when deployment has many controls" do
@@ -378,29 +417,68 @@ describe Lti::ContextControlsController, type: :request do
           expect(last_course_index).to be < first_account_index
         end
       end
+
+      context "when paginating across deployment types" do
+        let(:params) { { per_page: 3 } }
+
+        before do
+          # Add 2 extra controls to subaccount_deployment (3 total).
+          # With per_page=3, the page boundary will be in between
+          # the subaccount deployments, putting the course deployment on page 2.
+          2.times { control_for(subaccount_deployment, account_model(parent_account: subaccount)) }
+        end
+
+        it "returns root account, then subaccount, then course across page boundaries" do
+          # Make sure the course's deployment ID comes first, otherwise this test will still
+          # pass but not necessarily because the sorting logic is working.
+          expect(course_deployment.id).to be < subaccount_deployment.id
+
+          # Total is 1 root account + 3 subaccounts + 1 course = 5 deployments
+          # Page 1 has [ root_account[control], subaccount[control1, control2] ]
+          # Page 2 has [ subaccount[control3], course[control] ]
+          subject
+          expect(response_json.pluck("id")).to eq([deployment.id, subaccount_deployment.id])
+
+          links = Api.parse_pagination_links(response.headers["Link"])
+          next_link = links.detect { |link| link[:rel] == "next" }
+
+          get next_link[:uri].to_s
+          page2_json = response.parsed_body
+          expect(page2_json.pluck("id")).to eq([subaccount_deployment.id, course_deployment.id])
+        end
+      end
     end
 
-    context "with cross-shard registration" do
+    context "with site admin template registration" do
       specs_require_sharding
 
-      let(:registration) { @shard2.activate { lti_registration_with_tool(account: xshard_account) } }
-      let(:xshard_account) { @shard2.activate { account_model } }
-      let(:local_deployment) { deployment_for(account) }
-
-      before { local_deployment }
-
-      it "returns deployments and controls from current shard" do
-        subject
-        expect(response).to be_successful
-        expect(response_json.length).to eq(1)
-        expect(response_json[0]["id"]).to eq(local_deployment.id)
-        expect(response_json[0]["context_controls"].length).to eq(1)
+      subject do
+        get "/api/v1/accounts/#{xshard_account.id}/lti_registrations/#{local_copy.id}/controls", params:
       end
 
-      context "when registration's account has flag off" do
-        before { xshard_account.disable_feature!(:lti_registrations_next) }
+      let_once(:xshard_account) { @shard2.activate { account_model } }
+      let_once(:local_deployment) { local_copy.deployments.first }
+      let_once(:xshard_admin) { @shard2.activate { account_admin_user(account: xshard_account) } }
+      let_once(:sa_registration) { Account.site_admin.shard.activate { lti_registration_with_tool(account: Account.site_admin) } }
+      let_once(:local_copy) do
+        @shard2.activate do
+          Lti::InstallTemplateRegistrationService.call(
+            account: xshard_account, user: xshard_admin, template: sa_registration
+          )[:local_copy]
+        end
+      end
 
-        it "returns deployment and controls from current shard" do
+      before do
+        @shard2.activate do
+          xshard_account.enable_feature!(:lti_registrations_next)
+          xshard_account.enable_feature!(:lti_registrations_templates)
+        end
+        local_copy
+        user_session(xshard_admin)
+      end
+
+      it "returns deployments and controls from current shard" do
+        @shard2.activate do
           subject
           expect(response).to be_successful
           expect(response_json.length).to eq(1)
@@ -411,27 +489,31 @@ describe Lti::ContextControlsController, type: :request do
     end
 
     context "with inherited registration shared across multiple root accounts" do
-      subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{site_admin_registration.id}/controls", params: }
+      # Query via local_copy — with flag ON, routes through app_id = local_copy.id
+      subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{local_copy.id}/controls", params: }
 
-      let(:site_admin) { Account.site_admin }
-      let(:site_admin_user) { account_admin_user(account: site_admin) }
-      let(:site_admin_registration) do
-        Lti::CreateRegistrationService.call(
-          account: site_admin,
-          created_by: site_admin_user,
-          registration_params:,
-          configuration_params:
-        )
-      end
+      let(:site_admin_registration) { lti_registration_with_tool(account: Account.site_admin) }
       let(:other_root_account) { account_model }
-      let(:account_deployment) { site_admin_registration.new_external_tool(account) }
-      let(:other_deployment) { site_admin_registration.new_external_tool(other_root_account) }
+      let(:local_copy) do
+        Lti::InstallTemplateRegistrationService.call(
+          account:, user: admin, template: site_admin_registration
+        )[:local_copy]
+      end
+      let(:other_local_copy) do
+        other_admin = account_admin_user(account: other_root_account)
+        other_root_account.enable_feature!(:lti_registrations_next)
+        Lti::InstallTemplateRegistrationService.call(
+          account: other_root_account, user: other_admin, template: site_admin_registration
+        )[:local_copy]
+      end
+      let(:account_deployment) { local_copy.app_deployments.first }
+      let(:other_deployment) { other_local_copy.app_deployments.first }
       let(:account_control) { account_deployment.primary_context_control }
       let(:other_control) { other_deployment.primary_context_control }
 
       before do
-        site_admin.enable_feature!(:lti_registrations_next)
-        other_root_account.enable_feature!(:lti_registrations_next)
+        local_copy
+        other_local_copy
         account_control
         other_control
       end
@@ -442,7 +524,8 @@ describe Lti::ContextControlsController, type: :request do
 
         # Should only see controls from current account, not other_root_account
         all_control_ids = response_json.flat_map { |d| d["context_controls"].pluck("id") }
-        expect(all_control_ids).to eql([account_control.id])
+        expect(all_control_ids).to include(account_control.id)
+        expect(all_control_ids).not_to include(other_control.id)
       end
     end
 
@@ -550,6 +633,35 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 404" do
         subject
+        expect(response).to be_not_found
+      end
+    end
+
+    context "with site admin template registration (cross-shard app_id routing)" do
+      # The control's registration_id = sa_registration.id (cross-shard FK).
+      # The control's app_id = local_copy.id.
+      # We pass local_copy.id in the URL — the fixed `control` helper must
+      # use for_registration (app_id path) to find the control, not registration_id.
+      subject do
+        @shard2.activate do
+          get "/api/v1/accounts/#{xshard_account.id}/lti_registrations/#{local_copy.id}/controls/#{primary_control.id}"
+        end
+      end
+
+      include_context "cross-shard SA template"
+
+      it "finds the control via app_id and returns 200" do
+        subject
+        expect(response).to be_successful
+        # Compare inside shard2 so .id returns the local (not global) ID
+        @shard2.activate { expect(response.parsed_body["id"]).to eq(primary_control.id) }
+      end
+
+      it "does not find the control when the SA registration ID is passed instead" do
+        @shard2.activate do
+          get "/api/v1/accounts/#{xshard_account.id}/lti_registrations/#{sa_registration.id}/controls/#{primary_control.id}"
+        end
+        # SA reg is on a different shard — find raises RecordNotFound
         expect(response).to be_not_found
       end
     end
@@ -816,6 +928,33 @@ describe Lti::ContextControlsController, type: :request do
         expect(response).to be_not_found
       end
     end
+
+    context "with site admin template registration (cross-shard app_id routing)" do
+      # Without a deployment_id param, create relies on root_account_deployment to
+      # find the deployment. The deployment has lti_registration_id=sa_registration.id
+      # and app_id=local_copy.id. The fixed root_account_deployment must use
+      # for_lti_registration (app_id path) — old code would return nil and 422.
+      subject do
+        @shard2.activate do
+          post "/api/v1/accounts/#{xshard_account.id}/lti_registrations/#{local_copy.id}/controls",
+               params: { course_id: course.id },
+               as: :json
+        end
+      end
+
+      include_context "cross-shard SA template"
+
+      let(:course) { @shard2.activate { course_model(account: xshard_account) } }
+
+      it "finds the deployment via app_id and creates the control" do
+        course
+        subject
+        expect(response).to have_http_status(:created)
+        created = response.parsed_body
+        # Compare inside shard2 so .id returns the local (not global) ID
+        @shard2.activate { expect(created["deployment_id"]).to eq(local_deployment.id) }
+      end
+    end
   end
 
   describe "POST #create_many" do
@@ -902,6 +1041,73 @@ describe Lti::ContextControlsController, type: :request do
           .to eql(subaccount_control.reload.attributes.with_indifferent_access.slice(*Lti::ContextControl::TRACKED_ATTRIBUTES))
         expect(history_entry.new_context_controls[course_control.id.to_s])
           .to eql(course_control.reload.attributes.with_indifferent_access.slice(*Lti::ContextControl::TRACKED_ATTRIBUTES))
+      end
+    end
+
+    context "when registration belongs to the request account (no template)" do
+      let(:subaccount) { account_model(parent_account: account) }
+      let(:params) { [{ account_id: subaccount.id, available: true }] }
+
+      it "sets app_id to the registration's own id on created controls" do
+        subject
+        expect(response).to be_successful
+        control = Lti::ContextControl.find_by(account_id: subaccount.id, registration:)
+        expect(control.app_id).to eq(registration.id)
+      end
+    end
+
+    context "with site admin template registration (cross-shard app_id routing)" do
+      subject do
+        post "/api/v1/accounts/#{xshard_account.id}/lti_registrations/#{sa_registration.id}/controls/bulk",
+             params:,
+             as: :json
+      end
+
+      include_context "cross-shard SA template"
+
+      let(:subaccount) { @shard2.activate { account_model(parent_account: xshard_account) } }
+      let(:subsubaccount) { @shard2.activate { account_model(parent_account: subaccount) } }
+      let(:params) do
+        [{ account_id: subaccount.id, available: true, deployment_id: local_deployment.id }]
+      end
+
+      it "sets app_id to local_copy.id on created_controls" do
+        @shard2.activate do
+          subject
+          expect(response).to have_http_status(:created)
+          control = Lti::ContextControl.find_by(account_id: subaccount.id, deployment: local_deployment)
+          expect(control.app_id).to eq(local_copy.id)
+        end
+      end
+
+      context "with flag off" do
+        before { @shard2.activate { xshard_account.disable_feature!(:lti_registrations_templates) } }
+
+        it "sets app_id to local_copy.id on created controls" do
+          @shard2.activate do
+            subject
+            expect(response).to have_http_status(:created)
+            control = Lti::ContextControl.find_by(account_id: subaccount.id)
+            expect(control.app_id).to eq(local_copy.id)
+          end
+        end
+      end
+
+      context "with anchor controls needed" do
+        # subsubaccount is 2 levels below xshard_account (deployment level),
+        # so an anchor at subaccount level will be created
+        let(:params) { [{ account_id: subsubaccount.id, available: true, deployment_id: local_deployment.id }] }
+
+        it "sets app_id on both the control and its anchor" do
+          @shard2.activate do
+            subject
+            expect(response).to have_http_status(:created)
+            control = Lti::ContextControl.find_by(account_id: subsubaccount.id, deployment: local_deployment)
+            anchor  = Lti::ContextControl.find_by(account_id: subaccount.id, deployment: local_deployment)
+            expect(control.app_id).to eq(local_copy.id)
+            expect(anchor.app_id).to eq(local_copy.id)
+          end
+        end
       end
     end
 
@@ -1390,6 +1596,23 @@ describe Lti::ContextControlsController, type: :request do
         expect(response).to be_not_found
       end
     end
+
+    context "with site admin template registration (cross-shard app_id routing)" do
+      subject do
+        @shard2.activate do
+          put "/api/v1/accounts/#{xshard_account.id}/lti_registrations/#{local_copy.id}/controls/#{primary_control.id}",
+              params: { available: false }
+        end
+      end
+
+      include_context "cross-shard SA template"
+
+      it "finds the control via app_id and updates it" do
+        subject
+        expect(response).to be_successful
+        expect(primary_control.reload.available).to be false
+      end
+    end
   end
 
   describe "DELETE #delete" do
@@ -1462,6 +1685,42 @@ describe Lti::ContextControlsController, type: :request do
       it "returns a 404 if the lti_registrations_next feature flag is disabled" do
         subject
         expect(response).to be_not_found
+      end
+    end
+
+    context "with site admin template registration (cross-shard app_id routing)" do
+      # The course_control has registration_id=sa_registration.id, app_id=local_copy.id.
+      # The fixed `control` helper uses for_registration (app_id path) to find it.
+      # Old code used find_by(registration_id: local_copy.id) → 404.
+      subject do
+        @shard2.activate do
+          delete "/api/v1/accounts/#{xshard_account.id}/lti_registrations/#{local_copy.id}/controls/#{course_control.id}"
+        end
+      end
+
+      include_context "cross-shard SA template"
+
+      # We need a non-primary control to delete (primary deletion is blocked).
+      # Create a course-level control whose app_id=local_copy.id, registration_id=sa_registration.id.
+      let(:course) { @shard2.activate { course_model(account: xshard_account) } }
+      let(:course_control) do
+        @shard2.activate do
+          Lti::ContextControl.create!(
+            course:,
+            deployment: local_deployment,
+            registration: sa_registration,
+            root_account: xshard_account,
+            updated_by: xshard_admin,
+            created_by: xshard_admin
+          )
+        end
+      end
+
+      it "finds the control via app_id and deletes it" do
+        course_control
+        subject
+        expect(response).to be_successful
+        expect(course_control.reload).to be_deleted
       end
     end
   end

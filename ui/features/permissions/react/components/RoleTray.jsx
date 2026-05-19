@@ -33,7 +33,7 @@ import {IconArrowStartSolid, IconEditLine, IconTrashLine, IconXSolid} from '@ins
 import {TextInput} from '@instructure/ui-text-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Tray} from '@instructure/ui-tray'
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {getLiveRegion} from '@instructure/platform-instui-bindings'
 
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import actions from '../actions'

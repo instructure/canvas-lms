@@ -17,7 +17,9 @@
  */
 
 import * as DeepLinking from '@canvas/deep-linking/DeepLinking'
-import * as Alerts from '@canvas/alerts/react/FlashAlert'
+import * as Alerts from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts')
 import {
   handleAssignmentIndexDeepLinking,
   alertUserModuleCreatedKey,

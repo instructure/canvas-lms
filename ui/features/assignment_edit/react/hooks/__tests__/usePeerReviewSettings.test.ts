@@ -428,7 +428,7 @@ describe('usePeerReviewSettings', () => {
         result.current.validateReviewsRequired(mockEvent)
       })
 
-      expect(result.current.errorMessageReviewsRequired).toBe('Number of peer reviews is required.')
+      expect(result.current.errorMessageReviewsRequired).toBe('Please enter a valid number.')
     })
 
     it('validates zero as invalid input', () => {
@@ -451,24 +451,18 @@ describe('usePeerReviewSettings', () => {
       expect(result.current.errorMessageReviewsRequired).toBe('Number of peer reviews is required.')
     })
 
-    it('validates browser-rejected invalid input', () => {
+    it('validates empty input as required', () => {
       const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
         result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '')
       })
 
-      const mockEvent = {
-        target: {
-          validity: {valid: false},
-        },
-      } as React.FocusEvent<HTMLInputElement>
-
       act(() => {
-        result.current.validateReviewsRequired(mockEvent)
+        result.current.validateReviewsRequired({} as React.FocusEvent<HTMLInputElement>)
       })
 
-      expect(result.current.errorMessageReviewsRequired).toBe('Please enter a valid number.')
+      expect(result.current.errorMessageReviewsRequired).toBe('Number of peer reviews is required.')
     })
 
     it('returns undefined when field is valid', () => {
@@ -602,21 +596,15 @@ describe('usePeerReviewSettings', () => {
       expect(result.current.errorMessagePointsPerReview).toBeUndefined()
     })
 
-    it('validates browser-rejected invalid input', () => {
+    it('validates non-numeric input', () => {
       const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
-        result.current.handlePointsPerReviewChange({} as React.ChangeEvent<HTMLInputElement>, '')
+        result.current.handlePointsPerReviewChange({} as React.ChangeEvent<HTMLInputElement>, 'abc')
       })
 
-      const mockEvent = {
-        target: {
-          validity: {valid: false},
-        },
-      } as React.FocusEvent<HTMLInputElement>
-
       act(() => {
-        result.current.validatePointsPerReview(mockEvent)
+        result.current.validatePointsPerReview({} as React.FocusEvent<HTMLInputElement>)
       })
 
       expect(result.current.errorMessagePointsPerReview).toBe('Please enter a valid number.')
@@ -717,7 +705,7 @@ describe('usePeerReviewSettings', () => {
       expect(result.current.totalPoints).toBe('0')
     })
 
-    it('returns zero when there are validation errors', () => {
+    it('returns zero when a validation error is set', () => {
       const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
 
       act(() => {
@@ -733,6 +721,90 @@ describe('usePeerReviewSettings', () => {
       })
 
       expect(result.current.errorMessageReviewsRequired).toBeDefined()
+      expect(result.current.totalPoints).toBe('0')
+    })
+
+    it('returns zero when reviews required exceeds maximum', () => {
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
+
+      act(() => {
+        result.current.handleReviewsRequiredChange(
+          {} as React.ChangeEvent<HTMLInputElement>,
+          String(MAX_NUM_PEER_REVIEWS + 1),
+        )
+        result.current.handlePointsPerReviewChange({} as React.ChangeEvent<HTMLInputElement>, '5')
+      })
+
+      act(() => {
+        result.current.validateReviewsRequired({} as React.FocusEvent<HTMLInputElement>)
+      })
+
+      expect(result.current.errorMessageReviewsRequired).toBeDefined()
+      expect(result.current.totalPoints).toBe('0')
+    })
+
+    it('recalculates total when error is cleared after blur', () => {
+      // Once the error is resolved, total should reflect the valid inputs
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
+
+      act(() => {
+        result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '-1')
+      })
+
+      act(() => {
+        result.current.validateReviewsRequired({} as React.FocusEvent<HTMLInputElement>)
+      })
+
+      expect(result.current.errorMessageReviewsRequired).toBeDefined()
+      expect(result.current.totalPoints).toBe('0')
+
+      act(() => {
+        result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '3')
+      })
+
+      act(() => {
+        result.current.handlePointsPerReviewChange({} as React.ChangeEvent<HTMLInputElement>, '5')
+      })
+
+      act(() => {
+        result.current.validateReviewsRequired({} as React.FocusEvent<HTMLInputElement>)
+      })
+
+      expect(result.current.errorMessageReviewsRequired).toBeUndefined()
+      expect(result.current.totalPoints).toBe('15')
+    })
+
+    it('returns zero when a points per review validation error is set', () => {
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
+
+      act(() => {
+        result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '3')
+        result.current.handlePointsPerReviewChange({} as React.ChangeEvent<HTMLInputElement>, '-5')
+      })
+
+      act(() => {
+        result.current.validatePointsPerReview({} as React.FocusEvent<HTMLInputElement>)
+      })
+
+      expect(result.current.errorMessagePointsPerReview).toBeDefined()
+      expect(result.current.totalPoints).toBe('0')
+    })
+
+    it('returns zero when both inputs have validation errors', () => {
+      const {result} = renderHook(() => usePeerReviewSettings(defaultProps()))
+
+      act(() => {
+        result.current.handleReviewsRequiredChange({} as React.ChangeEvent<HTMLInputElement>, '-1')
+        result.current.handlePointsPerReviewChange({} as React.ChangeEvent<HTMLInputElement>, '-5')
+      })
+
+      act(() => {
+        result.current.validateReviewsRequired({} as React.FocusEvent<HTMLInputElement>)
+        result.current.validatePointsPerReview({} as React.FocusEvent<HTMLInputElement>)
+      })
+
+      expect(result.current.errorMessageReviewsRequired).toBeDefined()
+      expect(result.current.errorMessagePointsPerReview).toBeDefined()
       expect(result.current.totalPoints).toBe('0')
     })
 

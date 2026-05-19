@@ -99,7 +99,6 @@
 #   }
 #
 class LatePolicyController < ApplicationController
-  before_action :require_user
   before_action :require_manage_grades_for_course, except: [:show]
   before_action :require_view_or_manage_grades_for_course, only: [:show]
 
@@ -162,7 +161,7 @@ class LatePolicyController < ApplicationController
     if late_policy.save
       render json: serialize(late_policy), status: :created
     else
-      render json: late_policy.errors, status: :unprocessable_entity
+      render json: late_policy.errors, status: :unprocessable_content
     end
   end
 
@@ -199,7 +198,7 @@ class LatePolicyController < ApplicationController
     if course.late_policy.update(late_policy_params)
       head :no_content
     else
-      render json: course.late_policy.errors, status: :unprocessable_entity
+      render json: course.late_policy.errors, status: :unprocessable_content
     end
   end
 

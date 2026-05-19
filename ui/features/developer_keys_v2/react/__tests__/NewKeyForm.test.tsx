@@ -24,7 +24,7 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import type {DeveloperKey} from 'features/developer_keys_v2/model/api/DeveloperKey'
 import type {NewKeyFormProps} from '../NewKeyForm'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const developerKey: DeveloperKey = {
   access_token_count: 77,
@@ -114,7 +114,7 @@ function renderComponent(
 describe('DeveloperKeyFormFields', () => {
   beforeEach(() => {
     fakeENV.setup({
-      FEATURES: {api_rate_limits: true},
+      FEATURES: {},
       validLtiScopes: {},
     })
   })
@@ -268,31 +268,5 @@ describe('DeveloperKeyFormFields', () => {
       })
     })
 
-    describe('when feature flag is disabled', () => {
-      beforeEach(() => {
-        ENV.FEATURES.api_rate_limits = false
-      })
-
-      it('does not show UTID selector for API keys', () => {
-        const {queryByTestId} = renderComponent(developerKey, false, {
-          contextId: '1',
-        })
-        expect(queryByTestId('utid-selector')).not.toBeInTheDocument()
-      })
-
-      it('can save dev key without UTID selector', () => {
-        const updateDeveloperKey = vi.fn()
-        const {queryByTestId} = renderComponent(developerKey, false, {
-          contextId: '1',
-          updateDeveloperKey,
-          hasRedirectUris: true,
-        })
-
-        expect(queryByTestId('utid-selector')).not.toBeInTheDocument()
-
-        const keyNameInput = queryByTestId('key-name-input')
-        expect(keyNameInput).toBeInTheDocument()
-      })
-    })
   })
 })

@@ -25,7 +25,7 @@ module AssignmentOverrideApplicator
   # pass skip_clone if you don't really care about the override attributes, and
   # it's okay to get back the passed in object - that you promise not to modify -
   # if there are no overrides
-  # valid learning objects are Assignment, Quizzes::Quiz, DiscussionTopic, and WikiPage
+  # valid learning objects are Assignment, PeerReviewSubAssignment, Quizzes::Quiz, DiscussionTopic, and WikiPage
   def self.assignment_overridden_for(learning_object, user, skip_clone: false)
     return learning_object if learning_object.overridden_for?(user)
 
@@ -54,13 +54,13 @@ module AssignmentOverrideApplicator
 
       overridden_section_ids = result_learning_object
                                .applied_overrides.select { |o| o.set_type == "CourseSection" }
-                               .map(&:set_id)
+                                                 .map(&:set_id)
       course_section_ids = context.active_course_sections.map(&:id)
       course_override_due_at = result_learning_object
                                .applied_overrides.find { |o| o.set_type == "Course" }
-                               &.due_at
+                                                 &.due_at
 
-      if learning_object.is_a?(Assignment) || learning_object.is_a?(Quizzes::Quiz)
+      if learning_object.is_a?(Assignment) || learning_object.is_a?(Quizzes::Quiz) || learning_object.is_a?(PeerReviewSubAssignment)
         result_learning_object.due_at =
           # if only some sections are overridden, return the most due date for
           # teachers, if all sections are overridden, return the most lenient
@@ -515,7 +515,7 @@ module AssignmentOverrideApplicator
   def self.should_preload_override_students?(assignments, user, endpoint_key)
     return false unless user
 
-    assignment_key = Digest::SHA256.hexdigest(assignments.map(&:id).sort.map(&:to_s).join(","))
+    assignment_key = Digest::SHA256.hexdigest(assignments.map(&:id).sort.join(","))
     key = ["should_preload_assignment_override_students", user.cache_key(:enrollments), user.cache_key(:groups), endpoint_key, assignment_key].cache_key
     # if the user has been touch we should preload all of the overrides because it's almost certain we'll need them all
     if Rails.cache.read(key)

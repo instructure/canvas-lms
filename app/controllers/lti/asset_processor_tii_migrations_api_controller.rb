@@ -22,7 +22,6 @@ module Lti
   class AssetProcessorTiiMigrationsApiController < ApplicationController
     include Api::V1::Progress
 
-    before_action :require_user
     before_action :get_context
     before_action :require_account_context
     before_action :require_root_account, only: [:index, :migrate_all]

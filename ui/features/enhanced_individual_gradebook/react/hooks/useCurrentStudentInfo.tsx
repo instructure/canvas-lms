@@ -25,7 +25,7 @@ import type {
 } from '../../types'
 import {fetchStudentSubmission, getNextStudentSubmissionPage} from '../../queries/Queries'
 import type {InfiniteData} from '@tanstack/react-query'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 
 type Response = {
   currentStudent?: GradebookStudentDetails

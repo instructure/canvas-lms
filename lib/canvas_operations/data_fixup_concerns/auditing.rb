@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../errors"
-
 module CanvasOperations
   module DataFixupConcerns
     module Auditing
@@ -30,11 +28,11 @@ module CanvasOperations
         base.include InstanceMethods
       end
 
-      # Whether to record changes made by this datafixup in an Attachment log associated wit the context.
+      # Whether to record changes made by this datafixup in an Attachment log associated with the context.
       #
-      # Defaults to false and is always false in the test environment.
+      # Defaults to false.
       def record_changes?
-        (@record_changes || false) && auditable_environment?
+        @record_changes || false
       end
 
       # Set whether to record changes made by this datafixup in an Attachment log associated with the context.
@@ -45,10 +43,6 @@ module CanvasOperations
         raise CanvasOperations::Errors::InvalidPropertyValue, "record_changes must be a boolean" unless [true, false].include?(value)
 
         @record_changes = value
-      end
-
-      def auditable_environment?
-        !Rails.env.test?
       end
 
       module InstanceMethods

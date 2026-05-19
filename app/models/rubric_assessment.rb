@@ -21,7 +21,7 @@
 # Associates an artifact with a rubric while offering an assessment and
 # scoring using the rubric.  Assessments are grouped together in one
 # RubricAssociation, which may or may not have an association model.
-class RubricAssessment < ActiveRecord::Base
+class RubricAssessment < ApplicationRecord
   include TextHelper
   include HtmlTextHelper
   include Trackable
@@ -185,6 +185,16 @@ class RubricAssessment < ActiveRecord::Base
       a.attributes = { rubric_assessment: self, assessor: }
       a.complete
     end
+
+    # Use a separate loop as all ARs must be completed before checking the PRs threshold
+    requests.each do |a| # rubocop:disable Style/CombinableLoops
+      next unless a.peer_review_sub_assignment
+
+      PeerReview::SubmissionCreatorService.new(
+        parent_assignment: a.asset.assignment,
+        assessor: a.assessor
+      ).call
+    end
   end
   protected :update_assessment_requests
 
@@ -317,7 +327,7 @@ class RubricAssessment < ActiveRecord::Base
         submission = rubric_association.association_object.find_asset_for_assessment(rubric_association, student).first
         { submission:,
           rubric_assessments: submission.rubric_assessments
-                                        .where.not(rubric_association: nil)
+                              .where.not(rubric_association: nil)
                                         .map { |ra| ra.as_json(methods: :assessor_name) } }
       end
     else

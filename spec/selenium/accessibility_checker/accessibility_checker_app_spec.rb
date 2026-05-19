@@ -176,8 +176,10 @@ describe "Accessibility Checker", :ignore_js_errors do
 
         get "/courses/#{@course.id}/accessibility"
 
-        # Should be redirected or see unauthorized
-        expect(driver.current_url).not_to include("/courses/#{@course.id}/accessibility")
+        # Should display unauthorized message (case-insensitive)
+        body_text = f("body").text.downcase
+        expect(body_text).to include("access denied".downcase)
+        expect(body_text).to include("you don't have access to view this resource.".downcase)
       end
 
       it "does not display the Accessibility tab even when a11y_checker_ga1 is enabled" do
@@ -193,8 +195,10 @@ describe "Accessibility Checker", :ignore_js_errors do
 
         get "/courses/#{@course.id}/accessibility"
 
-        # Should be redirected or see unauthorized
-        expect(driver.current_url).not_to include("/courses/#{@course.id}/accessibility")
+        # Should display unauthorized message (case-insensitive)
+        body_text = f("body").text.downcase
+        expect(body_text).to include("access denied".downcase)
+        expect(body_text).to include("you don't have access to view this resource.".downcase)
       end
     end
 
@@ -214,6 +218,22 @@ describe "Accessibility Checker", :ignore_js_errors do
         get "/courses/#{@course.id}"
 
         expect(f("#content")).not_to contain_css("#course_check_accessibility_btn")
+      end
+
+      context "when course home page is set to a front page" do
+        before do
+          page = @course.wiki_pages.create!(title: "Home", body: "<p>Welcome</p>")
+          page.set_as_front_page!
+          @course.update_attribute(:default_view, "wiki")
+          @course.account.enable_feature!(:a11y_checker_ga1)
+        end
+
+        it "does not display the Check Accessibility button and loads the page successfully" do
+          get "/courses/#{@course.id}"
+
+          expect(f("#content")).not_to contain_css("#course_check_accessibility_btn")
+          expect(f("#wiki_page_show")).to be_displayed
+        end
       end
     end
   end

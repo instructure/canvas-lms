@@ -19,7 +19,7 @@
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Portal} from '@instructure/ui-portal'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {QRMobileLogin} from './components/QRMobileLogin'
 
 const I18n = createI18nScope('QRMobileLogin')

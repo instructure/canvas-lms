@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Enrollment < ActiveRecord::Base
+class Enrollment < ApplicationRecord
   SIS_TYPES = {
     "TeacherEnrollment" => "teacher",
     "TaEnrollment" => "ta",
@@ -183,7 +183,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   # see .active_student_conditions
-  def active_student?(was = false)
+  def active_student?(was: false)
     suffix = was ? "_before_last_save" : ""
 
     %w[StudentEnrollment StudentViewEnrollment].include?(send(:"type#{suffix}")) &&
@@ -191,7 +191,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def active_student_changed?
-    active_student? != active_student?(:was)
+    active_student? != active_student?(was: true)
   end
 
   def clear_needs_grading_count_cache
@@ -351,6 +351,21 @@ class Enrollment < ActiveRecord::Base
   }
 
   scope :not_fake, -> { where("enrollments.type<>'StudentViewEnrollment'") }
+
+  # SQL condition that excludes temporary enrollments that are not currently
+  # active by date. Course admin temp enrollments get 'inactive' state when
+  # future (not view_restrictable?), while student/observer ones get
+  # 'pending_active', so we check for state = 'active' to cover all types.
+  def self.pending_temporary_enrollment_exclusion_sql
+    "enrollments.temporary_enrollment_source_user_id IS NULL OR EXISTS (" \
+      "SELECT 1 FROM #{EnrollmentState.quoted_table_name} " \
+      "WHERE enrollment_states.enrollment_id = enrollments.id " \
+      "AND enrollment_states.state = 'active')"
+  end
+
+  scope :excluding_pending_temporary_enrollments, lambda {
+    where(pending_temporary_enrollment_exclusion_sql)
+  }
 
   scope :temporary_enrollment_recipients_for_provider, lambda { |user|
     active.joins(:course).where(temporary_enrollment_source_user_id: user,
@@ -518,7 +533,7 @@ class Enrollment < ActiveRecord::Base
       enrollment ||= observer.observer_enrollments.build
       enrollment.associated_user_id = user_id
       enrollment.shard = shard if enrollment.new_record?
-      enrollment.update_from(self, !!@skip_broadcasts)
+      enrollment.update_from(self, skip_broadcasts: !!@skip_broadcasts)
     end
   end
 
@@ -556,7 +571,7 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
-  def update_from(other, skip_broadcasts = false)
+  def update_from(other, skip_broadcasts: false)
     self.course_id = other.course_id
     self.workflow_state = if type == "ObserverEnrollment" && other.workflow_state == "invited"
                             "active"
@@ -738,7 +753,7 @@ class Enrollment < ActiveRecord::Base
     res
   end
 
-  def accept(force = false)
+  def accept(force: false)
     GuardRail.activate(:primary) do
       return false unless force || invited?
 
@@ -770,11 +785,14 @@ class Enrollment < ActiveRecord::Base
   end
 
   def add_to_favorites
-    # this method was written by Alan Smithee
     user.shard.activate do
-      if user.favorites.where(context_type: "Course").exists? # only add a favorite if they've ever favorited anything even if it's no longer in effect
-        Favorite.create_or_find_by(user:, context: course)
-      end
+      # Only auto-favorite if the user still has at least one accessible favorite course,
+      # otherwise stale favorites (for concluded/deleted/inactive enrollments) would make
+      # auto-favoriting permanent with no way for the user to opt out.
+      favorite_course_ids = user.favorites.where(context_type: "Course").select(:context_id)
+      return unless user.enrollments.current_and_invited.where(course_id: favorite_course_ids).exists?
+
+      Favorite.create_or_find_by(user:, context: course)
     end
   end
 
@@ -1308,6 +1326,26 @@ class Enrollment < ActiveRecord::Base
     temporary_enrollment_source_user_id.present?
   end
 
+  def temporary_enrollment_display_state
+    return nil unless temporary_enrollment?
+
+    es = enrollment_state
+    case es.state
+    when "pending_active", "pending_invited"
+      "future"
+    when "active", "invited"
+      "active"
+    when "completed"
+      "completed"
+    when "inactive"
+      # Future admin-type enrollments get "inactive" with state_valid_until
+      # set to the start date; truly inactive enrollments do not
+      es.state_valid_until.present? ? "future" : "inactive"
+    else
+      es.state
+    end
+  end
+
   def temporary_enrollment_source_user
     return nil unless temporary_enrollment?
 
@@ -1405,8 +1443,14 @@ class Enrollment < ActiveRecord::Base
                                        joins(:enrollment_state).where(enrollment_states: { restricted_access: false })
                                                                .where("enrollment_states.state IN ('invited', 'pending_invited', 'pending_active')")
                                      }
+  scope :invited_or_pending_by_date_ignoring_access, lambda {
+                                                       joins(:enrollment_state)
+                                                         .where("enrollment_states.state IN ('invited', 'pending_invited', 'pending_active')")
+                                                     }
   scope :completed_by_date,
         -> { joins(:enrollment_state).where(enrollment_states: { restricted_access: false, state: "completed" }) }
+  scope :completed_by_date_ignoring_access,
+        -> { joins(:enrollment_state).where(enrollment_states: { state: "completed" }) }
   scope :not_inactive_by_date, lambda {
                                  joins(:enrollment_state).where(enrollment_states: { restricted_access: false })
                                                          .where("enrollment_states.state IN ('active', 'invited', 'completed', 'pending_invited', 'pending_active')")
@@ -1547,7 +1591,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def touch_graders_if_needed
-    if !active_student? && active_student?(:was) && course.submissions.where(user_id:).exists?
+    if !active_student? && active_student?(was: true) && course.submissions.where(user_id:).exists?
       self.class.connection.after_transaction_commit do
         course.admins.clear_cache_keys(:todo_list)
       end

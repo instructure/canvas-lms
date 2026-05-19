@@ -30,17 +30,47 @@ module PageViews
 
     def request_headers
       request_id = RequestContext::Generator.request_id
-      headers = { "Authorization" => "Bearer #{@configuration.access_token}",
-                  "X-Request-Context-Id" => request_id }
-      headers["X-Canvas-User-Id"] = @requestor_user.global_id.to_s if @requestor_user
-      headers
+      jwt_token = generate_jwt_token
+      { "Authorization" => "Bearer #{jwt_token}",
+        "X-Request-Context-Id" => request_id }
+    end
+
+    def generate_jwt_token
+      raise ArgumentError, "requestor_user is required for JWT generation" unless @requestor_user
+
+      CanvasSecurity::ServicesJwt.for_user(
+        HostUrl.default_host,
+        @requestor_user,
+        encrypt: false,
+        base64: false
+      )
+    end
+
+    def get_with_clean_redirect(uri, headers, &)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = uri.scheme == "https"
+      http.ssl_timeout = http.open_timeout = CanvasHttp::OPEN_TIMEOUT
+      http.read_timeout = CanvasHttp::READ_TIMEOUT
+      http.write_timeout = CanvasHttp::WRITE_TIMEOUT
+      http.max_retries = 0
+      response = http.request(Net::HTTP::Get.new(uri.request_uri, headers))
+
+      if response.is_a?(Net::HTTPRedirection)
+        redirect_url = response["Location"]
+        raise "Redirect response is missing a Location header" unless redirect_url
+
+        CanvasHttp.get(redirect_url, &)
+      else
+        yield response
+      end
     end
 
     def handle_generic_errors(response)
       case response.code.to_i
       when 400
         error_messages = extract_error_messages_if_present(response)
-        raise Common::InvalidRequestError, "Invalid request: #{error_messages.join(", ")}"
+        detail = error_messages.any? ? error_messages.join(", ") : response.body
+        raise Common::InvalidRequestError, "Invalid request: #{detail}"
       when 403
         raise Common::AccessDeniedError, "Access denied to the requested resource"
       when 404
@@ -51,6 +81,8 @@ module PageViews
         raise Common::NoContentError, "Empty result, no content available"
       when 500
         raise Common::InternalServerError, "Internal server error"
+      when 503
+        raise Common::ServiceUnavailable, "Service temporarily unavailable"
       else
         raise "Unexpected response: #{response.code}"
       end
@@ -58,9 +90,9 @@ module PageViews
 
     def extract_error_messages_if_present(response)
       errors = JSON.parse(response.body)["errors"]
-      errors.is_a?(Array) ? errors : [errors]
+      Array(errors).compact
     rescue JSON::ParserError
-      nil
+      []
     end
   end
 end

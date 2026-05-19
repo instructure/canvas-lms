@@ -556,7 +556,7 @@ describe ActiveRecord::Base do
     # in rails 4, the where conditions use bind values for association scopes
     it "does an update all with a join on associations" do
       @u1.pseudonyms.joins(:user).active.where(users: { name: "b" }).update_all(unique_id: "pa3")
-      expect(@p1.reload.unique_id).to_not eq "pa3"
+      expect(@p1.reload.unique_id).not_to eq "pa3"
       @u1.pseudonyms.joins(:user).active.where(users: { name: "a" }).update_all(unique_id: "pa3")
       expect(@p1.reload.unique_id).to eq "pa3"
       expect(@p1_2.reload.unique_id).to eq "pa2"

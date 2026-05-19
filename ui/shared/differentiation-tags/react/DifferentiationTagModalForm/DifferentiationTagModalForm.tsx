@@ -39,7 +39,7 @@ import {
   CREATE_NEW_SET_OPTION,
 } from '../util/constants'
 import {useBulkManageDifferentiationTags} from '../hooks/useBulkManageDifferentiationTags'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import type {Course} from '../types.d'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 

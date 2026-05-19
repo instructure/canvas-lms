@@ -79,7 +79,7 @@ describe MicrosoftSync::GroupsController do
         user_session(teacher)
       end
 
-      it { is_expected.to_not be_unauthorized }
+      it { is_expected.not_to be_unauthorized }
     end
   end
 
@@ -94,15 +94,15 @@ describe MicrosoftSync::GroupsController do
   shared_examples_for "endpoints that return an existing group" do
     before { group.reload.update!(job_state: { step: "abc" }, last_error_report_id: 123) }
 
-    specify { expect(subject.parsed_body).to_not include("job_state") }
-    specify { expect(subject.parsed_body).to_not include("last_error_report_id") }
+    specify { expect(subject.parsed_body).not_to include("job_state") }
+    specify { expect(subject.parsed_body).not_to include("last_error_report_id") }
 
     context "when the user is a site admin" do
       before { user_session(site_admin) }
 
       let(:site_admin) { site_admin_user(user: user_with_pseudonym(account: Account.site_admin)) }
 
-      specify { expect(subject.parsed_body).to_not include("job_state") }
+      specify { expect(subject.parsed_body).not_to include("job_state") }
       specify { expect(subject.parsed_body["last_error_report_id"]).to eq(123) }
     end
 

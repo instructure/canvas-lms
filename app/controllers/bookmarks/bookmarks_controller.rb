@@ -47,7 +47,6 @@
 #       }
 #     }
 class Bookmarks::BookmarksController < ApplicationController
-  before_action :require_user
   around_action :activate_user_shard
   before_action :find_bookmark, only: %i[show update destroy]
 

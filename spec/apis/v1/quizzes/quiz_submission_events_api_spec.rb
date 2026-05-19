@@ -140,6 +140,14 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
         api_create({ raw: true }, {})
         assert_status(204)
       end
+
+      it "allows anonymous event submission" do
+        temp_code = "tmp_#{Digest::SHA256.hexdigest("#{Time.now.to_i}_#{rand}")}"
+        @quiz_submission = @quiz.generate_submission(temp_code)
+        @user = nil
+        api_create({ raw: true }, { "quiz_submission_events" => events_data })
+        assert_status(204)
+      end
     end
   end
 
@@ -192,10 +200,10 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
         before(:once) do
           student_in_course(course: @course)
           @quiz_submission = @quiz.generate_submission(@student)
-          @quiz_submission.with_versioning(true, &:save!)
+          @quiz_submission.with_versioning(&:save!)
 
           @quiz_submission.attempt = 2
-          @quiz_submission.with_versioning(true, &:save!)
+          @quiz_submission.with_versioning(&:save!)
 
           @quiz_submission.events.create!({ event_type: "a", attempt: 1 })
           @quiz_submission.events.create!({ event_type: "b", attempt: 2 })

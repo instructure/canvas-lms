@@ -18,13 +18,63 @@
 
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import React from 'react'
+import React, {useCallback} from 'react'
 import {arrayOf, bool, string, object, func, shape} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {useQuery} from '@tanstack/react-query'
 import UsersListRow from './UsersListRow'
 import UsersListHeader from './UsersListHeader'
+import {fetchBulkTemporaryEnrollmentStatus} from '@canvas/temporary-enrollment/react/api/enrollment'
 
 const I18n = createI18nScope('account_course_user_search')
+
+const LOADING_STATUS = {is_provider: false, is_recipient: false, can_provide: false}
+
+function useBulkTempEnrollmentStatuses(users, enabled) {
+  const userIds = users.map(u => u.id)
+  const accountParam = ENV.ACCOUNT_ID !== ENV.ROOT_ACCOUNT_ID ? String(ENV.ACCOUNT_ID) : undefined
+
+  const {data: statuses} = useQuery({
+    queryKey: ['bulkTempEnrollmentStatuses', [...userIds].sort()],
+    queryFn: () => fetchBulkTemporaryEnrollmentStatus(userIds, accountParam),
+    enabled: enabled && userIds.length > 0,
+  })
+
+  return useCallback(
+    userId => {
+      if (!enabled) return undefined
+      return statuses?.[userId] ?? LOADING_STATUS
+    },
+    [enabled, statuses],
+  )
+}
+
+function UsersListBody({
+  users,
+  accountId,
+  permissions,
+  handleSubmitEditUserForm,
+  roles,
+  includeDeletedUsers,
+}) {
+  const getTempEnrollStatus = useBulkTempEnrollmentStatuses(
+    users,
+    permissions.can_view_temporary_enrollments,
+  )
+
+  return users.map(user => (
+    <UsersListRow
+      handleSubmitEditUserForm={handleSubmitEditUserForm}
+      roles={roles}
+      key={user.id}
+      accountId={accountId}
+      user={user}
+      permissions={permissions}
+      includeDeletedUsers={includeDeletedUsers}
+      temporaryEnrollmentStatus={getTempEnrollStatus(user.id)}
+    />
+  ))
+}
 
 export default class UsersList extends React.Component {
   shouldComponentUpdate(nextProps) {
@@ -89,17 +139,14 @@ export default class UsersList extends React.Component {
           </Table.Row>
         </Table.Head>
         <Table.Body data-automation="users list">
-          {this.props.users.map(user => (
-            <UsersListRow
-              handleSubmitEditUserForm={this.props.handleSubmitEditUserForm}
-              roles={this.props.roles}
-              key={user.id}
-              accountId={this.props.accountId}
-              user={user}
-              permissions={this.props.permissions}
-              includeDeletedUsers={this.props.includeDeletedUsers}
-            />
-          ))}
+          <UsersListBody
+            users={this.props.users}
+            accountId={this.props.accountId}
+            permissions={this.props.permissions}
+            handleSubmitEditUserForm={this.props.handleSubmitEditUserForm}
+            roles={this.props.roles}
+            includeDeletedUsers={this.props.includeDeletedUsers}
+          />
         </Table.Body>
       </Table>
     )

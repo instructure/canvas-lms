@@ -41,11 +41,13 @@ export interface StudioMediaOptionsAttributes {
 export const parsedStudioOptionsPropType = shape({
   resizable: bool.isRequired,
   convertibleToLink: bool.isRequired,
+  isImprovedEmbed: bool.isRequired,
 })
 
 export type ParsedStudioOptions = {
   resizable: boolean
   convertibleToLink: boolean
+  isImprovedEmbed: boolean
   embedOptions: StudioEmbedOptions
 }
 
@@ -98,6 +100,15 @@ export function displayStyleFrom(
     : ''
 }
 
+export function isImprovedStudioEmbed(element: Element): boolean {
+  const src = element.getAttribute('data-mce-p-src') || ''
+  return (
+    src.includes('thumbnail_embed') ||
+    src.includes('learn_embed') ||
+    src.includes('collaboration_embed')
+  )
+}
+
 export function isStudioEmbeddedMedia(element: Element): boolean {
   // Borrowing this structure from isMediaElement in ContentSelection.js
   const tinymceIframeShim = element?.tagName === 'IFRAME' ? element?.parentElement : element
@@ -112,25 +123,32 @@ export function isStudioEmbeddedMedia(element: Element): boolean {
 export function parseStudioOptions(element: Element | null): ParsedStudioOptions {
   const tinymceIframeShim = element?.tagName === 'IFRAME' ? element?.parentElement : element
 
-  const embedOptions = {} as StudioEmbedOptions;
+  const embedOptions = {} as StudioEmbedOptions
   const href = tinymceIframeShim?.getAttribute('data-mce-p-src')
 
   if (href) {
     // parse out embed options from url params
     const urlMatch = href.match(/url=([^&]*)$/)
-    const url = new URL(decodeURIComponent(urlMatch ? urlMatch[1] : ''))
-    const params = url.searchParams
+    if (urlMatch) {
+      const url = new URL(decodeURIComponent(urlMatch[1]))
+      const params = url.searchParams
 
-    embedOptions['enableMediaDownload'] = params.get('custom_arc_display_download') === 'true'
-    embedOptions['enableTranscriptDownload'] = params.get('custom_arc_transcript_downloadable') === 'true'
-    embedOptions['lockSpeed']= params.get('custom_arc_lock_speed') === 'true'
-    embedOptions['isExternal']= params.get('custom_arc_is_external') === 'true'
+      embedOptions['enableMediaDownload'] = params.get('custom_arc_display_download') === 'true'
+      embedOptions['enableTranscriptDownload'] =
+     
+        params.get('custom_arc_transcript_downloadable') === 'true'
+      embedOptions['showRollingTranscript'] =
+      params.get('custom_arc_show_rolling_transcript') === 'true'
+    embedOptions['lockSpeed']  = params.get('custom_arc_lock_speed') === 'true'
+      embedOptions['isExternal']  = params.get('custom_arc_is_external') === 'true'
+    }
   }
 
   return {
     resizable: tinymceIframeShim?.getAttribute('data-mce-p-data-studio-resizable') === 'true',
     convertibleToLink:
       tinymceIframeShim?.getAttribute('data-mce-p-data-studio-convertible-to-link') === 'true',
+    isImprovedEmbed: tinymceIframeShim ? isImprovedStudioEmbed(tinymceIframeShim) : false,
     embedOptions,
   }
 }
@@ -161,7 +179,6 @@ export function findStudioLtiIframeFromSelection(selectedNode: Node): HTMLIFrame
   }
 
   if (!outerIframe) {
-    // eslint-disable-next-line no-console
     console.error('No outer iframe found')
     return null
   }
@@ -189,7 +206,6 @@ export function findStudioLtiIframeFromSelection(selectedNode: Node): HTMLIFrame
       }
     }
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('>> Cannot access outer iframe content (cross-origin):', error)
     // Return the outer iframe as fallback since we can't access its contents
     return outerIframe
@@ -200,10 +216,7 @@ export function findStudioLtiIframeFromSelection(selectedNode: Node): HTMLIFrame
 
 export type EmbedType = 'thumbnail_embed' | 'learn_embed' | 'collaboration_embed'
 
-export const notifyStudioEmbedTypeChange = (
-  editor: Editor,
-  embedType: EmbedType,
-) => {
+export const notifyStudioEmbedTypeChange = (editor: Editor, embedType: EmbedType) => {
   const studioIframe = findStudioLtiIframeFromSelection(editor.selection.getNode())
 
   if (studioIframe && studioIframe.contentWindow) {
@@ -300,31 +313,39 @@ export type StudioEmbedOptions = {
   enableTranscriptDownload: boolean
   lockSpeed: boolean
   isExternal: boolean
+  showRollingTranscript: boolean
 }
 
 const embedOptionsKeyMap: {[key in keyof StudioEmbedOptions]: string} = {
   enableMediaDownload: 'custom_arc_display_download',
   enableTranscriptDownload: 'custom_arc_transcript_downloadable',
+  showRollingTranscript: 'custom_arc_show_rolling_transcript',
   lockSpeed: 'custom_arc_lock_speed',
   isExternal: 'custom_arc_is_external',
 }
 
 export function validateStudioEmbedOptions(input: any): input is StudioEmbedOptions {
   return (
-    typeof input === 'object' && (
-      Object.keys(input).length === 0 ||
+    typeof input === 'object' &&
+    (Object.keys(input).length === 0 ||
+      typeof input.isExternal === 'boolean' ||
       typeof input.enableMediaDownload === 'boolean' ||
       typeof input.enableTranscriptDownload === 'boolean' ||
-      typeof input.lockSpeed === 'boolean'
-    )
+      typeof input.showRollingTranscript === 'boolean' ||
+      typeof input.lockSpeed === 'boolean')
   )
 }
 
-export function updateStudioEmbedOptions (editor: Editor, embedOptions: StudioEmbedOptions) {
-  const container = editor.getContainer()
-  const iframe = container.querySelector('iframe');
-  const mcseShim = iframe?.contentDocument?.querySelector('.mce-shim');
-  const tinymceIframeShim = mcseShim?.parentElement;
+export function updateStudioEmbedOptions(
+  editor: Editor,
+  embedOptions: StudioEmbedOptions,
+  videoContainer: Element | null,
+) {
+  if (videoContainer?.tagName !== 'IFRAME') {
+    return
+  }
+
+  const tinymceIframeShim = videoContainer.parentElement
 
   if (!tinymceIframeShim) {
     return
@@ -340,12 +361,15 @@ export function updateStudioEmbedOptions (editor: Editor, embedOptions: StudioEm
   const url = new URL(decodeURIComponent(urlMatch ? urlMatch[1] : ''))
   const params = url.searchParams
 
-  for (const [option, param] of Object.entries(embedOptionsKeyMap)) {
-    const optionValue = embedOptions[option as keyof StudioEmbedOptions]
-    if (optionValue) {
-      params.set(param, 'true')
-    } else if (params.has(param)) {
-      params.delete(param)
+  for (const param of Object.values(embedOptionsKeyMap)) {
+    params.delete(param)
+  }
+
+  if (embedOptions) {
+    for (const [option, param] of Object.entries(embedOptionsKeyMap)) {
+      if (embedOptions[option as keyof StudioEmbedOptions]) {
+        params.set(param, 'true')
+      }
     }
   }
 

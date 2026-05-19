@@ -161,6 +161,7 @@ describe AuthenticationProvider::LDAP do
                                         global_id: 2,
                                         should_send_to_statsd?: true)
         allow(InstStatsd::Statsd).to receive(:distributed_increment)
+        allow(InstStatsd::Statsd).to receive(:timing)
       end
 
       it "sends to statsd on success" do
@@ -206,6 +207,16 @@ describe AuthenticationProvider::LDAP do
             account_id: Shard.global_id_for(@aac.account_id),
             auth_provider_id: @aac.global_id
           }
+        )
+      end
+
+      it "emits timing for bind_as" do
+        allow(@ldap).to receive(:bind_as).and_return(true)
+        @aac.ldap_bind_result("user", "pass")
+        expect(InstStatsd::Statsd).to have_received(:timing).with(
+          "canvas.ldap.bind_as",
+          anything,
+          tags: Utils::InstStatsdUtils::Tags.tags_for(@aac.account.shard)
         )
       end
     end

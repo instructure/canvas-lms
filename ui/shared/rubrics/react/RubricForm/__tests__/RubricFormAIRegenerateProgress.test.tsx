@@ -23,7 +23,7 @@ import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {RubricForm, type RubricFormComponentProp} from '../index'
 import * as RubricFormQueries from '../queries/RubricFormQueries'
 import * as ProgressHelpers from '@canvas/progress/ProgressHelpers'
-import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer as destroyFlashAlertContainer} from '@instructure/platform-alerts'
 import fakeEnv from '@canvas/test-utils/fakeENV'
 
 vi.mock('../queries/RubricFormQueries', async () => ({
@@ -43,12 +43,13 @@ const mockCriteria = [
     description: 'Generated Criterion 1',
     points: 20,
     ratings: [],
-    longDescription: '',
+    long_description: '',
     outcome: undefined,
-    learningOutcomeId: undefined,
-    ignoreForScoring: false,
-    criterionUseRange: false,
-    masteryPoints: 0,
+    learning_outcome_id: undefined,
+    ignore_for_scoring: false,
+    criterion_use_range: false,
+    mastery_points: 0,
+    generated: true,
   },
 ]
 
@@ -177,7 +178,9 @@ describe('RubricForm AI Regenerate Progress Test', () => {
 
     // Wait for criteria to be generated - use findBy which combines waitFor with getBy
     const generateCriteriaHeader = await findByTestId('generate-criteria-header')
-    const regenerateButton = within(generateCriteriaHeader).getByTestId('regenerate-criteria-button')
+    const regenerateButton = within(generateCriteriaHeader).getByTestId(
+      'regenerate-criteria-button',
+    )
 
     // Open regenerate modal
     fireEvent.click(regenerateButton)

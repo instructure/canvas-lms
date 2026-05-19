@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 describe NavMenuLinkTabs do
   before :once do
     account_model
@@ -41,7 +39,7 @@ describe NavMenuLinkTabs do
         { "id" => "nav_menu_link_#{@link_deleted.id}" },
       ]
 
-      NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:)
+      NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:, can_manage_links: true)
     end
 
     it "preserves existing links and passes through non-link" do
@@ -83,7 +81,7 @@ describe NavMenuLinkTabs do
           { "id" => "nav_menu_link_#{@account_link.id}" }
         ]
 
-        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:)
+        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:, can_manage_links: true)
 
         expect(result.length).to eq(2)
         expect(result[1]).to eq({ "id" => "nav_menu_link_#{@account_link.id}" })
@@ -105,7 +103,7 @@ describe NavMenuLinkTabs do
           { "id" => "people" }
         ]
 
-        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:)
+        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:, can_manage_links: true)
 
         expect(result.length).to eq(4)
         expect(result[0]["id"]).to eq("assignments")
@@ -124,11 +122,202 @@ describe NavMenuLinkTabs do
           { "id" => "nav_menu_link_#{NavMenuLink.last.id + 1}" } # Non-existent link
         ]
 
-        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:)
+        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:, can_manage_links: true)
 
         # Should filter out the other account's link
         expect(result.length).to eq(1)
         expect(result[0]["id"]).to eq("assignments")
+      end
+    end
+
+    context "with can_manage_links: false" do
+      it "skips creating new links" do
+        @link1 = NavMenuLink.create!(context: @course, course_nav: true, label: "Existing Link", url: "https://existing.com")
+
+        tabs = [
+          { "id" => "assignments" },
+          { "id" => "nav_menu_link_#{@link1.id}" },
+          { "href" => "nav_menu_link_url", "args" => ["https://new.com"], "label" => "New Link" },
+        ]
+
+        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:, can_manage_links: false)
+
+        # Should preserve existing link
+        expect(result[1]).to eq({ "id" => "nav_menu_link_#{@link1.id}" })
+
+        # Should not create new link
+        expect(result.length).to eq(2) # assignments + existing link (new link skipped)
+
+        links = NavMenuLink.active.where(context: @course).to_a
+        expect(links.length).to eq(1)
+        expect(links[0].id).to eq(@link1.id)
+      end
+
+      it "skips deleting existing links" do
+        @link1 = NavMenuLink.create!(context: @course, course_nav: true, label: "Keep Link", url: "https://keep.com")
+        @link2 = NavMenuLink.create!(context: @course, course_nav: true, label: "Also Keep", url: "https://alsokeep.com")
+
+        tabs = [
+          { "id" => "assignments" },
+          { "id" => "nav_menu_link_#{@link1.id}" },
+          # link2 is not in tabs, but should not be deleted when can_manage_links: false
+        ]
+
+        NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:, can_manage_links: false)
+
+        # Both links should still exist
+        links = NavMenuLink.active.where(context: @course).to_a
+        expect(links.map(&:id)).to contain_exactly(@link1.id, @link2.id)
+      end
+
+      it "still allows rearranging existing links" do
+        @link1 = NavMenuLink.create!(context: @course, course_nav: true, label: "Link 1", url: "https://link1.com")
+        @link2 = NavMenuLink.create!(context: @course, course_nav: true, label: "Link 2", url: "https://link2.com")
+
+        tabs = [
+          { "id" => "assignments" },
+          { "id" => "nav_menu_link_#{@link2.id}" }, # link2 first
+          { "id" => "nav_menu_link_#{@link1.id}" }, # link1 second
+          { "id" => "people" }
+        ]
+
+        result = NavMenuLinkTabs.sync_course_links_with_tabs(course: @course, tabs:, can_manage_links: false)
+
+        expect(result[1]["id"]).to eq("nav_menu_link_#{@link2.id}")
+        expect(result[2]["id"]).to eq("nav_menu_link_#{@link1.id}")
+
+        # Both links should still exist
+        links = NavMenuLink.active.where(context: @course).to_a
+        expect(links.length).to eq(2)
+      end
+    end
+
+    context "with request_host and request_port" do
+      it "strips matching host from new link URLs" do
+        tabs = [
+          { "id" => "assignments" },
+          { "href" => "nav_menu_link_url", "args" => ["https://canvas.instructure.com/courses/123"], "label" => "Course Link" }
+        ]
+
+        NavMenuLinkTabs.sync_course_links_with_tabs(
+          course: @course,
+          tabs:,
+          can_manage_links: true,
+          request_host: "canvas.instructure.com",
+          request_port: 443
+        )
+
+        new_link = NavMenuLink.active.where(context: @course, course_nav: true).last
+        expect(new_link.url).to eq("/courses/123")
+        expect(new_link.label).to eq("Course Link")
+      end
+
+      it "preserves external URLs when host does not match" do
+        tabs = [
+          { "id" => "assignments" },
+          { "href" => "nav_menu_link_url", "args" => ["https://external-site.com/page"], "label" => "External Link" }
+        ]
+
+        NavMenuLinkTabs.sync_course_links_with_tabs(
+          course: @course,
+          tabs:,
+          can_manage_links: true,
+          request_host: "canvas.instructure.com",
+          request_port: 443
+        )
+
+        new_link = NavMenuLink.active.where(context: @course, course_nav: true).last
+        expect(new_link.url).to eq("https://external-site.com/page")
+      end
+
+      it "handles relative URLs without stripping" do
+        tabs = [
+          { "id" => "assignments" },
+          { "href" => "nav_menu_link_url", "args" => ["/courses/123/pages/home"], "label" => "Relative Link" }
+        ]
+
+        NavMenuLinkTabs.sync_course_links_with_tabs(
+          course: @course,
+          tabs:,
+          can_manage_links: true,
+          request_host: "canvas.instructure.com",
+          request_port: 443
+        )
+
+        new_link = NavMenuLink.active.where(context: @course, course_nav: true).last
+        expect(new_link.url).to eq("/courses/123/pages/home")
+      end
+
+      it "works without request_host and request_port" do
+        tabs = [
+          { "id" => "assignments" },
+          { "href" => "nav_menu_link_url", "args" => ["https://example.com/page"], "label" => "Link" }
+        ]
+
+        NavMenuLinkTabs.sync_course_links_with_tabs(
+          course: @course,
+          tabs:,
+          can_manage_links: true
+        )
+
+        new_link = NavMenuLink.active.where(context: @course, course_nav: true).last
+        expect(new_link.url).to eq("https://example.com/page")
+      end
+
+      it "preserves query strings when stripping host" do
+        tabs = [
+          { "id" => "assignments" },
+          { "href" => "nav_menu_link_url", "args" => ["https://canvas.instructure.com/files/123?wrap=1"], "label" => "File Link" }
+        ]
+
+        NavMenuLinkTabs.sync_course_links_with_tabs(
+          course: @course,
+          tabs:,
+          can_manage_links: true,
+          request_host: "canvas.instructure.com",
+          request_port: 443
+        )
+
+        new_link = NavMenuLink.active.where(context: @course, course_nav: true).last
+        expect(new_link.url).to eq("/files/123?wrap=1")
+      end
+
+      it "preserves fragments when stripping host" do
+        tabs = [
+          { "id" => "assignments" },
+          { "href" => "nav_menu_link_url", "args" => ["https://canvas.instructure.com/courses/123#section-2"], "label" => "Anchored Link" }
+        ]
+
+        NavMenuLinkTabs.sync_course_links_with_tabs(
+          course: @course,
+          tabs:,
+          can_manage_links: true,
+          request_host: "canvas.instructure.com",
+          request_port: 443
+        )
+
+        new_link = NavMenuLink.active.where(context: @course, course_nav: true).last
+        expect(new_link.url).to eq("/courses/123#section-2")
+      end
+
+      it "normalizes '//' returned by strip_host for URLs with a double slash after the host" do
+        # https://canvas.instructure.com//double-slash strips to //double-slash;
+        # the gsub collapses it to /double-slash so it isn't treated as protocol-relative
+        tabs = [
+          { "id" => "assignments" },
+          { "href" => "nav_menu_link_url", "args" => ["https://canvas.instructure.com//double-slash"], "label" => "Double Slash Link" }
+        ]
+
+        NavMenuLinkTabs.sync_course_links_with_tabs(
+          course: @course,
+          tabs:,
+          can_manage_links: true,
+          request_host: "canvas.instructure.com",
+          request_port: 443
+        )
+
+        new_link = NavMenuLink.active.where(context: @course, course_nav: true).last
+        expect(new_link.url).to eq("/double-slash")
       end
     end
   end
@@ -199,6 +388,126 @@ describe NavMenuLinkTabs do
 
       expect(tabs.pluck(:label)).to eq %w[parent1 parent2 child1 child2]
       expect(tabs.pluck(:link_context_type).uniq).to eq ["account"]
+    end
+  end
+
+  describe ".account_tabs" do
+    it "returns tabs for account navigation links" do
+      link1 = NavMenuLink.create!(context: @account, account_nav: true, label: "Account Link 1", url: "https://account1.com")
+      link2 = NavMenuLink.create!(context: @account, account_nav: true, label: "Account Link 2", url: "https://account2.com")
+
+      # Should not be included
+      NavMenuLink.create!(context: @account, course_nav: true, label: "Course Link", url: "https://course.com")
+      NavMenuLink.create!(context: @account, user_nav: true, label: "User Link", url: "https://user.com")
+
+      tabs = NavMenuLinkTabs.account_tabs(@account)
+
+      expect(tabs.length).to eq(2)
+      expect(tabs[0]).to include(
+        id: "nav_menu_link_#{link1.id}",
+        label: "Account Link 1",
+        href: :nav_menu_link_url,
+        external: true,
+        target: "_blank",
+        link_context_type: "account"
+      )
+      expect(tabs[1]).to include(id: "nav_menu_link_#{link2.id}", label: "Account Link 2")
+    end
+
+    it "returns account nav links from the account chain" do
+      parent_account = Account.create!(name: "Parent Account")
+      child_account = Account.create!(name: "Child Account", parent_account:)
+
+      NavMenuLink.create!(context: parent_account, account_nav: true, label: "Parent Link", url: "https://parent.com")
+      NavMenuLink.create!(context: child_account, account_nav: true, label: "Child Link", url: "https://child.com")
+
+      tabs = NavMenuLinkTabs.account_tabs(child_account)
+
+      expect(tabs.pluck(:label)).to include("Parent Link", "Child Link")
+    end
+
+    it "does not include account nav links from unrelated accounts" do
+      other_account = Account.create!(name: "Unrelated Account")
+      NavMenuLink.create!(context: other_account, account_nav: true, label: "Other Link", url: "https://other.com")
+
+      tabs = NavMenuLinkTabs.account_tabs(@account)
+
+      expect(tabs.pluck(:label)).not_to include("Other Link")
+    end
+  end
+
+  describe ".user_tabs" do
+    it "returns tabs for user navigation links" do
+      link1 = NavMenuLink.create!(context: @account, user_nav: true, label: "User Link 1", url: "https://user1.com")
+      link2 = NavMenuLink.create!(context: @account, user_nav: true, label: "User Link 2", url: "https://user2.com")
+
+      # Should not be included
+      NavMenuLink.create!(context: @account, course_nav: true, label: "Course Link", url: "https://course.com")
+      NavMenuLink.create!(context: @account, account_nav: true, label: "Account Link", url: "https://account.com")
+
+      tabs = NavMenuLinkTabs.user_tabs(@account)
+
+      expect(tabs.length).to eq(2)
+      expect(tabs[0]).to include(
+        id: "nav_menu_link_#{link1.id}",
+        label: "User Link 1",
+        href: :nav_menu_link_url,
+        external: true,
+        target: "_blank",
+        link_context_type: "account"
+      )
+      expect(tabs[1]).to include(id: "nav_menu_link_#{link2.id}", label: "User Link 2")
+    end
+
+    it "returns user nav links from the account chain" do
+      parent_account = Account.create!(name: "Parent Account")
+      child_account = Account.create!(name: "Child Account", parent_account:)
+
+      NavMenuLink.create!(context: parent_account, user_nav: true, label: "Parent Link", url: "https://parent.com")
+      NavMenuLink.create!(context: child_account, user_nav: true, label: "Child Link", url: "https://child.com")
+
+      tabs = NavMenuLinkTabs.user_tabs(child_account)
+
+      expect(tabs.pluck(:label)).to include("Parent Link", "Child Link")
+    end
+
+    it "does not include user nav links from unrelated accounts" do
+      other_account = Account.create!(name: "Unrelated Account")
+      NavMenuLink.create!(context: other_account, user_nav: true, label: "Other Link", url: "https://other.com")
+
+      tabs = NavMenuLinkTabs.user_tabs(@account)
+
+      expect(tabs.pluck(:label)).not_to include("Other Link")
+    end
+  end
+
+  describe "HrefHelper#nav_menu_link_url" do
+    subject(:helper) do
+      obj = Object.new
+      obj.extend(NavMenuLinkTabs::HrefHelper)
+      obj
+    end
+
+    it "returns absolute URLs unchanged even with host opt" do
+      expect(helper.nav_menu_link_url("https://example.com/page", { host: "canvas.instructure.com" }))
+        .to eq("https://example.com/page")
+    end
+
+    it "returns relative URLs unchanged when no host opt" do
+      expect(helper.nav_menu_link_url("/courses/1/details#tab-navigation"))
+        .to eq("/courses/1/details#tab-navigation")
+    end
+
+    it "makes relative URLs absolute when host opt is present" do
+      allow(HostUrl).to receive(:protocol).and_return("https")
+      expect(helper.nav_menu_link_url("/courses/1/details#tab-navigation", { host: "canvas.instructure.com" }))
+        .to eq("https://canvas.instructure.com/courses/1/details#tab-navigation")
+    end
+
+    it "includes host port when host opt contains port" do
+      allow(HostUrl).to receive(:protocol).and_return("http")
+      expect(helper.nav_menu_link_url("/courses/1", { host: "localhost:3000" }))
+        .to eq("http://localhost:3000/courses/1")
     end
   end
 

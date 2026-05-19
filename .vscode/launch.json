@@ -24,13 +24,20 @@
     {
       "type": "rdbg",
       "name": "Attach to web server",
-      "request": "attach",
+      "request": "attach"
     },
     {
       "type": "rdbg",
-      "name": "Attach with rdbg (tcp 12345)",
+      "name": "Attach with rdbg to web server (tcp 12345)",
       "request": "attach",
       "debugPort": "localhost:12345",
+      "localfsMap": "/usr/src/app:${workspaceFolder}"
+    },
+    {
+      "type": "rdbg",
+      "name": "Attach with rdbg to jobs server (tcp 12356)",
+      "request": "attach",
+      "debugPort": "localhost:12356",
       "localfsMap": "/usr/src/app:${workspaceFolder}"
     },
     {
@@ -48,6 +55,14 @@
       "rdbgPath": "bin/rdbg-spring",
       "command": "rspec",
       "script": "${file}:${lineNumber}"
+    },
+    {
+      "type": "rdbg",
+      "request": "attach",
+      "name": "Debug Current Spec (Docker)",
+      "debugPort": "localhost:12354",
+      "localfsMap": "/usr/src/app:${workspaceFolder}",
+      "preLaunchTask": "rspec-rdbg"
     }
   ]
 }

@@ -534,7 +534,9 @@ describe Importers::ContextExternalToolImporter do
     it "adds an error when developer key is not usable in context" do
       # Create a developer key that won't be usable in this course
       other_account = account_model
-      other_dev_key = lti_registration_with_tool(account: other_account).developer_key
+      other_registration = lti_registration_with_tool(account: other_account)
+      other_dev_key = other_registration.developer_key
+      other_registration.deactivate
       tool_hash[:settings] = { client_id: other_dev_key.global_id }
 
       expect(migration).to receive(:add_error).with(
@@ -589,6 +591,61 @@ describe Importers::ContextExternalToolImporter do
 
       control = Lti::ContextControl.last
       expect(control.deployment_id).to eq tool.id
+    end
+  end
+
+  describe "lock_deploying enforcement" do
+    let_once(:developer_key) do
+      lti_registration_with_tool(account: @course.account, registration_params: { lock_deploying: true }).developer_key
+    end
+    let_once(:migration) { @course.content_migrations.create!(user: user_model) }
+    let_once(:tool_hash) do
+      {
+        migration_id: "locked_tool_1",
+        title: "Locked Tool",
+        url: "http://www.example.com",
+        lti_version: "1.3",
+        settings: { client_id: developer_key.global_id }
+      }
+    end
+
+    context "when flag is enabled and registration is locked" do
+      it "does not persist the tool" do
+        expect do
+          Importers::ContextExternalToolImporter.import_from_migration(
+            tool_hash,
+            @course,
+            migration:
+          )
+        end.not_to change { ContextExternalTool.count }
+      end
+
+      it "adds a warning to the migration" do
+        expect(migration).to receive(:add_warning).with(
+          a_string_matching(/not imported because it has been locked/)
+        )
+        Importers::ContextExternalToolImporter.import_from_migration(
+          tool_hash,
+          @course,
+          migration:
+        )
+      end
+    end
+
+    context "when flag is disabled" do
+      before do
+        @course.account.disable_feature!(:lock_lti_registrations)
+      end
+
+      it "imports the tool normally even when lock_deploying is true" do
+        expect do
+          Importers::ContextExternalToolImporter.import_from_migration(
+            tool_hash,
+            @course,
+            migration:
+          )
+        end.to change { ContextExternalTool.count }.by(1)
+      end
     end
   end
 end

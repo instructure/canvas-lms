@@ -95,6 +95,7 @@
 #
 class AssignmentGroupsController < ApplicationController
   before_action :require_context
+  skip_before_action :require_user, only: :index
 
   include Api::V1::AssignmentGroup
 
@@ -349,6 +350,7 @@ class AssignmentGroupsController < ApplicationController
 
   def assignment_visibilities(course, assignments)
     if include_visibility?
+      DatesOverridable.preload_override_data_for_objects(assignments)
       AssignmentVisibility::AssignmentVisibilityService.assignments_with_user_visibilities(course, assignments)
     else
       params.fetch(:include, []).delete("assignment_visibility")

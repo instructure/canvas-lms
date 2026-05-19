@@ -30,7 +30,7 @@ vi.mock('@canvas/util/globalUtils', () => ({
 // on the class component instances. So we've got to cobble up enough of the date
 // formatter to send in as a prop.
 const dateFormatter = date => {
-  const fmtr = Intl.DateTimeFormat('en').format
+  const fmtr = Intl.DateTimeFormat('en', {timeZone: 'UTC'}).format
   try {
     if (date === null) return ''
     return fmtr(date instanceof Date ? date : new Date(date))
@@ -97,7 +97,7 @@ describe('DiscussionRow', () => {
     )
 
   beforeEach(() => {
-    fakeENV.setup()
+    fakeENV.setup({TIMEZONE: 'UTC'})
     ENV.discussion_anonymity_enabled = true
   })
 

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {unmountComponentAtNode} from 'react-dom'
+import * as canvasReact from '@canvas/react'
 import PostPolicies from '../index'
 import SpeedGraderHelpers from '../../../jquery/speed_grader_helpers'
 
@@ -70,30 +70,24 @@ describe('SpeedGrader PostPolicies', () => {
   })
 
   test('renders the "Hide Assignment Grades" tray', () => {
-    const $trayContainer = document.getElementById('hide-assignment-grades-tray')
-    const unmounted = unmountComponentAtNode($trayContainer)
-    strictEqual(unmounted, true)
+    ok(postPolicies._hideAssignmentGradesTray)
   })
 
   test('renders the "Post Assignment Grades" tray', () => {
-    const $trayContainer = document.getElementById('post-assignment-grades-tray')
-    const unmounted = unmountComponentAtNode($trayContainer)
-    strictEqual(unmounted, true)
+    ok(postPolicies._postAssignmentGradesTray)
   })
 
   describe('#destroy', () => {
     test('unmounts the "Hide Assignment Grades" tray', () => {
+      const spy = vi.spyOn(canvasReact, 'legacyUnmountComponentAtNode')
       postPolicies.destroy()
-      const $trayContainer = document.getElementById('hide-assignment-grades-tray')
-      const unmounted = unmountComponentAtNode($trayContainer)
-      strictEqual(unmounted, false)
+      expect(spy).toHaveBeenCalledWith($hideTrayMountPoint)
     })
 
     test('unmounts the "Post Assignment Grades" tray', () => {
+      const spy = vi.spyOn(canvasReact, 'legacyUnmountComponentAtNode')
       postPolicies.destroy()
-      const $trayContainer = document.getElementById('post-assignment-grades-tray')
-      const unmounted = unmountComponentAtNode($trayContainer)
-      strictEqual(unmounted, false)
+      expect(spy).toHaveBeenCalledWith($postTrayMountPoint)
     })
   })
 

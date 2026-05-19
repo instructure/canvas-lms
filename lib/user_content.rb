@@ -24,7 +24,7 @@ module UserContent
   def self.escape(
     str,
     current_host = nil,
-    use_updated_math_rendering = true
+    use_updated_math_rendering: true
   )
     html = Nokogiri::HTML5.fragment(str, nil, **CanvasSanitize::SANITIZE[:parser_options])
     find_user_content(html) do |obj, uc|
@@ -79,7 +79,7 @@ module UserContent
       end
     end
 
-    html.to_s.html_safe
+    html.to_s.html_safe # rubocop:disable Rails/OutputSafety
   end
 
   def self.latex_to_mathml(latex)
@@ -177,8 +177,8 @@ module UserContent
       @contextless_types = contextless_types
       @context_prefix = "/#{context.class.name.tableize}/#{context.id}"
       @context_regex = %r{(?:/(#{context.class.name.tableize})/(#{context.id})|/(#{FILES_LOCATIONS_PREFIXES.join("|")})/([^\s"<'?/]+))}
-      @absolute_part = '(https?://[\w-]+(?:\.[\w-]+)*(?:\:\d{1,5})?)?'
-      @toplevel_regex = %r{#{@absolute_part}#{@context_regex}?/(\w+)(?:/([^\s"<'?/]*)([^\s"<']*))?}
+      @absolute_part = %r{(https?://[\w-]+(?:\.[\w-]+)*(?::\d{1,5})?)?}
+      @toplevel_regex = %r{#{@absolute_part.source}#{@context_regex.source}?/(\w+)(?:/([^\s"<'?/]*)([^\s"<']*))?}
       @handlers = {}
       @default_handler = nil
       @unknown_handler = nil
@@ -187,7 +187,7 @@ module UserContent
 
     attr_reader :user, :context
 
-    UriMatch = Struct.new(:url, :type, :obj_class, :obj_id, :rest, :prefix, :context_type, :context_id) do
+    UriMatch = Struct.new(:url, :type, :obj_class, :obj_id, :rest, :prefix, :context_type, :context_id, :host) do
       def query
         rest && rest[/\?.*/]
       end
@@ -219,6 +219,11 @@ module UserContent
       return precise_translate_content(parsed_html) if Account.site_admin.feature_enabled?(:precise_link_replacements)
 
       html.gsub(@toplevel_regex) { |url| replacement(url) }
+    end
+
+    # For places we have URLs outside of HTML content
+    def translate_url(url)
+      url&.gsub(@toplevel_regex) { |matched_url| replacement(matched_url) }
     end
 
     def add_lazy_loading(parsed_html)
@@ -269,12 +274,14 @@ module UserContent
 
       matched = url.match(@toplevel_regex)
       asset_types = ASSET_TYPES.slice(*@allowed_types)
+      host = matched[1]
       context_type = matched[2] || matched[4]
       context_id   = matched[3] || matched[5]
       type, obj_id, rest = matched.values_at(6, 7, 8)
       home_link = url.match(%r{(/courses/#{Api::SHARDID_REGEX}/?(?=\b|[^/\w]|$))}o)
       url = url.sub(%r{/$}, "") if home_link
       prefix = "/#{context_type}/#{context_id}" if context_type && context_id
+      return url if context_type == "users" && type == "external_tools"
       return url if !@contextless_types.include?(type) && prefix != @context_prefix && url.split("?").first != @context_prefix && !FILES_LOCATIONS_PREFIXES.include?(context_type)
 
       # wiki pages can have slugs instead of ids, but nothing else can.
@@ -298,7 +305,7 @@ module UserContent
 
       if asset_types.key?(type)
         klass = asset_types[type]&.to_s&.constantize
-        match = UriMatch.new(url, type, klass, obj_id, rest, prefix, context_type, context_id)
+        match = UriMatch.new(url, type, klass, obj_id, rest, prefix, context_type, context_id, host)
         handler = @handlers[type] || @default_handler
       else
         match = UriMatch.new(url, type)

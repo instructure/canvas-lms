@@ -32,7 +32,7 @@ import {InternalSettings} from './react/internal_settings/InternalSettings'
 import QuotasTabContent from './react/quotas/QuotasTabContent'
 import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 import SettingsTabs from '../../shared/tabs/SettingsTabs'
-import ErrorBoundary from '@canvas/error-boundary'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
 
 const I18n = createI18nScope('account_settings_jsx_bundle')
 

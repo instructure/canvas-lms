@@ -76,7 +76,7 @@ module Lti
     def show
       # sending read_only=true; sending false would give more fields but passes the
       # nil session in to extensions' extend_account_json() which may not be safe
-      render json: account_json(context, nil, nil, [], true), content_type: MIME_TYPE
+      render json: account_json(context, nil, nil, [], read_only: true), content_type: MIME_TYPE
     end
 
     private

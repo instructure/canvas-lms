@@ -178,12 +178,12 @@ describe ApplicationHelper do
     it "produces a date-only format" do
       format = accessible_date_format("date")
       expect(format).to match(/YYYY/)
-      expect(format).to_not match(/hh:mm/)
+      expect(format).not_to match(/hh:mm/)
     end
 
     it "produces a time-only format" do
       format = accessible_date_format("time")
-      expect(format).to_not match(/YYYY/)
+      expect(format).not_to match(/YYYY/)
       expect(format).to match(/hh:mm/)
     end
 
@@ -426,7 +426,7 @@ describe ApplicationHelper do
             group = course.groups.create!
             [@grandchild_account, course, group].each do |context|
               @context = context
-              expect(helper.include_account_js).to eq("<script src=\"https://example.com/root/account.js\" defer=\"defer\"></script>\n  <script src=\"https://example.com/child/account.js\" defer=\"defer\"></script>\n  <script src=\"https://example.com/grandchild/account.js\" defer=\"defer\"></script>")
+              expect(helper.include_account_js).to eq("<script src=\"https://example.com/root/account.js\" defer=\"defer\"></script><script src=\"https://example.com/child/account.js\" defer=\"defer\"></script><script src=\"https://example.com/grandchild/account.js\" defer=\"defer\"></script>")
             end
           end
         end
@@ -1194,8 +1194,8 @@ describe ApplicationHelper do
         response.content_type = "application/json"
         account.enable_csp!
         helper.add_csp_for_root
-        expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
-        expect(headers).to_not have_key("Content-Security-Policy")
+        expect(headers).not_to have_key("Content-Security-Policy-Report-Only")
+        expect(headers).not_to have_key("Content-Security-Policy")
       end
 
       it "sets the CSP full header when active" do
@@ -1203,9 +1203,9 @@ describe ApplicationHelper do
 
         helper.add_csp_for_root
         helper.include_custom_meta_tags
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; "
-        expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
-        expect(js_env[:csp]).to eq "frame-src 'self' localhost root_account.test root_account2.test blob:; script-src 'self' 'unsafe-eval' 'unsafe-inline' localhost root_account.test root_account2.test; object-src 'self' localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: rldb: localhost root_account.test root_account2.test; "
+        expect(headers).not_to have_key("Content-Security-Policy-Report-Only")
+        expect(js_env[:csp]).to eq "frame-src 'self' localhost root_account.test root_account2.test blob: rldb:; script-src 'self' 'unsafe-eval' 'unsafe-inline' localhost root_account.test root_account2.test; object-src 'self' localhost root_account.test root_account2.test; "
       end
 
       it "does not include the report URI when active" do
@@ -1213,7 +1213,7 @@ describe ApplicationHelper do
         account.enable_csp!
         helper.add_csp_for_root
         helper.include_custom_meta_tags
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: rldb: localhost root_account.test root_account2.test; "
       end
 
       it "includes canvadocs domain if enabled" do
@@ -1224,7 +1224,7 @@ describe ApplicationHelper do
           config: { "base_url" => "https://canvadocs.instructure.com/1" }
         )
         helper.add_csp_for_root
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: canvadocs.instructure.com localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: rldb: canvadocs.instructure.com localhost root_account.test root_account2.test; "
       end
 
       it "includes inst_fs domain if enabled" do
@@ -1235,7 +1235,7 @@ describe ApplicationHelper do
           app_host: "https://inst_fs.instructure.com"
         )
         helper.add_csp_for_root
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: *.inst_fs.instructure.com inst_fs.instructure.com localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: rldb: *.inst_fs.instructure.com inst_fs.instructure.com localhost root_account.test root_account2.test; "
       end
 
       context "with default source CSP directives" do
@@ -1249,7 +1249,7 @@ describe ApplicationHelper do
           allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
           helper.add_csp_for_root
           expect(headers["Content-Security-Policy"])
-            .to eq "frame-src 'self' blob: #{helper.allow_list_domains}; " + helper.default_csp_logging_directives
+            .to eq "frame-src 'self' blob: rldb: #{helper.allow_list_domains}; " + helper.default_csp_logging_directives
         end
 
         it "sets header for files" do
@@ -1266,16 +1266,23 @@ describe ApplicationHelper do
           expect(headers["Content-Security-Policy"]).to eq helper.default_csp_logging_directives
         end
 
-        it "sets header without default source CSP directives if :default_source_csp_logging feature is disabled" do
-          account.disable_feature!(:default_source_csp_logging)
-          helper.add_csp_for_root
-          expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: #{helper.allow_list_domains}; "
-          headers.clear
-          helper.add_csp_for_file
-          expect(headers["Content-Security-Policy"]).to eq helper.csp_iframe_attribute
-          headers.clear
-          helper.set_default_source_csp_directive_if_enabled
-          expect(headers["Content-Security-Policy"]).not_to eq helper.default_csp_logging_directives
+        context "when :default_source_csp_logging feature is disabled" do
+          before { account.disable_feature!(:default_source_csp_logging) }
+
+          it "sets frame-src without logging directives for root" do
+            helper.add_csp_for_root
+            expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: rldb: #{helper.allow_list_domains}; "
+          end
+
+          it "sets iframe attribute without logging directives for files" do
+            helper.add_csp_for_file
+            expect(headers["Content-Security-Policy"]).to eq helper.csp_iframe_attribute
+          end
+
+          it "does not set the default logging CSP directive" do
+            helper.set_default_source_csp_directive_if_enabled
+            expect(headers).not_to have_key("Content-Security-Policy")
+          end
         end
 
         it "doesn't set the header if :javascript_csp feature is enabled but not enforced" do
@@ -1283,20 +1290,20 @@ describe ApplicationHelper do
           account.disable_csp!
           allow_any_instance_of(DynamicSettings).to receive(:find).with("csp-logging").and_return({ host: "mocked_host_value" })
           helper.add_csp_for_root
-          expect(headers).to_not have_key("Content-Security-Policy")
+          expect(headers).not_to have_key("Content-Security-Policy")
         end
 
         it "doesn't set the header if javascript_csp feature is disabled" do
           account.disable_feature!(:javascript_csp)
           allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
           helper.add_csp_for_root
-          expect(headers).to_not have_key("Content-Security-Policy")
+          expect(headers).not_to have_key("Content-Security-Policy")
         end
 
         it "won't override existing header" do
           allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
           directives =
-            "frame-src 'self' blob: #{helper.allow_list_domains}; " + helper.default_csp_logging_directives
+            "frame-src 'self' blob: rldb: #{helper.allow_list_domains}; " + helper.default_csp_logging_directives
           helper.add_csp_for_root
           expect(headers["Content-Security-Policy"]).to eq directives
           helper.set_default_source_csp_directive_if_enabled
@@ -1671,6 +1678,88 @@ describe ApplicationHelper do
                                   "canvas_career_learner" => "https://assets.instructure.com/test1",
                                   "canvas_career_learning_provider" => "https://assets.instructure.com/test2"
                                 })
+      end
+    end
+  end
+
+  describe "csp_context" do
+    describe "when attachment context_type is User" do
+      before(:once) do
+        @course = course_factory(active_all: true)
+        @student = user_factory(active_all: true)
+        @course.enroll_student(@student, enrollment_state: "active")
+        @assignment = @course.assignments.create!(title: "Test Assignment", submission_types: "online_upload")
+      end
+
+      let(:attachment) do
+        Attachment.create!(
+          filename: "test.txt",
+          context: @student,
+          uploaded_data: StringIO.new("test content")
+        )
+      end
+
+      it "returns the course when attachment has one submission association" do
+        @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+
+        @attachment = attachment
+        result = helper.csp_context
+
+        expect(result).to eq(@course)
+        expect(helper.instance_variable_get(:@csp_context_is_submission)).to be(true)
+      end
+
+      it "returns nil when attachment has no submission associations" do
+        @attachment = attachment
+        result = helper.csp_context
+
+        expect(result).to be_nil
+        expect(helper.instance_variable_get(:@csp_context_is_submission)).to be(false)
+      end
+
+      it "returns nil when attachment has submissions from multiple courses" do
+        course2 = course_factory(active_all: true)
+        course2.enroll_student(@student, enrollment_state: "active")
+        assignment2 = course2.assignments.create!(title: "Test Assignment 2", submission_types: "online_upload")
+
+        @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+        assignment2.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+
+        @attachment = attachment
+        result = helper.csp_context
+
+        expect(result).to be_nil
+        expect(helper.instance_variable_get(:@csp_context_is_submission)).to be(false)
+      end
+
+      it "returns the course when attachment has multiple submissions from the same course" do
+        assignment2 = @course.assignments.create!(title: "Test Assignment 2", submission_types: "online_upload")
+
+        @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+        assignment2.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+
+        @attachment = attachment
+        result = helper.csp_context
+
+        expect(result).to eq(@course)
+        expect(helper.instance_variable_get(:@csp_context_is_submission)).to be(true)
+      end
+
+      it "does not return courses where the attachment is only referenced in past, but not current, submission attempts" do
+        attachment2 = Attachment.create!(
+          filename: "file2.txt",
+          context: @student,
+          uploaded_data: StringIO.new("second attempt")
+        )
+
+        @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+        @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [attachment2])
+
+        @attachment = attachment
+        result = helper.csp_context
+
+        expect(result).to be_nil
+        expect(helper.instance_variable_get(:@csp_context_is_submission)).to be(false)
       end
     end
   end

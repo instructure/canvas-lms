@@ -23,7 +23,7 @@ module CC::Exporter::Epub::Converters
     include CC::CCHelper
     include Canvas::Migration::XMLHelper
 
-    def settings_doc(html = false)
+    def settings_doc(html: false)
       path = @package_root.item_path("course_settings", "module_meta.xml")
       return nil unless File.exist? path
 

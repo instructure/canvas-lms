@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../../spec_helper"
-
 describe Accessibility::Concerns::ResourceResolvable do
   let(:course) { course_model }
   let(:wiki_page) { wiki_page_model(course:) }

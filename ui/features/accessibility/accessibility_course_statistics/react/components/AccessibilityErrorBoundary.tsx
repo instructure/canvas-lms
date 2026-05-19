@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ErrorBoundary from '@canvas/error-boundary/react'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import {PropsWithChildren} from 'react'
 import {AccessibilityGenericErrorPage} from './AccessibilityGenericErrorPage'
 

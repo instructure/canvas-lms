@@ -26,13 +26,13 @@ describe ErrorReport do
                 "llo"
       data = { extra: { message: } }
       expect { described_class.log_exception_from_canvas_errors("my error", data) }
-        .to_not raise_error
+        .not_to raise_error
     end
 
     it "uses an empty hash as a default for errors with no extra data" do
       data = { tags: { a: "b" } }
       expect { described_class.log_exception_from_canvas_errors("my error", data) }
-        .to_not raise_error
+        .not_to raise_error
     end
 
     it "uses class name for category" do

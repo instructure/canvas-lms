@@ -60,14 +60,14 @@ describe "user_content post processing" do
       file_link1 = f("a#link1")
       expect(file_link1).to be_displayed
       expect(file_link1.attribute("class")).to include("file_preview_link")
-      expect(file_link1.attribute("href")).to end_with "#{@file_url}?wrap=1&verifier=#{@file.uuid}"
+      expect(file_link1.attribute("href")).to end_with "#{@file_url}?verifier=#{@file.uuid}&wrap=1"
 
       file_link2 = f("a#link2")
       expect(file_link2).to be_displayed
       expect(file_link2.attribute("class")).to include("file_preview_link")
       expect(
         file_link2.attribute("href")
-      ).to end_with "#{@file_url}/download?wrap=1&verifier=#{@file.uuid}"
+      ).to end_with "#{@file_url}/download?verifier=#{@file.uuid}&wrap=1"
 
       # the file inline preview buttons
       expect(ff("a.file_preview_link")[0]).to be_displayed
@@ -107,7 +107,7 @@ describe "user_content post processing" do
       file_link = f("a#thelink")
       expect(file_link).to be_displayed
       expect(file_link.attribute("class")).to eq("inline_disabled preview_in_overlay")
-      expect(file_link.attribute("href")).to end_with "#{@file_url}?wrap=1&verifier=#{@file.uuid}"
+      expect(file_link.attribute("href")).to end_with "#{@file_url}?verifier=#{@file.uuid}&wrap=1"
 
       # the file inline preview button
       expect(f("body")).not_to contain_css("a.file_preview_link")

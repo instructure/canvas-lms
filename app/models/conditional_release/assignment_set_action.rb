@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module ConditionalRelease
-  class AssignmentSetAction < ActiveRecord::Base
+  class AssignmentSetAction < ApplicationRecord
     include Deletion
 
     validates :action, inclusion: { in: %w[assign unassign] }

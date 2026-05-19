@@ -31,7 +31,7 @@ import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {ReplyPreview} from '../../components/ReplyPreview/ReplyPreview'
 import theme from '@instructure/canvas-theme'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import useHighlightStore from '../../hooks/useHighlightStore'
 
@@ -383,7 +383,6 @@ DiscussionEntryContainerBase.propTypes = {
   quotedEntry: PropTypes.object,
   attachment: Attachment.shape,
   toggleUnread: PropTypes.func,
-  breakpoints: breakpointsShape,
   delayedPostAt: PropTypes.string,
   isPinned: PropTypes.bool,
   pinnedBy: User.shape,
@@ -392,7 +391,6 @@ DiscussionEntryContainerBase.propTypes = {
 DiscussionEntryContainerBase.defaultProps = {
   deleted: false,
   threadParent: false,
-  breakpoints: breakpointsShape,
 }
 
 export const DiscussionEntryContainer = WithBreakpoints(DiscussionEntryContainerBase)

@@ -22,10 +22,11 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import ErrorBoundary from '@canvas/error-boundary'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 
 const I18n = createI18nScope('assignment')
 
@@ -53,6 +54,8 @@ function FileBrowserWrapper(props) {
       errorComponent={
         <GenericErrorPage
           imageUrl={errorShipUrl}
+          onReportError={reportError}
+          translations={canvasErrorPageTranslations}
           errorCategory="FileBrowser on Create Assignment page"
         />
       }

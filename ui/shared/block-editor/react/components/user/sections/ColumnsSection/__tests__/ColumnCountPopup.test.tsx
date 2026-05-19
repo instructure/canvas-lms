@@ -57,9 +57,8 @@ describe('ColumnCountPopup', () => {
     const {getByText} = render(<ColumnCountPopup {...props} />)
     const btn = getByText('Columns').closest('button') as HTMLButtonElement
     await user.click(btn)
-    const colinput = await screen.findByLabelText('Columns 1-4')
-    expect(colinput).toBeInTheDocument()
-    expect(screen.getByLabelText('Set the number of columns')).toBeInTheDocument()
+    expect(await screen.findByText('Columns 1-4')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('2')).toBeInTheDocument()
   })
 
   it('shows the right column count', async () => {
@@ -81,7 +80,8 @@ describe('ColumnCountPopup', () => {
     const btn = getByText('Columns').closest('button') as HTMLButtonElement
     await user.click(btn)
 
-    const colinput = await screen.findByLabelText('Columns 1-4')
+    await screen.findByText('Columns 1-4')
+    const colinput = screen.getByDisplayValue('2')
 
     fireEvent.change(colinput, {target: {value: '3'}})
 

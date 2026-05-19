@@ -18,7 +18,7 @@
 
 import {gql} from '@apollo/client'
 import {executeQuery} from '@canvas/graphql'
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 
 export const ASSIGNMENT_RUBRIC_ASSESSMENTS_QUERY = gql`
   query GetAssignmentRubricAssessments($assignmentId: ID!) {
@@ -103,7 +103,7 @@ export const importRubricAssessment = async (
   const response = await fetch(url, {
     method: 'POST',
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
     },
     body: formData,
   })
@@ -125,7 +125,7 @@ export const fetchRubricAssessmentImport = async (
   const response = await fetch(url, {
     method: 'GET',
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
     },
   })
 

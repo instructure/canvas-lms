@@ -22,7 +22,7 @@ require "icalendar"
 
 Icalendar::Event.optional_property :x_alt_desc
 
-class CalendarEvent < ActiveRecord::Base
+class CalendarEvent < ApplicationRecord
   include CopyAuthorizedLinks
   include TextHelper
   include HtmlTextHelper
@@ -438,7 +438,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   alias_method :destroy_permanently!, :destroy
-  def destroy(update_context_or_parent = true)
+  def destroy(update_context_or_parent: true)
     transaction do
       self.workflow_state = "deleted"
       self.deleted_at = Time.now.utc
@@ -447,7 +447,7 @@ class CalendarEvent < ActiveRecord::Base
       child_events.find_each do |e|
         e.cancel_reason = cancel_reason
         e.updating_user = updating_user
-        e.destroy(false)
+        e.destroy(update_context_or_parent: false)
       end
       next unless update_context_or_parent
 
@@ -506,7 +506,7 @@ class CalendarEvent < ActiveRecord::Base
     dispatch :appointment_reserved_by_user
     to do
       appointment_group.instructors +
-        User.observing_students_in_course(@updating_user.id, appointment_group.active_contexts.select { |c| c.is_a?(Course) })
+        User.observing_students_in_course(@updating_user.id, appointment_group.active_contexts.grep(Course))
     end
     whenever do
       @updating_user && appointment_group && parent_event &&
@@ -518,7 +518,7 @@ class CalendarEvent < ActiveRecord::Base
     dispatch :appointment_canceled_by_user
     to do
       appointment_group.instructors +
-        User.observing_students_in_course(@updating_user.id, appointment_group.active_contexts.select { |c| c.is_a?(Course) })
+        User.observing_students_in_course(@updating_user.id, appointment_group.active_contexts.grep(Course))
     end
     whenever do
       appointment_group && parent_event &&
@@ -795,7 +795,7 @@ class CalendarEvent < ActiveRecord::Base
       event.summary = @event.is_a?(SubAssignment) ? @event.title_with_required_replies : @event.title
 
       if @event.description && include_description
-        html = api_user_content(@event.description, @event.context, nil, preloaded_attachments, location: @event)
+        html = api_user_content(@event.description, @event.context, nil, preloaded_attachments, location: @event.asset_string)
         event.description = html_to_text(html)
         event.x_alt_desc = Icalendar::Values::Text.new(html, { "FMTTYPE" => "text/html" })
       end

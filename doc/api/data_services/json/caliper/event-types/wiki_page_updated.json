@@ -9,7 +9,8 @@
     },
     "data[0].object.extensions[\"com.instructure.canvas\"]": {
       "body": "The body of the new page. NOTE: This field will be truncated to only include the first 8192 characters.",
-      "entity_id": "Canvas global ID of the object affected by the event"
+      "entity_id": "Canvas global ID of the object affected by the event",
+      "workflow_state": "The current workflow_state of the wiki page. Possible values are \"active\", \"unpublished\", and \"deleted\"."
     },
     "data[0].object": {
       "type": "Page"
@@ -47,7 +48,8 @@
               "extensions": {
                 "com.instructure.canvas": {
                   "body": "This is wiki page text",
-                  "entity_id": "72270000000674553"
+                  "entity_id": "72270000000674553",
+                  "workflow_state": "active"
                 }
               }
             },

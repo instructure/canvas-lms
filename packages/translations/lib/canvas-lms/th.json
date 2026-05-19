@@ -1,0 +1,306 @@
+{
+    "ConfirmationDialog": {
+        "Cancel": "ยกเลิก",
+        "Confirm": "ยืนยัน"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "กำกับเป็นวันที่ที่สำคัญและแสดงไว้ในแถบรายการด้านข้างของโฮมรูม"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "รูปแบบการให้เกรดเริ่มต้นสำหรับบัญชีผู้ใช้",
+        "Account default grading scheme was successfully saved.": "บันทึกรูปแบบการให้เกรดเริ่มต้นสำหรับบัญชีผู้ใช้เสร็จสิ้น",
+        "Active Grading Schemes": "รูปแบบการให้เกรดใช้งาน",
+        "Applied": "ที่ปรับใช้",
+        "Apply": "ปรับใช้",
+        "Archive Grading Scheme": "จัดเก็บรูปแบบการให้เกรดแยก",
+        "Archived": "จัดเก็บแยกแล้ว",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "รูปแบบการให้เกรดที่จัดเก็บแยกไว้ที่ใช้งานยังสามารถใช้งานได้ต่อไป แต่จะไม่สามารถเพิ่มไปยังบทเรียนหรือภารกิจใหม่",
+        "Are you sure you want to delete this grading scheme?": "แน่ใจว่าต้อกงารลบรูปแบบการให้เกรดนี้หรือไม่",
+        "Cancel": "ยกเลิก",
+        "Canvas Default": "ค่าเริ่มต้นของ Canvas",
+        "Close": "ปิด",
+        "Confirm": "ยืนยัน",
+        "Confirm Default Grading Scheme Change": "ยืนยันการแก้ไขรูปแบบการให้เกรดเริ่มต้น",
+        "Delete Grading Scheme": "ลบรูปแบบการให้เกรด",
+        "Duplicate Grading Scheme": "จำลองรูปแบบการให้เกรด",
+        "Edit Grading Scheme": "แก้ไขรูปแบบการให้เกรด",
+        "Grading Scheme Name": "ชื่อรูปแบบการให้เกรด",
+        "Grading scheme was successfully archived.": "จัดเก็บแยกรูปแบบการให้เกรดเสร็จสิ้น",
+        "Grading scheme was successfully created.": "จัดทำรูปแบบการให้เกรดเสร็จสิ้น",
+        "Grading scheme was successfully removed.": "ลบรูปแบบการให้เกรดเสร็จสิ้น",
+        "Grading scheme was successfully saved.": "บันทึกรูปแบบการให้เกรดเสร็จสิ้น",
+        "Grading scheme was successfully unarchived.": "ยกเลิกการจัดเก็บรูปแบบการให้เกรดเสร็จสิ้น",
+        "Locations Used": "ใช้ข้อมูลสถานที่",
+        "Lower limit of range": "เกณฑ์จำกัดช่วงล่าง",
+        "New Grading Scheme": "รูปแบบการให้เกรดใหม่",
+        "Next Page": "เพจถัดไป",
+        "No account default": "ไม่มีค่าเริ่มต้นบัญชีผู้ใช้",
+        "Previous Page": "หน้าที่แล้ว",
+        "Save": "บันทึก",
+        "Search": "ค้นหา",
+        "Search...": "ค้นหา...",
+        "Show courses and assignments": "แสดงบทเรียนและภารกิจ",
+        "Show locations used": "แสดงตำแหน่งที่ใช้",
+        "Sort by": "จัดเรียงจาก",
+        "There was an error while archiving the grading scheme": "มีข้อผิดพลาดขณะจัดเก็ฐแยกรูปแบบการให้เกรด",
+        "There was an error while creating the grading scheme": "มีข้อผิดพลาดขณะจัดทำรูปแบบการให้เกรด",
+        "There was an error while loading grading schemes": "มีข้อผิดพลาดขณะโหลดรูปแบบการให้เกรด",
+        "There was an error while loading the default canvas grading scheme": "มีข้อผิดพลาดขณะโหลดรูปแบบการให้เกรดเริ่มต้นของ Canvas",
+        "There was an error while loading the default grading scheme": "มีข้อผิดพลาดขณะโหลดรูปแบบการให้เกรดเริ่มต้น",
+        "There was an error while removing the grading scheme": "มีข้อผิดพลาดขณะลบรูปแบบการให้เกรด",
+        "There was an error while unarchiving the grading scheme": "มีข้อผิดพลาดขณะเลิกจัดเก็บแยกรูปแบบการให้เกรด",
+        "There was an error while updating the default grading scheme": "พบข้อผิดพลาดขณะอัพเดตรูปแบบการให้เกรดเริ่มต้น",
+        "There was an error while updating the grading scheme": "มีข้อผิดพลาดขณะอัพเดตรูปแบบการให้เกรด",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "การเปลี่ยนแปลงนี้จะส่งผลต่อบทเรียนใช้งานและภารกิจทั้งหมดที่รับช่วงค่าเริ่มต้นทางบัญชีอยู่ในปัจจุบัน การเปลี่ยนแปลงนี้ต้องใช้เวลาดำเนินการสักครู่เนื่องจากเกรดสำหรับบทเรียนและภารกิจทั้งหมดจะถูกคำนวณใหม่ตามรูปแบบการให้เกรดเริ่มต้นของบัญชีผู้ใช้ใหม่",
+        "Unarchive Grading Scheme": "เลิกจัดเก็บแยกรูปแบบการให้เกรด",
+        "Upper limit of range": "เกณฑ์จำกัดช่วงบนของช่วง",
+        "View Grading Scheme": "ดูรูปแบบการให้เกรด",
+        "View/Copy Grading Scheme": "ดู/คัดลอกรูปแบบการให้เกรด",
+        "View/Edit Grading Scheme": "ดู/แก้ไขรูปแบบการให้เกรด",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "คุณไม่สามารถจัดเก็บแยกรูปแบบการให้เกรดนี้เนื่องจากกำหนดไว้เป็นค่าเริ่มต้นสำหรับบทเรียนหรือบัญชีผู้ใช้",
+        "You can't delete this grading scheme because it is in use.": "คุณไม่สามารถลบรูปแบบการให้เกรดนี้เนื่องจากถูกใช้งานอยู่",
+        "You have no active grading schemes.": "คุณไม่มีรูปแบบการให้เกรดใช้งานในปัจจุบัน",
+        "You have no archived grading schemes.": "คุณไม่มีรูปแบบการให้เกรดที่จัดเก็บแยกไว้",
+        "to": "เป็น"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "แน่ใจว่าต้อกงารลบรูปแบบการให้เกรดนี้หรือไม่",
+        "Are you sure you want to duplicate this grading scheme?": "แน่ใจว่าต้องการจำลองรูปแบบการให้เกรดนี้หรือไม่",
+        "Cancel": "ยกเลิก",
+        "Close": "ปิด",
+        "Delete": "ลบ",
+        "Delete ": "ลบ ",
+        "Duplicate": "ซ้ำซ้อน",
+        "Duplicate ": "จำลอง  ",
+        "Edit Grading Scheme": "แก้ไขรูปแบบการให้เกรด",
+        "New Grading Scheme": "รูปแบบการให้เกรดใหม่",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "เปอร์เซ็นต์และคะแนนไม่สามารถแก้ไขได้เนื่องจากเป็นรูปแบบการให้เกรดระดับบัญชี",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "เปอร์เซ็นต์และคะแนนไม่สามารถแก้ไขได้เนื่องจากถูกใช้เป็นรูปแบบการให้เกรดเริ่มต้นอยู่",
+        "Percentages and points can't be edited because it is currently being used.": "เปอร์เซ็นต์และคะแนนไม่สามารถแก้ไขได้เนื่องจากกำลังใช้อยู่ในปัจจุบัน",
+        "Save": "บันทึก"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "ตารางที่มีข้อมูลรูปแบบการให้เกรดเริ่มต้นของ Canvas  แต่ละแถวจะมีชื่อ เปอร์เซ็นต์สูงสุดและเปอร์เซ็นต์ต่ำสุด",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "ตารางที่มีข้อมูลรูปแบบการให้เกรด  แต่ละแถวจะมีชื่อ เปอร์เซ็นต์สูงสุดและเปอร์เซ็นต์ต่ำสุด",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "ไม่สามารถมีชื่อแถวที่ซ้ำกันหรือชื่อเปล่าได้ แก้ไขชื่อและลองคลิก “บันทึก” (Save) อีกครั้ง",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "ไม่สามารถมีช่วงที่ซ้อนทับกันหรือช่วงเปล่า แก้ไขช่วงแล้วคลิก “บันทึก” (Save) อีกครั้ง",
+        "Delete grading scheme": "ลบรูปแบบการให้เกรด",
+        "Edit Grading Scheme": "แก้ไขรูปแบบการให้เกรด",
+        "Edit a copy of this grading scheme": "แก้ไขสำเนารูปแบบการให้เกรดนี้",
+        "Edit grading scheme": "แก้ไขรูปแบบการให้เกรด",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "ต้องระบุชื่อรูปแบบการให้เกรด (Grading Scheme Name) เพิ่มชื่อแล้วลองคลิกที่ “บันทีก” (Save) อีกครั้ง",
+        "Grading scheme title": "ชื่อรูปแบบการให้เกรด",
+        "Invalid grading scheme": "รูปแบบการให้เกรดไม่ถูกต้อง",
+        "Letter Grade": "เกรดแบบตัวอักษร",
+        "Looks great!": "ดูใช้ได้เลย!",
+        "Percentage": "เปอร์เซ็นต์",
+        "Points": "คะแนน",
+        "Range": "ช่วง",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "ช่วงจะต้องเป็นตัวเลขที่ถูกต้อง จะมีจำนวนติดลบหรือจำนวนที่มากกว่า 100 ไม่ได้ แก้ไขช่วงแล้วคลิก “บันทึก” (Save) อีกครั้ง",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "ช่วงจะต้องเป็นตัวเลขที่ถูกต้อง จะมีจำนวนติดลบหรือจำนวนที่มากกว่าช่วงคะแนนช่วงบนไม่ได้ แก้ไขช่วงแล้วคลิก “บันทึก” (Save) อีกครั้ง",
+        "edit a copy": "แก้ไขสำเนา"
+    },
+    "OutcomeManagement": {
+        "Course": "บทเรียน",
+        "Institution": "สถาบัน"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "บัญชี",
+        "Close": "ปิด",
+        "Concluded": "สรุปแล้ว",
+        "Courses": "บทเรียน",
+        "Failed to load account used locations": "ไม่สามารถโหลดตำแหน่งที่ใช้โดยบัญชีผู้ใช้",
+        "Failed to load assignments used locations": "ไม่สามารถโหลดตำแหน่งที่ใช้โดยภารกิจ",
+        "Failed to load used locations": "ไม่สามารถโหลดตำแหน่งที่ใช้",
+        "Load Assignments ...": "โหลดภารกิจ...",
+        "Load More Assignments ...": "โหลดภารกิจเพิ่มเติม...",
+        "Loading": "กำลังโหลด",
+        "Locations Used": "ใช้ข้อมูลสถานที่",
+        "Search": "ค้นหา",
+        "Search...": "ค้นหา..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "นโยบายการใช้งานที่ยอมรับได้",
+        "Close": "ปิด",
+        "Loading page": "กำลังโหลดหน้าเพจ",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "นโยบายการใช้งานที่ยอมรับได้ไม่พร้อมเรียกใช้ในตอนนี้ กรุณากลับเข้ามาใหม่ในภายหลังหรือติดต่อฝ่ายบริการหากต้องการความช่วยเหลือเพิ่มเติม",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "ไม่สามารถโหลดนโยบายการใช้งานที่ยอมรับได้ กรุณาลองใหม่อีกครั้งในภายหลังหรือติดต่อฝ่ายบริการหากยังพบปัญหาอยู่"
+    },
+    "account_reports": {
+        "Close": "ปิด",
+        "Invalid date and time.": "วันที่และเวลาไม่ถูกต้อง",
+        "Next month": "เดือนถัดไป",
+        "Previous month": "เดือนก่อนหน้า",
+        "Time": "เวลา"
+    },
+    "admin_split": {
+        "Cancel": "ยกเลิก",
+        "Failed to split users.": "ไม่สามารถแยกผู้ใช้",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "หมายเหตุ: การดำเนินการนี้จะเป็นการยกเลิกการผสานให้สมบูรณ์มากที่สุด ทั้งนี้ผู้ใช้ที่ถูกผสานไปแล้วอาจไม่สามารถกู้คืนเป็นสถานะก่อนหน้าได้อย่างสมบุรณ์แบบ",
+        "OK": "ตกลง",
+        "Split": "แยก",
+        "The following users will be split into separate user accounts:": "ผู้ใช้ต่อไปนี้จะถูกแยกเป็นบัญชีผู้ใช้แยกเฉพาะ:",
+        "There are no user accounts to split from this user.": "ไม่มีบัญชีผู้ใช้สำหรับแยกจากผู้ใช้รายนี้",
+        "User split complete. Links to split user accounts follow:": "แยกผู้ใช้เสร็จสิ้น ลิงค์เพื่อแยกบัญชีผู้ใช้ดังนี้"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "รายละเอียด"
+    },
+    "assignment_footer": {
+        "Next": "ถัดไป",
+        "Previous": "ก่อนหน้า"
+    },
+    "assignment_tabs": {
+        "Assignment": "ภารกิจ",
+        "Peer Review": "ความคิดเห็นจากผู้เกี่ยวข้อง"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "(ค่าเริ่มต้นบทเรียน)",
+        "Account Level": "ระดับบัญชีผู้ใช้",
+        "Canvas Grading Scheme (course default)": "รูปแบบการให้เกรดของ Canvas (ค่าเริ่มต้นของบทเรียน)",
+        "Close": "ปิด",
+        "Course Level": "ระดับบทเรียน",
+        "Default Canvas Grading Scheme": "รูปแบบการให้เกรดเริ่มต้นของ Canvas",
+        "Grading scheme was successfully removed.": "ลบรูปแบบการให้เกรดเสร็จสิ้น",
+        "Grading scheme was successfully updated.": "อัพเดตรูปแบบการให้เกรดเสร็จสิ้น",
+        "Manage All Grading Schemes": "จัดการรูปแบบการให้เกรดทั้งหมด",
+        "New Grading Scheme": "รูปแบบการให้เกรดใหม่",
+        "Select a grading scheme": "เลือกรูปแบบการให้เกรด",
+        "There was an error while loading grading schemes": "มีข้อผิดพลาดขณะโหลดรูปแบบการให้เกรด",
+        "There was an error while loading the grading scheme": "มีปัญหาขณะโหลดรูปแบบ",
+        "There was an error while refreshing grading schemes": "มีข้อผิดพลาดขณะรีเฟรชรูปแบบการให้เกรด",
+        "There was an error while removing the grading scheme": "มีข้อผิดพลาดขณะลบรูปแบบการให้เกรด",
+        "View": "ดู"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "เพจแจ้งข้อผิดพลาดสำหรับผู้สอนภารกิจ 2",
+        "Assignments 2 Teacher initial query error": "ข้อผิดพลาดในการสืบค้นเบื้องต้นสำหรับผู้สอนภารกิจ 2",
+        "Loading": "กำลังโหลด"
+    },
+    "catalog": {
+        "Course Catalog": "แคตาล็อกบทเรียน"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "ทำได้ดีมาก! จากผู้พัฒนาของ Canvas"
+    },
+    "content_copy_redesign": {
+        "Cancel": "ยกเลิก",
+        "Copy course": "คัดลอกบทเรียน",
+        "Course code": "รหัสบทเรียน",
+        "Course code must be 255 characters or less": "รหัสบทเรียนจะต้องยาวไม่เกิน 255 อักขระ",
+        "Course name must be 255 characters or less": "เส้นทางการเรียนรู้จะต้องยาวไม่เกิน 255 อักขระ",
+        "Create course": "จัดทำบทเรียน",
+        "Creating...": "กำลังจัดทำ...",
+        "End date": "วันที่สิ้นสุด",
+        "End date must be after start date": "วันที่สิ้นสุดต้องอยู่หลังจากวันที่เริ่มต้น",
+        "Name": "ชื่อ",
+        "No results": "ไม่มีผลลัพธ์",
+        "Please enter the details for the new course.": "กรุณากรอกรายละเอียดสำหรับบทเรียนใหม่",
+        "Select a new beginning date": "เลือกวันที่เริ่มต้นใหม่",
+        "Select a new end date": "เลือกวันทีสิ้นสุดใหม่",
+        "Select end date": "เลือกวันที่สิ้นสุด",
+        "Select start date": "เลือกวันที่เริ่มต้น",
+        "Start date": "วันที่เริ่มต้น",
+        "Start date must be before end date": "วันที่เริ่มต้นจะต้องอยู่ก่อนวันที่สิ้นสุด",
+        "Start typing to search...": "เริ่มพิมพ์เพื่อค้นหา...",
+        "Term": "เทอม",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "วันที่เริ่มต้นและสิ้นสุดเทอมไม่สามารถแก้ไขที่นี่ได้ เฉพาะจากเพจ รายละเอียดเทอม (Term Details) จาก ผู้ดูแล (Admin) เท่านั้น",
+        "Use arrow keys to navigate options.": "ใช้ปุ่มลูกศรเพื่อไปยังตัวเลือกต่าง ๆ"
+    },
+    "content_share_preview_overlay": {
+        "Close": "ปิด",
+        "Content Share Preview": "แสดงตัวอย่างการแชร์เนื้อหา",
+        "Preview": "แสดงตัวอย่าง"
+    },
+    "copy_warnings_modal": {
+        "Attention": "ข้อควรทราบ"
+    },
+    "course_logging_content": {
+        "No results": "ไม่มีผลลัพธ์",
+        "Type to search": "พิมพ์เพื่อค้นหา"
+    },
+    "create_course_modal": {
+        "Cancel": "ยกเลิก",
+        "Course Details": "รายละเอียดบทเรียน",
+        "Course Name": "ชื่อบทเรียน",
+        "Create": "จัดทำ",
+        "Create Course": "จัดทำบทเรียน",
+        "Create Subject": "จัดทำวิชา",
+        "Creating new course...": "กำลังจัดทำบทเรียนใหม่...",
+        "Creating new subject...": "กำลังจัดทำวิชาใหม่...",
+        "Error creating new course": "มีข้อผิดพลาดในการจัดทำบทเรียนใหม่",
+        "Error creating new subject": "มีข้อผิดพลาดในการจัดทำวิชาใหม่",
+        "Loading accounts...": "กำลังโหลดบัญชี...",
+        "Name...": "ชื่อ...",
+        "No Results": "ผลลัพธ์",
+        "Select a homeroom": "เลือกโฮมรูม",
+        "Subject Name": "ชื่อวิชา",
+        "Unable to get accounts": "ไม่สามารถรับบัญชีผู้ใช้",
+        "Unable to get homerooms": "ไม่สามารถรับโฮมรูม",
+        "Use arrow keys to navigate options.": "ใช้ปุ่มลูกศรเพื่อไปยังตัวเลือกต่าง ๆ",
+        "Which account will this course be associated with?": "บัญชีใดที่จะเชื่อมโยงกับบทเรียนนี้",
+        "Which account will this subject be associated with?": "บัญชีใดที่จะเชื่อมโยงกับวิชานี้"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "บอกล้างเกรดสรุป"
+    },
+    "feature_flags": {
+        "Accept": "ตอบรับ",
+        "Cancel": "ยกเลิก"
+    },
+    "filter_bar": {
+        "All": "ทั้งหมด",
+        "Clear": "ล้าง",
+        "Filter by": "กรองจาก",
+        "Search": "ค้นหา",
+        "Use arrow keys to navigate options.": "ใช้ปุ่มลูกศรเพื่อไปยังตัวเลือกต่าง ๆ"
+    },
+    "groupNavigationSelector": {
+        "Select Group": "เลือกกลุ่ม",
+        "Use arrow keys to navigate options.": "ใช้ปุ่มลูกศรเพื่อไปยังตัวเลือกต่าง ๆ"
+    },
+    "jobs": {
+        "Close": "ปิด"
+    },
+    "modules_home_page": {
+        "Create a new Module": "จัดทำหน่วยการเรียนใหม่"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "แพนด้าผู้คงแก่เรียน",
+        "Moves:": "ย้าย:"
+    },
+    "overview_page": {
+        "Edit home page": "แก้ไขหน้าหลัก",
+        "Subject Home Page": "หน้าหลักวิชา"
+    },
+    "pages_edit_title": {
+        "Page Title": "ชื่อเพจ"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "ยกเลิก",
+        "Close": "ปิด"
+    },
+    "study_assist": {
+        "Back": "ย้อนกลับ",
+        "Close": "ปิด",
+        "Page": "หน้าเพจ"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "ต้องระบุ URL ที่ถูกต้อง",
+        "Website URL": "URL เว็บไซต์"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "นโยบายการใช้งานที่ยอมรับได้",
+        "Loading...": "กำลังโหลด...",
+        "Preview": "แสดงตัวอย่าง"
+    },
+    "todos_page": {
+        "Failed to load todos": "ไม่สามารถโหลดรายการสิ่งที่ต้องทำ",
+        "Loading Additional Todo Details": "กำลังโหลดรายละเอียดสิ่งที่ต้องทำเพิ่มเติม",
+        "Loading Todo Course Name": "กำลังโหลดชื่อบทเรียนสำหรับสิ่งที่ต้องทำ",
+        "Loading Todo Title": "กำลังโหลดชื่อรายการสิ่งที่ต้องทำ"
+    },
+    "tray": {
+        "Close": "ปิด"
+    }
+}

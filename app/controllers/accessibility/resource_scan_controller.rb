@@ -22,7 +22,6 @@ module Accessibility
     include AccessibilityFilters
 
     before_action :require_context
-    before_action :require_user
     before_action :check_authorized_action
     before_action :check_close_issues_feature_flag, only: [:close_issues]
 
@@ -150,7 +149,7 @@ module Accessibility
         end
       else
         relation.order({ sort => direction.downcase.to_sym })
-      end
+      end.order(id: :asc)
     end
 
     # Returns a hash representation of the scan, for JSON rendering.

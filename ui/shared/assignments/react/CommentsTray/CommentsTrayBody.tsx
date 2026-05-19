@@ -20,17 +20,18 @@ import {useQuery} from '@apollo/client'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
-import ErrorBoundary from '@canvas/error-boundary'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import LoadingIndicator from '@canvas/loading-indicator'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {bool, func} from 'prop-types'
+import {bool, func, number} from 'prop-types'
 import React, {useContext, useState} from 'react'
 import ClosedDiscussionSVG from '@canvas/assignments/react/images/ClosedDiscussions.svg'
 import SVGWithTextPlaceholder from './SVGWithTextPlaceholder'
@@ -118,6 +119,8 @@ export default function CommentsTrayBody(props) {
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject="Assignments 2 Student submission comments query error"
         errorCategory="Assignments 2 Student Error Page"
       />
@@ -133,6 +136,8 @@ export default function CommentsTrayBody(props) {
       errorComponent={
         <GenericErrorPage
           imageUrl={errorShipUrl}
+          onReportError={reportError}
+          translations={canvasErrorPageTranslations}
           errorCategory="Assignments 2 Student Comment Error Page"
         />
       }
@@ -188,6 +193,7 @@ export default function CommentsTrayBody(props) {
                 submission={props.submission}
                 reviewerSubmission={props.reviewerSubmission}
                 isPeerReviewEnabled={props.isPeerReviewEnabled}
+                focusTrigger={props.focusTrigger}
                 onSendCommentSuccess={() => {
                   if (props.isPeerReviewEnabled && !props.assignment.rubric) {
                     handlePeerReviewPromptModal()
@@ -224,6 +230,7 @@ CommentsTrayBody.propTypes = {
   submission: Submission.shape.isRequired,
   reviewerSubmission: Submission.shape,
   isPeerReviewEnabled: bool,
+  focusTrigger: number,
   onSuccessfulPeerReview: func,
   usePeerReviewModal: bool,
   suppressSuccessAlert: bool,

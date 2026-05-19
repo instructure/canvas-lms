@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 RSpec.describe SubmissionComment do
   before(:once) do
     course_with_teacher(active_all: true)
@@ -261,15 +259,15 @@ RSpec.describe SubmissionComment do
     it "does not dispatch notification on create if course is unpublished" do
       @course.complete
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
-      expect(@course).to_not be_available
-      expect(@comment.messages_sent.keys).to_not include("Submission Comment")
+      expect(@course).not_to be_available
+      expect(@comment.messages_sent.keys).not_to include("Submission Comment")
     end
 
     it "does not dispatch notification on create if student is inactive" do
       @student.enrollments.first.deactivate
 
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
-      expect(@comment.messages_sent.keys).to_not include("Submission Comment")
+      expect(@comment.messages_sent.keys).not_to include("Submission Comment")
     end
 
     it "does not dispatch notification on create for provisional comments" do
@@ -359,18 +357,15 @@ RSpec.describe SubmissionComment do
     expect(@comment.cached_attachments).to eql [a]
   end
 
-  it "renders formatted_body correctly" do
+  it "sanitizes XSS from formatted_body" do
     @comment = @submission.submission_comments.create!(valid_attributes)
-    @comment.comment = <<~TEXT
-      This text has a http://www.google.com link in it...
-
-      > and some
-      > quoted text
-    TEXT
+    @comment.comment = 'Safe text <script>alert("xss")</script> <img src=x onerror="alert(1)"> end'
     @comment.save!
     body = @comment.formatted_body
-    expect(body).to match(/<a/)
-    expect(body).to match(/quoted_text/)
+    expect(body).not_to include("<script>")
+    expect(body).not_to include("onerror")
+    expect(body).to include("Safe text")
+    expect(body).to include("end")
   end
 
   def prepare_test_submission
@@ -1013,7 +1008,7 @@ RSpec.describe SubmissionComment do
       @assignment.post_policy.update_attribute(:post_manually, true)
       @assignment.hide_submissions(submission_ids: [@submission.id])
 
-      expect(ContentParticipation).to_not receive(:create_or_update)
+      expect(ContentParticipation).not_to receive(:create_or_update)
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
     end
 
@@ -1024,7 +1019,7 @@ RSpec.describe SubmissionComment do
     end
 
     it "does not update participation for a draft comment" do
-      expect(ContentParticipation).to_not receive(:create_or_update)
+      expect(ContentParticipation).not_to receive(:create_or_update)
         .with({ content: @submission, user: @submission.user, workflow_state: "unread" })
       @comment = @submission.add_comment(author: @teacher, comment: "some comment", draft_comment: true)
     end
@@ -1148,6 +1143,43 @@ RSpec.describe SubmissionComment do
     end
   end
 
+  describe "#publishable_for?" do
+    before(:once) do
+      @comment_author = User.create!(name: "Comment Author")
+      @other_user = User.create!(name: "Other User")
+      @draft_comment = @submission.submission_comments.create!(
+        comment: "draft",
+        author: @comment_author,
+        draft: true
+      )
+      @published_comment = @submission.submission_comments.create!(
+        comment: "published",
+        author: @comment_author,
+        draft: false
+      )
+    end
+
+    it "returns true when the comment is a draft and the user is the author" do
+      expect(@draft_comment.publishable_for?(@comment_author)).to be true
+    end
+
+    it "returns false when the comment is published and the user is the author" do
+      expect(@published_comment.publishable_for?(@comment_author)).to be false
+    end
+
+    it "returns false when the comment is a draft and the user is not the author" do
+      expect(@draft_comment.publishable_for?(@other_user)).to be false
+    end
+
+    it "returns false when the comment is published and the user is not the author" do
+      expect(@published_comment.publishable_for?(@other_user)).to be false
+    end
+
+    it "returns false when user is nil" do
+      expect(@draft_comment.publishable_for?(nil)).to be false
+    end
+  end
+
   describe "finalizing draft comments" do
     let(:assignment) { @course.assignments.create! }
     let(:student) { @user }
@@ -1205,6 +1237,16 @@ RSpec.describe SubmissionComment do
       comment = submission.add_comment(comment: "hmmmm", draft_comment: true, author: teacher)
       comment.update!(draft: false)
       expect(submission.reload).not_to be_posted
+    end
+  end
+
+  describe "comment sanitization" do
+    it "strips XSS from the comment field on save" do
+      sc = @submission.submission_comments.create!(
+        comment: "<a href='#' onclick='alert(1)'>click me</a>",
+        author: @teacher
+      )
+      expect(sc.comment).to eq('<a href="#">click me</a>')
     end
   end
 end

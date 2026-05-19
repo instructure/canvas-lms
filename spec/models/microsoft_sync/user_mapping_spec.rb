@@ -143,7 +143,7 @@ describe MicrosoftSync::UserMapping do
     context "when user_id_to_aad_hash is empty" do
       it "doesn't raise an error" do
         expect { described_class.bulk_insert_for_root_account(account_model, {}) }
-          .to_not change { described_class.count }.from(0)
+          .not_to change { described_class.count }.from(0)
       end
     end
   end

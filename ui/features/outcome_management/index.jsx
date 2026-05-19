@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import ready from '@instructure/ready'
 import OutcomeManagement from './react/OutcomeManagement'
 
 ready(() => {
-  ReactDOM.render(<OutcomeManagement />, document.getElementById('outcome_management'))
+  legacyRender(<OutcomeManagement />, document.getElementById('outcome_management'))
 })

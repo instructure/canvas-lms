@@ -18,10 +18,10 @@
 
 /* global vi */
 if (typeof vi !== 'undefined') {
-  vi.mock('@canvas/alerts/react/FlashAlert')
+  vi.mock('@instructure/platform-alerts')
   vi.mock('@canvas/post-assignment-grades-tray/react/Api')
 }
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 vi.mock('@canvas/post-assignment-grades-tray/react/Api')
 
 import React from 'react'
@@ -29,7 +29,7 @@ import {render, screen as rtlScreen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import PostAssignmentGradesTray from '..'
 import * as Api from '@canvas/post-assignment-grades-tray/react/Api'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 
 describe('PostAssignmentGradesTray', () => {
   let tray

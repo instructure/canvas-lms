@@ -17,4 +17,5 @@ DOCKER_BUILDKIT=1 docker build \
   --file Dockerfile.jenkins.linters \
   --label "WEBPACK_BUILDER_IMAGE=$WEBPACK_BUILDER_IMAGE" \
   --tag "$1" \
+  --tag local/linters-runner \
   "$WORKSPACE"

@@ -833,6 +833,7 @@ describe Group do
         # should reload
         account.default_group_storage_quota = 20.decimal_megabytes
         account.save!
+        run_jobs
         @group = Group.find(@group.id)
 
         expect(@group.quota).to eq 20.decimal_megabytes

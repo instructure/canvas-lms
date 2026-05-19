@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {render} from '@canvas/react'
 import AccountTabContainer from './react/AccountTabContainer'
 import ready from '@instructure/ready'
 import type {CollectionUrls} from './react/types'
@@ -33,10 +33,7 @@ ready(() => {
     deleteGradingPeriodURL: ENV.DELETE_GRADING_PERIOD_URL ?? '',
   }
 
-  ReactDOM.render(
-    <AccountTabContainer readOnly={!!ENV.GRADING_PERIODS_READ_ONLY} urls={urls} />,
-    mountPoint,
-  )
+  render(<AccountTabContainer readOnly={!!ENV.GRADING_PERIODS_READ_ONLY} urls={urls} />, mountPoint)
 })
 
 export function Component() {

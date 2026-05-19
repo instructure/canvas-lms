@@ -19,7 +19,7 @@
 import {vi} from 'vitest'
 import $ from 'jquery'
 import * as uploadFileModule from '@canvas/upload-file'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import FileUpload from '../FileUpload'
 import {fireEvent, render, waitFor} from '@testing-library/react'

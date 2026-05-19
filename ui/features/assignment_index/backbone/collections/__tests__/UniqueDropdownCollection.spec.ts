@@ -48,37 +48,41 @@ describe('UniqueDropdownCollection', () => {
     expect(coll.availableValues instanceof Backbone.Collection).toBe(true)
   })
 
-  test('updates available/taken when models change', done => {
-    coll.availableValues.on('remove', (model: any) => {
-      expect(model.get('value')).toBe('4')
-    })
-    coll.availableValues.on('add', (model: any) => {
-      expect(model.get('value')).toBe('1')
-    })
+  test('updates available/taken when models change', () => {
+    return new Promise<void>(resolve => {
+      coll.availableValues.on('remove', (model: any) => {
+        expect(model.get('value')).toBe('4')
+      })
+      coll.availableValues.on('add', (model: any) => {
+        expect(model.get('value')).toBe('1')
+      })
 
-    coll.takenValues.on('remove', (model: any) => {
-      expect(model.get('value')).toBe('1')
-    })
-    coll.takenValues.on('add', (model: any) => {
-      expect(model.get('value')).toBe('4')
-      done()
-    })
+      coll.takenValues.on('remove', (model: any) => {
+        expect(model.get('value')).toBe('1')
+      })
+      coll.takenValues.on('add', (model: any) => {
+        expect(model.get('value')).toBe('4')
+        resolve()
+      })
 
-    records[0].set('state', '4')
+      records[0].set('state', '4')
+    })
   })
 
-  test('removing a model updates the available/taken values', done => {
-    coll.availableValues.on('add', (model: any) => {
-      expect(model.get('value')).toBe('1')
-    })
-    coll.takenValues.on('remove', (model: any) => {
-      expect(model.get('value')).toBe('1')
-      done()
-    })
+  test('removing a model updates the available/taken values', () => {
+    return new Promise<void>(resolve => {
+      coll.availableValues.on('add', (model: any) => {
+        expect(model.get('value')).toBe('1')
+      })
+      coll.takenValues.on('remove', (model: any) => {
+        expect(model.get('value')).toBe('1')
+        resolve()
+      })
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore - Backbone collection methods
-    coll.remove(coll.get(1))
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone collection methods
+      coll.remove(coll.get(1))
+    })
   })
 
   test('overrides add to munge params with an available value', () => {
@@ -96,22 +100,24 @@ describe('UniqueDropdownCollection', () => {
     expect(coll.at(coll.length - 1).get('state')).toBe('4')
   })
 
-  test('add should take the value from the front of the available values collection', done => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore - Backbone collection methods
-    coll.remove(coll.at(0))
+  test('add should take the value from the front of the available values collection', () => {
+    return new Promise<void>(resolve => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone collection methods
+      coll.remove(coll.at(0))
 
-    const first_avail = coll.availableValues.at(0).get('state')
-    coll.availableValues.on('remove', (model: any) => {
-      expect(model.get('state')).toBe(first_avail)
-      done()
+      const first_avail = coll.availableValues.at(0).get('state')
+      coll.availableValues.on('remove', (model: any) => {
+        expect(model.get('state')).toBe(first_avail)
+        resolve()
+      })
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone collection property
+      coll.model = Backbone.Model
+
+      coll.add({})
     })
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore - Backbone collection property
-    coll.model = Backbone.Model
-
-    coll.add({})
   })
 })
 

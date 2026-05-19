@@ -283,89 +283,169 @@ describe Context do
       RubricAssociation.create!(context:, rubric: r, purpose: :bookmark, association_object: context)
     end
 
-    it "returns rubric for concluded course enrollment" do
-      c1 = Course.create!(name: "c1")
-      c2 = Course.create!(name: "c1")
-      r = Rubric.create!(context: c1, title: "testing")
-      user = user_factory(active_all: true)
-      RubricAssociation.create!(context: c1, rubric: r, purpose: :bookmark, association_object: c1)
-      enroll = c1.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
-      enroll.conclude
-      c2.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
-      expect(c2.rubric_contexts(user)).to eq([{
-                                               rubrics: 1,
-                                               context_code: c1.asset_string,
-                                               name: c1.name
-                                             }])
-    end
-
-    it "excludes rubrics associated via soft-deleted rubric associations" do
-      c1 = Course.create!(name: "c1")
-      r = Rubric.create!(context: c1, title: "testing")
-      user = user_factory(active_all: true)
-      association = RubricAssociation.create!(context: c1, rubric: r, purpose: :bookmark, association_object: c1)
-      association.destroy
-      c1.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
-      expect(c1.rubric_contexts(user)).to be_empty
-    end
-
-    it "returns contexts in alphabetically sorted order" do
-      great_grandparent = Account.default
-      grandparent = Account.create!(name: "AAA", parent_account: great_grandparent)
-      add_rubric(grandparent)
-      parent = Account.create!(name: "ZZZ", parent_account: grandparent)
-      add_rubric(parent)
-      course = Course.create!(name: "MMM", account: parent)
-      add_rubric(course)
-
-      contexts = course.rubric_contexts(nil).map { |c| c.slice(:name, :rubrics) }
-      expect(contexts).to eq([
-                               { name: "AAA", rubrics: 1 },
-                               { name: "MMM", rubrics: 1 },
-                               { name: "ZZZ", rubrics: 1 }
-                             ])
-    end
-
-    it "does not return rubrics that have been archived or deleted" do
-      course = Course.create!(name: "c1")
-      user = user_factory(active_all: true)
-      r = Rubric.create!(context: course, title: "testing")
-      RubricAssociation.create!(context: course, rubric: r, purpose: :bookmark, association_object: course)
-      course.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
-      r.update(workflow_state: "archived")
-      expect(course.rubric_contexts(user)).to be_empty
-      r.update(workflow_state: "deleted")
-      expect(course.rubric_contexts(user)).to be_empty
-    end
-
-    context "sharding" do
-      specs_require_sharding
-
-      it "retrieves rubrics from other shard courses the teacher belongs to" do
-        course1 = Course.create!(name: "c1")
-        course2 = Course.create!(name: "c2")
-        course3 = @shard1.activate do
-          a = Account.create!
-          Course.create!(name: "c3", account: a)
-        end
+    shared_examples "rubric_contexts contract" do
+      it "returns rubric for concluded course enrollment" do
+        c1 = Course.create!(name: "c1")
+        c2 = Course.create!(name: "c1")
+        r = Rubric.create!(context: c1, title: "testing")
         user = user_factory(active_all: true)
-        [course1, course2, course3].each do |c|
-          c.shard.activate do
-            r = Rubric.create!(context: c, title: "testing")
-            RubricAssociation.create!(context: c, rubric: r, purpose: :bookmark, association_object: c)
-            c.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
+        RubricAssociation.create!(context: c1, rubric: r, purpose: :bookmark, association_object: c1)
+        enroll = c1.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
+        enroll.conclude
+        c2.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
+        expect(c2.rubric_contexts(user)).to eq([{
+                                                 rubrics: 1,
+                                                 context_code: c1.asset_string,
+                                                 name: c1.short_name
+                                               }])
+      end
+
+      it "excludes rubrics associated via soft-deleted rubric associations" do
+        c1 = Course.create!(name: "c1")
+        r = Rubric.create!(context: c1, title: "testing")
+        user = user_factory(active_all: true)
+        association = RubricAssociation.create!(context: c1, rubric: r, purpose: :bookmark, association_object: c1)
+        association.destroy
+        c1.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
+        expect(c1.rubric_contexts(user)).to be_empty
+      end
+
+      it "returns contexts in alphabetically sorted order" do
+        great_grandparent = Account.default
+        grandparent = Account.create!(name: "AAA", parent_account: great_grandparent)
+        add_rubric(grandparent)
+        parent = Account.create!(name: "ZZZ", parent_account: grandparent)
+        add_rubric(parent)
+        course = Course.create!(name: "MMM", account: parent)
+        add_rubric(course)
+
+        contexts = course.rubric_contexts(nil).map { |c| c.slice(:name, :rubrics) }
+        expect(contexts).to eq([
+                                 { name: "AAA", rubrics: 1 },
+                                 { name: "MMM", rubrics: 1 },
+                                 { name: "ZZZ", rubrics: 1 }
+                               ])
+      end
+
+      it "does not return rubrics that have been archived or deleted" do
+        course = Course.create!(name: "c1")
+        user = user_factory(active_all: true)
+        r = Rubric.create!(context: course, title: "testing")
+        RubricAssociation.create!(context: course, rubric: r, purpose: :bookmark, association_object: course)
+        course.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
+        r.update(workflow_state: "archived")
+        expect(course.rubric_contexts(user)).to be_empty
+        r.update(workflow_state: "deleted")
+        expect(course.rubric_contexts(user)).to be_empty
+      end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "retrieves rubrics from other shard courses the teacher belongs to" do
+          course1 = Course.create!(name: "c1")
+          course2 = Course.create!(name: "c2")
+          course3 = @shard1.activate do
+            a = Account.create!
+            Course.create!(name: "c3", account: a)
+          end
+          user = user_factory(active_all: true)
+          [course1, course2, course3].each do |c|
+            c.shard.activate do
+              r = Rubric.create!(context: c, title: "testing")
+              RubricAssociation.create!(context: c, rubric: r, purpose: :bookmark, association_object: c)
+              c.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
+            end
+          end
+          expected = lambda do
+            [
+              { name: "c1", rubrics: 1, context_code: course1.asset_string },
+              { name: "c2", rubrics: 1, context_code: course2.asset_string },
+              { name: "c3", rubrics: 1, context_code: course3.asset_string }
+            ]
+          end
+          expect(course1.rubric_contexts(user)).to match_array(expected.call)
+          @shard1.activate do
+            expect(course2.rubric_contexts(user)).to match_array(expected.call)
           end
         end
-        expected = lambda do
-          [
-            { name: "c1", rubrics: 1, context_code: course1.asset_string },
-            { name: "c2", rubrics: 1, context_code: course2.asset_string },
-            { name: "c3", rubrics: 1, context_code: course3.asset_string }
-          ]
+      end
+    end
+
+    context "with :optimized_grading_rubrics disabled" do
+      before { Account.site_admin.disable_feature!(:optimized_grading_rubrics) }
+
+      it_behaves_like "rubric_contexts contract"
+    end
+
+    context "with :optimized_grading_rubrics enabled" do
+      before { Account.site_admin.enable_feature!(:optimized_grading_rubrics) }
+
+      it_behaves_like "rubric_contexts contract"
+
+      # context_code: is new API — only present in rubric_contexts_optimized
+      context "with context_code filter" do
+        it "returns only the specified context's associations" do
+          course1 = Course.create!(name: "Course A")
+          course2 = Course.create!(name: "Course B")
+          user = user_factory(active_all: true)
+          [course1, course2].each do |c|
+            add_rubric(c)
+            c.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
+          end
+
+          result = course1.rubric_contexts(user, context_code: course1.asset_string)
+          expect(result.length).to eq(1)
+          expect(result.first[:context_code]).to eq(course1.asset_string)
+          expect(result.first[:rubrics]).to eq(1)
         end
-        expect(course1.rubric_contexts(user)).to match_array(expected.call)
-        @shard1.activate do
-          expect(course2.rubric_contexts(user)).to match_array(expected.call)
+
+        it "returns empty when context_code refers to a context the user cannot access" do
+          accessible = Course.create!(name: "Accessible")
+          inaccessible = Course.create!(name: "Locked")
+          user = user_factory(active_all: true)
+          accessible.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
+          add_rubric(inaccessible) # rubric exists but user is not enrolled
+
+          result = accessible.rubric_contexts(user, context_code: inaccessible.asset_string)
+          expect(result).to be_empty
+        end
+
+        it "returns the account context when filtering to an account context_code" do
+          course = Course.create!(name: "c1")
+          account = course.account
+          user = user_factory(active_all: true)
+          course.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
+          add_rubric(account)
+
+          result = course.rubric_contexts(user, context_code: account.asset_string)
+          expect(result.length).to eq(1)
+          expect(result.first[:context_code]).to eq(account.asset_string)
+        end
+      end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "skips non-matching shards when filtering by context_code" do
+          course1 = Course.create!(name: "c1")
+          user = user_factory(active_all: true)
+          add_rubric(course1)
+          course1.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
+
+          cs_course = @shard1.activate do
+            a = Account.create!
+            c = Course.create!(account: a, name: "c_shard1")
+            r = Rubric.create!(context: c, title: "CS Rubric")
+            RubricAssociation.create!(context: c, rubric: r, purpose: :bookmark, association_object: c)
+            c.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
+            c
+          end
+
+          result = course1.rubric_contexts(user, context_code: course1.asset_string)
+          codes = result.pluck(:context_code)
+          expect(codes).to eq([course1.asset_string])
+          expect(codes).not_to include(cs_course.global_asset_string)
         end
       end
     end
@@ -386,13 +466,183 @@ describe Context do
       add_rubric("Rubric 4 Archived", "archived")
     end
 
-    it "sorts rubrics by title and only include active rubrics" do
-      sorted_rubrics = Context.sorted_rubrics(@course)
+    shared_examples "sorted_rubrics contract" do
+      it "sorts rubrics by title and only include active rubrics" do
+        sorted_rubrics = Context.sorted_rubrics(@course)
 
-      expect(sorted_rubrics.size).to eq(3)
-      expect(sorted_rubrics[0].rubric.title).to eq("Rubric 1 Active")
-      expect(sorted_rubrics[1].rubric.title).to eq("Rubric 2 Active")
-      expect(sorted_rubrics[2].rubric.title).to eq("Rubric 4 Active")
+        expect(sorted_rubrics.size).to eq(3)
+        expect(sorted_rubrics[0].rubric.title).to eq("Rubric 1 Active")
+        expect(sorted_rubrics[1].rubric.title).to eq("Rubric 2 Active")
+        expect(sorted_rubrics[2].rubric.title).to eq("Rubric 4 Active")
+      end
+
+      it "excludes non-bookmarked associations" do
+        rubric = Rubric.create!(context: @course, title: "Non-bookmarked Rubric")
+        RubricAssociation.create!(
+          context: @course,
+          rubric:,
+          association_object: @course,
+          purpose: :grading,
+          bookmarked: false
+        )
+
+        result = Context.sorted_rubrics(@course)
+        expect(result.map { |ra| ra.rubric.title }).not_to include("Non-bookmarked Rubric")
+      end
+
+      it "excludes deleted associations" do
+        rubric = Rubric.create!(context: @course, title: "Deleted Association Rubric")
+        ra = RubricAssociation.create!(context: @course, rubric:, association_object: @course, purpose: :bookmark)
+        ra.update_columns(workflow_state: "deleted")
+
+        result = Context.sorted_rubrics(@course)
+        expect(result.map { |ra| ra.rubric.title }).not_to include("Deleted Association Rubric")
+      end
+
+      it "deduplicates associations with the same rubric_id" do
+        rubric = Rubric.create!(context: @course, title: "Duplicate Rubric")
+        2.times do
+          RubricAssociation.create!(context: @course, rubric:, association_object: @course, purpose: :bookmark)
+        end
+
+        result = Context.sorted_rubrics(@course)
+        expect(result.count { |ra| ra.rubric_id == rubric.id }).to eq(1)
+      end
+
+      it "sorts nil-title rubrics last" do
+        named = Rubric.create!(context: @course, title: "Named Rubric")
+        # Create associations before setting nil to prevent populate_rubric_title
+        # from resetting the title during the after_create :update_rubric callback
+        untitled = Rubric.create!(context: @course, title: "Temp")
+        [named, untitled].each do |r|
+          RubricAssociation.create!(context: @course, rubric: r, association_object: @course, purpose: :bookmark)
+        end
+        untitled.update_columns(title: nil)
+
+        result = Context.sorted_rubrics(@course)
+        titled_results = result.select { |ra| ra.rubric.title.present? }
+        nil_results = result.select { |ra| ra.rubric.title.nil? }
+        expect(titled_results).to all(satisfy { |ra| result.index(ra) < result.index(nil_results.first) })
+      end
+
+      it "returns RubricAssociation objects with preloaded rubric" do
+        result = Context.sorted_rubrics(@course)
+
+        expect(result).to all(be_a(RubricAssociation))
+        expect(result.first.association(:rubric)).to be_loaded
+      end
+
+      it "returns an empty array for a context with no associations" do
+        empty_course = Course.create!
+        expect(Context.sorted_rubrics(empty_course)).to eq([])
+      end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "returns rubrics for a cross-shard context" do
+          cs_course = @shard1.activate do
+            a = Account.create!
+            c = Course.create!(account: a, name: "CS Course")
+            r = Rubric.create!(context: c, title: "CS Rubric")
+            RubricAssociation.create!(context: c, rubric: r, purpose: :bookmark, association_object: c)
+            c
+          end
+
+          result = @shard1.activate { Context.sorted_rubrics(cs_course) }
+          expect(result.length).to eq(1)
+          expect(result.first.rubric.title).to eq("CS Rubric")
+        end
+
+        it "returns associations scoped to the cross-shard context" do
+          cs_course = @shard1.activate do
+            a = Account.create!
+            c = Course.create!(account: a)
+            r = Rubric.create!(context: c, title: "CS Rubric")
+            RubricAssociation.create!(context: c, rubric: r, purpose: :bookmark, association_object: c)
+            c
+          end
+
+          result = @shard1.activate { Context.sorted_rubrics(cs_course) }
+          expect(result.first.context.asset_string).to eq(cs_course.asset_string)
+        end
+      end
+    end
+
+    context "with :optimized_grading_rubrics disabled" do
+      before { Account.site_admin.disable_feature!(:optimized_grading_rubrics) }
+
+      it_behaves_like "sorted_rubrics contract"
+    end
+
+    context "with :optimized_grading_rubrics enabled" do
+      before { Account.site_admin.enable_feature!(:optimized_grading_rubrics) }
+
+      it_behaves_like "sorted_rubrics contract"
+
+      context "with :grading_rubrics_pagination enabled" do
+        before { @course.root_account.enable_feature!(:grading_rubrics_pagination) }
+
+        it "filters rubrics by search_term (case-insensitive, partial match)" do
+          result = Context.sorted_rubrics(@course, search_term: "rubric 1")
+
+          expect(result.map { |ra| ra.rubric.title }).to eql(["Rubric 1 Active"])
+        end
+
+        it "performs a partial match on search_term" do
+          result = Context.sorted_rubrics(@course, search_term: "active")
+
+          titles = result.map { |ra| ra.rubric.title }
+          expect(titles).to include("Rubric 1 Active", "Rubric 2 Active", "Rubric 4 Active")
+        end
+
+        it "returns an empty array when search_term matches nothing" do
+          result = Context.sorted_rubrics(@course, search_term: "zzznomatch")
+
+          expect(result).to eql([])
+        end
+
+        it "returns all rubrics when search_term is nil" do
+          result = Context.sorted_rubrics(@course, search_term: nil)
+
+          expect(result.length).to be 3
+        end
+      end
+
+      context "with :grading_rubrics_pagination disabled" do
+        before { @course.root_account.disable_feature!(:grading_rubrics_pagination) }
+
+        it "ignores search_term and returns all rubrics" do
+          result = Context.sorted_rubrics(@course, search_term: "rubric 1")
+
+          expect(result.length).to be 3
+        end
+      end
+
+      it "preloads the association's own context" do
+        result = Context.sorted_rubrics(@course)
+
+        expect(result.first.association(:context)).to be_loaded
+        expect(result.first.rubric.association(:context)).to be_loaded
+      end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "preloads both the association context and rubric context cross-shard" do
+          cs_course = @shard1.activate do
+            a = Account.create!
+            c = Course.create!(account: a, name: "CS Course")
+            r = Rubric.create!(context: c, title: "CS Rubric")
+            RubricAssociation.create!(context: c, rubric: r, purpose: :bookmark, association_object: c)
+            c
+          end
+
+          result = @shard1.activate { Context.sorted_rubrics(cs_course) }
+          expect(result.first.association(:context)).to be_loaded
+          expect(result.first.rubric.association(:context)).to be_loaded
+        end
+      end
     end
   end
 

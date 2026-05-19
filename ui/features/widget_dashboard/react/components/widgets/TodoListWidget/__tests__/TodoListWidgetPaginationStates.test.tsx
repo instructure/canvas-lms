@@ -28,11 +28,12 @@ import {
   emptyPlannerItemsHandler,
   errorPlannerItemsHandler,
   plannerNoteHandlers,
+  plannerOverrideHandlers,
 } from './mocks/handlers'
 import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 import {WidgetDashboardProvider} from '../../../../hooks/useWidgetDashboardContext'
-import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import {clearWidgetDashboardCache, PlatformTestWrapper} from '../../../../__tests__/testHelpers'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 const mockWidget: Widget = {
@@ -49,7 +50,11 @@ const buildDefaultProps = (overrides: Partial<BaseWidgetProps> = {}): BaseWidget
   }
 }
 
-const server = setupServer(...plannerItemsHandlers, ...plannerNoteHandlers)
+const server = setupServer(
+  ...plannerItemsHandlers,
+  ...plannerNoteHandlers,
+  ...plannerOverrideHandlers,
+)
 
 const mockSharedCourseData = [
   {
@@ -95,13 +100,15 @@ const renderWithClient = (ui: React.ReactElement) => {
     },
   })
   return render(
-    <QueryClientProvider client={queryClient}>
-      <WidgetDashboardProvider sharedCourseData={mockSharedCourseData}>
-        <WidgetDashboardEditProvider>
-          <WidgetLayoutProvider>{ui}</WidgetLayoutProvider>
-        </WidgetDashboardEditProvider>
-      </WidgetDashboardProvider>
-    </QueryClientProvider>,
+    <PlatformTestWrapper>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider sharedCourseData={mockSharedCourseData}>
+          <WidgetDashboardEditProvider>
+            <WidgetLayoutProvider>{ui}</WidgetLayoutProvider>
+          </WidgetDashboardEditProvider>
+        </WidgetDashboardProvider>
+      </QueryClientProvider>
+    </PlatformTestWrapper>,
   )
 }
 
@@ -149,6 +156,52 @@ describe('TodoListWidget - Pagination', () => {
 
     await waitFor(() => {
       expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
+    })
+  })
+})
+
+describe('TodoListWidget - Checkbox on paginated pages', () => {
+  it('updates checkbox state immediately when toggled on page 2', async () => {
+    const user = userEvent.setup()
+    renderWithClient(<TodoListWidget {...buildDefaultProps()} />)
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading to-do items...')).not.toBeInTheDocument()
+    })
+
+    await waitFor(
+      () => {
+        const container = screen.queryByTestId('pagination-container')
+        if (!container) throw new Error('Pagination not found')
+        return container
+      },
+      {timeout: 5000},
+    )
+
+    const page2Button = screen.getByRole('button', {name: '2'})
+    await user.click(page2Button)
+
+    const page2ItemId = '6'
+    const page2ItemTitle = 'Office Hours with Dr. Smith'
+
+    await waitFor(
+      () => {
+        expect(screen.getByTestId(`todo-checkbox-${page2ItemId}`)).toBeInTheDocument()
+      },
+      {timeout: 5000},
+    )
+
+    expect(screen.getByText(`Mark ${page2ItemTitle} as complete`)).toBeInTheDocument()
+
+    const checkbox = screen.getByTestId(`todo-checkbox-${page2ItemId}`)
+    await user.click(checkbox)
+
+    await waitFor(() => {
+      expect(screen.queryByTestId(`todo-checkbox-loading-${page2ItemId}`)).not.toBeInTheDocument()
+    })
+
+    await waitFor(() => {
+      expect(screen.getByText(`Mark ${page2ItemTitle} as incomplete`)).toBeInTheDocument()
     })
   })
 })

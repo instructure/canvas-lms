@@ -22,9 +22,11 @@ import GroupCategoryCollection from '@canvas/groups/backbone/collections/GroupCa
 import ready from '@instructure/ready'
 
 ready(() => {
+  // @ts-expect-error TS7 migration
   const groupCategories = new GroupCategoryCollection((ENV as any).group_categories, {
     markInactiveStudents: true,
   })
+  // @ts-expect-error TS7 migration
   const app = new GroupCategoriesView({collection: groupCategories})
   app.render()
   // @ts-expect-error - Backbone View property

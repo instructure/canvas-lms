@@ -49,7 +49,7 @@ module Lti::IMS::Concerns
       super
 
       klass.extend(ClassMethods)
-      klass.skip_before_action :load_user, :verify_authenticity_token
+      klass.skip_before_action :load_user, :verify_authenticity_token, :require_user
 
       klass.before_action(
         :verify_access_token,

@@ -20,6 +20,6 @@
 module WikiPageVisibility
   module Entities
     # When a wiki page is visible to a (student) user
-    WikiPageVisibleToStudent = Struct.new(:course_id, :user_id, :wiki_page_id, keyword_init: true)
+    WikiPageVisibleToStudent = Struct.new(:course_id, :user_id, :wiki_page_id)
   end
 end

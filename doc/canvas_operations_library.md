@@ -8,7 +8,7 @@ See [`lib/canvas_operations`](../lib/canvas_operations)
 ## Features
 - **Operation Base Class**: All operations inherit from a common base, ensuring consistent behavior and features.
 - **Shard Binding**: Operations are bound to a single Switchman shard for data consistency.
-- **Progress Tracking**: Integrated with a `Progress` model for tracking and reporting.
+- **Progress Tracking**: Integrated with a `Progress` model for tracking and reporting (opt-in).
 - **Metric Emission**: Emits events to InstStatsd for monitoring operation lifecycle.
 - **Configurable Settings**: Per-operation, per-cluster settings.
 - **Callbacks**: Lifecycle hooks for before/after/around run and failure events.
@@ -30,6 +30,11 @@ class EnableCoolFeatures < CanvasOperations::BaseOperation
   # define settings that can be changed on-the-fly
   setting :feature_list, default: "feature_one"
   setting :stakeholder_notification_channel, default: "#releases"
+
+  # defaults to false. If true, the operation will create a Progress
+  # record when run and update that progress when a completion or
+  # failure state for the operation is reached.
+  self.progress_tracking = true
 
   def execute
     log_message("Enabling features #{feature_list}!")
@@ -149,6 +154,24 @@ These settings can be changed on-the-fly; just be sure to send SIGHUP to job hos
 A data fixup operation and associated files can be generated with `rails g data_fixup <OperationName>`.
 
 See [`lib/canvas_operations/base_concerns/settings.rb`](lib/canvas_operations/base_concerns/settings.rb) for more details on using operation settings.
+
+#### DataFixup Additional Properties
+**batch_strategy**
+
+Defaults to `:pluck_ids`, which performs a pluck on the scope (after range filtering), and loads records into memory in batches based on those IDs.
+
+In some cases, it may be appropriate to change this strategy. To do so, set the `batch_strategy` class instance variable:
+
+```ruby
+class UnsetAuthlogicAttributesOnInstPseudonyms < CanvasOperations::DataFixup
+...
+  self.batch_strategy = :id
+...
+end
+```
+
+See `/usr/src/app/config/initializers/active_record.rb` for additional details on available batch strategies.
+
 
 ### RootAccountOperation
 

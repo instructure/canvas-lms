@@ -21,7 +21,7 @@ import React, {Component} from 'react'
 import {func, string, bool} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 
 const I18n = createI18nScope('confirmMasteryModal')
 

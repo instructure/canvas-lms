@@ -16,32 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getRegistry} from '@instructure/theme-registry'
-import {merge, cloneDeep} from 'es-toolkit/compat'
+import {canvas, canvasHighContrast} from '@instructure/ui-themes'
+import {cloneDeep} from 'es-toolkit/compat'
 
-// The running theme is the running theme for this page load, and it never
-// changes, so there's no point in doing the work more than once.
-let memoizedVariables: {
-  variables: Record<string, unknown>
-  key: string
-}
+const cache = new Map<string, {variables: Record<string, unknown>; key: string}>()
 
-function getThemeVars() {
-  if (memoizedVariables) return memoizedVariables
+function getThemeVars(useHighContrast = false, fontFamily?: string) {
+  const cacheKey = `${useHighContrast}:${fontFamily ?? ''}`
+  if (cache.has(cacheKey)) return cache.get(cacheKey)!
 
-  // @ts-expect-error
-  const {currentThemeKey, overrides, themes} = getRegistry()
-  // Just assume the "canvas" theme if the default key is null. This will
-  // never happen in the live app because one way or another a theme gets
-  // used, but unit tests don't always do that.
-  // Also we have to cloneDeep this because the merge below is about to
-  // mutate the whole thing.
-  const themeKey = currentThemeKey || 'canvas'
-  const variables = cloneDeep(themes[themeKey])
-  merge(variables, overrides)
+  const baseTheme = useHighContrast ? canvasHighContrast : canvas
+  const key = useHighContrast ? 'canvas-high-contrast' : 'canvas'
 
-  memoizedVariables = {variables, key: themeKey}
-  return memoizedVariables
+  const brandVars =
+    !useHighContrast && typeof window !== 'undefined'
+      ? (window as any).CANVAS_ACTIVE_BRAND_VARIABLES || {}
+      : {}
+  const variables: Record<string, unknown> = {...cloneDeep(baseTheme), ...brandVars}
+
+  if (fontFamily) {
+    variables.typography = {...(variables.typography as Record<string, unknown>), fontFamily}
+  }
+
+  const result = {variables, key}
+  cache.set(cacheKey, result)
+  return result
 }
 
 export {getThemeVars}

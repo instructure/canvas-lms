@@ -28,6 +28,7 @@ interface Link {
 interface Collection {
   loading: boolean
   data: number[]
+  error?: boolean
   links: {
     current: Link
     last?: Link
@@ -75,6 +76,15 @@ describe('SearchMessage::', () => {
     props.collection.loading = true
     const {getByTestId} = render(<SearchMessage {...props} />)
     expect(getByTestId('loading-spinner')).toBeInTheDocument()
+  })
+
+  it('shows an error message when collection has an error', () => {
+    const props = defaultProps()
+    props.collection.error = true
+    const {getByText} = render(<SearchMessage {...props} />)
+    expect(
+      getByText('There was an error with your query; please try a different search'),
+    ).toBeInTheDocument()
   })
 
   describe('Pagination', () => {

@@ -22,7 +22,13 @@ class EnsureUniqueAccountUsers < ActiveRecord::Migration[7.0]
   disable_ddl_transaction!
 
   def change
-    DataFixup::DeleteDuplicateRows.run(AccountUser, :user_id, :role_id, :account_id)
+    DataFixup::DeleteDuplicateRows.run(
+      AccountUser,
+      :user_id,
+      :role_id,
+      :account_id,
+      reassign_references: { Auditors::ActiveRecord::AccountUserRecord => :account_user_id }
+    )
     add_index :account_users, %i[user_id role_id account_id], unique: true, algorithm: :concurrently, if_not_exists: true
     remove_index :account_users, [:user_id], algorithm: :concurrently, if_exists: true
   end

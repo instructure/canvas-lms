@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AlertManager from '@canvas/alerts/react/AlertManager'
+import {AlertManager} from '@instructure/platform-alerts'
 import {Heading} from '@instructure/ui-heading'
 import {InternalSettingsQuery} from './InternalSettingsQuery'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -25,7 +25,6 @@ import React from 'react'
 const I18n = createI18nScope('internal-settings')
 
 export const InternalSettingsView = () => (
-  // @ts-expect-error
   <AlertManager>
     <Heading level="h2" margin="x-small auto">
       {I18n.t('Internal Settings')}

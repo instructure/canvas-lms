@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {act} from 'react'
 import {configure, waitFor} from '@testing-library/react'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
@@ -57,6 +58,7 @@ const server = setupServer(
   http.get('/api/v1/users/self/todo*', () =>
     HttpResponse.json([], {headers: {link: 'url; rel="current"'}}),
   ),
+  http.get('/api/v1/dashboard/dashboard_cards*', () => HttpResponse.json([])),
 )
 
 beforeAll(() => server.listen())
@@ -67,10 +69,6 @@ afterEach(() => {
 afterAll(() => server.close())
 
 describe('planner rendering', () => {
-  const sidebarRoot = null
-  const plannerRoot = null
-  const headerRoot = null
-
   beforeEach(() => {
     document.body.innerHTML = ''
     document.body.appendChild(document.createElement('div')).id = 'dashboard-planner'
@@ -94,10 +92,10 @@ describe('planner rendering', () => {
   })
 
   afterEach(async () => {
-    // Wait for any pending React updates to complete
-    await waitFor(() => {}, {timeout: 100}).catch(() => {})
-
-    // Clean up any mounted React roots by clearing the DOM
+    // Drain React 18 concurrent update queue and in-flight network
+    // responses before clearing DOM to prevent post-teardown errors
+    await act(async () => {})
+    await act(async () => {})
     document.body.innerHTML = ''
   })
 

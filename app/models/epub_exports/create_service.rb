@@ -28,7 +28,14 @@ module EpubExports
 
     def offline_export
       unless @_offline_export
-        @_offline_export = course.send(export_type.to_s.pluralize).visible_to(user).running.first
+        @_offline_export = course.send(export_type.to_s.pluralize)
+                                 .visible_to(user)
+                                 .running
+                                 .preload(:job_progress)
+                                 .first
+        EpubExport.fail_stuck_epub_exports([@_offline_export]) if @_offline_export
+        @_offline_export = nil if @_offline_export&.failed?
+
         @_offline_export ||= course.send(export_type.to_s.pluralize).build({
                                                                              user:
                                                                            })

@@ -21,7 +21,6 @@ import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {GlobalInst} from '@canvas/global/inst/GlobalInst'
 import {GlobalRemotes} from '@canvas/global/remotes/GlobalRemotes'
 import {ajaxJSON} from '@canvas/jquery/jquery.ajaxJSON'
-import type {AdaEmbed, AdaEmbedConstructor} from './shared/help-dialog/react/adaTypes'
 
 // Type definitions for the mocked() utility (test environments only)
 type MockInstance<T extends (...args: any[]) => any> = T & {
@@ -101,9 +100,6 @@ declare global {
     deferredBundles: string[]
     canvasReadyState?: 'loading' | 'complete'
     CANVAS_ACTIVE_BRAND_VARIABLES?: Record<string, unknown>
-    adaEmbed?: AdaEmbed
-    AdaEmbed?: AdaEmbedConstructor
-    adaSettings?: import('./shared/help-dialog/react/adaTypes').AdaSettings
   }
 
   /**

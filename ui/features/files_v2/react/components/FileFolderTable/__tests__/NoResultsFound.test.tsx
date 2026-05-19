@@ -20,8 +20,8 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {NoResultsFound} from '../NoResultsFound'
 
-vi.mock('@canvas/images/react/EmptyDesert', () => ({
-  default: () => <div data-testid="empty-desert" />,
+vi.mock('@instructure/platform-images', () => ({
+  EmptyDesert: () => <div data-testid="empty-desert" />,
 }))
 
 const mockFlashScreenReaderHolder = () => {

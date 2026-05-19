@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render, screen, waitFor, act} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AnonymousSpeedGraderAlert from '../AnonymousSpeedGraderAlert'
 
@@ -32,16 +31,11 @@ describe('AnonymousSpeedGraderAlert', () => {
   })
 
   const renderComponent = (props = {}) => {
-    const ref = React.createRef()
-    render(<AnonymousSpeedGraderAlert ref={ref} {...defaultProps} {...props} />)
-    return ref
+    render(<AnonymousSpeedGraderAlert {...defaultProps} {...props} />)
   }
 
-  it('shows the alert content when open() is called', async () => {
-    const ref = renderComponent()
-    await act(async () => {
-      ref.current.open()
-    })
+  it('shows the alert content when initiallyOpen is true', async () => {
+    renderComponent({initiallyOpen: true})
     await waitFor(() => {
       expect(screen.getByText('Anonymous Mode On:')).toBeInTheDocument()
     })
@@ -51,29 +45,20 @@ describe('AnonymousSpeedGraderAlert', () => {
   })
 
   it('renders the Open SpeedGrader link with the correct href', async () => {
-    const ref = renderComponent({speedGraderUrl: 'http://custom.url/speed_grader'})
-    await act(async () => {
-      ref.current.open()
-    })
+    renderComponent({speedGraderUrl: 'http://custom.url/speed_grader', initiallyOpen: true})
     const openButton = await screen.findByRole('link', {name: /Open SpeedGrader/i})
     expect(openButton).toHaveAttribute('href', 'http://custom.url/speed_grader')
   })
 
   it('renders a Cancel button', async () => {
-    const ref = renderComponent()
-    await act(async () => {
-      ref.current.open()
-    })
+    renderComponent({initiallyOpen: true})
     const cancelButton = await screen.findByRole('button', {name: /Cancel/i})
     expect(cancelButton).toBeInTheDocument()
   })
 
   it('calls onClose when Cancel is clicked', async () => {
     const onClose = vi.fn()
-    const ref = renderComponent({onClose})
-    await act(async () => {
-      ref.current.open()
-    })
+    renderComponent({onClose, initiallyOpen: true})
     const cancelButton = await screen.findByRole('button', {name: /Cancel/i})
     await userEvent.click(cancelButton)
     await waitFor(() => {
@@ -82,10 +67,7 @@ describe('AnonymousSpeedGraderAlert', () => {
   })
 
   it('closes the alert when Cancel is clicked', async () => {
-    const ref = renderComponent()
-    await act(async () => {
-      ref.current.open()
-    })
+    renderComponent({initiallyOpen: true})
     await waitFor(() => {
       expect(screen.getByText('Anonymous Mode On:')).toBeInTheDocument()
     })

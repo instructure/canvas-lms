@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Bookmarks::Bookmark < ActiveRecord::Base
+class Bookmarks::Bookmark < ApplicationRecord
   acts_as_list scope: :user_id
   def data
     json ? JSON.parse(json) : nil

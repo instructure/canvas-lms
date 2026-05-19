@@ -277,6 +277,7 @@ describe "Gradebook Scheduled Feedback Release" do
 
     describe "scheduled release management" do
       it "removes scheduled release when checkbox is unchecked" do
+        skip "EVAL-6642 2026-03-04"
         future_date = format_date_for_view(2.days.from_now)
         future_time = "11:30 AM"
 

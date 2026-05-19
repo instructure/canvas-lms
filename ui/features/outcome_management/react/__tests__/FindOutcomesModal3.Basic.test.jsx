@@ -18,16 +18,20 @@
 
 import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
-import {render as rtlRender, waitFor} from '@testing-library/react'
+import {render as rtlRender, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
 import FindOutcomesModal from '../FindOutcomesModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo-v3'
 import {findModalMocks} from '@canvas/outcomes/mocks/Outcomes'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 describe('FindOutcomesModal - Basic Tests', () => {
   let cache
@@ -113,18 +117,16 @@ describe('FindOutcomesModal - Basic Tests', () => {
         contextType: 'Course',
       },
     )
-    await waitFor(() =>
-      expect(getByText('Add Outcomes to "The Group Title"')).toBeInTheDocument(),
-    )
+    await waitFor(() => expect(getByText('Add Outcomes to "The Group Title"')).toBeInTheDocument())
   })
 
   it('shows modal when open prop is true and hides when false', async () => {
-    const {getByText, queryByText, rerender} = render(<FindOutcomesModal {...defaultProps()} />)
+    const {getByText, rerender} = render(<FindOutcomesModal {...defaultProps()} />)
     await waitFor(() => expect(getByText('Close')).toBeInTheDocument())
 
-    // Test closed state
+    // Test closed state - use waitForElementToBeRemoved to handle modal close animation
     render(<FindOutcomesModal {...defaultProps({open: false})} />, {renderer: rerender})
-    await waitFor(() => expect(queryByText('Close')).not.toBeInTheDocument())
+    await waitForElementToBeRemoved(() => getByText('Close'))
   })
 
   describe('error handling', () => {

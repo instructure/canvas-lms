@@ -42,7 +42,12 @@ module Messages
     private
 
     def anonymized_name?(assignment)
-      (author_asset? && !asset.can_read_author?(message_recipient, nil)) || (assignment.anonymize_students? && source_user != message_recipient)
+      anonymous = if assignment.quiz_lti?
+                    assignment.anonymous_participants?
+                  else
+                    assignment.anonymize_students?
+                  end
+      (author_asset? && !asset.can_read_author?(message_recipient, nil)) || (anonymous && source_user != message_recipient)
     end
 
     def anonymized_user_name

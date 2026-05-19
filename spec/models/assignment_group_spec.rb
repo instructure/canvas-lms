@@ -129,8 +129,8 @@ describe AssignmentGroup do
             assignment_ids: nil,
             include_discussion_checkpoints: false
           ).pluck(:id)
-          expect(assignment_ids).to_not include(@reply_to_topic.id)
-          expect(assignment_ids).to_not include(@reply_to_entry.id)
+          expect(assignment_ids).not_to include(@reply_to_topic.id)
+          expect(assignment_ids).not_to include(@reply_to_entry.id)
         end
       end
     end

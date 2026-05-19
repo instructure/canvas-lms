@@ -68,7 +68,7 @@ module SIS
           end
         end
         errors = messages.map do |message|
-          (message.is_a?(SisBatchError) ? message : SisBatch.build_error(csv, message, sis_batch: @batch))
+          message.is_a?(SisBatchError) ? message : SisBatch.build_error(csv, message, sis_batch: @batch)
         end
         SisBatch.bulk_insert_sis_errors(errors)
         count

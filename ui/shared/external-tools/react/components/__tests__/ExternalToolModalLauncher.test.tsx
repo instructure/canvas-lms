@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ExternalToolModalLauncher from '../ExternalToolModalLauncher'
 
@@ -145,12 +145,10 @@ describe('ExternalToolModalLauncher', () => {
     // flaky test failures when running with other tests
   })
 
-  test('sets the iframe allowances', async () => {
+  test('sets the iframe allowances at render time', () => {
     const {getByTitle} = render(<ExternalToolModalLauncher {...generateProps({isOpen: true})} />)
     const iframe = getByTitle('Modal Title')
-    await waitFor(() =>
-      expect(iframe).toHaveAttribute('allow', ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; ')),
-    )
+    expect(iframe).toHaveAttribute('allow', ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
   })
 
   test('sets the iframe data-lti-launch attribute', () => {

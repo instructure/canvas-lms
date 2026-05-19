@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import store from '../lib/ExternalAppsStore'
 import {bool, string} from 'prop-types'
 import ConfigurationForm from './configuration_forms/ConfigurationForm'
@@ -31,6 +31,7 @@ import '@canvas/rails-flash-notifications'
 import fetchToolConfiguration from '../lib/fetchToolConfiguration'
 import toolConfigurationError from '../lib/toolConfigurationError'
 import install13Tool from '../lib/install13Tool'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {IconAddLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
@@ -218,6 +219,16 @@ export default class AddExternalToolButton extends React.Component {
           this.closeModal()
         },
         response => {
+          if (response.response?.status === 403) {
+            showFlashAlert({
+              type: 'error',
+              message: I18n.t(
+                'This app has been locked by an administrator and is not available for installation.',
+              ),
+            })
+            this.closeModal()
+            return
+          }
           const errors = response.response.data.errors
           this._duplicate_check_error(errors)
         },

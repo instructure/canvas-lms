@@ -553,11 +553,6 @@ describe Message do
     context "SMS" do
       before :once do
         user_model
-        @user.account.enable_feature!(:international_sms)
-      end
-
-      before do
-        allow(Canvas::Twilio).to receive(:enabled?).and_return(true)
       end
 
       it "doesn't allow sms notification" do
@@ -570,7 +565,7 @@ describe Message do
           notification_name: "Assignment Graded",
           user: @user
         )
-        expect(@message).to_not receive(:deliver_via_sms)
+        expect(@message).not_to receive(:deliver_via_sms)
         @message.deliver
       end
     end
@@ -840,7 +835,7 @@ describe Message do
     url = "a" * 256
     msg = Message.new
     msg.url = url
-    expect { msg.save! }.to_not raise_error
+    expect { msg.save! }.not_to raise_error
   end
 
   describe "#context_context" do

@@ -87,12 +87,24 @@ class Accessibility::ResourceScannerService < ApplicationService
     issues = scan_resource_for_issues
 
     scan.accessibility_issues.rescannable.delete_all
+
+    if Account.site_admin.feature_enabled?(:a11y_checker_ga2_features) && issues.any?
+      issue_limit = Setting.get("a11y_checker_course_issue_limit", "2500").to_i
+      current_active = AccessibilityIssue.active.where(course_id: scan.course_id).count
+      if current_active + issues.count > issue_limit
+        return handle_issue_limit_reached(scan)
+      end
+    end
+
     scan.accessibility_issues.create!(issues) if issues.any?
 
     scan.update(
       workflow_state: "completed",
       issue_count: issues.count,
-      closed_at: nil
+      closed_at: nil,
+      resource_name: @resource.try(:title),
+      resource_workflow_state:,
+      resource_updated_at: @resource.updated_at
     )
     queue_course_statistics(scan.course)
     log_to_datadog(scan)
@@ -259,5 +271,9 @@ class Accessibility::ResourceScannerService < ApplicationService
   def handle_scan_failure(scan, error_report)
     scan&.update(workflow_state: "failed", error_message: error_report.id)
     log_to_datadog(scan)
+  end
+
+  def handle_issue_limit_reached(scan)
+    scan.update!(workflow_state: "failed", error_message: "issue_limit_reached", issue_count: 0)
   end
 end

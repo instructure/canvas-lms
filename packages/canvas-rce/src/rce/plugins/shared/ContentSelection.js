@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fromImageEmbed, fromVideoEmbed} from '../instructure_image/ImageEmbedOptions'
-import {isOnlyTextSelected} from '../../contentInsertionUtils'
 import formatMessage from '../../../format-message'
-import {isStudioEmbeddedMedia} from './StudioLtiSupportUtils'
 import {parseUrlPath} from '../../../util/url-util'
+import {isOnlyTextSelected} from '../../contentInsertionUtils'
+import {fromImageEmbed, fromVideoEmbed} from '../instructure_image/ImageEmbedOptions'
 import {findMediaPlayerIframe} from './iframeUtils'
+import {isStudioEmbeddedMedia} from './StudioLtiSupportUtils'
 
 const FILE_DOWNLOAD_PATH_REGEX = /^\/(courses\/\d+\/)?files\/\d+\/download$/
 
@@ -101,7 +101,7 @@ export function asLink($element, editor) {
 // and it's attributes, even though this could change with future
 // tinymce releases.
 // see https://github.com/tinymce/tinymce/issues/5181
-export function asVideoElement($element) {
+export function asVideoElement($element, isStudioVideo = false) {
   const $videoElem = findMediaPlayerIframe($element)
 
   if (!isVideoElement($videoElem) && !isStudioEmbeddedMedia($videoElem)) {
@@ -115,6 +115,9 @@ export function asVideoElement($element) {
     id:
       $videoElem.parentElement?.getAttribute('data-mce-p-data-media-id') ||
       $videoElem.getAttribute('data-mce-p-data-media-id'),
+    viewerRestrictions: isStudioVideo
+      ? {}
+      : ($videoElem.contentWindow?.['env'.toUpperCase()]?.media_object?.viewer_restrictions ?? {}),
   }
 }
 
@@ -130,11 +133,13 @@ export function asAudioElement($element) {
     $tinymceIframeShim.getAttribute('data-mce-p-title') ||
     ''
   ).replace(formatMessage('Video player for '), '')
+  const containerRect = $element.getBoundingClientRect()
   const audioOptions = {
     titleText: title,
     id:
       $element.parentElement?.getAttribute('data-mce-p-data-media-id') ||
       $element.getAttribute('data-mce-p-data-media-id'),
+    containerDimensions: {width: containerRect.width, height: containerRect.height},
   }
 
   if ($audioIframe.tagName === 'IFRAME') {
@@ -153,6 +158,9 @@ export function asAudioElement($element) {
   if (matches) {
     audioOptions.attachmentId = matches[1]
   }
+
+  audioOptions.viewerRestrictions =
+    $audioIframe.contentWindow?.['env'.toUpperCase()]?.media_object?.viewer_restrictions ?? {}
 
   return audioOptions
 }

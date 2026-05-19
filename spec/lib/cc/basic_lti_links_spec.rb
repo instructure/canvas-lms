@@ -156,8 +156,8 @@ describe CC::BasicLTILinks do
       }
       subject.create_blti_link(tool, lti_doc)
       xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
-      parsed_custom_fields = xml_doc.xpath("//blti:custom/lticm:property").each_with_object({}) do |x, h|
-        h[x.attribute("name").text] = x.text
+      parsed_custom_fields = xml_doc.xpath("//blti:custom/lticm:property").to_h do |x|
+        [x.attribute("name").text, x.text]
       end
       expect(parsed_custom_fields).to eq tool.settings[:custom_fields]
     end
@@ -309,7 +309,7 @@ describe CC::BasicLTILinks do
           subject.create_blti_link(tool, lti_doc)
           xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
           xpath = '//blti:extensions/lticm:options[@name="course_navigation"]/blti:custom/lticm:property'
-          parsed_custom_fields = xml_doc.xpath(xpath).each_with_object({}) { |x, h| h[x.attribute("name").text] = x.text }
+          parsed_custom_fields = xml_doc.xpath(xpath).to_h { |x| [x.attribute("name").text, x.text] }
           expect(parsed_custom_fields).to eq custom_fields
         end
       end
@@ -331,7 +331,7 @@ describe CC::BasicLTILinks do
           subject.create_blti_link(tool, lti_doc)
           xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
           xpath = '//blti:extensions[@platform="my vendor platform"]/lticm:property'
-          parsed_custom_fields = xml_doc.xpath(xpath).each_with_object({}) { |x, h| h[x.attribute("name").text] = x.text }
+          parsed_custom_fields = xml_doc.xpath(xpath).to_h { |x| [x.attribute("name").text, x.text] }
           expect(parsed_custom_fields).to eq custom_fields
         end
       end

@@ -22,6 +22,7 @@ def call() {
     "rspecq-processes": 5,
     "rspecq-max-requeues": 2,
     "rspecq-file-split-threshold": 150,
+    "rspecq-chunk-target-duration": 30,
     "worker-liveness-sec": 120,
   ]
 }

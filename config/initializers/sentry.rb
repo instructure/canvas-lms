@@ -55,7 +55,10 @@ Rails.configuration.to_prepare do
 
       filter = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters)
       config.before_send = lambda do |event, _|
-        filter.filter(event.to_hash)
+        if event.request&.data.is_a?(Hash)
+          event.request.data = filter.filter(event.request.data)
+        end
+        event
       end
 
       # this array should only contain exceptions that are intentionally

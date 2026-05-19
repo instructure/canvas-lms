@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import React from 'react'
 import {Assignment} from '../../../../graphql/Assignment'
 import {DiscussionTopic} from '../../../../graphql/DiscussionTopic'
@@ -81,7 +81,7 @@ describe('DiscussionTopicForm', () => {
   })
 
   describe('Course Pacing', () => {
-    it('can successfully validate the form when course pacing is enabled (custom ItemAssignToTray validation is skipped, as there is no related input is expected)', () => {
+    it('can successfully validate the form when course pacing is enabled (custom ItemAssignToTray validation is skipped, as there is no related input is expected)', async () => {
       window.ENV.CONTEXT_TYPE = 'Group'
       window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
       window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.in_paced_course = true
@@ -99,8 +99,10 @@ describe('DiscussionTopicForm', () => {
       })
       const saveButton = getByText('Save')
       fireEvent.input(getByPlaceholderText('Topic Title'), {target: {value: 'a title'}})
-      saveButton.click()
-      expect(onSubmit).toHaveBeenCalled()
+      // Use fireEvent.click and waitFor: React 18 concurrent mode may invoke
+      // onSubmit asynchronously after the click event is processed
+      fireEvent.click(saveButton)
+      await waitFor(() => expect(onSubmit).toHaveBeenCalled())
     })
   })
 })

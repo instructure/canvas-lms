@@ -22,7 +22,8 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {IconWarningSolid} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Button, IconButton} from '@instructure/ui-buttons'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {Spinner} from '@instructure/ui-spinner'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Text} from '@instructure/ui-text'
@@ -124,6 +125,8 @@ export default function OrphanedStrandIndicator({name, type, onComplete}) {
         label={actionLabel}
         footer={<Footer />}
         shouldCloseOnDocumentClick={false}
+        closeButtonLabel={I18n.t('Close')}
+        errorComponent={canvasErrorComponent()}
       >
         {error && <Alert variant="error">{I18n.t('Failed to unblock strand/singleton')}</Alert>}
         {blocked && (

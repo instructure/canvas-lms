@@ -23,6 +23,7 @@ class Login::SamlIdpDiscoveryController < ApplicationController
 
   before_action :forbid_on_files_domain
   before_action :fix_ms_office_redirects, only: :new
+  skip_before_action :require_user, only: %i[new]
 
   def new
     uri = URI.parse(aac.discovery_service_url)

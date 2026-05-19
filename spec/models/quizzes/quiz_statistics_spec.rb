@@ -47,7 +47,7 @@ describe Quizzes::QuizStatistics do
     # and one in progress
     @quiz.generate_submission(@student)
 
-    stats = @quiz.statistics(false)
+    stats = @quiz.statistics(include_all_versions: false)
     expect(stats[:multiple_attempts_exist]).to be_falsey
   end
 

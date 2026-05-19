@@ -22,9 +22,9 @@ import userEvent from '@testing-library/user-event'
 import {MockedProvider} from '@apollo/client/testing'
 import {CreateCommentSection} from '../CreateCommentSection'
 import {SpeedGraderLegacy_CreateCommentBankItem} from '../../graphql/mutations'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 
-vi.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 describe('CreateCommentSection', () => {
   afterEach(() => {

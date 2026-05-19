@@ -30,7 +30,6 @@ export const IndividualMessageCheckbox = ({checked, checkedAndDisabled, ...props
   return (
     <Responsive
       match="media"
-      // @ts-expect-error TS2769 (typescriptify)
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {

@@ -17,9 +17,10 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconAddSolid, IconCheckSolid, IconNeutralSolid, IconNoSolid} from '@instructure/ui-icons'
+import {IconAddSolid, IconCheckSolid, IconNeutralSolid} from '@instructure/ui-icons'
 import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
@@ -27,8 +28,6 @@ import {View} from '@instructure/ui-view'
 import React from 'react'
 import type {LtiRegistrationUpdateRequest} from '../model/lti_ims_registration/LtiRegistrationUpdateRequest'
 import {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
-import type {Lti1p3RegistrationOverlayStore} from '../registration_overlay/Lti1p3RegistrationOverlayStore'
-import {Alert} from '@instructure/ui-alerts'
 import {ChangeInfo, summarizeRegistrationUpdateChanges} from './summarizeRegistrationUpdateChanges'
 
 const I18n = createI18nScope('lti_registrations')

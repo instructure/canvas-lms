@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import elideString from '../../helpers/elideString'
 import {arrayOf, bool, func, number, shape, string, object} from 'prop-types'
@@ -26,7 +26,7 @@ import MoreOptions from './MoreOptions/index'
 import React, {Component, createRef} from 'react'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import UploadFileSVG from '../../../images/UploadFile.svg'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Flex} from '@instructure/ui-flex'
@@ -49,7 +49,6 @@ const FILE_REQUIRED_ERROR_MESSAGE = I18n.t('At least one submission type is requ
 class FileUpload extends Component {
   static propTypes = {
     assignment: Assignment.shape,
-    breakpoints: breakpointsShape,
     createSubmissionDraft: func,
     filesToUpload: arrayOf(
       shape({

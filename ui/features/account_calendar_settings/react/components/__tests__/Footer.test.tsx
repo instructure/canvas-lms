@@ -17,11 +17,20 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer, showFlashError} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    destroyContainer: vi.fn(),
+    showFlashError: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
 
 import {Footer} from '../Footer'
 
@@ -54,6 +63,7 @@ describe('Footer', () => {
   afterEach(() => {
     server.resetHandlers()
     destroyContainer()
+    vi.clearAllMocks()
   })
 
   it('calls onApplyClicked when apply button is pressed', () => {
@@ -82,8 +92,10 @@ describe('Footer', () => {
         return new HttpResponse(null, {status: 500})
       }),
     )
-    const {findAllByText} = render(<Footer {...defaultProps} />)
-    expect((await findAllByText('Unable to load calendar count'))[0]).toBeInTheDocument()
+    render(<Footer {...defaultProps} />)
+    await waitFor(() => {
+      expect(showFlashError).toHaveBeenCalledWith('Unable to load calendar count')
+    })
   })
 
   it('displays the confirmation modal if showConfirmation is enabled', async () => {

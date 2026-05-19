@@ -115,6 +115,17 @@ describe PlannerOverridesController do
         expect(PlannerOverride.where(user_id: @student.id).count).to be 1
       end
 
+      it "saves peer_review_sub_assignment overrides with plannable type peer_review_sub_assignment" do
+        @course.account.enable_feature!(:peer_review_allocation_and_grading)
+        parent_assignment = @course.assignments.create!(title: "Parent Assignment", peer_reviews: true)
+        prsa = PeerReviewSubAssignment.create!(parent_assignment:, context: @course, title: "Peer Review", points_possible: 10)
+        post :create, params: { plannable_type: "peer_review_sub_assignment", plannable_id: prsa.id, user_id: @student.id, marked_complete: true }
+        expect(response).to have_http_status(:created)
+        json = json_parse(response.body)
+        expect(json["plannable_type"]).to eq "peer_review_sub_assignment"
+        expect(json["marked_complete"]).to be true
+      end
+
       it "saves sub_assignment overrides with plannable type sub_assignment" do
         @course.account.enable_feature!(:discussion_checkpoints)
         @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
@@ -124,6 +135,34 @@ describe PlannerOverridesController do
         post :create, params: { plannable_type: "sub_assignment", plannable_id: @reply_to_entry.id, user_id: @student.id, marked_complete: true }
         json = json_parse(response.body)
         expect(json["plannable_type"]).to eq "sub_assignment"
+      end
+    end
+
+    describe "authorization" do
+      before :once do
+        @other_student = user_factory(active_all: true)
+        @course.enroll_student(@other_student, enrollment_state: "active")
+        @other_override = PlannerOverride.create!(plannable_id: @assignment.id,
+                                                  plannable_type: "Assignment",
+                                                  marked_complete: false,
+                                                  user_id: @other_student.id)
+      end
+
+      it "returns 404 when showing another user's override" do
+        get :show, params: { id: @other_override.id }
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 404 when updating another user's override" do
+        put :update, params: { id: @other_override.id, marked_complete: true }
+        expect(response).to have_http_status(:not_found)
+        expect(@other_override.reload.marked_complete).to be_falsey
+      end
+
+      it "returns 404 when deleting another user's override" do
+        delete :destroy, params: { id: @other_override.id }
+        expect(response).to have_http_status(:not_found)
+        expect(@other_override.reload).not_to be_deleted
       end
     end
 

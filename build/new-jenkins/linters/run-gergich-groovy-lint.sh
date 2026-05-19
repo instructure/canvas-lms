@@ -6,7 +6,7 @@ exit_status=0
 
 echo "Running Groovy linter..."
 gergich capture custom:./build/gergich/npm_groovy_lint:Gergich::NpmGroovyLint \
-  'npx npm-groovy-lint \
+  'npx npm-groovy-lint@16.2.0 \
     --path "." \
     --ignorepattern "**/node_modules/**" \
     --files "**/*.groovy,**/Jenkinsfile*" \

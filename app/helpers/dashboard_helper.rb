@@ -71,8 +71,8 @@ module DashboardHelper
 
     contexts.map do |name, url|
       url = nil if category == "Conversation"
-      url.present? ? "<a href=\"#{url}\" aria-label=\"#{accessibility_category_label(category)} for #{h(name)}\">#{h(name)}</a>" : h(name)
-    end.to_sentence.html_safe
+      url.present? ? tag.a(name, href: url, aria: { label: "#{accessibility_category_label(category)} for #{name}" }) : h(name)
+    end.to_sentence.html_safe # rubocop:disable Rails/OutputSafety
   end
 
   def accessibility_category_label(category)

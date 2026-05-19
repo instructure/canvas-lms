@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AlertCriterion < ActiveRecord::Base
+class AlertCriterion < ApplicationRecord
   belongs_to :alert
 
   validates :threshold, numericality: { greater_than_or_equal_to: 0 }

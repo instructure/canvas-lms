@@ -128,7 +128,7 @@ describe "master courses sidebar" do
     it "show mobile trigger button and hides trigger tab" do
       resize_screen_to_mobile_width
       get "/courses/#{@master.id}"
-      expect(blueprint_open_sidebar_button).to_not be_displayed
+      expect(blueprint_open_sidebar_button).not_to be_displayed
       expect(blueprint_mobile_open_sidebar_button).to be_displayed
     end
 

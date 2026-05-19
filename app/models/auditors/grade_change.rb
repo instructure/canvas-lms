@@ -32,10 +32,14 @@ class Auditors::GradeChange
       NULL_PLACEHOLDER
     end
     alias_method :global_id, :id
+
+    def checkpoints_parent?
+      false
+    end
   end
   COURSE_OVERRIDE_ASSIGNMENT = DummyAssignment.new.freeze
 
-  OverrideGradeChange = Struct.new(:grader, :old_grade, :old_score, :score, keyword_init: true)
+  OverrideGradeChange = Struct.new(:grader, :old_grade, :old_score, :score)
 
   class Record < Auditors::Record
     attributes :account_id,

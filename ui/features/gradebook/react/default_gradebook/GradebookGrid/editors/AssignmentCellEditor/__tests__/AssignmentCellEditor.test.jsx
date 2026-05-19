@@ -56,16 +56,12 @@ describe('GradebookGrid AssignmentCellEditor', () => {
       user_id: '1101',
     })
 
-    vi
-      .spyOn(gradebook, 'isGradeEditable')
-      .mockImplementation(
-        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
-      )
-    vi
-      .spyOn(gradebook, 'isGradeVisible')
-      .mockImplementation(
-        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
-      )
+    vi.spyOn(gradebook, 'isGradeEditable').mockImplementation(
+      (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+    )
+    vi.spyOn(gradebook, 'isGradeVisible').mockImplementation(
+      (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+    )
 
     editorOptions = {
       column: {
@@ -124,14 +120,14 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('renders an AssignmentRowCell', () => {
       createEditor()
       const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
-      expect(element.type.name).toBe('AssignmentRowCell')
+      expect(element.props.children.type.name).toBe('AssignmentRowCell')
     })
 
     test('renders a ReadOnlyCell when the grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
       const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
-      expect(element.type.name).toBe('ReadOnlyCell')
+      expect(element.props.children.type.name).toBe('ReadOnlyCell')
     })
 
     test('renders into the given container', () => {
@@ -348,16 +344,12 @@ describe('GradebookGrid AssignmentCellEditor', () => {
       user_id: '1101',
     })
 
-    vi
-      .spyOn(gradebook, 'isGradeEditable')
-      .mockImplementation(
-        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
-      )
-    vi
-      .spyOn(gradebook, 'isGradeVisible')
-      .mockImplementation(
-        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
-      )
+    vi.spyOn(gradebook, 'isGradeEditable').mockImplementation(
+      (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+    )
+    vi.spyOn(gradebook, 'isGradeVisible').mockImplementation(
+      (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+    )
 
     editorOptions = {
       column: {
@@ -421,14 +413,14 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('renders an AssignmentRowCell', () => {
       createEditor()
       const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
-      expect(element.type.name).toBe('AssignmentRowCell')
+      expect(element.props.children.type.name).toBe('AssignmentRowCell')
     })
 
     test('renders a ReadOnlyCell when the grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
       const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
-      expect(element.type.name).toBe('ReadOnlyCell')
+      expect(element.props.children.type.name).toBe('ReadOnlyCell')
     })
 
     test('renders into the given container', () => {
@@ -644,16 +636,12 @@ describe('GradebookGrid AssignmentCellEditor', () => {
       user_id: '1101',
     })
 
-    vi
-      .spyOn(gradebook, 'isGradeEditable')
-      .mockImplementation(
-        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
-      )
-    vi
-      .spyOn(gradebook, 'isGradeVisible')
-      .mockImplementation(
-        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
-      )
+    vi.spyOn(gradebook, 'isGradeEditable').mockImplementation(
+      (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+    )
+    vi.spyOn(gradebook, 'isGradeVisible').mockImplementation(
+      (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+    )
 
     editorOptions = {
       column: {
@@ -717,14 +705,14 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('renders an AssignmentRowCell', () => {
       createEditor()
       const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
-      expect(element.type.name).toBe('AssignmentRowCell')
+      expect(element.props.children.type.name).toBe('AssignmentRowCell')
     })
 
     test('renders a ReadOnlyCell when the grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
       const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
-      expect(element.type.name).toBe('ReadOnlyCell')
+      expect(element.props.children.type.name).toBe('ReadOnlyCell')
     })
 
     test('renders into the given container', () => {
@@ -940,16 +928,12 @@ describe('GradebookGrid AssignmentCellEditor', () => {
       user_id: '1101',
     })
 
-    vi
-      .spyOn(gradebook, 'isGradeEditable')
-      .mockImplementation(
-        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
-      )
-    vi
-      .spyOn(gradebook, 'isGradeVisible')
-      .mockImplementation(
-        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
-      )
+    vi.spyOn(gradebook, 'isGradeEditable').mockImplementation(
+      (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+    )
+    vi.spyOn(gradebook, 'isGradeVisible').mockImplementation(
+      (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+    )
 
     editorOptions = {
       column: {
@@ -1013,14 +997,14 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('renders an AssignmentRowCell', () => {
       createEditor()
       const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
-      expect(element.type.name).toBe('AssignmentRowCell')
+      expect(element.props.children.type.name).toBe('AssignmentRowCell')
     })
 
     test('renders a ReadOnlyCell when the grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
       const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
-      expect(element.type.name).toBe('ReadOnlyCell')
+      expect(element.props.children.type.name).toBe('ReadOnlyCell')
     })
 
     test('renders into the given container', () => {
@@ -1236,16 +1220,12 @@ describe('GradebookGrid AssignmentCellEditor', () => {
       user_id: '1101',
     })
 
-    vi
-      .spyOn(gradebook, 'isGradeEditable')
-      .mockImplementation(
-        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
-      )
-    vi
-      .spyOn(gradebook, 'isGradeVisible')
-      .mockImplementation(
-        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
-      )
+    vi.spyOn(gradebook, 'isGradeEditable').mockImplementation(
+      (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+    )
+    vi.spyOn(gradebook, 'isGradeVisible').mockImplementation(
+      (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+    )
 
     editorOptions = {
       column: {
@@ -1309,14 +1289,14 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     test('renders an AssignmentRowCell', () => {
       createEditor()
       const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
-      expect(element.type.name).toBe('AssignmentRowCell')
+      expect(element.props.children.type.name).toBe('AssignmentRowCell')
     })
 
     test('renders a ReadOnlyCell when the grade is not editable', () => {
       gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
       const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
-      expect(element.type.name).toBe('ReadOnlyCell')
+      expect(element.props.children.type.name).toBe('ReadOnlyCell')
     })
 
     test('renders into the given container', () => {

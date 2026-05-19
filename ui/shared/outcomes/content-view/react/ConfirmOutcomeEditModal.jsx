@@ -18,11 +18,11 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import {func, shape, bool} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 
 const I18n = createI18nScope('confirmOutcomeEditModal')
 
@@ -44,7 +44,7 @@ export function showConfirmOutcomeEdit(props) {
     if (modal) modal.show()
   }
 
-  ReactDOM.render(
+  legacyRender(
     <ConfirmOutcomeEditModal {...props} parent={() => parent} ref={showConfirmOutcomeEditRef} />,
     parent,
   )
@@ -83,7 +83,7 @@ export default class ConfirmOutcomeEditModal extends Component {
   hide() {
     this.setState({show: false}, () => {
       const parent = this.props.parent ? this.props.parent() : null
-      if (parent) ReactDOM.unmountComponentAtNode(parent)
+      if (parent) legacyUnmountComponentAtNode(parent)
     })
   }
 

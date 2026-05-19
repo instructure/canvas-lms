@@ -271,7 +271,7 @@ describe "User Profile API", type: :request do
 
   context "canvas for elementary" do
     it "returns k5_user false if not a k5 user" do
-      toggle_k5_setting(@course.account, false)
+      toggle_k5_setting(@course.account, enable: false)
 
       @user = @student
       json = api_call(:get,
@@ -286,7 +286,7 @@ describe "User Profile API", type: :request do
 
     context "k5 mode on" do
       before(:once) do
-        toggle_k5_setting(@course.account, true)
+        toggle_k5_setting(@course.account)
       end
 
       it "returns k5_user true for current_user" do
@@ -312,5 +312,20 @@ describe "User Profile API", type: :request do
         expect(json["k5_user"]).to be_nil
       end
     end
+  end
+
+  # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+  # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+  it "passes current_user to SisPseudonym.for" do
+    allow(SisPseudonym).to receive(:for).and_call_original
+    expect(SisPseudonym).to receive(:for)
+      .with(@student, anything, hash_including(current_user: @admin))
+      .and_call_original
+    api_call(:get,
+             "/api/v1/users/#{@student.id}/profile",
+             controller: "profile",
+             action: "settings",
+             user_id: @student.to_param,
+             format: "json")
   end
 end

@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useEffect} from 'react'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import TopNavPortal from '@canvas/top-navigation/react/TopNavPortal'
@@ -32,7 +32,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {fromNow} from '@canvas/fuzzy-relative-time'
 import {Alert} from '@instructure/ui-alerts'
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {getLiveRegion} from '@instructure/platform-instui-bindings'
 
 const I18n = createI18nScope('QRMobileLogin')
 

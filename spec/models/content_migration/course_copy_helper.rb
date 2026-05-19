@@ -36,6 +36,18 @@ shared_context "course copy" do
     @cm.save!
   end
 
+  before do
+    # Add AccountDomain for localhost and migration test hosts to support URL filtering in content migrations
+    ad1 = Account.default.account_domains.find_or_initialize_by(host: "localhost")
+    ad1.save(validate: false) if ad1.new_record?
+    ad2 = Account.default.account_domains.find_or_initialize_by(host: "canvas-web.inseng.test")
+    ad2.save(validate: false) if ad2.new_record?
+    # Clear AccountDomain caches so find_cached picks up the new domains
+    AccountDomain.reload
+    MultiCache.delete(AccountDomain.domain_lookup_cache_key("localhost", force_current_test_cluster: false))
+    MultiCache.delete(AccountDomain.domain_lookup_cache_key("canvas-web.inseng.test", force_current_test_cluster: false))
+  end
+
   def run_course_copy(warnings = [])
     @cm.set_default_settings
     worker = Canvas::Migration::Worker::CourseCopyWorker.new

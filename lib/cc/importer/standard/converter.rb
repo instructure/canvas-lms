@@ -146,7 +146,7 @@ module CC::Importer::Standard
       @course[:file_map][file[:migration_id]] = file
     end
 
-    def add_course_file(file, overwrite = false)
+    def add_course_file(file, overwrite: false)
       return unless file[:path_name]
 
       file[:path_name].sub!(WEB_RESOURCES_FOLDER + "/", "")

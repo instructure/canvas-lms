@@ -22,7 +22,7 @@ import {dateString, datetimeString, timeString} from '@canvas/datetime/date-func
 
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import {initializePlanner} from '@canvas/planner'
-import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('k5_use_planner')
 

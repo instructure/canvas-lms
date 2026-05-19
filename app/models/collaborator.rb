@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Collaborator < ActiveRecord::Base
+class Collaborator < ApplicationRecord
   belongs_to :collaboration
   belongs_to :group
   belongs_to :user

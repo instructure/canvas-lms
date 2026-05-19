@@ -98,6 +98,11 @@ module SIS
         updates = ids_to_change(column, data_change)
         details[:scope].where(id: old_item.id).update_all(updates)
         old_item.invalidate_association_cache if old_item.is_a?(Account)
+        # update_all bypasses AR callbacks; re-index GlobalLookups
+        # so cross-shard searches can find the new IDs.
+        if old_item.is_a?(Pseudonym) && GlobalLookups.enabled?
+          old_item.delay_if_production.ensure_global_lookup_record(force: true)
+        end
       end
 
       def ids_to_change(column, data_change)

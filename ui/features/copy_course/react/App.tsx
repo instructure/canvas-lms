@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import CourseCopy from './components/CourseCopy'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 
 export const App = ({

@@ -20,7 +20,7 @@ import React from 'react'
 import {render as testingLibraryRender, act, waitFor} from '@testing-library/react'
 import ReleaseNotesList from '../ReleaseNotesList'
 import userEvent from '@testing-library/user-event'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const render = (children: unknown) =>

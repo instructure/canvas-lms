@@ -293,6 +293,7 @@ describe('DashboardHeader', () => {
         ...defaultEnv,
         widget_dashboard_overridable: false,
         current_user_id: '1',
+        current_user_roles: ['user', 'student'],
       }
 
       const {getByTestId} = render(<FakeDashboardHeader {...defaultProps} />)
@@ -328,6 +329,7 @@ describe('DashboardHeader', () => {
         ...defaultEnv,
         widget_dashboard_overridable: false,
         current_user_id: '1',
+        current_user_roles: ['user', 'student'],
       }
 
       fetchMock.put('/api/v1/users/1/settings', {
@@ -350,11 +352,44 @@ describe('DashboardHeader', () => {
       })
     })
 
+    it('renders switch button when observer is observing a student', async () => {
+      window.ENV = {
+        ...defaultEnv,
+        widget_dashboard_overridable: false,
+        current_user_id: '1',
+        current_user_roles: ['user', 'observer'],
+      }
+
+      fetchMock.get('/api/v1/show_k5_dashboard', {show_k5_dashboard: false})
+
+      const {findByTestId} = render(<FakeDashboardHeader {...defaultProps} />)
+      expect(await findByTestId('switch-to-new-dashboard-button')).toBeInTheDocument()
+    })
+
+    it('does not render switch button when observer is observing themselves', async () => {
+      window.ENV = {
+        ...defaultEnv,
+        widget_dashboard_overridable: false,
+        current_user_id: '1',
+        current_user_roles: ['user', 'observer'],
+        OBSERVED_USERS_LIST: [{id: '1', name: 'Self', avatar_url: undefined}],
+      }
+
+      fetchMock.get('/api/v1/show_k5_dashboard', {show_k5_dashboard: false})
+
+      const {queryByTestId} = render(<FakeDashboardHeader {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(queryByTestId('switch-to-new-dashboard-button')).not.toBeInTheDocument()
+      })
+    })
+
     it('renders switch button in responsive view', () => {
       window.ENV = {
         ...defaultEnv,
         widget_dashboard_overridable: false,
         current_user_id: '1',
+        current_user_roles: ['user', 'student'],
         FEATURES: {
           instui_header: true,
         },

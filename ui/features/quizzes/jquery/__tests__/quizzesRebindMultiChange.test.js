@@ -32,11 +32,14 @@ const $questionContent = {
 describe('rebindMultiChange', () => {
   let quiz
 
-  beforeEach(async () => {
-    fakeENV.setup()
-    $._data = vi.fn()
+  beforeAll(async () => {
     const module = await import('../quizzes')
     quiz = module.quiz
+  })
+
+  beforeEach(() => {
+    fakeENV.setup()
+    $._data = vi.fn()
     quiz.loadJQueryElemById = vi.fn().mockReturnValue($questionContent)
   })
 
@@ -79,5 +82,5 @@ describe('rebindMultiChange', () => {
     quiz.rebindMultiChange(questionType, 'question_content_0', {})
 
     expect($questionContent.bind).not.toHaveBeenCalled()
-  }, 30000)
+  })
 })

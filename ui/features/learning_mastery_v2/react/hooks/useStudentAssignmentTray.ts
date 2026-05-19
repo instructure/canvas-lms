@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useMemo, useCallback} from 'react'
+import {useState, useMemo, useCallback, useRef} from 'react'
 import {Student, Outcome} from '@canvas/outcomes/react/types/rollup'
 import {ContributingScoreAlignment} from '@canvas/outcomes/react/hooks/useContributingScores'
 
@@ -67,6 +67,7 @@ interface UseStudentAssignmentTrayResult {
 
 export const useStudentAssignmentTray = (students: Student[]): UseStudentAssignmentTrayResult => {
   const [state, setState] = useState<StudentAssignmentTrayState | null>(null)
+  const triggerRef = useRef<HTMLElement | null>(null)
 
   const currentAlignment = useMemo(() => {
     if (!state) return null
@@ -153,6 +154,7 @@ export const useStudentAssignmentTray = (students: Student[]): UseStudentAssignm
       alignments: ContributingScoreAlignment[],
     ) => {
       if (alignmentIndex === undefined) return
+      triggerRef.current = document.activeElement as HTMLElement | null
       setState({
         outcome,
         student,
@@ -165,6 +167,8 @@ export const useStudentAssignmentTray = (students: Student[]): UseStudentAssignm
 
   const close = useCallback(() => {
     setState(null)
+    triggerRef.current?.focus()
+    triggerRef.current = null
   }, [])
 
   return {

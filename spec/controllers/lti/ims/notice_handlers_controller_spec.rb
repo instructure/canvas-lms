@@ -59,8 +59,24 @@ describe Lti::IMS::NoticeHandlersController do
     end
 
     context "with unbound developer key" do
-      it "returns 401 unauthorized and complains about missing developer key" do
+      before do
+        root_account.disable_feature! :lti_deactivate_registrations
         developer_key.developer_key_account_bindings.first.update! workflow_state: "off"
+      end
+
+      it "returns 401 unauthorized and complains about missing developer key" do
+        send_request
+        expect(response).to have_http_status :unauthorized
+        expect(json).to be_lti_advantage_error_response_body("unauthorized", "Invalid Developer Key")
+      end
+    end
+
+    context "with inactive registration" do
+      before do
+        developer_key.lti_registration.deactivate
+      end
+
+      it "returns 401 unauthorized" do
         send_request
         expect(response).to have_http_status :unauthorized
         expect(json).to be_lti_advantage_error_response_body("unauthorized", "Invalid Developer Key")
@@ -192,6 +208,7 @@ describe Lti::IMS::NoticeHandlersController do
 
       before do
         developer_key.account_binding_for(Account.default).update!(workflow_state: "off")
+        developer_key.lti_registration.deactivate
       end
 
       it "it throws 401" do

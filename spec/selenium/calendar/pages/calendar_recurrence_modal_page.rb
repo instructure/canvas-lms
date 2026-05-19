@@ -134,6 +134,7 @@ module CalendarRecurrenceModalPage
 
   def click_cancel_button
     cancel_button.click
+    keep_trying_until { !recurrence_modal_exists? }
   end
 
   def click_day_selection_checkbox(day)
@@ -142,6 +143,7 @@ module CalendarRecurrenceModalPage
 
   def click_done_button
     done_button.click
+    keep_trying_until { !recurrence_modal_exists? }
   end
 
   def click_on_radio_button

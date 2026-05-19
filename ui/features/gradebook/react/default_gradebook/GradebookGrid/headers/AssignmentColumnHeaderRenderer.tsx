@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import {isGraded, isPostable} from '@canvas/grading/SubmissionHelper'
 import {optionsForGradingType} from '../../../shared/EnterGradesAsSetting'
 import AssignmentColumnHeader from './AssignmentColumnHeader'
@@ -235,10 +235,10 @@ export default class AssignmentColumnHeaderRenderer {
   render(column: Column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, options)
 
-    ReactDOM.render(<AssignmentColumnHeader {...props} />, $container)
+    legacyRender(<AssignmentColumnHeader {...props} />, $container)
   }
 
   destroy(_column: Column, $container: HTMLElement, _gridSupport: GridSupport) {
-    ReactDOM.unmountComponentAtNode($container)
+    legacyUnmountComponentAtNode($container)
   }
 }

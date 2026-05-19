@@ -20,6 +20,9 @@
 # allows setting up mocks/stubs that will be automatically applied any time
 # this AR instance is instantiated, through find or whatever
 # the record must be saved before calling any_instantiation, so that it has an id
+
+require "rspec/mocks"
+
 module RspecMockAnyInstantiation
   module ClassMethods
     def reset_any_instantiation!

@@ -19,7 +19,6 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
 import createReactClass from 'create-react-class'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'

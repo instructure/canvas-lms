@@ -57,9 +57,7 @@ const AccountCourseUserSearch = props => {
 AccountCourseUserSearch.propTypes = {
   accountId: string.isRequired,
   rootAccountId: string.isRequired,
-  permissions: shape({
-    analytics: bool.isRequired,
-  }).isRequired,
+  permissions: shape({}).isRequired,
   store: shape({
     getState: func.isRequired,
   }).isRequired,

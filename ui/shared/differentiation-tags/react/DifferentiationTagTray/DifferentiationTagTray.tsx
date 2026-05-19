@@ -37,7 +37,7 @@ import DifferentiationTagSearch from './DifferentiationTagSearch'
 import UploadFileSVG from '../images/UploadFile.svg'
 import {FormMessage} from '@instructure/ui-form-field'
 import doFetchApi, {DoFetchApiResults} from '@canvas/do-fetch-api-effect'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {monitorProgress, type CanvasProgress} from '@canvas/progress/ProgressHelpers'
 
 const I18n = createI18nScope('differentiation_tags')

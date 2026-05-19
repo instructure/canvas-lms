@@ -34,11 +34,15 @@ import {
 } from '@canvas/outcomes/mocks/Management'
 import {clickEl} from '@canvas/outcomes/react/helpers/testHelpers'
 import resolveProgress from '@canvas/progress/resolve_progress'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 vi.mock('@canvas/progress/resolve_progress')
 vi.useFakeTimers()

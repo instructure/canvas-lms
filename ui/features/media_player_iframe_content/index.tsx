@@ -16,32 +16,54 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render} from '@canvas/react'
 // TODO: use URL() in browser to parse URL
 // eslint-disable-next-line import/no-nodejs-modules
 import {parse} from 'url'
 import ready from '@instructure/ready'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import CanvasMediaPlayer from '@canvas/canvas-media-player'
 import CanvasStudioPlayer from '@canvas/canvas-studio-player'
 import {MediaInfo} from '@canvas/canvas-studio-player/react/types'
 import {captionLanguageForLocale} from '@instructure/canvas-media'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+import {NoTranscript} from './components/NoTranscript'
+import {isAsrGenerating} from './utils/isAsrGenerating'
+import {getPlayerTracks} from './utils/getPlayerTracks'
+
+import {createOnTranscriptEdit, onConfirmEditChanges} from './transcriptEditing'
+import {createPendoTrackEventHandler} from './pendoTrackEventHandler'
 
 declare const ENV: GlobalEnv & {
   media_object: MediaInfo
   attachment_id?: string
   attachment?: boolean
-  FEATURES: {
-    consolidated_media_player_iframe?: boolean
-  }
+  current_user_roles?: string[]
+}
+
+interface AsrContext {
+  isAsrEnabled: boolean
+  isEditMode: boolean
+  rceJwt: string | undefined
 }
 
 const I18n = createI18nScope('CanvasMediaPlayer')
 
 const isStandalone = () => {
   return !window.frameElement && window.location === window?.top?.location
+}
+
+const getAsrContext = (): AsrContext => {
+  const disabled: AsrContext = {isAsrEnabled: false, isEditMode: false, rceJwt: undefined}
+
+  if (!ENV.FEATURES?.rce_asr_captioning_improvements) return disabled
+
+  try {
+    const isEditMode = window.parent.document.body.id === 'tinymce'
+    const rceEnv = window.parent.parent.ENV as {JWT?: string} | undefined
+    return {isAsrEnabled: true, isEditMode, rceJwt: rceEnv?.JWT}
+  } catch {
+    return disabled
+  }
 }
 
 const addVerifier = (url: string, verifier: string | string[] | undefined): string => {
@@ -102,81 +124,135 @@ ready(() => {
         (media_id === event?.data?.media_object_id || attachment_id === event?.data?.attachment_id)
       ) {
         document.getElementsByTagName('video')[0].load()
-      } else if (event?.data?.subject === 'media_tracks_request') {
+        return
+      }
+
+      if (event?.data?.subject === 'media_tracks_request') {
         const tracks = mediaTracks?.map(t => ({
           locale: t.language,
           language: t.label,
           inherited: t.inherited,
+          asr: t.asr,
+          workflow_state: t.workflow_state,
+          url: t.url,
+          filename: `${media_object?.title}_${t.locale}.srt`,
         }))
-        if (tracks)
+        if (tracks) {
           event?.source?.postMessage(
             {subject: 'media_tracks_response', payload: tracks},
             {targetOrigin: event.origin},
           )
+        }
+        return
+      }
+
+      if (event.data?.subject === 'media_player.get_ready_state') {
+        event.source?.postMessage(
+          {
+            subject: 'media_player.iframe_ready',
+            mediaId: media_id,
+          },
+          {targetOrigin: event.origin},
+        )
       }
     },
     false,
   )
+
+  try {
+    const topOrigin = window?.top?.location.origin
+    if (topOrigin) {
+      window?.top?.postMessage(
+        {
+          subject: 'media_player.iframe_ready',
+          mediaId: media_id,
+        },
+        {targetOrigin: topOrigin},
+      )
+    }
+  } catch {
+    // Parent frame is cross-origin; skip the unsolicited ready broadcast.
+    // The parent can still discover readiness via 'media_player.get_ready_state'.
+  }
 
   document.body.setAttribute('style', 'margin: 0; padding: 0; border-style: none')
   // if the user takes the video fullscreen and back, the documentElement winds up
   // with scrollbars, even though everything is the right size.
   document.documentElement.setAttribute('style', 'overflow: hidden;')
   const div = document.body.firstElementChild
-  let explicitSize;
+  let explicitSize
   if (isStandalone()) {
     // we're standalone mode
     div?.setAttribute('style', 'width: 640px; max-width: 100%; margin: 16px auto;')
-    explicitSize = { width: 640, height: 408 };
+    explicitSize = {width: 640, height: 408}
   }
 
+  const {isAsrEnabled, isEditMode, rceJwt} = getAsrContext()
+
+  const handleTranscriptEdit =
+    isAsrEnabled && isEditMode && attachment_id && rceJwt
+      ? createOnTranscriptEdit(attachment_id, rceJwt)
+      : undefined
+
+  const handleConfirmEditChanges = isAsrEnabled && isEditMode ? onConfirmEditChanges : undefined
+
+  const handleTrackEvent = isAsrEnabled
+    ? createPendoTrackEventHandler(ENV.current_user_roles ?? [])
+    : undefined
+
   const aria_label = !media_object.title ? undefined : media_object.title
-  if (ENV.FEATURES?.consolidated_media_player_iframe) {
-    render(
-      <CanvasStudioPlayer
-        media_id={media_id || ''}
-        media_sources={href_source || media_object.media_sources}
-        media_tracks={mediaTracks}
-        type={is_video ? 'video' : 'audio'}
-        aria_label={aria_label}
-        is_attachment={is_attachment}
-        attachment_id={attachment_id}
-        explicitSize={explicitSize}
-        kebabMenuElements={
-          ENV.FEATURES?.rce_studio_embed_improvements
-            ? [
-                {
-                  id: 'expand-view',
-                  text: I18n.t('Expand View'),
-                  showInOverlay: true,
-                  overlayText: I18n.t('Expand'),
-                  ariaLabel: I18n.t('Open immersive view with all media tools'),
-                  icon: 'expand',
-                  onClick: () => {
-                    if (window.top) {
-                      window.top.location.href = `/media_attachments/${attachment_id}/immersive_view`
-                    }
-                  },
-                  order: 0,
+  const canManageTranscripts = (ENV.current_user_roles ?? []).some(
+    r => r === 'teacher' || r === 'admin',
+  )
+  const isGenerating = isAsrGenerating(media_object?.media_tracks)
+  const playerTracks = getPlayerTracks(mediaTracks)
+
+  const viewerRestrictions = media_object?.viewer_restrictions || {}
+  const showRollingTranscript = viewerRestrictions.show_rolling_transcript === true
+  const showExpandView = isAsrEnabled && showRollingTranscript && is_video
+
+  render(
+    <CanvasStudioPlayer
+      media_id={media_id || ''}
+      media_sources={href_source || media_object.media_sources}
+      media_tracks={playerTracks}
+      type={is_video ? 'video' : 'audio'}
+      aria_label={aria_label}
+      is_attachment={is_attachment}
+      attachment_id={attachment_id}
+      explicitSize={explicitSize}
+      enableSidebar={isAsrEnabled && showRollingTranscript}
+      openSidebar={isAsrEnabled}
+      onTranscriptEdit={handleTranscriptEdit}
+      onConfirmEditChanges={handleConfirmEditChanges}
+      onTrackEvent={handleTrackEvent}
+      hideUploadCaptions
+      kebabMenuElements={
+        showExpandView
+          ? [
+              {
+                id: 'expand-view',
+                text: I18n.t('Expand View'),
+                showInOverlay: true,
+                overlayText: I18n.t('Expand'),
+                ariaLabel: I18n.t('Open immersive view with all media tools'),
+                icon: 'expand',
+                onClick: () => {
+                  if (window.top) {
+                    window.top.location.href = `/media_attachments/${attachment_id}/immersive_view`
+                  }
                 },
-              ]
-            : []
-        }
-      />,
-      container,
-    )
-  } else {
-    render(
-      <CanvasMediaPlayer
-        media_id={media_id || ''}
-        media_sources={href_source || media_object.media_sources}
-        media_tracks={mediaTracks}
-        type={is_video ? 'video' : 'audio'}
-        aria_label={aria_label}
-        is_attachment={is_attachment}
-        attachment_id={attachment_id}
-      />,
-      container,
-    )
-  }
+                order: 0,
+              },
+            ]
+          : []
+      }
+      emptyTranscriptsComponent={
+        isAsrEnabled && is_video ? (
+          <NoTranscript isGenerating={isGenerating} canManageTranscripts={canManageTranscripts} />
+        ) : undefined
+      }
+    />,
+    container,
+  )
 })

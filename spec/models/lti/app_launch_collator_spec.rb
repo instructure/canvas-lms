@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
 require_relative "../../lti_spec_helper"
 
 module Lti
@@ -213,7 +212,7 @@ module Lti
       end
 
       it "returns resource_selection tools" do
-        tool = new_valid_external_tool(account, true)
+        tool = new_valid_external_tool(account, resource_selection: true)
         placements = %w[assignment_selection link_selection resource_selection]
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
 
@@ -264,8 +263,8 @@ module Lti
         expect(definitions.count).to eq 2
         external_tool = definitions.find { |d| d[:definition_type] == "ContextExternalTool" }
         message_handler = definitions.find { |d| d[:definition_type] == "Lti::MessageHandler" }
-        expect(message_handler).to_not be_nil
-        expect(external_tool).to_not be_nil
+        expect(message_handler).not_to be_nil
+        expect(external_tool).not_to be_nil
       end
 
       context "pagination" do
@@ -286,7 +285,7 @@ module Lti
           page2 = collection.paginate(page: page1.next_page, per_page:)
           expect(page1.count).to eq 3
           expect(page2.count).to eq 3
-          expect(page1.first).to_not eq page2.first
+          expect(page1.first).not_to eq page2.first
         end
       end
     end
@@ -400,7 +399,7 @@ module Lti
 
           collection = described_class.bookmarked_collection(course, [placement])
           tools = collection.paginate(per_page: 100).to_a
-          message_handlers = tools.select { |t| t.is_a?(Lti::MessageHandler) }
+          message_handlers = tools.grep(Lti::MessageHandler)
           expect(message_handlers.count).to eq 2
           expect(message_handlers).to include(@mh1, @mh2)
         end
@@ -414,7 +413,7 @@ module Lti
         it "returns all message handlers when none are migrated" do
           collection = described_class.bookmarked_collection(course, [placement])
           tools = collection.paginate(per_page: 100).to_a
-          message_handlers = tools.select { |t| t.is_a?(Lti::MessageHandler) }
+          message_handlers = tools.grep(Lti::MessageHandler)
           expect(message_handlers.count).to eq 2
           expect(message_handlers).to include(@mh1, @mh2)
         end
@@ -425,7 +424,7 @@ module Lti
 
           collection = described_class.bookmarked_collection(course, [placement])
           tools = collection.paginate(per_page: 100).to_a
-          message_handlers = tools.select { |t| t.is_a?(Lti::MessageHandler) }
+          message_handlers = tools.grep(Lti::MessageHandler)
           expect(message_handlers.count).to eq 1
           expect(message_handlers).to include(@mh2)
           expect(message_handlers).not_to include(@mh1)
@@ -439,7 +438,7 @@ module Lti
 
           collection = described_class.bookmarked_collection(course, [placement])
           tools = collection.paginate(per_page: 100).to_a
-          message_handlers = tools.select { |t| t.is_a?(Lti::MessageHandler) }
+          message_handlers = tools.grep(Lti::MessageHandler)
           expect(message_handlers.count).to eq 0
         end
       end

@@ -17,14 +17,17 @@
     "add_alt_text_for_the_image_48cd88aa": {
         "message": "Add alt text for the image"
     },
-    "add_another_f4e50d57": {
-        "message": "Add another"
-    },
     "add_cc_subtitles_55f0394e": {
         "message": "Add CC/Subtitles"
     },
     "add_image_60b2de07": {
         "message": "Add Image"
+    },
+    "add_new_a9226085": {
+        "message": "Add New"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "Add New Caption"
     },
     "add_one_9e34a6f8": {
         "message": "Add one!"
@@ -43,12 +46,6 @@
     },
     "afrikaans_da0fe6ee": {
         "message": "Afrikaans"
-    },
-    "ai_response_9624e8e8": {
-        "message": "AI Response"
-    },
-    "ai_tools_fda01177": {
-        "message": "AI Tools"
     },
     "albanian_21ed929e": {
         "message": "Albanian"
@@ -94,9 +91,6 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "An error occurred making a network request"
-    },
-    "an_error_occurred_processing_your_request_a3a38d84": {
-        "message": "An error occurred processing your request"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "An error occurred uploading your media."
@@ -176,6 +170,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Auto-saved content exists. Would you like to load the auto-saved content instead?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Automatic captioning"
+    },
     "available_folders_694d0436": {
         "message": "Available folders"
     },
@@ -248,6 +245,27 @@
     "cap_product_3a5265a6": {
         "message": "Cap Product"
     },
+    "caption_generation_failed_7312f917": {
+        "message": "Caption generation failed"
+    },
+    "caption_manager_aae0906f": {
+        "message": "Caption Manager"
+    },
+    "captionname_caption_delete_failed_3afa617e": {
+        "message": "{ captionName } caption delete failed"
+    },
+    "captionname_caption_generation_failed_6fd29bfe": {
+        "message": "{ captionName } caption generation failed"
+    },
+    "captionname_caption_upload_failed_fa0f13a4": {
+        "message": "{ captionName } caption upload failed"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "Captions have been added for { lang }"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "Captions have been deleted for { lang }"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "Captions inherited from a parent subject cannot be removed."
     },
@@ -308,6 +326,12 @@
     "choose_caption_file_9c45bc4e": {
         "message": "Choose caption file"
     },
+    "choose_file_8d89ccab": {
+        "message": "Choose File"
+    },
+    "choose_file_required_61f0d716": {
+        "message": "Choose File (required)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Choose usage rights..."
     },
@@ -346,6 +370,9 @@
     },
     "close_d634289d": {
         "message": "Close"
+    },
+    "close_keyboard_shortcuts_modal_291ce074": {
+        "message": "Close Keyboard Shortcuts Modal"
     },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "Closed caption file must be less than { maxKb } kb"
@@ -392,9 +419,6 @@
     "complex_numbers_a543d004": {
         "message": "Complex Numbers"
     },
-    "compose_44c904f4": {
-        "message": "Compose"
-    },
     "computer_1d7dfa6f": {
         "message": "Computer"
     },
@@ -424,9 +448,6 @@
     },
     "coproduct_e7838082": {
         "message": "Coproduct"
-    },
-    "copy_9748f9f": {
-        "message": "Copy"
     },
     "copyright_holder_66ee111": {
         "message": "Copyright Holder:"
@@ -500,9 +521,6 @@
     "custom_6979cd81": {
         "message": "Custom"
     },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Custom width and height (Pixels)"
-    },
     "cyan_c1d5f68a": {
         "message": "Cyan"
     },
@@ -551,6 +569,9 @@
     "degree_symbol_4a823d5f": {
         "message": "Degree Symbol"
     },
+    "delete_failed_6529e336": {
+        "message": "Delete Failed"
+    },
     "delimiters_4db4840d": {
         "message": "Delimiters"
     },
@@ -562,9 +583,6 @@
     },
     "describe_the_type_ff448da5": {
         "message": "(Describe the { TYPE })"
-    },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Describe the video)"
     },
     "description_436c48d7": {
         "message": "Description"
@@ -587,9 +605,6 @@
     "dimension_type_f5fa9170": {
         "message": "Dimension Type"
     },
-    "dimensions_45ddb7b7": {
-        "message": "Dimensions"
-    },
     "directionality_26ae9e08": {
         "message": "Directionality"
     },
@@ -610,9 +625,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "Disjoint Union"
-    },
-    "dislike_14befc48": {
-        "message": "Dislike"
     },
     "display_options_315aba85": {
         "message": "Display Options"
@@ -649,6 +661,9 @@
     },
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "Down And Right Diagonal Arrow"
+    },
+    "download_captionname_2e5eea35": {
+        "message": "Download { captionName }"
     },
     "download_filename_2baae924": {
         "message": "Download { filename }"
@@ -716,9 +731,6 @@
     "embed_image_1080badc": {
         "message": "Embed Image"
     },
-    "embed_options_44c4cba8": {
-        "message": "Embed Options"
-    },
     "embed_video_a97a64af": {
         "message": "Embed Video"
     },
@@ -758,6 +770,9 @@
     "english_united_kingdom_a613f831": {
         "message": "English (United Kingdom)"
     },
+    "enter_a_media_title_81b490ec": {
+        "message": "Enter a media title"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Enter at least 3 characters to search"
     },
@@ -766,9 +781,6 @@
     },
     "enter_search_text_26cb4459": {
         "message": "enter search text"
-    },
-    "enter_text_8b35c65b": {
-        "message": "Enter text"
     },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
@@ -824,6 +836,9 @@
     "extra_large_b6cdf1ff": {
         "message": "Extra Large"
     },
+    "extra_large_width_x_height_px_915571fa": {
+        "message": "Extra Large ({ width } x { height }px)"
+    },
     "extra_small_9ae33252": {
         "message": "Extra Small"
     },
@@ -839,11 +854,11 @@
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Failed getting file contents"
     },
-    "failed_to_copy_response_d3def551": {
-        "message": "Failed to copy response"
-    },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Failed to retrieve content from external tool"
+    },
+    "file_d1b70050": {
+        "message": "File*"
     },
     "file_name_8fd421ff": {
         "message": "File name"
@@ -1058,12 +1073,6 @@
     "height_69b03e15": {
         "message": "Height"
     },
-    "hello_please_describe_the_modifications_you_would__49b19837": {
-        "message": "Hello. Please describe the modifications you would like to make to your composition."
-    },
-    "hello_please_describe_the_modifications_you_would__600dbbf0": {
-        "message": "Hello. Please describe the modifications you would like to make to your selection."
-    },
     "hexagon_d8468e0d": {
         "message": "Hexagon"
     },
@@ -1082,6 +1091,9 @@
     "home_351838cd": {
         "message": "Home"
     },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "How to request and edit captions?"
+    },
     "html_code_editor_fd967a44": {
         "message": "html code editor"
     },
@@ -1096,9 +1108,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "I hold the copyright"
-    },
-    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
-        "message": "I''m sorry, but I cannot find the AI''s answer"
     },
     "icelandic_9d6d35de": {
         "message": "Icelandic"
@@ -1277,8 +1286,17 @@
     "lambda_4f602498": {
         "message": "Lambda"
     },
+    "language_91effaa0": {
+        "message": "Language*"
+    },
     "language_arts_icon_a798b0f8": {
         "message": "Language Arts Icon"
+    },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Language Spoken in This Media*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (Automatic)"
     },
     "languages_icon_9d20539": {
         "message": "Languages Icon"
@@ -1288,6 +1306,9 @@
     },
     "large_text_e7ba08cd": {
         "message": "Large text"
+    },
+    "large_width_x_height_px_c61c2fd": {
+        "message": "Large ({ width } x { height }px)"
     },
     "latvian_2bbb6aab": {
         "message": "Latvian"
@@ -1397,6 +1418,12 @@
     "links_to_an_external_site_de74145d": {
         "message": "Links to an external site."
     },
+    "list_collapsed_9ac35920": {
+        "message": "List collapsed."
+    },
+    "list_expanded_efec2d0": {
+        "message": "List expanded."
+    },
     "lists_cd1336fc": {
         "message": "Lists"
     },
@@ -1496,6 +1523,9 @@
     "medium_5a8e9ead": {
         "message": "Medium"
     },
+    "medium_width_x_height_px_b076f6b6": {
+        "message": "Medium ({ width } x { height }px)"
+    },
     "merge_links_2478df96": {
         "message": "Merge links"
     },
@@ -1525,9 +1555,6 @@
     },
     "miscellaneous_e9818229": {
         "message": "Miscellaneous"
-    },
-    "modify_6b0b13e3": {
-        "message": "Modify"
     },
     "module_90d9fd32": {
         "message": "Module"
@@ -1742,6 +1769,9 @@
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Other editor shortcuts may be found at"
     },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Our technology generates ~85% accurate captions."
+    },
     "outline_color_3ef2cea7": {
         "message": "Outline Colour"
     },
@@ -1844,14 +1874,14 @@
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "Play media comment by { name } from { createdAt }."
     },
+    "player_layout_14e09a29": {
+        "message": "Player layout"
+    },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Please allow Canvas to access your microphone and webcam."
     },
     "please_choose_a_file_c2449cc": {
         "message": "Please choose a file"
-    },
-    "please_decribe_what_you_would_like_to_compose_27a51be5": {
-        "message": "Please describe what you would like to compose."
     },
     "please_enter_a_file_name_f159edc1": {
         "message": "Please enter a file name."
@@ -1859,8 +1889,17 @@
     "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
         "message": "Please enter a valid video URL from a supported platform."
     },
+    "please_select_a_file_before_uploading_4cd6e2db": {
+        "message": "Please select a file before uploading."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Please select a file of a supported type"
+    },
+    "please_select_a_language_d90256fb": {
+        "message": "Please select a language"
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": "Please select a .vtt or .srt file"
     },
     "plus_d43cd4ec": {
         "message": "Plus"
@@ -1921,6 +1960,9 @@
     },
     "prime_numbers_13464f61": {
         "message": "Prime Numbers"
+    },
+    "processing_8c569014": {
+        "message": "Processing..."
     },
     "product_39cf144f": {
         "message": "Product"
@@ -2015,14 +2057,14 @@
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "Replaced all { alertFindText } with { alertReplaceText }"
     },
+    "request_d1129f7d": {
+        "message": "Request"
+    },
     "reset_95a81614": {
         "message": "Reset"
     },
     "resize_ec83d538": {
         "message": "Resize"
-    },
-    "response_copied_to_clipboard_130d66cd": {
-        "message": "Response copied to clipboard"
     },
     "restore_auto_save_deccd84b": {
         "message": "Restore auto-save?"
@@ -2030,8 +2072,8 @@
     "result_index_of_max_7db5ad8b": {
         "message": "Result { index } of { max }."
     },
-    "retry_ebd5f8ba": {
-        "message": "Retry"
+    "retry_captionname_5ed0a12f": {
+        "message": "Retry { captionName }"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Reverse Turnstile (Does Not Yield)"
@@ -2162,6 +2204,9 @@
     "selected_274ce24f": {
         "message": "Selected"
     },
+    "selected_file_name_93fa1a14": {
+        "message": "Selected file: { name }"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "Selected { linkFileName }"
     },
@@ -2192,14 +2237,17 @@
     "shortcut_911d6255": {
         "message": "Shortcut"
     },
-    "show_all_967a90f0": {
-        "message": "Show all."
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Show image options"
     },
     "show_link_options_545338fd": {
         "message": "Show link options"
+    },
+    "show_rolling_transcript_c1481744": {
+        "message": "Show rolling transcript"
+    },
+    "show_rolling_transcript_d353aca4": {
+        "message": "Show Rolling Transcript"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Sighted users browse web pages quickly, looking for large or bolded headings. Screen reader users rely on headers for contextual understanding. Headers should use the proper structure."
@@ -2233,6 +2281,9 @@
     },
     "small_b070434a": {
         "message": "Small"
+    },
+    "small_width_x_height_px_359acd38": {
+        "message": "Small ({ width } x { height }px)"
     },
     "solid_circle_9f061dfc": {
         "message": "Solid Circle"
@@ -2513,6 +2564,9 @@
     "timebar_a4d18443": {
         "message": "Timebar"
     },
+    "title_can_t_be_blank_eb4021d7": {
+        "message": "Title can''t be blank"
+    },
     "title_ee03d132": {
         "message": "Title"
     },
@@ -2533,6 +2587,9 @@
     },
     "top_66e0adb6": {
         "message": "Top"
+    },
+    "transcript_panel_is_available_at_widths_above_720p_1cf94c0d": {
+        "message": "Transcript panel is available at widths above 720px."
     },
     "tray_839df38a": {
         "message": "Tray"
@@ -2573,6 +2630,9 @@
     "unpublished_dfd8801": {
         "message": "unpublished"
     },
+    "unsaved_changes_will_be_lost_f977252a": {
+        "message": "Unsaved changes will be lost."
+    },
     "untitled_16aa4f2b": {
         "message": "Untitled"
     },
@@ -2591,8 +2651,17 @@
     "updated_link_a827e441": {
         "message": "Updated link"
     },
+    "upload_8b403d05": {
+        "message": "Upload"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "Upload a subtitle track in either the SRT or WebVTT format."
+    },
     "upload_document_253f0478": {
         "message": "Upload Document"
+    },
+    "upload_failed_a5dc91ec": {
+        "message": "Upload Failed"
     },
     "upload_file_fd2361b8": {
         "message": "Upload File"
@@ -2696,9 +2765,6 @@
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Used by screen readers to describe the content of an image"
     },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Used by screen readers to describe the video"
-    },
     "user_documents_c206e61f": {
         "message": "User Documents"
     },
@@ -2759,8 +2825,8 @@
     "view_word_and_character_counts_a743dd0c": {
         "message": "View word and character counts"
     },
-    "waiting_for_response_1efd0c50": {
-        "message": "Waiting for response"
+    "viewer_restrictions_e14274c9": {
+        "message": "Viewer Restrictions"
     },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "We couldn’t detect a working microphone connected to your device."
@@ -2782,9 +2848,6 @@
     },
     "welsh_42ab94b1": {
         "message": "Welsh"
-    },
-    "what_would_you_like_to_do_6dc0d541": {
-        "message": "What would you like to do?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "When markup is used that visually formats items as a list but does not indicate the list relationship, users may have difficulty in navigating the information."
@@ -2815,9 +2878,6 @@
     },
     "wreath_product_200b38ef": {
         "message": "Wreath Product"
-    },
-    "writing_assistant_a30ac16a": {
-        "message": "Writing Assistant"
     },
     "xi_149681d0": {
         "message": "Xi"

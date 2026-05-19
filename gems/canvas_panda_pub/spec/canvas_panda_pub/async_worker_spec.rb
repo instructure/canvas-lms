@@ -18,14 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe CanvasPandaPub::AsyncWorker do
   before do
     CanvasPandaPub.process_interval = -> { 0.1 }
     CanvasPandaPub.max_queue_size = -> { 100 }
     CanvasPandaPub.logger = double.as_null_object
-    @worker = CanvasPandaPub::AsyncWorker.new(false)
+    @worker = CanvasPandaPub::AsyncWorker.new(start_thread: false)
   end
 
   describe "push" do

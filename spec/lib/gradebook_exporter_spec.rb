@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 describe GradebookExporter do
   before(:once) do
     @course = course_model(grading_standard_id: 0)
@@ -885,7 +883,7 @@ describe GradebookExporter do
 
             it "does not export totals columns when 'Display Totals for All Grading Periods' disabled" do
               @group.update!(display_totals_for_all_grading_periods: false)
-              expect(headers).to_not include "Final Score"
+              expect(headers).not_to include "Final Score"
             end
 
             it "does not throw an error when final grade override is enabled and not exporting totals, and there are hidden assignments" do
@@ -951,7 +949,7 @@ describe GradebookExporter do
               expect(@headers).to include @no_due_date_assignment.title_with_id,
                                           @future_assignment.title_with_id
 
-              expect(@headers).to_not include @current_assignment.title_with_id,
+              expect(@headers).not_to include @current_assignment.title_with_id,
                                               @past_assignment.title_with_id
             end
           end

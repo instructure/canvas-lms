@@ -45,6 +45,9 @@ template: |
   <ADDITIONAL_USER_PROMPT_PLACEHOLDER>
   </USER_PROMPT>
 
+  # Rating Language Requirements
+  <BLOOM_TAXONOMY_CONTEXT_PLACEHOLDER>
+
   # Language & Tone
   - Match the required grade level/complexity; be clear, concise, constructive.
   - Adapt both language and performance expectations to the specified grade level:

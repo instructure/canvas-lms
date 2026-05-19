@@ -44,7 +44,7 @@ describe('ItemAssignToTray - Rendering', () => {
   })
 
   afterEach(() => {
-    window.location = originalLocation
+    Object.defineProperty(window, 'location', {value: originalLocation, writable: true})
     server.resetHandlers()
     cleanup()
   })

@@ -20,9 +20,13 @@ import {act, fireEvent} from '@testing-library/react'
 import OutcomeManagementPanel from '../index'
 import {setupTest, teardownTest, accountMocks} from './testSetup'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 vi.mock('@canvas/rce/RichContentEditor')
 vi.mock('axios')
 vi.useFakeTimers()

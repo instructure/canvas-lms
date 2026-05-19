@@ -32,14 +32,18 @@ import {makeBulkItemRequests} from '../../../../queries/makeBulkItemRequests'
 import {deleteItem} from '../../../../queries/deleteItem'
 import {UnauthorizedError} from '../../../../../utils/apiUtils'
 
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 import * as Sentry from '@sentry/react'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: vi.fn(() => vi.fn()),
-  showFlashWarning: vi.fn(() => vi.fn()),
-  showFlashError: vi.fn(() => vi.fn()),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashSuccess: vi.fn(() => vi.fn()),
+    showFlashWarning: vi.fn(() => vi.fn()),
+    showFlashError: vi.fn(() => vi.fn()),
+  }
+})
 
 // Mock makeBulkItemRequests function
 vi.mock('../../../../queries/makeBulkItemRequests', () => ({

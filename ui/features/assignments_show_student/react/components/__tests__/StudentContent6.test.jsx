@@ -24,7 +24,7 @@ import StudentContent from '../StudentContent'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import store from '../stores'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 
 describe('Assignment Student Content View', () => {
   beforeAll(() => {

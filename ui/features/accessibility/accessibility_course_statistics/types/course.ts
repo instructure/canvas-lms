@@ -20,6 +20,8 @@
 // Note: ui/api.d.ts has generic Course/Term types but they don't match
 // the specific fields returned by this endpoint with our include[] params
 
+export type SortOrder = 'asc' | 'desc'
+
 export interface Term {
   name: string
 }

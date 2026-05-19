@@ -178,7 +178,7 @@ module CanvasCareer
       return false if career_unaffiliated_institution?
       return true if career_at_root_account?
 
-      enrollment_types.include?(true) || has_career_account_users?
+      enrollment_types.include?(true) || has_career_account_users? || user_experience_exists?
     end
 
     def has_academic_associations?
@@ -209,7 +209,7 @@ module CanvasCareer
       # Optimization to avoid queries when possible
       return false if career_unaffiliated_institution?
 
-      has_career_enrollment_roles?(LEARNER_ENROLLMENT_TYPES)
+      has_career_enrollment_roles?(LEARNER_ENROLLMENT_TYPES) || user_experience_exists?
     end
 
     def has_career_learning_provider_roles?
@@ -217,6 +217,12 @@ module CanvasCareer
       return false if career_unaffiliated_institution?
 
       has_career_enrollment_roles?(LEARNING_PROVIDER_ENROLLMENT_TYPES) || has_career_account_users?
+    end
+
+    def user_experience_exists?
+      return @_user_experience_exists unless @_user_experience_exists.nil?
+
+      @_user_experience_exists = UserExperience.active.where(user: @user, root_account: @domain_root_account).exists?
     end
 
     def has_career_account_users?

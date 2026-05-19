@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe AdheresToPolicy::Policy, "set_policy" do
   it "takes a block" do
     expect do

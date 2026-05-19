@@ -62,15 +62,16 @@ const FeedbackQuestionTile: React.FC = () => {
   return (
     <View
       as="div"
-      padding="small medium"
+      padding="medium"
+      margin="medium"
       background="primary"
-      borderRadius="medium"
+      borderRadius="large"
       shadow="resting"
       data-testid="feedback-question-tile"
     >
-      <Flex direction="column" alignItems="center" gap="x-small">
+      <Flex alignItems="center" gap="x-small" wrap="wrap">
         <Flex.Item>
-          <Text as="div" weight="normal" size="medium">
+          <Text weight="normal" size="medium">
             {selectedQuestion.question}
           </Text>
         </Flex.Item>

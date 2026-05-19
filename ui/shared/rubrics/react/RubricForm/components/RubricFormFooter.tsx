@@ -31,6 +31,7 @@ type RubricFormFooterProps = {
   hasRubricAssociations: boolean
   rubricId?: string
   formValid: boolean
+  isCompact: boolean
   savePending: boolean
   handleCancelButton: () => void
   handlePreviewRubric: () => void
@@ -47,23 +48,41 @@ export const RubricFormFooter = ({
   handleSaveAsDraft,
   handleSave,
   formValid,
+  isCompact,
 }: RubricFormFooterProps) => {
   return (
-    <div id="enhanced-rubric-builder-footer" style={{backgroundColor: colors.contrasts.white1010}}>
+    <div
+      id="enhanced-rubric-builder-footer"
+      className={!assignmentId ? 'enhanced-rubric-builder-footer' : ''}
+      style={{
+        backgroundColor: colors.contrasts.white1010,
+        minHeight: isCompact ? '62px' : 'auto',
+      }}
+    >
       <View
         as="div"
-        margin="small large"
+        margin={isCompact ? 'x-small x-small' : 'small large'}
         themeOverride={{marginLarge: '48px', marginSmall: '12px'}}
       >
-        <Flex justifyItems="end">
-          <Flex.Item margin="0 medium 0 0">
-            <Button onClick={handleCancelButton} data-testid="cancel-rubric-save-button">
+        <Flex
+          justifyItems={isCompact ? 'center' : 'end'}
+          wrap="wrap"
+          gap={isCompact ? 'xx-small' : 'small'}
+          width="100%"
+        >
+          <Flex.Item>
+            <Button
+              size={isCompact ? 'small' : 'medium'}
+              onClick={handleCancelButton}
+              data-testid="cancel-rubric-save-button"
+            >
               {I18n.t('Cancel')}
             </Button>
-
+          </Flex.Item>
+          <Flex.Item>
             {!hasRubricAssociations && !assignmentId && (
               <Button
-                margin="0 0 0 small"
+                size={isCompact ? 'small' : 'medium'}
                 disabled={savePending || !formValid}
                 onClick={handleSaveAsDraft}
                 data-testid="save-as-draft-button"
@@ -71,9 +90,10 @@ export const RubricFormFooter = ({
                 {I18n.t('Save as Draft')}
               </Button>
             )}
-
+          </Flex.Item>
+          <Flex.Item>
             <Button
-              margin="0 0 0 small"
+              size={isCompact ? 'small' : 'medium'}
               color="primary"
               onClick={handleSave}
               disabled={savePending || !formValid}
@@ -85,15 +105,16 @@ export const RubricFormFooter = ({
           <Flex.Item>
             <View
               as="div"
-              padding="0 0 0 medium"
-              borderWidth="none none none medium"
-              height="2.375rem"
+              margin={isCompact ? '0' : '0 small'}
+              padding={isCompact ? '0' : '0 small'}
+              borderWidth={isCompact ? '0' : 'none none none medium'}
+              height={isCompact ? 'auto' : '2.375rem'}
             >
               <Link
                 as="button"
                 data-testid="preview-rubric-button"
                 isWithinText={false}
-                margin="x-small 0 0 0"
+                margin={isCompact ? '0' : 'x-small 0 0 0'}
                 onClick={() => handlePreviewRubric()}
               >
                 <IconEyeLine /> {I18n.t('Preview Rubric')}

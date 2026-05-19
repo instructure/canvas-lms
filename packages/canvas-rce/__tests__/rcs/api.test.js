@@ -16,10 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import RceApiSource, {headerFor, originFromHost} from '../../src/rcs/api'
-import fetchMock from 'fetch-mock'
 import * as fileUrl from '../../src/common/fileUrl'
 import {ICON_MAKER_ICONS} from '../../src/rce/plugins/instructure_icon_maker/svg/constants'
+
+const BASE = 'http://localhost'
+
+const server = setupServer(http.get(`${BASE}/api/session`, () => HttpResponse.json({})))
 
 describe('sources/api', () => {
   const endpoint = 'wikiPages'
@@ -33,22 +38,38 @@ describe('sources/api', () => {
   let setProps = {}
   let apiSource
   let alertFuncSpy
+  let noHostApiSource
+
+  beforeAll(() => {
+    server.listen({onUnhandledRequest: 'error'})
+  })
 
   beforeEach(() => {
     alertFuncSpy = jest.fn()
     apiSource = new RceApiSource({
+      jwt: 'theJWT',
+      host: 'localhost',
+      refreshToken: callback => {
+        callback('freshJWT')
+      },
+      alertFunc: alertFuncSpy,
+    })
+    noHostApiSource = new RceApiSource({
       jwt: 'theJWT',
       refreshToken: callback => {
         callback('freshJWT')
       },
       alertFunc: alertFuncSpy,
     })
-    fetchMock.mock('/api/session', '{}')
   })
 
   afterEach(() => {
-    fetchMock.restore()
-    jest.resetAllMocks()
+    server.resetHandlers()
+    jest.restoreAllMocks()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   describe('initializeCollection', () => {
@@ -63,15 +84,15 @@ describe('sources/api', () => {
 
     it('creates a collection with a bookmark derived from props', () => {
       expect(collection.bookmark).toEqual(
-        `${window.location.protocol}//example.host/api/wikiPages?contextType=group&contextId=123&search_term=panda`
+        `${window.location.protocol}//example.host/api/wikiPages?contextType=group&contextId=123&search_term=panda`,
       )
     })
 
     it('bookmark omits host if not in props', () => {
       const noHostProps = {...props, host: undefined}
-      collection = apiSource.initializeCollection(endpoint, noHostProps)
+      collection = noHostApiSource.initializeCollection(endpoint, noHostProps)
       expect(collection.bookmark).toEqual(
-        '/api/wikiPages?contextType=group&contextId=123&search_term=panda'
+        '/api/wikiPages?contextType=group&contextId=123&search_term=panda',
       )
     })
 
@@ -101,7 +122,7 @@ describe('sources/api', () => {
     })
 
     it('uses a path for no-host url construction', () => {
-      const uri = apiSource.baseUri('files')
+      const uri = noHostApiSource.baseUri('files')
       expect(uri).toEqual('/api/files')
     })
 
@@ -113,7 +134,7 @@ describe('sources/api', () => {
 
     it('never applies protocol to path', () => {
       const fakeWindow = {location: {protocol: 'https:'}}
-      const uri = apiSource.baseUri('files', null, fakeWindow)
+      const uri = noHostApiSource.baseUri('files', null, fakeWindow)
       expect(uri).toEqual('/api/files')
     })
 
@@ -136,74 +157,78 @@ describe('sources/api', () => {
     })
 
     it('gets documents', () => {
-      const uri = apiSource.uriFor('documents', setProps)
+      const uri = noHostApiSource.uriFor('documents', setProps)
       expect(uri).toEqual(
-        '/api/documents?contextType=course&contextId=17&exclude_content_types=image,video,audio&sort=name&order=asc&search_term=hello%20world'
+        '/api/documents?contextType=course&contextId=17&exclude_content_types=image,video,audio&sort=name&order=asc&search_term=hello%20world',
       )
     })
 
     it('gets images', () => {
-      const uri = apiSource.uriFor('images', setProps)
+      const uri = noHostApiSource.uriFor('images', setProps)
       expect(uri).toEqual(
-        '/api/documents?contextType=course&contextId=17&content_types=image&sort=name&order=asc&search_term=hello%20world'
+        '/api/documents?contextType=course&contextId=17&content_types=image&sort=name&order=asc&search_term=hello%20world',
       )
     })
 
     // this endpoint isn't actually used yet, but could be if media_objects all had associated Attachments
     it('gets media', () => {
-      const uri = apiSource.uriFor('media', setProps)
+      const uri = noHostApiSource.uriFor('media', setProps)
       expect(uri).toEqual(
-        '/api/documents?contextType=course&contextId=17&content_types=video,audio&sort=name&order=asc&search_term=hello%20world'
+        '/api/documents?contextType=course&contextId=17&content_types=video,audio&sort=name&order=asc&search_term=hello%20world',
       )
     })
 
     it('gets media_objects', () => {
-      const uri = apiSource.uriFor('media_objects', setProps)
+      const uri = noHostApiSource.uriFor('media_objects', setProps)
       expect(uri).toEqual(
-        '/api/media_objects?contextType=course&contextId=17&sort=title&order=asc&search_term=hello%20world'
+        '/api/media_objects?contextType=course&contextId=17&sort=title&order=asc&search_term=hello%20world',
       )
     })
   })
 
   describe('fetchPage', () => {
-    const uri = 'theURI'
-    const fakePageBody =
-      '{"bookmark":"newBookmark","links":[' +
-      '{"href":"link1","title":"Link 1"},' +
-      '{"href":"link2","title":"Link 2"}]}'
+    const uri = `${BASE}/theURI`
+    const fakePageBody = {
+      bookmark: 'newBookmark',
+      links: [
+        {href: 'link1', title: 'Link 1'},
+        {href: 'link2', title: 'Link 2'},
+      ],
+    }
 
     it('includes jwt in Authorization header', async () => {
-      fetchMock.mock(uri, '{}')
+      let capturedRequest
+      server.use(
+        http.get(uri, ({request}) => {
+          capturedRequest = request
+          return HttpResponse.json({})
+        }),
+      )
       await apiSource.fetchPage(uri)
-      expect(fetchMock.lastOptions(uri).headers.Authorization).toEqual('Bearer theJWT')
+      expect(capturedRequest.headers.get('Authorization')).toEqual('Bearer theJWT')
     })
 
     it('converts 400+ statuses to errors', async () => {
-      fetchMock.mock(uri, 403)
+      server.use(
+        http.get(uri, () => new HttpResponse(null, {status: 403, statusText: 'Forbidden'})),
+      )
       await expect(apiSource.fetchPage(uri)).rejects.toThrow('Forbidden')
     })
 
     it('parses server response before handing it back', async () => {
-      fetchMock.mock(uri, fakePageBody)
+      server.use(http.get(uri, () => HttpResponse.json(fakePageBody)))
       const page = await apiSource.fetchPage(uri)
-      expect(page).toEqual({
-        bookmark: 'newBookmark',
-        links: [
-          {href: 'link1', title: 'Link 1'},
-          {href: 'link2', title: 'Link 2'},
-        ],
-      })
+      expect(page).toEqual(fakePageBody)
     })
 
     it('retries once on 401 with a renewed token', async () => {
-      fetchMock.mock((fetchUrl, opts) => {
-        return uri === fetchUrl && opts.headers.Authorization === 'Bearer theJWT'
-      }, 401)
-
-      fetchMock.mock((fetchUrl, opts) => {
-        return uri === fetchUrl && opts.headers.Authorization === 'Bearer freshJWT'
-      }, fakePageBody)
-
+      server.use(
+        http.get(uri, ({request}) => {
+          const auth = request.headers.get('Authorization')
+          if (auth === 'Bearer theJWT') return new HttpResponse(null, {status: 401})
+          return HttpResponse.json(fakePageBody)
+        }),
+      )
       const page = await apiSource.fetchPage(uri, 'theJWT')
       expect(page.bookmark).toEqual('newBookmark')
       expect(apiSource.jwt).toEqual('freshJWT')
@@ -223,14 +248,14 @@ describe('sources/api', () => {
     })
 
     it('proxies the call to fetchPage', async () => {
-      const uri = 'files-uri'
-      const body = await apiSource.fetchFiles(uri)
-      expect(apiSource.fetchPage).toHaveBeenCalledWith(uri)
+      const fetchUri = `${BASE}/files-uri`
+      const body = await apiSource.fetchFiles(fetchUri)
+      expect(apiSource.fetchPage).toHaveBeenCalledWith(fetchUri)
       expect(body.bookmark).toEqual(bookmark)
     })
 
     it('converts file urls from download to preview', async () => {
-      const body = await apiSource.fetchFiles('foo')
+      const body = await apiSource.fetchFiles(`${BASE}/foo`)
       files.forEach((file, i) => {
         expect(fileUrl.downloadToWrap).toHaveBeenCalledWith(file.url)
         expect(body.files[i].href).toEqual(wrapUrl)
@@ -253,7 +278,7 @@ describe('sources/api', () => {
         `${window.location.protocol}//canvas.rce/api/folders/2`,
         {
           Authorization: 'Bearer theJWT',
-        }
+        },
       )
     })
 
@@ -281,7 +306,7 @@ describe('sources/api', () => {
             'https://canvas.rce/api/files/2?per_page=50',
             {
               Authorization: 'Bearer theJWT',
-            }
+            },
           )
         })
       })
@@ -312,10 +337,6 @@ describe('sources/api', () => {
       onError = jest.fn()
     })
 
-    afterEach(() => {
-      jest.resetAllMocks()
-    })
-
     const subject = () =>
       apiSource.fetchBookmarkedData(fetchFunction, properties, onSuccess, onError)
 
@@ -324,7 +345,7 @@ describe('sources/api', () => {
       expect(fetchFunction).toHaveBeenCalledWith(properties, undefined)
       expect(fetchFunction).toHaveBeenCalledWith(
         properties,
-        'https://canvas.rce/api/thing/1?page=2'
+        'https://canvas.rce/api/thing/1?page=2',
       )
       expect(fetchFunction).toHaveBeenCalledTimes(2)
     })
@@ -336,7 +357,7 @@ describe('sources/api', () => {
 
     describe('when "fetchFunction" throws an exception', () => {
       beforeEach(() => {
-        jest.resetAllMocks()
+        fetchFunction.mockReset()
         fetchFunction.mockRejectedValue('error')
       })
 
@@ -365,7 +386,7 @@ describe('sources/api', () => {
         })
         .then(() => {
           expect(apiSource.fetchPage).toHaveBeenCalledWith(
-            '/api/folders/icon_maker?contextType=course&contextId=22'
+            `${BASE}/api/folders/icon_maker?contextType=course&contextId=22`,
           )
         })
     })
@@ -387,94 +408,94 @@ describe('sources/api', () => {
         })
         .then(() => {
           expect(apiSource.fetchPage).toHaveBeenCalledWith(
-            '/api/folders/media?contextType=course&contextId=22'
+            `${BASE}/api/folders/media?contextType=course&contextId=22`,
           )
         })
     })
   })
 
   describe('preflightUpload', () => {
-    const uri = '/api/upload'
+    const uri = `${BASE}/api/upload`
     const fileProps = {}
     const apiProps = {}
 
-    afterEach(() => {
-      fetchMock.restore()
+    it('includes "onDuplicate"', async () => {
+      let capturedBody
+      server.use(
+        http.post(uri, async ({request}) => {
+          capturedBody = await request.json()
+          return HttpResponse.json({})
+        }),
+      )
+      await apiSource.preflightUpload(fileProps, {onDuplicate: 'overwrite'}, apiProps)
+      expect(capturedBody.onDuplicate).toEqual('overwrite')
     })
 
-    it('includes "onDuplicate"', () => {
-      fetchMock.mock(uri, '{}')
+    it('includes "category"', async () => {
+      let capturedBody
+      server.use(
+        http.post(uri, async ({request}) => {
+          capturedBody = await request.json()
+          return HttpResponse.json({})
+        }),
+      )
+      await apiSource.preflightUpload(fileProps, {category: ICON_MAKER_ICONS}, apiProps)
+      expect(capturedBody.category).toEqual(ICON_MAKER_ICONS)
+    })
 
-      return apiSource.preflightUpload(fileProps, {onDuplicate: 'overwrite'}, apiProps).then(() => {
-        const body = JSON.parse(fetchMock.lastOptions(uri).body)
-        expect(body.onDuplicate).toEqual('overwrite')
+    it('includes jwt in Authorization header', async () => {
+      let capturedRequest
+      server.use(
+        http.post(uri, ({request}) => {
+          capturedRequest = request
+          return HttpResponse.json({})
+        }),
+      )
+      await apiSource.preflightUpload(fileProps, apiProps)
+      expect(capturedRequest.headers.get('Authorization')).toEqual('Bearer theJWT')
+    })
+
+    it('retries once with fresh token on 401', async () => {
+      server.use(
+        http.post(uri, ({request}) => {
+          const auth = request.headers.get('Authorization')
+          if (auth === 'Bearer theJWT') return new HttpResponse(null, {status: 401})
+          return HttpResponse.json({upload: 'done'})
+        }),
+      )
+      const response = await apiSource.preflightUpload(fileProps, apiProps)
+      expect(response.upload).toEqual('done')
+    })
+
+    it('notifies a provided callback when a new token is fetched', async () => {
+      server.use(
+        http.post(uri, ({request}) => {
+          const auth = request.headers.get('Authorization')
+          if (auth === 'Bearer theJWT') return new HttpResponse(null, {status: 401})
+          return HttpResponse.json({upload: 'done'})
+        }),
+      )
+      await apiSource.preflightUpload(fileProps, apiProps)
+      expect(apiSource.jwt).toEqual('freshJWT')
+    })
+
+    it('calls alertFunc when an error occurs', async () => {
+      jest.spyOn(console, 'error').mockImplementation(() => {})
+      server.use(http.post(uri, () => HttpResponse.json({}, {status: 500})))
+      await apiSource.preflightUpload(fileProps, apiProps).catch(() => {})
+      expect(alertFuncSpy).toHaveBeenCalledWith({
+        text: 'Something went wrong. Check your connection, reload the page, and try again.',
+        variant: 'error',
       })
-    })
-
-    it('includes "category"', () => {
-      fetchMock.mock(uri, '{}')
-
-      return apiSource
-        .preflightUpload(fileProps, {category: ICON_MAKER_ICONS}, apiProps)
-        .then(() => {
-          const body = JSON.parse(fetchMock.lastOptions(uri).body)
-          expect(body.category).toEqual(ICON_MAKER_ICONS)
-        })
-    })
-
-    it('includes jwt in Authorization header', () => {
-      fetchMock.mock(uri, '{}')
-
-      return apiSource.preflightUpload(fileProps, apiProps).then(() => {
-        expect(fetchMock.lastOptions(uri).headers.Authorization).toEqual('Bearer theJWT')
-      })
-    })
-
-    it('retries once with fresh token on 401', () => {
-      fetchMock.mock((fetchUrl, opts) => {
-        return uri === fetchUrl && opts.headers.Authorization === 'Bearer theJWT'
-      }, 401)
-
-      fetchMock.mock((fetchUrl, opts) => {
-        return uri === fetchUrl && opts.headers.Authorization === 'Bearer freshJWT'
-      }, '{"upload": "done"}')
-
-      return apiSource.preflightUpload(fileProps, apiProps).then(response => {
-        expect(response.upload).toEqual('done')
-      })
-    })
-
-    it('notifies a provided callback when a new token is fetched', () => {
-      fetchMock.mock((fetchUrl, opts) => {
-        return uri === fetchUrl && opts.headers.Authorization === 'Bearer theJWT'
-      }, 401)
-
-      fetchMock.mock((fetchUrl, opts) => {
-        return uri === fetchUrl && opts.headers.Authorization === 'Bearer freshJWT'
-      }, '{"upload": "done"}')
-
-      return apiSource.preflightUpload(fileProps, apiProps).then(() => {
-        expect(apiSource.jwt).toEqual('freshJWT')
-      })
-    })
-
-    it('calls alertFunc when an error occurs', () => {
-      fetchMock.mock(uri, 500)
-      return apiSource
-        .preflightUpload(fileProps, apiProps)
-        .then(() => {
-          expect(alertFuncSpy).toHaveBeenCalledWith({
-            text: 'Something went wrong uploading, check your connection and try again.',
-            variant: 'error',
-          })
-        })
-        .catch(() => {
-          // This will re-throw so we just catch it here.
-        })
     })
 
     it('throws an exception when an error occurs', () => {
-      fetchMock.mock(uri, 500)
+      server.use(
+        http.post(
+          uri,
+          () => new HttpResponse(null, {status: 500, statusText: 'Internal Server Error'}),
+        ),
+      )
       return apiSource.preflightUpload(fileProps, apiProps).catch(e => {
         expect(e).not.toBeNull()
       })
@@ -482,10 +503,11 @@ describe('sources/api', () => {
 
     describe('when the file storage quota is exceeded', () => {
       beforeEach(() => {
-        const error = new Error('file size exceeds quota')
-        error.response = {json: async () => ({message: 'file size exceeds quota'})}
-
-        fetchMock.mock(uri, {throws: error}, {overwriteRoutes: true})
+        server.use(
+          http.post(uri, () =>
+            HttpResponse.json({message: 'file size exceeds quota'}, {status: 413}),
+          ),
+        )
       })
 
       it('gives a "quota" error if quota is full', async () => {
@@ -497,7 +519,7 @@ describe('sources/api', () => {
           })
         } catch (e) {
           return e
-        } // This will re-throw so we just catch it here/
+        }
       })
     })
   })
@@ -507,21 +529,22 @@ describe('sources/api', () => {
 
     beforeEach(() => {
       fileDomObject = new window.Blob()
-      uploadUrl = 'upload-url'
+      uploadUrl = 'http://upload-url/'
       preflightProps = {
         upload_params: {},
         upload_url: uploadUrl,
       }
       file = {url: 'file-url'}
-      fetchMock.mock(uploadUrl, file)
-    })
-
-    afterEach(() => {
-      fetchMock.restore()
+      server.use(http.post(uploadUrl, () => HttpResponse.json(file)))
     })
 
     it('calls alertFunc if there is a problem', () => {
-      fetchMock.once(uploadUrl, 500, {overwriteRoutes: true})
+      server.use(
+        http.post(
+          uploadUrl,
+          () => new HttpResponse(null, {status: 500, statusText: 'Internal Server Error'}),
+        ),
+      )
       return apiSource
         .uploadFRD(fileDomObject, preflightProps)
         .then(() => {
@@ -541,73 +564,75 @@ describe('sources/api', () => {
         jest.spyOn(apiSource, 'getFile').mockReturnValue(Promise.resolve(file))
       })
 
-      afterEach(() => {
-        jest.restoreAllMocks()
-      })
-
-      it('includes credentials in non-S3 upload', () => {
+      it('includes credentials in non-S3 upload', async () => {
+        // request.credentials is not available in MSW Node.js handlers; spy on fetch directly
+        const fetchSpy = jest.spyOn(global, 'fetch')
         preflightProps.upload_params.success_url = undefined
-        return apiSource.uploadFRD(fileDomObject, preflightProps).then(() => {
-          expect(fetchMock.lastOptions(uploadUrl).credentials).toEqual('include')
-        })
+        await apiSource.uploadFRD(fileDomObject, preflightProps)
+        const uploadCall = fetchSpy.mock.calls.find(([url]) => String(url).includes('upload-url'))
+        expect(uploadCall?.[1]?.credentials).toEqual('include')
       })
 
-      it('does not include credentials in S3 upload', () => {
+      it('does not include credentials in S3 upload', async () => {
+        const fetchSpy = jest.spyOn(global, 'fetch')
         preflightProps.upload_params['x-amz-signature'] = 'success-url'
-        preflightProps.upload_params.success_url = 'success-url'
+        preflightProps.upload_params.success_url = 'http://success-url/'
         const s3File = {url: 's3-file-url'}
-        fetchMock.mock(preflightProps.upload_params.success_url, s3File)
-        return apiSource.uploadFRD(fileDomObject, preflightProps).then(() => {
-          expect(fetchMock.lastOptions(uploadUrl).credentials).toBeUndefined()
-        })
+        server.use(http.get('http://success-url/', () => HttpResponse.json(s3File)))
+        await apiSource.uploadFRD(fileDomObject, preflightProps)
+        const uploadCall = fetchSpy.mock.calls.find(([url]) => String(url).includes('upload-url'))
+        expect(uploadCall?.[1]?.credentials).not.toEqual('include')
       })
 
-      it('does not include credentials in a local cross-origin upload', () => {
+      it('does not include credentials in a local cross-origin upload', async () => {
+        const fetchSpy = jest.spyOn(global, 'fetch')
         preflightProps.upload_params.success_url = undefined
-        const crossOriginUploadUrl = 'cross-origin.site/files_api'
+        const crossOriginUploadUrl = 'http://cross-origin.site/files_api'
         preflightProps.upload_url = crossOriginUploadUrl
-        fetchMock.mock(crossOriginUploadUrl, file)
-        return apiSource.uploadFRD(fileDomObject, preflightProps).then(() => {
-          expect(fetchMock.lastOptions(crossOriginUploadUrl).credentials).toBeUndefined()
-        })
+        server.use(http.post(crossOriginUploadUrl, () => HttpResponse.json(file)))
+        await apiSource.uploadFRD(fileDomObject, preflightProps)
+        const uploadCall = fetchSpy.mock.calls.find(([url]) =>
+          String(url).includes('cross-origin.site'),
+        )
+        expect(uploadCall?.[1]?.credentials).not.toEqual('include')
       })
 
       it('handles s3 post-flight', async () => {
-        preflightProps.upload_params.success_url = 'success-url'
+        preflightProps.upload_params.success_url = 'http://success-url/'
         const s3File = {url: 's3-file-url'}
-        fetchMock.mock(preflightProps.upload_params.success_url, s3File)
+        server.use(http.get('http://success-url/', () => HttpResponse.json(s3File)))
         const result = await apiSource.uploadFRD(fileDomObject, preflightProps)
         expect(result).toEqual(s3File)
       })
 
-      it('handles inst-fs post-flight', () => {
-        preflightProps.upload_url = 'instfs-upload-url'
+      it('handles inst-fs post-flight', async () => {
         const fileId = '123'
+        const instFsUrl = 'http://instfs-upload-url/'
+        preflightProps.upload_url = instFsUrl
         const response = {
           location: `http://canvas/api/v1/files/${fileId}?foo=bar`,
           uuid: 'xyzzy',
         }
-        fetchMock.mock(preflightProps.upload_url, response)
-        return apiSource.uploadFRD(fileDomObject, preflightProps).then(resp => {
-          expect(apiSource.getFile).toHaveBeenCalledWith(fileId)
-          expect(resp.uuid).toEqual('xyzzy')
-          expect(resp.url).toEqual('file-url')
-        })
+        server.use(http.post(instFsUrl, () => HttpResponse.json(response)))
+        const resp = await apiSource.uploadFRD(fileDomObject, preflightProps)
+        expect(apiSource.getFile).toHaveBeenCalledWith(fileId)
+        expect(resp.uuid).toEqual('xyzzy')
+        expect(resp.url).toEqual('file-url')
       })
 
-      it('handles inst-fs post-flight with global file id', () => {
-        preflightProps.upload_url = 'instfs-upload-url'
+      it('handles inst-fs post-flight with global file id', async () => {
         const fileId = '1023~789'
+        const instFsUrl = 'http://instfs-upload-url/'
+        preflightProps.upload_url = instFsUrl
         const response = {
           location: `http://canvas/api/v1/files/${fileId}?foo=bar`,
           uuid: 'xyzzy',
         }
-        fetchMock.mock(preflightProps.upload_url, response)
-        return apiSource.uploadFRD(fileDomObject, preflightProps).then(resp => {
-          expect(apiSource.getFile).toHaveBeenCalledWith(fileId)
-          expect(resp.uuid).toEqual('xyzzy')
-          expect(resp.url).toEqual('file-url')
-        })
+        server.use(http.post(instFsUrl, () => HttpResponse.json(response)))
+        const resp = await apiSource.uploadFRD(fileDomObject, preflightProps)
+        expect(apiSource.getFile).toHaveBeenCalledWith(fileId)
+        expect(resp.uuid).toEqual('xyzzy')
+        expect(resp.url).toEqual('file-url')
       })
     })
   })
@@ -628,13 +653,13 @@ describe('sources/api', () => {
     props.searchString = 'panda'
 
     it('can fetch folders', async () => {
-      fetchMock.mock(/\/folders\?/, {body})
+      server.use(http.get(/\/api\/folders/, () => HttpResponse.json(body)))
       const page = await apiSource.fetchRootFolder(props)
       expect(page).toEqual(body)
     })
 
     it('requests images from API', async () => {
-      fetchMock.mock(/\/documents\?.*content_types=image/, {body})
+      server.use(http.get(/\/api\/documents/, () => HttpResponse.json(body)))
       const page = await apiSource.fetchImages(props)
       expect(page).toEqual({
         bookmark: 'mo.images',
@@ -644,9 +669,8 @@ describe('sources/api', () => {
     })
 
     it('requests subsequent page of images from API', async () => {
-      props.images.group.bookmark = 'mo.images'
-      fetchMock.mock(/\/documents\?.*content_types=image/, 'should not get here')
-      fetchMock.mock(/mo.images/, {body})
+      props.images.group.bookmark = `${BASE}/api/documents?page=2`
+      server.use(http.get(`${BASE}/api/documents`, () => HttpResponse.json(body)))
       const page = await apiSource.fetchImages(props)
       expect(page).toEqual({
         bookmark: 'mo.images',
@@ -657,124 +681,129 @@ describe('sources/api', () => {
   })
 
   describe('getSession', () => {
-    const uri = '/api/session' // already mocked
-
-    it('includes jwt in Authorization header', () => {
-      return apiSource.getSession().then(() => {
-        expect(fetchMock.lastOptions(uri).headers.Authorization).toEqual('Bearer theJWT')
-      })
+    it('includes jwt in Authorization header', async () => {
+      let capturedRequest
+      server.use(
+        http.get(`${BASE}/api/session`, ({request}) => {
+          capturedRequest = request
+          return HttpResponse.json({})
+        }),
+      )
+      await apiSource.getSession()
+      expect(capturedRequest.headers.get('Authorization')).toEqual('Bearer theJWT')
     })
   })
 
   describe('setUsageRights', () => {
-    const uri = '/api/usage_rights'
+    const uri = `${BASE}/api/usage_rights`
     const fileId = 47
     const usageRights = {usageRight: 'foo'}
 
-    beforeEach(() => {
-      fetchMock.mock(uri, '{}')
+    it('includes jwt in Authorization header', async () => {
+      let capturedRequest
+      server.use(
+        http.post(uri, ({request}) => {
+          capturedRequest = request
+          return HttpResponse.json({})
+        }),
+      )
+      await apiSource.setUsageRights(fileId, usageRights)
+      expect(capturedRequest.headers.get('Authorization')).toEqual('Bearer theJWT')
     })
 
-    it('includes jwt in Authorization header', () => {
-      return apiSource.setUsageRights(fileId, usageRights).then(() => {
-        expect(fetchMock.lastOptions(uri).headers.Authorization).toEqual('Bearer theJWT')
-      })
-    })
-
-    it('posts file id and usage rights to the api', () => {
-      return apiSource.setUsageRights(fileId, usageRights).then(() => {
-        const postBody = JSON.parse(fetchMock.lastOptions(uri).body)
-        expect(postBody).toEqual({
-          fileId,
-          usageRight: usageRights.usageRight,
-        })
+    it('posts file id and usage rights to the api', async () => {
+      let capturedBody
+      server.use(
+        http.post(uri, async ({request}) => {
+          capturedBody = await request.json()
+          return HttpResponse.json({})
+        }),
+      )
+      await apiSource.setUsageRights(fileId, usageRights)
+      expect(capturedBody).toEqual({
+        fileId,
+        usageRight: usageRights.usageRight,
       })
     })
   })
 
   describe('getFile', () => {
     const id = 47
-    const uri = `/api/file/${id}`
+    const uri = `${BASE}/api/file/${id}`
     let url = '/file/url'
     setProps = {}
 
-    it('includes jwt in Authorization header', () => {
-      fetchMock.mock(uri, {url})
-
-      return apiSource.getFile(id, setProps).then(() => {
-        expect(fetchMock.lastOptions(uri).headers.Authorization).toEqual('Bearer theJWT')
-      })
-    })
-
-    it('retries once with fresh token on 401', () => {
-      fetchMock.mock((fetchUrl, opts) => {
-        return uri === fetchUrl && opts.headers.Authorization === 'Bearer theJWT'
-      }, 401)
-
-      fetchMock.mock(
-        (fetchUrl, opts) => {
-          return uri === fetchUrl && opts.headers.Authorization === 'Bearer freshJWT'
-        },
-        {upload: 'done', url}
+    it('includes jwt in Authorization header', async () => {
+      let capturedRequest
+      server.use(
+        http.get(uri, ({request}) => {
+          capturedRequest = request
+          return HttpResponse.json({url})
+        }),
       )
-
-      return apiSource.getFile(id, setProps).then(response => {
-        expect(response.upload).toEqual('done')
-      })
+      await apiSource.getFile(id, setProps)
+      expect(capturedRequest.headers.get('Authorization')).toEqual('Bearer theJWT')
     })
 
-    it('notifies a provided callback when a new token is fetched', () => {
-      fetchMock.mock((fetchUrl, opts) => {
-        return uri === fetchUrl && opts.headers.Authorization === 'Bearer theJWT'
-      }, 401)
-
-      fetchMock.mock(
-        (fetchUrl, opts) => {
-          return uri === fetchUrl && opts.headers.Authorization === 'Bearer freshJWT'
-        },
-        {upload: 'done', url}
+    it('retries once with fresh token on 401', async () => {
+      server.use(
+        http.get(uri, ({request}) => {
+          const auth = request.headers.get('Authorization')
+          if (auth === 'Bearer theJWT') return new HttpResponse(null, {status: 401})
+          return HttpResponse.json({upload: 'done', url})
+        }),
       )
-
-      return apiSource.getFile(id, setProps).then(() => {
-        expect(apiSource.jwt).toEqual('freshJWT')
-      })
+      const response = await apiSource.getFile(id, setProps)
+      expect(response.upload).toEqual('done')
     })
 
-    it('transforms file url with downloadToWrap', () => {
+    it('notifies a provided callback when a new token is fetched', async () => {
+      server.use(
+        http.get(uri, ({request}) => {
+          const auth = request.headers.get('Authorization')
+          if (auth === 'Bearer theJWT') return new HttpResponse(null, {status: 401})
+          return HttpResponse.json({upload: 'done', url})
+        }),
+      )
+      await apiSource.getFile(id, setProps)
+      expect(apiSource.jwt).toEqual('freshJWT')
+    })
+
+    it('transforms file url with downloadToWrap', async () => {
       url = '/file/url?download_frd=1'
       const wrapUrl = '/file/url?wrap=1'
-      fetchMock.mock('*', {url})
+      server.use(http.get(uri, () => HttpResponse.json({url})))
       jest.spyOn(fileUrl, 'downloadToWrap').mockReturnValue(wrapUrl)
-      return apiSource.getFile(id).then(file => {
-        expect(fileUrl.downloadToWrap).toHaveBeenCalledWith(url)
-        expect(file.href).toEqual(wrapUrl)
-        fetchMock.restore()
-      })
+      const file = await apiSource.getFile(id)
+      expect(fileUrl.downloadToWrap).toHaveBeenCalledWith(url)
+      expect(file.href).toEqual(wrapUrl)
     })
 
-    it('defaults display_name to name', () => {
+    it('defaults display_name to name', async () => {
       url = '/file/url?download_frd=1'
       const name = 'filename'
-      fetchMock.mock('*', {url, name})
+      server.use(http.get(uri, () => HttpResponse.json({url, name})))
       jest.spyOn(fileUrl, 'downloadToWrap')
-      return apiSource.getFile(id).then(file => {
-        expect(file.display_name).toEqual(name)
-        fetchMock.restore()
-      })
+      const file = await apiSource.getFile(id)
+      expect(file.display_name).toEqual(name)
     })
   })
 
   describe('media object apis', () => {
     describe('updateMediaObject', () => {
       it('PUTs to the media_object endpoint', async () => {
-        const uri = `/api/media_objects/m-id?user_entered_title=${encodeURIComponent('new title')}`
-        fetchMock.put(uri, '{"media_id": "m-id", "title": "new title"}')
-        const response = await apiSource.updateMediaObject(
-          {},
-          {media_object_id: 'm-id', title: 'new title'}
+        const mediaId = 'm-id'
+        const title = 'new title'
+        let capturedRequest
+        server.use(
+          http.put(`${BASE}/api/media_objects/:mediaId`, ({request}) => {
+            capturedRequest = request
+            return HttpResponse.json({media_id: mediaId, title})
+          }),
         )
-        expect(fetchMock.lastOptions(uri).headers.Authorization).toEqual('Bearer theJWT')
-        expect(response).toEqual({media_id: 'm-id', title: 'new title'})
+        const response = await apiSource.updateMediaObject({}, {media_object_id: mediaId, title})
+        expect(capturedRequest.headers.get('Authorization')).toEqual('Bearer theJWT')
+        expect(response).toEqual({media_id: mediaId, title})
       })
     })
   })

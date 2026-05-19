@@ -126,7 +126,7 @@ export default function LearningMasteryTabsView() {
 
           return row.scores.map(score => ({
             user_id: row.links.user,
-            outcome_id: score.links.outcome_id,
+            outcome_id: score.links.outcome,
             score: parseInt(score.score, 10),
           }))
         })

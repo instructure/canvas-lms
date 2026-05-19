@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
 require_relative "../apis/api_spec_helper"
 
 describe AssignmentGroupsController do
@@ -308,7 +307,7 @@ describe AssignmentGroupsController do
           user_session(@admin)
           get :index, params: index_params.merge(grading_period_id: feb_grading_period.id), format: :json
           expect(assignments_ids).to include assignment_with_override.id
-          expect(assignments_ids).to_not include assignment.id
+          expect(assignments_ids).not_to include assignment.id
         end
 
         it "includes an assignment if any of its overrides fall within the given grading period" do
@@ -323,7 +322,7 @@ describe AssignmentGroupsController do
            "date for the requesting user falls within the given grading period" do
           user_session(student)
           get :index, params: index_params.merge(grading_period_id: jan_grading_period.id, scope_assignments_to_student: true), format: :json
-          expect(assignments_ids).to_not include assignment_with_override.id
+          expect(assignments_ids).not_to include assignment_with_override.id
           expect(assignments_ids).to include assignment.id
         end
 
@@ -335,7 +334,7 @@ describe AssignmentGroupsController do
           override.assignment_override_students.create!(user: fake_student)
           user_session(fake_student)
           get :index, params: index_params.merge(grading_period_id: jan_grading_period.id, scope_assignments_to_student: true), format: :json
-          expect(assignments_ids).to_not include assignment_with_override.id
+          expect(assignments_ids).not_to include assignment_with_override.id
           expect(assignments_ids).to include assignment.id
         end
 

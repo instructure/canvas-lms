@@ -47,7 +47,11 @@ const providerIcons: Record<string, string> = {
   microsoft: iconMicrosoft,
 }
 
-const SSOButtons = () => {
+interface SSOButtonsProps {
+  children?: React.ReactNode
+}
+
+const SSOButtons = ({children}: SSOButtonsProps) => {
   const {isUiActionPending} = useNewLogin()
   const {isPreviewMode, authProviders} = useNewLoginData()
 
@@ -101,8 +105,9 @@ const SSOButtons = () => {
   }
 
   return (
-    <Flex direction="column" wrap="no-wrap" gap="small" justifyItems="center" alignItems="stretch">
+    <Flex alignItems="stretch" direction="column" gap="small" justifyItems="center" wrap="no-wrap">
       {authProviders.map(renderProviderButton)}
+      {children}
     </Flex>
   )
 }

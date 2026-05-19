@@ -88,6 +88,18 @@ describe Lti::ResourceLinksController, type: :request do
       end
     end
 
+    context "with teacher lacking manage_lti_add permission" do
+      before do
+        account.role_overrides.create!(permission: "manage_lti_add", enabled: false, role: teacher_role)
+        user_session(teacher_in_course(course:, active_all: true).user)
+      end
+
+      it "is successful" do
+        subject
+        expect(response).to be_successful
+      end
+    end
+
     it "is successful" do
       subject
       expect(response).to be_successful
@@ -185,6 +197,18 @@ describe Lti::ResourceLinksController, type: :request do
       end
     end
 
+    context "with teacher lacking manage_lti_add permission" do
+      before do
+        account.role_overrides.create!(permission: "manage_lti_add", enabled: false, role: teacher_role)
+        user_session(teacher_in_course(course:, active_all: true).user)
+      end
+
+      it "is successful" do
+        subject
+        expect(response).to be_successful
+      end
+    end
+
     it "is successful" do
       subject
       expect(response).to be_successful
@@ -269,6 +293,18 @@ describe Lti::ResourceLinksController, type: :request do
 
     context "with non-admin user" do
       before { user_session(student_in_course(account:).user) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "with teacher lacking manage_lti_add permission" do
+      before do
+        account.role_overrides.create!(permission: "manage_lti_add", enabled: false, role: teacher_role)
+        user_session(teacher_in_course(course:, active_all: true).user)
+      end
 
       it "returns 403" do
         subject
@@ -422,6 +458,18 @@ describe Lti::ResourceLinksController, type: :request do
       end
     end
 
+    context "with teacher lacking manage_lti_add permission" do
+      before do
+        account.role_overrides.create!(permission: "manage_lti_add", enabled: false, role: teacher_role)
+        user_session(teacher_in_course(course:, active_all: true).user)
+      end
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
     it "is successful" do
       subject
       expect(response).to be_successful
@@ -485,6 +533,18 @@ describe Lti::ResourceLinksController, type: :request do
 
     context "with non-admin user" do
       before { user_session(student_in_course(account:).user) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "with teacher lacking manage_lti_add permission" do
+      before do
+        account.role_overrides.create!(permission: "manage_lti_add", enabled: false, role: teacher_role)
+        user_session(teacher_in_course(course:, active_all: true).user)
+      end
 
       it "returns 403" do
         subject
@@ -614,6 +674,18 @@ describe Lti::ResourceLinksController, type: :request do
 
     context "with non-admin user" do
       before { user_session(student_in_course(account:).user) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "with teacher lacking manage_lti_add permission" do
+      before do
+        account.role_overrides.create!(permission: "manage_lti_add", enabled: false, role: teacher_role)
+        user_session(teacher_in_course(course:, active_all: true).user)
+      end
 
       it "returns 403" do
         subject

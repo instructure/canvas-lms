@@ -56,23 +56,19 @@ describe FeatureFlags::OakPredicate do
         allow(Rails.env).to receive(:local?).and_return(false)
       end
 
-      context "with approved US AWS regions" do
-        it "returns true for us-east-1" do
-          predicate = described_class.new(context, "us-east-1")
+      context "with approved AWS regions" do
+        %w[us-east-1 us-west-2 eu-central-1 eu-west-1 ap-southeast-2].each do |region|
+          it "returns true for #{region}" do
+            predicate = described_class.new(context, region)
 
-          expect(predicate.call).to be true
-        end
-
-        it "returns true for us-west-2" do
-          predicate = described_class.new(context, "us-west-2")
-
-          expect(predicate.call).to be true
+            expect(predicate.call).to be true
+          end
         end
       end
 
       context "with non-approved regions" do
         it "returns false for a valid but non-approved region" do
-          predicate = described_class.new(context, "eu-west-1")
+          predicate = described_class.new(context, "eu-west-2")
 
           expect(predicate.call).to be false
         end

@@ -140,6 +140,7 @@ module Importers
           migration.update_import_progress(56)
           Importers::GradingStandardImporter.process_migration(data, migration)
           migration.update_import_progress(58)
+
           Importers::ContextExternalToolImporter.process_migration(data, migration)
           migration.update_import_progress(60)
           Importers::LtiContextControlImporter.process_migration(data, migration)
@@ -153,7 +154,7 @@ module Importers
           end
 
           Assignment.suspend_due_date_caching do
-            Importers::DiscussionTopicImporter.process_migration(data, migration)
+            import_discussion_topics_with_permission_check(course, data, migration)
             migration.update_import_progress(70)
           end
           Importers::WikiPageImporter.process_migration(data, migration)
@@ -180,6 +181,10 @@ module Importers
 
           if migration.context.try(:horizon_course?)
             Importers::ContentTagImporter.process_migration(data, migration)
+          end
+
+          if migration.context.root_account.feature_enabled?(:nav_menu_links)
+            Importers::NavMenuLinkImporter.process_migration(data, migration)
           end
 
           everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])
@@ -276,11 +281,9 @@ module Importers
 
       migration.trigger_live_events!
       Auditors::Course.record_copied(migration.source_course, course, migration.user, source: migration.initiated_source)
-      if course.root_account.feature_enabled?(:lti_context_copy_notice)
-        copied_at = (migration.started_at || Time.zone.now).iso8601
-        notice = Lti::Pns::LtiContextCopyNoticeBuilder.new(course:, copied_at:, source_course: migration.source_course)
-        Lti::PlatformNotificationService.notify_tools_in_course(course, notice)
-      end
+      copied_at = (migration.started_at || Time.zone.now).iso8601
+      notice = Lti::Pns::LtiContextCopyNoticeBuilder.new(course:, copied_at:, source_course: migration.source_course)
+      Lti::PlatformNotificationService.notify_tools_in_course(course, notice)
 
       InstStatsd::Statsd.distributed_increment("content_migrations.import_success")
       duration = Time.zone.now - migration.created_at
@@ -307,7 +310,7 @@ module Importers
       return unless imported_items.any?
 
       # get rid of assignments relating to quizzes lest they create 2 quizzes in the module
-      quiz_assignments = imported_items.filter { |item| item.is_a? Quizzes::Quiz }.pluck(:assignment_id)
+      quiz_assignments = imported_items.grep(Quizzes::Quiz).pluck(:assignment_id)
       imported_items.filter! { |item| !(item.is_a?(Assignment) && quiz_assignments.include?(item.id)) }
       start_pos = migration.migration_settings[:insert_into_module_position]
       start_pos = start_pos.to_i unless start_pos.nil? # 0 = start; nil = end
@@ -455,7 +458,16 @@ module Importers
       assignments = migration.imported_migration_items_by_class(Assignment).select(&:needs_update_cached_due_dates)
       if assignments.any?
         Assignment.clear_cache_keys(assignments, :availability)
-        SubmissionLifecycleManager.recompute_course(migration.context, assignments:, update_grades: true, executing_user: migration.user, skip_late_policy_applicator: !!migration.date_shift_options, run_late_policy_applicator_for_course: true)
+        skip_lpa = !!migration.date_shift_options || migration.should_skip_import?("LatePolicy")
+        sub_assignments = SubAssignment.active.where(parent_assignment_id: assignments.map(&:id)).to_a
+        SubmissionLifecycleManager.recompute_course(
+          migration.context,
+          assignments: assignments + sub_assignments,
+          update_grades: true,
+          executing_user: migration.user,
+          skip_late_policy_applicator: skip_lpa,
+          run_late_policy_applicator_for_course: true
+        )
       end
       quizzes = migration.imported_migration_items_by_class(Quizzes::Quiz).select(&:should_clear_availability_cache)
       Quizzes::Quiz.clear_cache_keys(quizzes, :availability) if quizzes.any?
@@ -467,7 +479,7 @@ module Importers
 
     def self.import_syllabus_from_migration(course, syllabus_body, migration)
       if migration.for_master_course_import?
-        if Account.site_admin.feature_enabled?(:syllabus_versioning)
+        if course.account.feature_enabled?(:syllabus_versioning)
           course.mark_as_importing!(migration)
         else
           course.master_migration = migration
@@ -476,37 +488,66 @@ module Importers
       course.syllabus_body = migration.convert_html(syllabus_body, :syllabus, nil, :syllabus)
     end
 
+    def self.all_links_for_course(course:)
+      NavMenuLink.active.where(course_nav: true, context: [course, *course.account_chain]).to_a
+    end
+
+    def self.all_tools_for_course(course:, migration:)
+      if migration.cross_institution?
+        Lti::ContextToolFinder.only_for(course).placements(:course_navigation)
+      else
+        Lti::ContextToolFinder.all_tools_for(course, placements: :course_navigation)
+      end
+    end
+
+    # Find by saved (on DB) or calculated (based on ID) migration id
+    def self.find_by_migration_id(items:, migration_id:)
+      items.detect { |t| t.migration_id == migration_id } ||
+        items.detect do |t|
+          CC::CCHelper.create_key(t) == migration_id ||
+            CC::CCHelper.create_key(t, global: true) == migration_id
+        end
+    end
+
+    def self.build_tab_config(course, tab_configuration, migration)
+      all_tools = nil
+      all_links = nil
+
+      tab_configuration.filter_map do |tab|
+        case tab["id"]
+        when /\Acontext_external_tool_(.+)/
+          all_tools ||= all_tools_for_course(course:, migration:)
+          if (tool = find_by_migration_id(items: all_tools, migration_id: $1))
+            tab.merge("id" => "context_external_tool_#{tool.id}")
+          end
+        when /\Anav_menu_link_(.+)\z/
+          next unless migration.context.root_account.feature_enabled?(:nav_menu_links)
+
+          all_links ||= all_links_for_course(course:)
+          if (link = find_by_migration_id(items: all_links, migration_id: $1))
+            tab.merge("id" => "nav_menu_link_#{link.id}")
+          end
+        else
+          tab
+        end
+      end
+    end
+
     def self.import_settings_from_migration(course, data, migration)
       return unless data[:course]
 
+      if course_settings_restricted?(course, migration)
+        migration.add_warning(
+          t("Course Settings were not imported because your role is restricted from modifying Course Settings.")
+        )
+        return
+      end
+
       settings = data[:course]
       if settings[:tab_configuration].is_a?(Array)
-        tab_config = []
-        all_tools = nil
-        settings[:tab_configuration].each do |tab|
-          if tab["id"].is_a?(String) && tab["id"].start_with?("context_external_tool_")
-            tool_mig_id = tab["id"].sub("context_external_tool_", "")
-            all_tools ||= if migration.cross_institution?
-                            Lti::ContextToolFinder.only_for(course).placements(:course_navigation)
-                          else
-                            Lti::ContextToolFinder.all_tools_for(course, placements: :course_navigation)
-                          end
-            if (tool = all_tools.detect { |t| t.migration_id == tool_mig_id } ||
-                all_tools.detect do |t|
-                  CC::CCHelper.create_key(t) == tool_mig_id ||
-                  CC::CCHelper.create_key(t, global: true) == tool_mig_id
-                end)
-              # translate the migration_id to a real id
-              tab["id"] = "context_external_tool_#{tool.id}"
-              tab_config << tab
-            end
-          elsif !NavMenuLinkTabs.nav_menu_link_tab_id?(tab["id"])
-            # Nav Menu Links not yet supported, see INTEROP-9293
-            tab_config << tab
-          end
-        end
-        course.tab_configuration = tab_config
+        course.tab_configuration = build_tab_config(course, settings[:tab_configuration], migration)
       end
+
       if settings[:storage_quota] && course.account.grants_right?(migration.user, :manage_storage_quotas)
         course.storage_quota = settings[:storage_quota]
       end
@@ -611,6 +652,15 @@ module Importers
       if course.course_sections.active.count > 1 && settings.key?(:hide_sections_on_course_users_page)
         course.hide_sections_on_course_users_page = settings[:hide_sections_on_course_users_page]
       end
+
+      if course.root_account.feature_enabled?(:default_discussion_options)
+        if settings.key?(:use_default_discussion_settings)
+          course.use_default_discussion_settings = settings[:use_default_discussion_settings]
+        end
+        if settings.key?(:default_discussion_settings)
+          course.default_discussion_settings = settings[:default_discussion_settings]
+        end
+      end
     end
 
     def self.shift_date_options(course, options = {})
@@ -709,6 +759,48 @@ module Importers
     def self.any_shift_date_missing?(date_shift_options_hash)
       date_shift_options_hash[:old_start_date].blank? || date_shift_options_hash[:old_end_date].blank? ||
         date_shift_options_hash[:new_start_date].blank? || date_shift_options_hash[:new_end_date].blank?
+    end
+
+    def self.course_settings_restricted?(course, migration)
+      return false unless migration.user
+      return false unless course.root_account.feature_enabled?(:course_navigation_and_feature_options_permissions)
+
+      !course.grants_right?(migration.user, :manage_course_details)
+    end
+
+    # Checks if the migrating user's role is restricted from modifying
+    # Discussion Settings. Only active when the default_discussion_options
+    # feature flag is enabled.
+    def self.discussion_settings_restricted?(course, migration)
+      return false unless migration.user
+      return false unless course.root_account.feature_enabled?(:default_discussion_options)
+
+      !course.grants_all_rights?(migration.user, *RoleOverride::GRANULAR_EDIT_DISCUSSION_TOPIC_PERMISSIONS)
+    end
+
+    # Imports Discussion Topics with a permission check:
+    # - If user is unrestricted, behaves as normal.
+    # - If user is restricted from modifying Discussion Settings, Discussion
+    #   Topics are skipped entirely and a warning is recorded. Announcements
+    #   are still imported.
+    def self.import_discussion_topics_with_permission_check(course, data, migration)
+      unless discussion_settings_restricted?(course, migration)
+        Importers::DiscussionTopicImporter.process_migration(data, migration)
+        return
+      end
+
+      Importers::DiscussionTopicImporter.process_announcements_migration(
+        Array(data["announcements"]), migration
+      )
+
+      discussion_topics_selected = !migration.copy_options ||
+                                   migration.is_set?(migration.copy_options[:everything]) ||
+                                   migration.is_set?(migration.copy_options[:all_discussion_topics])
+      if discussion_topics_selected
+        migration.add_warning(
+          t("Discussion Topics were not imported because your role is restricted from modifying Discussion Settings.")
+        )
+      end
     end
   end
 end

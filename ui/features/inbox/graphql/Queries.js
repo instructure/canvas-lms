@@ -26,6 +26,9 @@ import {SubmissionComment} from './SubmissionComment'
 import {PageInfo} from './PageInfo'
 import {TotalCountPageInfo} from './TotalCountPageInfo'
 
+// TODO: clean :inbox_sis_id_for_duplicates flag after release, VICE-5840
+const inbox_sis_enabled = !!ENV?.inbox_sis_id_for_duplicates
+
 export const ADDRESS_BOOK_RECIPIENTS = gql`
   query GetInboxAddressBookRecipients(
     $userID: ID!
@@ -56,6 +59,7 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
               name
               shortName
               pronouns
+              sisId @include(if: ${inbox_sis_enabled})
               observerEnrollmentsConnection(contextCode: $courseContextCode) {
                 nodes {
                   associatedUser {
@@ -108,6 +112,7 @@ export const ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES = gql`
               name
               shortName
               pronouns
+              sisId @include(if: ${inbox_sis_enabled})
               commonCoursesConnection {
                 nodes {
                   _id

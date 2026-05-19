@@ -25,8 +25,8 @@ env.BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
 env.COMPOSE_FILE = 'docker-compose.new-jenkins-js.yml'
 env.DOCKER_BUILDKIT = 1
 env.FORCE_FAILURE = commitMessageFlag('force-failure-js').asBooleanInteger()
-env.SELENIUM_NODE_IMAGE = '948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/node-chromium:126.0-20240621'
-env.SELENIUM_HUB_IMAGE = '948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/hub:4.22.0'
+env.SELENIUM_NODE_IMAGE = '948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/node-chromium:145.0'
+env.SELENIUM_HUB_IMAGE = '948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/hub:4.41.0'
 
 node(nodeLabel()) {
   timeout(time: 20, unit: 'MINUTES') {
@@ -35,10 +35,10 @@ node(nodeLabel()) {
         def tests = [:]
         try {
           for (int i = 0; i < jsTestsStage.VITEST_NODE_COUNT; i++) {
-            def index = i
-            def stageName = "Vitest ${index}"
+            def indexPadded = String.format('%02d', i)
+            def stageName = "Vitest ${indexPadded}"
             tests[stageName] = {
-              jsTestsStage.runVitestNode(index)
+              jsTestsStage.runVitestNode(indexPadded)
             }
           }
 
@@ -52,7 +52,7 @@ node(nodeLabel()) {
               }
 
               stage("${stageName} - Setup") {
-                jsTestsStage.checkoutCode()
+                distribution.unstashBuildScripts()
                 jsTestsStage.provisionDocker()
                 jsTestsStage.startServices()
               }
@@ -80,6 +80,11 @@ node(nodeLabel()) {
             } finally {
               pipelineHelpers.cleanupDocker()
             }
+          }
+
+          stage('Checkout') {
+            jsTestsStage.checkoutCode()
+            distribution.stashBuildScripts()
           }
 
           parallel(tests)

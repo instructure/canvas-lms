@@ -93,8 +93,8 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
                                           .preload(:submission)
                                           .index_by(&:id)
 
-    submissions_by_student_id = provisional_grades_by_id.values.each_with_object({}) do |grade, map|
-      map[grade.submission.user_id] = grade.submission
+    submissions_by_student_id = provisional_grades_by_id.values.to_h do |grade|
+      [grade.submission.user_id, grade.submission]
     end
 
     selections_by_student_id = @assignment.moderated_grading_selections
@@ -268,7 +268,7 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
 
       unless selected_provisional_grade
         return render json: { message: "All submissions must have a selected grade" },
-                      status: :unprocessable_entity
+                      status: :unprocessable_content
       end
 
       selected_provisional_grade

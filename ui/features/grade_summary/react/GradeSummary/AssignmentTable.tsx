@@ -184,11 +184,12 @@ const AssignmentTable = ({
       <Table.Head>
         <Table.Row>
           {(headers || []).map(header => (
-            // @ts-expect-error
             <Table.ColHeader
               key={header.key}
               id={header.id}
+              // @ts-expect-error TS7 migration
               textAlign={header.alignment}
+              // @ts-expect-error TS7 migration
               width={header.width}
             >
               {header.value}

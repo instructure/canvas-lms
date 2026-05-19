@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {assignLocation} from '@canvas/util/globalUtils'
 import {Button} from '@instructure/ui-buttons'
@@ -157,7 +157,7 @@ const OtpForm = () => {
     _event: React.ChangeEvent<HTMLInputElement>,
     value: string,
   ) => {
-    setVerificationCode(value.trim())
+    setVerificationCode(value)
     if (verificationCodeError) setVerificationCodeError('')
   }
 

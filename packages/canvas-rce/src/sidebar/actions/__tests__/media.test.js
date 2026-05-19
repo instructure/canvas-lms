@@ -340,5 +340,24 @@ describe('Media actions', () => {
         subtitles: [],
       })
     })
+
+    it('passes viewerRestrictions to the api', async () => {
+      const updateSpy = jest.fn(updateMediaObject)
+      const dispatch = () => {}
+      const getState = () => {
+        const state = getInitialState()
+        state.source = {updateMediaObject: updateSpy, updateClosedCaptions: jest.fn()}
+        return state
+      }
+      await actions.updateMediaObject({
+        media_object_id: 'moid',
+        title: 'title',
+        viewerRestrictions: {show_rolling_transcript: true},
+      })(dispatch, getState)
+      expect(updateSpy.mock.calls[0][1]).toMatchObject({
+        media_object_id: 'moid',
+        viewerRestrictions: {show_rolling_transcript: true},
+      })
+    })
   })
 })

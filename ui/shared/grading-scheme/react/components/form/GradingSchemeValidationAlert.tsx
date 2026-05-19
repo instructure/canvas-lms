@@ -19,7 +19,7 @@
 import React from 'react'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 
 import {
   gradingSchemeIsValid,
@@ -28,8 +28,6 @@ import {
   rowDataIsValidNumbers,
 } from './validations/gradingSchemeValidations'
 import type {GradingSchemeDataRow} from '@instructure/grading-utils'
-
-const I18n = createI18nScope('GradingSchemes')
 
 export interface ComponentProps {
   formData: {
@@ -42,6 +40,7 @@ export interface ComponentProps {
 }
 
 export const GradingSchemeValidationAlert: React.FC<ComponentProps> = ({onClose, formData}) => {
+  const {t} = useTranslation('GradingSchemes')
   const isValid = gradingSchemeIsValid(formData)
 
   return (
@@ -62,18 +61,18 @@ export const GradingSchemeValidationAlert: React.FC<ComponentProps> = ({onClose,
       >
         {gradingSchemeIsValid(formData) ? (
           // grading scheme did initially have validation error(s), but errors have since been corrected
-          <>{I18n.t('Looks great!')}</>
+          <>{t('Looks great!')}</>
         ) : !rowDataIsValidNumbers(formData) ? (
           <>
             {formData.pointsBased ? (
               <>
-                {I18n.t(
+                {t(
                   "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.",
                 )}
               </>
             ) : (
               <>
-                {I18n.t(
+                {t(
                   "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.",
                 )}
               </>
@@ -81,22 +80,20 @@ export const GradingSchemeValidationAlert: React.FC<ComponentProps> = ({onClose,
           </>
         ) : !rowDataIsValid(formData) ? (
           <>
-            {I18n.t(
+            {t(
               "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.",
             )}
           </>
         ) : !rowNamesAreValid(formData) ? (
           <>
-            {I18n.t(
+            {t(
               "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.",
             )}
           </>
         ) : !formData.title ? (
-          <>
-            {I18n.t("Grading Scheme Name is required. Add a name and try clicking 'Save' again.")}
-          </>
+          <>{t("Grading Scheme Name is required. Add a name and try clicking 'Save' again.")}</>
         ) : (
-          <>{I18n.t('Invalid grading scheme')}</>
+          <>{t('Invalid grading scheme')}</>
         )}
       </Alert>
     </View>

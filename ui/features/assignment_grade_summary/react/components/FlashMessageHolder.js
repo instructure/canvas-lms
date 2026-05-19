@@ -21,7 +21,7 @@ import {arrayOf, bool, oneOf, shape, string} from 'prop-types'
 import {connect} from 'react-redux'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import * as AssignmentActions from '../assignment/AssignmentActions'
 import * as GradeActions from '../grades/GradeActions'
 import * as StudentActions from '../students/StudentActions'

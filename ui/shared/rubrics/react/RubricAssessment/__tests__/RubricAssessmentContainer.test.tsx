@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {OUTCOME_DATA, RUBRIC_DATA, SELF_ASSESSMENT_DATA, TEACHER_ASSESSMENT_DATA} from './fixtures'
 import {RubricCriterion} from '../../types/rubric'
 

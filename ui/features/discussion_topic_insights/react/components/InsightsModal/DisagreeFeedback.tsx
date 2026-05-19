@@ -23,7 +23,7 @@ import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {useUpdateEntry} from '../../hooks/useUpdateEntry'
 import useInsightStore from '../../hooks/useInsightStore'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('discussion_insights')
 

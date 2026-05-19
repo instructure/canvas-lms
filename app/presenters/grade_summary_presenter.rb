@@ -209,6 +209,7 @@ class GradeSummaryPresenter
       :context,
       :discussion_topic,
       :grading_standard,
+      :parent_assignment,
       :post_policy,
       :quiz,
       :rubric_association,
@@ -249,7 +250,6 @@ class GradeSummaryPresenter
 
   def submissions
     preload_params = [
-      :attachment_associations,
       :content_participations,
       { originality_reports: [:lti_link, :attachment] },
       :user,

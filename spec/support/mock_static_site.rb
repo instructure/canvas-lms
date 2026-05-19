@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 # A MockStaticSite blocks any requests to the specified host, and instead
 # returns a corresponding file (using the path in the request) from the
 # specified local directory.
@@ -32,9 +30,6 @@ require_relative "../spec_helper"
 # reasonably-sized images will be fine.
 
 MOCK_SITES_DIRECTORY = "mock_static_sites"
-
-class NonexistentMockSiteError < StandardError
-end
 
 class MockStaticSite
   attr_accessor :mock_site, :index_file, :root_dir_path
@@ -79,4 +74,7 @@ class MockStaticSite
       path
     end
   end
+end
+
+class NonexistentMockSiteError < StandardError # rubocop:disable Style/OneClassPerFile
 end

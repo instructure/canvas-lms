@@ -37,7 +37,7 @@ describe Auditors::ActiveRecord::AuthenticationRecord do
 
     it "is creatable from an event_stream record of the correct type" do
       ar_rec = Auditors::ActiveRecord::AuthenticationRecord.create_from_event_stream!(es_record)
-      expect(ar_rec.id).to_not be_nil
+      expect(ar_rec.id).not_to be_nil
       expect(ar_rec.uuid).to eq(es_record.id)
       expect(ar_rec.request_id).to eq(request_id)
       expect(ar_rec.pseudonym_id).to eq(pseudonym_record.id)

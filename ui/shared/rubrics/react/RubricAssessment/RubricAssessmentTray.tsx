@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {Tray} from '@instructure/ui-tray'
 import {type ViewMode} from './ViewModeSelect'
 import type {Rubric, RubricAssessmentData} from '../types/rubric'

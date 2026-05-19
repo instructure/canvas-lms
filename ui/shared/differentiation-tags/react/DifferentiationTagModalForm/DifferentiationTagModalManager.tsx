@@ -21,7 +21,7 @@ import DifferentiationTagModalForm from './DifferentiationTagModalForm'
 import {useDifferentiationTagCategoriesIndex} from '../hooks/useDifferentiationTagCategoriesIndex'
 import type {Course, DifferentiationTagCategory} from '../types.d'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 
 declare const ENV: GlobalEnv & Course

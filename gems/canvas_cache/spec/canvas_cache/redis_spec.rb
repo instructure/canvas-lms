@@ -19,7 +19,6 @@
 #
 
 require "redis/cluster"
-require "spec_helper"
 require "timecop"
 
 describe CanvasCache::Redis do
@@ -41,7 +40,7 @@ describe CanvasCache::Redis do
 
     it "is false when config-less" do
       allow(ConfigFile).to receive(:load).with("redis").and_return(nil)
-      expect(CanvasCache::Redis).to_not be_enabled
+      expect(CanvasCache::Redis).not_to be_enabled
     end
   end
 
@@ -63,8 +62,8 @@ describe CanvasCache::Redis do
         expect(r).to eq(redis_client)
         CanvasCache::Redis.disconnect!
         r2 = CanvasCache::Redis.redis
-        expect(r2).to_not be_nil
-        expect(r2).to_not eq(r)
+        expect(r2).not_to be_nil
+        expect(r2).not_to eq(r)
       end
     end
 

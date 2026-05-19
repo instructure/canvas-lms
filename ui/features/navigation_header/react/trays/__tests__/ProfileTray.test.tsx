@@ -20,7 +20,7 @@ import React from 'react'
 import {cleanup, render as testingLibraryRender} from '@testing-library/react'
 import {getByText as domGetByText} from '@testing-library/dom'
 import ProfileTray from '../ProfileTray'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
@@ -55,6 +55,12 @@ const profileTabs = [
     html_url: '/accounts/1/external_tools/1?display=borderless',
     type: 'external',
   },
+  {
+    id: 'nav_menu_link_42',
+    label: 'Custom Link',
+    html_url: 'https://example.com',
+    type: 'external',
+  },
 ]
 
 describe('ProfileTray', () => {
@@ -84,17 +90,35 @@ describe('ProfileTray', () => {
     getByText('Sample Student')
   })
 
-  describe('when "open_tools_in_new_tab" FF is enabled', () => {
-    beforeEach(() => {
-      window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.open_tools_in_new_tab = true
-    })
+  it('renders external tool tabs with correct target attributes', () => {
+    queryClient.setQueryData(['profile'], profileTabs)
+    const {getByText} = render(<ProfileTray />)
+    const toolLink = getByText('External Tool').closest('a')
+    expect(toolLink).toHaveAttribute('target', '_blank')
+  })
 
-    it('renders external tool tabs with correct target attributes', () => {
+  describe('nav_menu_link tabs', () => {
+    it('opens in new tab', () => {
       queryClient.setQueryData(['profile'], profileTabs)
       const {getByText} = render(<ProfileTray />)
-      const toolLink = getByText('External Tool').closest('a')
-      expect(toolLink).toHaveAttribute('target', '_blank')
+      const link = getByText('Custom Link').closest('a')
+      expect(link).toHaveAttribute('target', '_blank')
+    })
+
+    it('shows external link icon', () => {
+      queryClient.setQueryData(['profile'], profileTabs)
+      const {getByText} = render(<ProfileTray />)
+      const link = getByText('Custom Link').closest('a')
+      const icon = link?.querySelector("svg[name='IconExternalLink']")
+      expect(icon).toBeInTheDocument()
+    })
+
+    it('does not show external link icon for LTI external tools', () => {
+      queryClient.setQueryData(['profile'], profileTabs)
+      const {getByText} = render(<ProfileTray />)
+      const link = getByText('External Tool').closest('a')
+      const icon = link?.querySelector("svg[name='IconExternalLink']")
+      expect(icon).not.toBeInTheDocument()
     })
   })
 
@@ -154,42 +178,6 @@ describe('ProfileTray', () => {
       it('renders the dyslexic font toggle', () => {
         const {getByTestId} = render(<ProfileTray />)
         const toggle = getByTestId('dyslexic-font-toggle')
-        expect(toggle).toBeInTheDocument()
-      })
-    })
-  })
-
-  describe('widget dashboard toggle', () => {
-    describe('when the widget_dashboard feature is not available', () => {
-      beforeEach(() => {
-        delete window.ENV.widget_dashboard_overridable
-      })
-
-      it('does not render the Early Adopter Program Settings section', () => {
-        const {queryByText} = render(<ProfileTray />)
-        expect(queryByText('Early Adopter Program Settings')).not.toBeInTheDocument()
-      })
-
-      it('does not render the widget dashboard toggle', () => {
-        const {queryByTestId} = render(<ProfileTray />)
-        const toggle = queryByTestId('widget-dashboard-toggle')
-        expect(toggle).not.toBeInTheDocument()
-      })
-    })
-
-    describe('when the widget_dashboard feature is available', () => {
-      beforeEach(() => {
-        window.ENV.widget_dashboard_overridable = false
-      })
-
-      it('renders the Early Adopter Program Settings section', () => {
-        const {getByText} = render(<ProfileTray />)
-        expect(getByText('Early Adopter Program Settings')).toBeInTheDocument()
-      })
-
-      it('renders the widget dashboard toggle', () => {
-        const {getByTestId} = render(<ProfileTray />)
-        const toggle = getByTestId('widget-dashboard-toggle')
         expect(toggle).toBeInTheDocument()
       })
     })

@@ -17,10 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-require_relative "../../lib/llm_conversation"
-require_relative "../../lib/llm_conversation/errors"
-
 describe AiConversationsController do
   before :once do
     course_with_teacher(active_all: true)
@@ -33,34 +29,6 @@ describe AiConversationsController do
       learning_objective: "Students will learn to handle customer complaints professionally",
       pedagogical_guidance: "A customer calls about incorrect billing"
     )
-  end
-
-  describe "GET #index" do
-    context "as teacher" do
-      before { user_session(@teacher) }
-
-      it "returns success for HTML format" do
-        get :index, params: { course_id: @course.id, ai_experience_id: @ai_experience.id }
-        expect(response).to be_successful
-      end
-
-      it "sets AI_EXPERIENCE in js_env with facts and pedagogical_guidance for teachers" do
-        get :index, params: { course_id: @course.id, ai_experience_id: @ai_experience.id }
-        ai_exp_json = assigns[:js_env][:AI_EXPERIENCE]
-        expect(ai_exp_json[:facts]).to eq(@ai_experience.facts)
-        expect(ai_exp_json[:pedagogical_guidance]).to eq(@ai_experience.pedagogical_guidance)
-        expect(ai_exp_json[:learning_objective]).to eq(@ai_experience.learning_objective)
-      end
-    end
-
-    context "as student" do
-      before { user_session(@student) }
-
-      it "returns unauthorized for students" do
-        get :index, params: { course_id: @course.id, ai_experience_id: @ai_experience.id }
-        assert_unauthorized
-      end
-    end
   end
 
   describe "GET #active_conversation" do
@@ -77,24 +45,24 @@ describe AiConversationsController do
           workflow_state: "active"
         )
 
-        mock_client = instance_double(LLMConversationClient)
-        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
-        allow(mock_client).to receive(:messages_with_conversation_progress).and_return({
-                                                                                         messages: [
-                                                                                           { role: "User", text: "Hello" },
-                                                                                           { role: "Assistant", text: "Hi there!" }
-                                                                                         ],
-                                                                                         progress: {
-                                                                                           current: 1,
-                                                                                           total: 3,
-                                                                                           percentage: 33,
-                                                                                           objectives: [
-                                                                                             { objective: "Objective 1", status: "covered" },
-                                                                                             { objective: "Objective 2", status: "" },
-                                                                                             { objective: "Objective 3", status: "" }
-                                                                                           ]
-                                                                                         }
-                                                                                       })
+        mock_service = instance_double(AiExperiences::ConversationMessagesService)
+        allow(AiExperiences::ConversationMessagesService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:fetch_with_progress).and_return({
+                                                                          messages: [
+                                                                            { role: "User", text: "Hello" },
+                                                                            { role: "Assistant", text: "Hi there!" }
+                                                                          ],
+                                                                          progress: {
+                                                                            current: 1,
+                                                                            total: 3,
+                                                                            percentage: 33,
+                                                                            objectives: [
+                                                                              { objective: "Objective 1", status: "covered" },
+                                                                              { objective: "Objective 2", status: "" },
+                                                                              { objective: "Objective 3", status: "" }
+                                                                            ]
+                                                                          }
+                                                                        })
 
         get :active_conversation,
             params: { course_id: @course.id, ai_experience_id: @ai_experience.id },
@@ -154,20 +122,20 @@ describe AiConversationsController do
     context "as teacher" do
       before do
         user_session(@teacher)
-        mock_client = instance_double(LLMConversationClient)
-        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
-        allow(mock_client).to receive(:messages_with_conversation_progress).and_return({
-                                                                                         messages: [
-                                                                                           { role: "User", text: "Hello" },
-                                                                                           { role: "Assistant", text: "Hi there!" }
-                                                                                         ],
-                                                                                         progress: {
-                                                                                           current: 1,
-                                                                                           total: 2,
-                                                                                           percentage: 50,
-                                                                                           objectives: []
-                                                                                         }
-                                                                                       })
+        mock_service = instance_double(AiExperiences::ConversationMessagesService)
+        allow(AiExperiences::ConversationMessagesService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:fetch_with_progress).and_return({
+                                                                          messages: [
+                                                                            { role: "User", text: "Hello" },
+                                                                            { role: "Assistant", text: "Hi there!" }
+                                                                          ],
+                                                                          progress: {
+                                                                            current: 1,
+                                                                            total: 2,
+                                                                            percentage: 50,
+                                                                            objectives: []
+                                                                          }
+                                                                        })
       end
 
       it "returns student conversation with messages" do
@@ -211,24 +179,24 @@ describe AiConversationsController do
       before { user_session(@teacher) }
 
       it "creates a new conversation and returns initial messages with progress" do
-        mock_client = instance_double(LLMConversationClient)
-        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
-        allow(mock_client).to receive(:starting_messages).and_return({
-                                                                       conversation_id: "llm-conv-id",
-                                                                       messages: [
-                                                                         { role: "User", text: "Hello" },
-                                                                         { role: "Assistant", text: "Hi there!" }
-                                                                       ],
-                                                                       progress: {
-                                                                         current: 0,
-                                                                         total: 2,
-                                                                         percentage: 0,
-                                                                         objectives: [
-                                                                           { objective: "Objective 1", status: "" },
-                                                                           { objective: "Objective 2", status: "" }
-                                                                         ]
-                                                                       }
-                                                                     })
+        mock_service = instance_double(AiExperiences::ConversationStartService)
+        allow(AiExperiences::ConversationStartService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:start).and_return({
+                                                            conversation_id: "llm-conv-id",
+                                                            messages: [
+                                                              { role: "User", text: "Hello" },
+                                                              { role: "Assistant", text: "Hi there!" }
+                                                            ],
+                                                            progress: {
+                                                              current: 0,
+                                                              total: 2,
+                                                              percentage: 0,
+                                                              objectives: [
+                                                                { objective: "Objective 1", status: "" },
+                                                                { objective: "Objective 2", status: "" }
+                                                              ]
+                                                            }
+                                                          })
 
         post :create,
              params: { course_id: @course.id, ai_experience_id: @ai_experience.id },
@@ -246,12 +214,12 @@ describe AiConversationsController do
       end
 
       it "creates an AiConversation record" do
-        mock_client = instance_double(LLMConversationClient)
-        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
-        allow(mock_client).to receive(:starting_messages).and_return({
-                                                                       conversation_id: "llm-conv-id",
-                                                                       messages: []
-                                                                     })
+        mock_service = instance_double(AiExperiences::ConversationStartService)
+        allow(AiExperiences::ConversationStartService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:start).and_return({
+                                                            conversation_id: "llm-conv-id",
+                                                            messages: []
+                                                          })
 
         expect do
           post :create,
@@ -275,12 +243,12 @@ describe AiConversationsController do
           workflow_state: "active"
         )
 
-        mock_client = instance_double(LLMConversationClient)
-        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
-        allow(mock_client).to receive(:starting_messages).and_return({
-                                                                       conversation_id: "new-llm-conv-id",
-                                                                       messages: []
-                                                                     })
+        mock_service = instance_double(AiExperiences::ConversationStartService)
+        allow(AiExperiences::ConversationStartService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:start).and_return({
+                                                            conversation_id: "new-llm-conv-id",
+                                                            messages: []
+                                                          })
 
         post :create,
              params: { course_id: @course.id, ai_experience_id: @ai_experience.id },
@@ -299,9 +267,9 @@ describe AiConversationsController do
       end
 
       it "returns service unavailable on conversation error" do
-        mock_client = instance_double(LLMConversationClient)
-        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
-        allow(mock_client).to receive(:starting_messages)
+        mock_service = instance_double(AiExperiences::ConversationStartService)
+        allow(AiExperiences::ConversationStartService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:start)
           .and_raise(LlmConversation::Errors::ConversationError, "Service unavailable")
 
         post :create,
@@ -318,12 +286,12 @@ describe AiConversationsController do
       before { user_session(@student) }
 
       it "allows students to create conversations" do
-        mock_client = instance_double(LLMConversationClient)
-        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
-        allow(mock_client).to receive(:starting_messages).and_return({
-                                                                       conversation_id: "llm-conv-id",
-                                                                       messages: []
-                                                                     })
+        mock_service = instance_double(AiExperiences::ConversationStartService)
+        allow(AiExperiences::ConversationStartService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:start).and_return({
+                                                            conversation_id: "llm-conv-id",
+                                                            messages: []
+                                                          })
 
         post :create,
              params: { course_id: @course.id, ai_experience_id: @ai_experience.id },
@@ -366,31 +334,25 @@ describe AiConversationsController do
       before { user_session(@teacher) }
 
       it "posts a message and returns updated messages with progress" do
-        mock_client = instance_double(LLMConversationClient)
-        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
-        allow(mock_client).to receive_messages(messages: {
-                                                 messages: [
-                                                   { role: "User", text: "Hello" }
-                                                 ],
-                                                 progress: nil
-                                               },
-                                               continue_conversation: {
-                                                 conversation_id: "llm-conv-id",
-                                                 messages: [
-                                                   { role: "User", text: "Hello" },
-                                                   { role: "User", text: "How are you?" },
-                                                   { role: "Assistant", text: "I'm doing well!" }
-                                                 ],
-                                                 progress: {
-                                                   current: 1,
-                                                   total: 2,
-                                                   percentage: 50,
-                                                   objectives: [
-                                                     { objective: "Objective 1", status: "covered" },
-                                                     { objective: "Objective 2", status: "" }
-                                                   ]
-                                                 }
-                                               })
+        mock_service = instance_double(AiExperiences::ConversationContinueService)
+        allow(AiExperiences::ConversationContinueService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:continue).and_return({
+                                                               conversation_id: "llm-conv-id",
+                                                               messages: [
+                                                                 { role: "User", text: "Hello" },
+                                                                 { role: "User", text: "How are you?" },
+                                                                 { role: "Assistant", text: "I'm doing well!" }
+                                                               ],
+                                                               progress: {
+                                                                 current: 1,
+                                                                 total: 2,
+                                                                 percentage: 50,
+                                                                 objectives: [
+                                                                   { objective: "Objective 1", status: "covered" },
+                                                                   { objective: "Objective 2", status: "" }
+                                                                 ]
+                                                               }
+                                                             })
 
         post :post_message,
              params: {
@@ -422,9 +384,9 @@ describe AiConversationsController do
       end
 
       it "returns service unavailable on conversation error" do
-        mock_client = instance_double(LLMConversationClient)
-        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
-        allow(mock_client).to receive(:messages)
+        mock_service = instance_double(AiExperiences::ConversationContinueService)
+        allow(AiExperiences::ConversationContinueService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:continue)
           .and_raise(LlmConversation::Errors::ConversationError, "Failed to send")
 
         post :post_message,
@@ -454,14 +416,13 @@ describe AiConversationsController do
       end
 
       it "allows students to post messages to their own conversations" do
-        mock_client = instance_double(LLMConversationClient)
-        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
-        allow(mock_client).to receive_messages(messages: { messages: [], progress: nil },
-                                               continue_conversation: {
-                                                 conversation_id: "student-llm-conv-id",
-                                                 messages: [],
-                                                 progress: nil
-                                               })
+        mock_service = instance_double(AiExperiences::ConversationContinueService)
+        allow(AiExperiences::ConversationContinueService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:continue).and_return({
+                                                               conversation_id: "student-llm-conv-id",
+                                                               messages: [],
+                                                               progress: nil
+                                                             })
 
         post :post_message,
              params: {
@@ -571,9 +532,9 @@ describe AiConversationsController do
           ],
           "overall_score" => 85
         }
-        mock_client = instance_double(LLMConversationClient)
-        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
-        allow(mock_client).to receive(:evaluation).and_return(@evaluation_data)
+        mock_service = instance_double(AiExperiences::ConversationEvaluationService)
+        allow(AiExperiences::ConversationEvaluationService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:evaluate).and_return(@evaluation_data)
       end
 
       it "returns evaluation data for a student conversation" do
@@ -601,9 +562,9 @@ describe AiConversationsController do
       end
 
       it "returns service unavailable on conversation error" do
-        mock_client = instance_double(LLMConversationClient)
-        allow(LLMConversationClient).to receive(:new).and_return(mock_client)
-        allow(mock_client).to receive(:evaluation)
+        mock_service = instance_double(AiExperiences::ConversationEvaluationService)
+        allow(AiExperiences::ConversationEvaluationService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:evaluate)
           .and_raise(LlmConversation::Errors::ConversationError, "Evaluation service unavailable")
 
         get :evaluation,
@@ -641,6 +602,160 @@ describe AiConversationsController do
             format: :json
 
         expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
+
+  describe "POST #create_feedback" do
+    before do
+      @conversation = @ai_experience.ai_conversations.create!(
+        llm_conversation_id: "llm-conv-id",
+        user: @teacher,
+        course: @course,
+        root_account: @course.root_account,
+        account: @course.account,
+        workflow_state: "active"
+      )
+    end
+
+    context "as teacher" do
+      before { user_session(@teacher) }
+
+      it "creates feedback and returns it" do
+        feedback_data = { "id" => "fb-1", "vote" => "liked", "user_id" => @teacher.uuid }
+        mock_service = instance_double(AiExperiences::ConversationMessageFeedbackService)
+        allow(AiExperiences::ConversationMessageFeedbackService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:create).and_return(feedback_data)
+
+        post :create_feedback,
+             params: {
+               course_id: @course.id,
+               ai_experience_id: @ai_experience.id,
+               id: @conversation.id,
+               message_id: "msg-123",
+               vote: "liked"
+             },
+             format: :json
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["feedback"]["id"]).to eq("fb-1")
+        expect(json_response["feedback"]["vote"]).to eq("liked")
+      end
+
+      it "returns service unavailable on conversation error" do
+        mock_service = instance_double(AiExperiences::ConversationMessageFeedbackService)
+        allow(AiExperiences::ConversationMessageFeedbackService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:create)
+          .and_raise(LlmConversation::Errors::ConversationError, "Feedback service error")
+
+        post :create_feedback,
+             params: {
+               course_id: @course.id,
+               ai_experience_id: @ai_experience.id,
+               id: @conversation.id,
+               message_id: "msg-123",
+               vote: "liked"
+             },
+             format: :json
+
+        expect(response).to have_http_status(:service_unavailable)
+        json_response = json_parse(response.body)
+        expect(json_response["error"]).to eq("Feedback service error")
+      end
+    end
+
+    context "as student" do
+      before do
+        user_session(@student)
+        @student_conversation = @ai_experience.ai_conversations.create!(
+          llm_conversation_id: "student-llm-conv-id",
+          user: @student,
+          course: @course,
+          root_account: @course.root_account,
+          account: @course.account,
+          workflow_state: "active"
+        )
+      end
+
+      it "allows students to create feedback on their own conversations" do
+        feedback_data = { "id" => "fb-2", "vote" => "disliked", "user_id" => @student.uuid }
+        mock_service = instance_double(AiExperiences::ConversationMessageFeedbackService)
+        allow(AiExperiences::ConversationMessageFeedbackService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:create).and_return(feedback_data)
+
+        post :create_feedback,
+             params: {
+               course_id: @course.id,
+               ai_experience_id: @ai_experience.id,
+               id: @student_conversation.id,
+               message_id: "msg-456",
+               vote: "disliked",
+               feedback_message: "Irrelevant"
+             },
+             format: :json
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["feedback"]["vote"]).to eq("disliked")
+      end
+    end
+  end
+
+  describe "DELETE #delete_feedback" do
+    before do
+      @conversation = @ai_experience.ai_conversations.create!(
+        llm_conversation_id: "llm-conv-id",
+        user: @teacher,
+        course: @course,
+        root_account: @course.root_account,
+        account: @course.account,
+        workflow_state: "active"
+      )
+    end
+
+    context "as teacher" do
+      before { user_session(@teacher) }
+
+      it "deletes feedback and returns success" do
+        mock_service = instance_double(AiExperiences::ConversationMessageFeedbackService)
+        allow(AiExperiences::ConversationMessageFeedbackService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:delete)
+
+        delete :delete_feedback,
+               params: {
+                 course_id: @course.id,
+                 ai_experience_id: @ai_experience.id,
+                 id: @conversation.id,
+                 message_id: "msg-123",
+                 feedback_id: "fb-1"
+               },
+               format: :json
+
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["success"]).to be true
+      end
+
+      it "returns service unavailable on conversation error" do
+        mock_service = instance_double(AiExperiences::ConversationMessageFeedbackService)
+        allow(AiExperiences::ConversationMessageFeedbackService).to receive(:new).and_return(mock_service)
+        allow(mock_service).to receive(:delete)
+          .and_raise(LlmConversation::Errors::ConversationError, "Delete feedback error")
+
+        delete :delete_feedback,
+               params: {
+                 course_id: @course.id,
+                 ai_experience_id: @ai_experience.id,
+                 id: @conversation.id,
+                 message_id: "msg-123",
+                 feedback_id: "fb-1"
+               },
+               format: :json
+
+        expect(response).to have_http_status(:service_unavailable)
+        json_response = json_parse(response.body)
+        expect(json_response["error"]).to eq("Delete feedback error")
       end
     end
   end

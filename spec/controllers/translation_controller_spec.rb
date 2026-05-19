@@ -40,6 +40,7 @@ describe TranslationController do
 
   describe "#translate" do
     before do
+      allow(FeatureFlags::Hooks).to receive(:tier_1_visible_on_hook).and_return(true)
       @course.enable_feature!(:translation)
       allow(Translation).to receive_messages(available?: true, translate_html: "translated.")
       allow(controller).to receive(:user_can_read?).and_return(true)

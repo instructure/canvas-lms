@@ -22,7 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconInfoLine} from '@instructure/ui-icons'
-import TemplateWidget from '../TemplateWidget/TemplateWidget'
+import {TemplateWidget} from '@instructure/platform-widget-dashboard'
 import CourseWorkFilters, {
   type DateFilterOption,
   isValidDateFilterOption,

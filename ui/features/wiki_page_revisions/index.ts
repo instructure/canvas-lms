@@ -32,8 +32,10 @@ ready(() => {
     revision: ENV.WIKI_PAGE_REVISION,
     contextAssetString: ENV.context_asset_string,
   })
+  // @ts-expect-error TS7 migration
   const revisions = new WikiPageRevisionsCollection([], {parentModel: wikiPage})
 
+  // @ts-expect-error TS7 migration
   const revisionsView = new WikiPageRevisionsView({
     collection: revisions,
     // @ts-expect-error - ENV properties not in GlobalEnv type
@@ -58,8 +60,11 @@ ready(() => {
   })
   // @ts-expect-error - Backbone view properties
   revisionsView.$el.appendTo('#wiki_page_revisions')
+  // @ts-expect-error TS7 migration
   revisionsView.render()
 
+  // @ts-expect-error TS7 migration
   revisionsView.collection.setParams({per_page: 10})
+  // @ts-expect-error TS7 migration
   revisionsView.collection.fetch()
 })

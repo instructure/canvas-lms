@@ -65,6 +65,9 @@ development:
         app-host: "rce.canvas.docker"
         # if you're running canvas-rce-api with docker-compose/rce-api.override.yml in .env
         app-host: "http://rce.canvas.docker:3000"
+      onetrust-cookie-consent:
+        domain_id: "stub-key-please-see-MRA-plugin"
+        vanity_domain_id: "stub-key-please-see-MRA-plugin"
       common_cartridge_viewer:
         base_url: "http://localhost:3300"
       csp-logging:
@@ -78,6 +81,12 @@ development:
 
   private:
     canvas:
+      pendo_app_id: "stub-key-please-see-MRA-plugin"
+      pendo_regional_app_id: "stub-key-please-see-MRA-plugin"
+      pendo_regional_app_env: "io"
+      pendo_mobile_api_key_teacher: "stub-teacher-key-see-MRA-plugin"
+      pendo_mobile_api_key_parent: "stub-parent-key-see-MRA-plugin"
+      pendo_mobile_api_key_student: "stub-student-key-see-MRA-plugin"
       auditors.yml: |
         write_paths:
           - active_record
@@ -88,6 +97,9 @@ development:
         aws_access_key_id: key
         aws_secret_access_key_dec: secret
         # stub_credentials: true # can be used in dev to print creds to stdout
+      kafka_events.yml: |-
+        topics:
+          course_events: course.events
       # bedrock configuration for smart search and discussion summaries
       bedrock.yml: |-
         bedrock_region: us-west-2
@@ -171,30 +183,22 @@ development:
       #   dark_theme_url: "http://localhost:3002/themes/horizon_dark.json"
       #   public_app_config:
       #     hosts:
-      #       api_proxy: "https://dev.cd.canvashorizon.com"
-      #       cedar: "https://cedar-api-dev.domain-svcs.nonprod.inseng.io"
       #       common_cartridge_viewer: "https://common-cartridge-viewer.netlify.app"
       #       ignite: "https://career-agent-dev.journey.nonprod.inseng.io"
       #       journey: "https://journey-server-dev.journey.nonprod.inseng.io"
-      #       pine: "https://pine-api-dev.domain-svcs.nonprod.inseng.io"
       #       rcs: "https://rich-content-pdx-cd.inseng.net"
-      #       redwood: "https://redwood-api-dev.domain-svcs.nonprod.inseng.io"
-      #       upload: "https://instructure-uploads-pdx-cd.s3.us-west-2.amazonaws.com"
       #     hotglue:
       #       api_key: "gFd34vgi2D5OY8RrNInl55wDY1ixqSvxZsSHf965"
       #       env_id: "demo.hg.instructure.com"
       #       flow_id: "NsN76D10s"
-      #     pendo:
-      #       api_key: "f5faad90-a2af-4bf9-6f7b-862e00100be4"
-      #     sentry:
-      #       learner_dsn: "https://4c2589d43fafee7da8e0896a8667cfcb@relay-pdx.sentry.insops.net/486"
-      #       learning_provider_dsn: "https://feb64e6e836b324f39dd9c499a9d3a47@relay-pdx.sentry.insops.net/530"
-      #       replays_sample_rate: 1.0
-      #       traces_sample_rate: 0.1
       #     environment: "dev"
-      #     feedback_url: "https://docs.google.com/forms/d/e/1FAIpQLScj-OKZVmsva-OE6T5rcvvm9fI6_eLtt2tk8pkgQ24DjSAPDQ/viewform"
+      #     experience_mode: "career"
       # new_quizzes.yml: |
-      #   launch_url: http://quizzes-ui-app.inseng.test:8082/none/remoteEntry.js
+      #   new_quizzes_cloudfront_host_production: http://quizzes-ui-app.inseng.test:8082
+      #   new_quizzes_cloudfront_host_beta: http://quizzes-ui-app.inseng.test:8082
+      #   new_quizzes_cloudfront_host_edge: http://quizzes-ui-app.inseng.test:8082
+      #   new_quizzes_importing_timeout_in_minutes: 360
+      #   new_quizzes_api_gateway_host: http://quiz-lti-web.inseng.test
 
   store:
     canvas:
@@ -203,7 +207,7 @@ development:
         # to generate a new key, run the following in a Canvas console:
         #
         # key = OpenSSL::PKey::RSA.generate(2048)
-        # key.public_key.to_jwk(kid: Time.now.utc.iso8601).to_json
+        # key.to_jwk(kid: Time.now.utc.iso8601).to_json
         jwk-past.json: "{\"kty\":\"RSA\",\"e\":\"AQAB\",\"n\":\"uX1MpfEMQCBUMcj0sBYI-iFaG5Nodp3C6OlN8uY60fa5zSBd83-iIL3n_qzZ8VCluuTLfB7rrV_tiX727XIEqQ\",\"kid\":\"2018-05-18T22:33:20Z\",\"d\":\"pYwR64x-LYFtA13iHIIeEvfPTws50ZutyGfpHN-kIZz3k-xVpun2Hgu0hVKZMxcZJ9DkG8UZPqD-zTDbCmCyLQ\",\"p\":\"6OQ2bi_oY5fE9KfQOcxkmNhxDnIKObKb6TVYqOOz2JM\",\"q\":\"y-UBef95njOrqMAxJH1QPds3ltYWr8QgGgccmcATH1M\",\"dp\":\"Ol_xkL7rZgNFt_lURRiJYpJmDDPjgkDVuafIeFTS4Ic\",\"dq\":\"RtzDY5wXr5TzrwWEztLCpYzfyAuF_PZj1cfs976apsM\",\"qi\":\"XA5wnwIrwe5MwXpaBijZsGhKJoypZProt47aVCtWtPE\"}"
         jwk-present.json: "{\"kty\":\"RSA\",\"e\":\"AQAB\",\"n\":\"uX1MpfEMQCBUMcj0sBYI-iFaG5Nodp3C6OlN8uY60fa5zSBd83-iIL3n_qzZ8VCluuTLfB7rrV_tiX727XIEqQ\",\"kid\":\"2018-06-18T22:33:20Z\",\"d\":\"pYwR64x-LYFtA13iHIIeEvfPTws50ZutyGfpHN-kIZz3k-xVpun2Hgu0hVKZMxcZJ9DkG8UZPqD-zTDbCmCyLQ\",\"p\":\"6OQ2bi_oY5fE9KfQOcxkmNhxDnIKObKb6TVYqOOz2JM\",\"q\":\"y-UBef95njOrqMAxJH1QPds3ltYWr8QgGgccmcATH1M\",\"dp\":\"Ol_xkL7rZgNFt_lURRiJYpJmDDPjgkDVuafIeFTS4Ic\",\"dq\":\"RtzDY5wXr5TzrwWEztLCpYzfyAuF_PZj1cfs976apsM\",\"qi\":\"XA5wnwIrwe5MwXpaBijZsGhKJoypZProt47aVCtWtPE\"}"
         jwk-future.json: "{\"kty\":\"RSA\",\"e\":\"AQAB\",\"n\":\"uX1MpfEMQCBUMcj0sBYI-iFaG5Nodp3C6OlN8uY60fa5zSBd83-iIL3n_qzZ8VCluuTLfB7rrV_tiX727XIEqQ\",\"kid\":\"2018-07-18T22:33:20Z\",\"d\":\"pYwR64x-LYFtA13iHIIeEvfPTws50ZutyGfpHN-kIZz3k-xVpun2Hgu0hVKZMxcZJ9DkG8UZPqD-zTDbCmCyLQ\",\"p\":\"6OQ2bi_oY5fE9KfQOcxkmNhxDnIKObKb6TVYqOOz2JM\",\"q\":\"y-UBef95njOrqMAxJH1QPds3ltYWr8QgGgccmcATH1M\",\"dp\":\"Ol_xkL7rZgNFt_lURRiJYpJmDDPjgkDVuafIeFTS4Ic\",\"dq\":\"RtzDY5wXr5TzrwWEztLCpYzfyAuF_PZj1cfs976apsM\",\"qi\":\"XA5wnwIrwe5MwXpaBijZsGhKJoypZProt47aVCtWtPE\"}"

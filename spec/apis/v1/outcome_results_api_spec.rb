@@ -926,7 +926,7 @@ describe "Outcome Results API", type: :request do
           expect(json["linked"]).to be_present
           expect(json["linked"]["outcomes"]).to be_present
           expect(json["linked"]["outcomes.alignments"]).to be_present
-          expect(json["linked"]["outcomes"][0]["alignments"].sort).to eq [outcome_assignment.asset_string, outcome_rubric.asset_string]
+          expect(json["linked"]["outcomes"][0]["alignments"].sort).to eq [outcome_assignment.asset_string]
           alignments = json["linked"]["outcomes.alignments"]
           alignments.sort_by! { |a| a["id"] }
           expect(alignments[0]["id"]).to eq outcome_assignment.asset_string
@@ -935,6 +935,72 @@ describe "Outcome Results API", type: :request do
           expect(alignments[1]["id"]).to eq outcome_rubric.asset_string
           expect(alignments[1]["name"]).to eq outcome_rubric.title
           expect(alignments[1]["html_url"]).to eq course_rubric_url(outcome_course, outcome_rubric)
+        end
+
+        it "includes indirect classic quiz alignments in outcomes alignments" do
+          outcome_assessment
+
+          bank = outcome_course.assessment_question_banks.create!(title: "Test Bank")
+          outcome_object.align(bank, outcome_course)
+
+          question = bank.assessment_questions.create!(
+            question_data: { "name" => "test question", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
+          )
+
+          quiz_assignment = outcome_course.assignments.create!(
+            title: "Classic Quiz",
+            submission_types: "online_quiz",
+            workflow_state: "published"
+          )
+          quiz = Quizzes::Quiz.find_by!(assignment_id: quiz_assignment.id)
+          quiz.add_assessment_questions [question]
+
+          api_call(:get,
+                   outcome_rollups_url(outcome_course, include: ["outcomes", "outcomes.alignments"]),
+                   controller: "outcome_results",
+                   action: "rollups",
+                   format: "json",
+                   course_id: outcome_course.id.to_s,
+                   include: ["outcomes", "outcomes.alignments"])
+          json = JSON.parse(response.body)
+
+          outcome_alignments = json["linked"]["outcomes"].find { |o| o["id"].to_s == outcome_object.id.to_s }["alignments"].sort
+          expect(outcome_alignments).to include(outcome_assignment.asset_string)
+          expect(outcome_alignments).to include(quiz_assignment.asset_string)
+        end
+
+        it "includes external new quiz alignments in outcomes alignments" do
+          outcome_assessment
+          outcome_course.root_account.enable_feature!(:outcome_alignment_summary_with_new_quizzes)
+
+          nq_assignment = outcome_course.assignments.create!(
+            title: "New Quiz",
+            submission_types: "external_tool",
+            workflow_state: "published"
+          )
+          os_alignments = {
+            outcome_object.id.to_s => [
+              {
+                artifact_type: "quizzes.quiz",
+                associated_asset_type: "canvas.assignment.quizzes",
+                associated_asset_id: nq_assignment.id.to_s
+              }
+            ]
+          }
+          allow_any_instance_of(OutcomeResultsController).to receive(:get_active_os_alignments).and_return(os_alignments)
+
+          api_call(:get,
+                   outcome_rollups_url(outcome_course, include: ["outcomes", "outcomes.alignments"]),
+                   controller: "outcome_results",
+                   action: "rollups",
+                   format: "json",
+                   course_id: outcome_course.id.to_s,
+                   include: ["outcomes", "outcomes.alignments"])
+          json = JSON.parse(response.body)
+
+          outcome_alignments = json["linked"]["outcomes"].find { |o| o["id"].to_s == outcome_object.id.to_s }["alignments"].sort
+          expect(outcome_alignments).to include(outcome_assignment.asset_string)
+          expect(outcome_alignments).to include(nq_assignment.asset_string)
         end
 
         it "side loads alignments with live assessment" do

@@ -20,10 +20,10 @@
 
 # @API Enrollment Terms
 #
-# API for viewing enrollment terms.  For all actions, the specified account
-# must be a root account and the caller must have permission to manage the
-# account (when called on non-root accounts, the errorwill be indicate the
-# appropriate root account).
+# API for viewing and managing enrollment terms.  For all actions, the specified account
+# must be a root account. To manage enrollment terms, the caller must have permission to
+# manage the account. To view enrollment terms, the caller must have an active teacher enrollment
+# in at least one course.
 #
 # @model EnrollmentTerm
 #     {
@@ -153,6 +153,10 @@ class TermsApiController < ApplicationController
   #
   # @returns EnrollmentTermsList
   def index
+    if request.format.html?
+      return unless require_root_account_management
+    end
+
     add_crumb(t("Terms"))
     page_has_instui_topnav
     @terms = @context.enrollment_terms

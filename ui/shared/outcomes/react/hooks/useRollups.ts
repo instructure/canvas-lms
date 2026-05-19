@@ -32,10 +32,10 @@ import {
 import {
   DEFAULT_PAGE_NUMBER,
   DEFAULT_STUDENTS_PER_PAGE,
-  SortOrder,
   SortBy,
   GradebookSettings,
 } from '../utils/constants'
+import {SortOrder} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import {Sorting} from '../types/shapes'
 import axios from '@canvas/axios'
 import {mapSettingsToFilters} from '../utils/filter'
@@ -78,6 +78,7 @@ const getRow = (studentRollups: StudentRollup[], outcomes: Outcome[]): OutcomeRo
     return {
       outcomeId: outcome.id,
       score: score.score,
+      count: score.count,
       rating: {
         ...rating,
         color: `#` + rating.color,

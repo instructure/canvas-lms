@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
 let main
@@ -35,10 +34,6 @@ class CollaborationsToolLaunch extends React.Component {
   componentDidMount() {
     this.setHeight()
     window.addEventListener('resize', this.setHeight)
-
-    if (this.iframe) {
-      this.iframe.setAttribute('allow', iframeAllowances())
-    }
   }
 
   componentWillUnmount() {

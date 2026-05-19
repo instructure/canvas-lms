@@ -23,7 +23,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import ConfirmationModal from './ConfirmationModal'
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {useScope as createI18nScope} from '@canvas/i18n'
 

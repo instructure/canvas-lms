@@ -19,7 +19,8 @@
 import {renderHook, act} from '@testing-library/react-hooks/dom'
 import axios from '@canvas/axios'
 import useRollups from '@canvas/outcomes/react/hooks/useRollups'
-import {DEFAULT_STUDENTS_PER_PAGE, SortOrder} from '@canvas/outcomes/react/utils/constants'
+import {DEFAULT_STUDENTS_PER_PAGE} from '@canvas/outcomes/react/utils/constants'
+import {SortOrder} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import {Outcome, Rating, Student} from '@canvas/outcomes/react/types/rollup'
 import {MOCK_OUTCOMES, MOCK_RATINGS, MOCK_STUDENTS} from '../../__fixtures__/rollups'
 
@@ -119,10 +120,9 @@ describe('useRollups', () => {
       await act(async () => vi.runAllTimers())
       const params = {
         params: {
-          rating_percents: true,
           per_page: DEFAULT_STUDENTS_PER_PAGE,
           exclude: [],
-          include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
+          include: ['outcomes', 'users'],
           sort_by: 'student',
           add_defaults: true,
           sort_order: SortOrder.ASC,
@@ -218,6 +218,7 @@ describe('useRollups', () => {
             {
               outcomeId: '1',
               score: 4,
+              count: undefined,
               rating: {...mockedRatings[0], color: `#${mockedRatings[0].color}`},
             },
           ],
@@ -228,6 +229,7 @@ describe('useRollups', () => {
             {
               outcomeId: '1',
               score: 4,
+              count: undefined,
               rating: {...mockedRatings[0], color: `#${mockedRatings[0].color}`},
             },
           ],
@@ -238,6 +240,7 @@ describe('useRollups', () => {
             {
               outcomeId: '1',
               score: 0,
+              count: undefined,
               rating: {...mockedRatings[2], color: `#${mockedRatings[2].color}`},
             },
           ],
@@ -261,10 +264,9 @@ describe('useRollups', () => {
       await act(async () => vi.runAllTimers())
       const params = {
         params: {
-          rating_percents: true,
           per_page: DEFAULT_STUDENTS_PER_PAGE,
           exclude: [],
-          include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
+          include: ['outcomes', 'users'],
           sort_by: 'student',
           add_defaults: true,
           sort_order: SortOrder.ASC,

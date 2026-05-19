@@ -220,9 +220,7 @@ module Canvadocs
     if submission.nil?
       return {} if attachment.nil?
 
-      submission = Submission.find_by(
-        id: AttachmentAssociation.where(context_type: "Submission", attachment:).select(:context_id)
-      )
+      submission = Submission.referencing_linked_attachment(attachment).first
       return {} if submission.nil?
     end
     assignment = submission.assignment

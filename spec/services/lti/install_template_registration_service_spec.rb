@@ -29,6 +29,15 @@ describe Lti::InstallTemplateRegistrationService do
     )
   end
 
+  def create_local_copy(account:, user:, template:, binding_state: :on)
+    Lti::InstallTemplateRegistrationService.call(
+      account:,
+      user:,
+      template:,
+      binding_state:
+    )[:local_copy]
+  end
+
   describe "invalid parameters" do
     it "raises an error if template is nil" do
       expect do
@@ -38,6 +47,28 @@ describe Lti::InstallTemplateRegistrationService do
           template: nil
         )
       end.to raise_error(ArgumentError, "template registration must be provided")
+    end
+
+    it "raises an error if template is deleted" do
+      template.update!(workflow_state: "deleted")
+      expect do
+        Lti::InstallTemplateRegistrationService.new(
+          account:,
+          user:,
+          template:
+        )
+      end.to raise_error(ArgumentError, "template registration is off")
+    end
+
+    it "raises an error if template is off" do
+      template.update!(workflow_state: "inactive")
+      expect do
+        Lti::InstallTemplateRegistrationService.new(
+          account:,
+          user:,
+          template:
+        )
+      end.to raise_error(ArgumentError, "template registration is off")
     end
 
     it "raises an error if account is nil" do
@@ -61,14 +92,14 @@ describe Lti::InstallTemplateRegistrationService do
       end.to raise_error(ArgumentError, "root account must be provided")
     end
 
-    it "raises an error if user is nil" do
+    it "does not raise an error if user is nil" do
       expect do
         Lti::InstallTemplateRegistrationService.new(
           account:,
           user: nil,
           template:
         )
-      end.to raise_error(ArgumentError, "user must be provided")
+      end.not_to raise_error
     end
 
     it "raises an error if registration is a dynamic registration" do
@@ -84,12 +115,15 @@ describe Lti::InstallTemplateRegistrationService do
     end
   end
 
+  it "returns local copy and bindings" do
+    result = Lti::InstallTemplateRegistrationService.call(account:, user:, template:)
+    expect(result[:local_copy]).to be_present
+    expect(result.dig(:bindings, :lti_registration_account_binding)).to be_present
+    expect(result.dig(:bindings, :developer_key_account_binding)).to be_present
+  end
+
   it "creates a local copy of the template registration" do
-    local_copy = Lti::InstallTemplateRegistrationService.call(
-      account:,
-      user:,
-      template:
-    )
+    local_copy = create_local_copy(account:, user:, template:)
 
     expect(local_copy).to be_persisted
     expect(local_copy.id).not_to eq(template.id)
@@ -119,17 +153,9 @@ describe Lti::InstallTemplateRegistrationService do
   end
 
   it "only creates one local copy per account" do
-    first_copy = Lti::InstallTemplateRegistrationService.call(
-      account:,
-      user:,
-      template:
-    )
+    first_copy = create_local_copy(account:, user:, template:)
 
-    second_copy = Lti::InstallTemplateRegistrationService.call(
-      account:,
-      user:,
-      template:
-    )
+    second_copy = create_local_copy(account:, user:, template:)
 
     expect(second_copy).to eq(first_copy)
     expect(template.local_copies.where(account:).count).to eq(1)
@@ -145,12 +171,7 @@ describe Lti::InstallTemplateRegistrationService do
     )
 
     expect do
-      result = Lti::InstallTemplateRegistrationService.call(
-        account:,
-        user:,
-        template:
-      )
-
+      result = create_local_copy(account:, user:, template:)
       expect(result).to eq(existing_copy)
     end.not_to change { Lti::Registration.count }
   end
@@ -165,44 +186,86 @@ describe Lti::InstallTemplateRegistrationService do
       workflow_state: "deleted"
     )
 
-    new_copy = Lti::InstallTemplateRegistrationService.call(
-      account:,
-      user:,
-      template:
-    )
+    new_copy = create_local_copy(account:, user:, template:)
 
     expect(new_copy).not_to eq(deleted_copy)
     expect(new_copy.workflow_state).to eq("active")
     expect(template.local_copies.where(account:).active.count).to eq(1)
   end
 
-  it "does not create an account binding" do
-    local_copy = Lti::InstallTemplateRegistrationService.call(
-      account:,
-      user:,
-      template:
-    )
+  it "binds account to template registration" do
+    result = Lti::InstallTemplateRegistrationService.call(account:, user:, template:)
+    rab = result.dig(:bindings, :lti_registration_account_binding)
+    expect(rab).to be_present
 
-    rab = Lti::RegistrationAccountBinding.find_by(account:, registration: local_copy)
-    expect(rab).to be_nil
+    queried_rab = Lti::RegistrationAccountBinding.find_by(account:, registration: template)
+    expect(queried_rab).to eq(rab)
   end
 
-  context "when create_binding is true" do
-    it "creates an account binding with the specified workflow state" do
-      local_copy = Lti::InstallTemplateRegistrationService.call(
+  context "when user is nil" do
+    it "creates registration and overlay with nil created_by/updated_by" do
+      Lti::InstallTemplateRegistrationService.call(
         account:,
-        user:,
-        template:,
-        create_binding: true
-      )
+        user: nil,
+        template:
+      ) => { local_copy: }
 
-      rab = Lti::RegistrationAccountBinding.find_by(account:, registration: local_copy)
+      expect(local_copy).to be_persisted
+      expect(local_copy.created_by).to be_nil
+      expect(local_copy.updated_by).to be_nil
+
+      overlay = local_copy.overlay_for(account)
+      expect(overlay).to be_present
+      expect(overlay.updated_by).to be_nil
+    end
+  end
+
+  context "when create_tool is false" do
+    it "does not create a ContextExternalTool" do
+      template # force eager evaluation before baseline count
+
+      expect do
+        Lti::InstallTemplateRegistrationService.call(
+          account:,
+          user:,
+          template:,
+          create_tool: false
+        )
+      end.not_to change { ContextExternalTool.count }
+    end
+  end
+
+  context "when create_tool is true" do
+    it "creates a ContextExternalTool" do
+      template # force eager evaluation before baseline count
+
+      expect do
+        Lti::InstallTemplateRegistrationService.call(
+          account:,
+          user:,
+          template:,
+          create_tool: true
+        )
+      end.to change { ContextExternalTool.count }.by(1)
+    end
+  end
+
+  context "when binding_state is off" do
+    it "creates an off account binding" do
+      result = Lti::InstallTemplateRegistrationService.call(account:, user:, template:, binding_state: :off)
+      rab = result.dig(:bindings, :lti_registration_account_binding)
+      dkab = result.dig(:bindings, :developer_key_account_binding)
+
       expect(rab).to be_present
-      expect(rab.workflow_state).to eq("on")
+      expect(rab.workflow_state).to eq("off")
 
-      dkab = DeveloperKeyAccountBinding.find_by(account:, developer_key: local_copy.developer_key)
       expect(dkab).to be_present
-      expect(dkab.workflow_state).to eq("on")
+      expect(dkab.workflow_state).to eq("off")
+    end
+
+    it "sets local copy to inactive" do
+      local_copy = create_local_copy(account:, user:, template:, binding_state: :off)
+      expect(local_copy.workflow_state).to eq("inactive")
     end
   end
 
@@ -216,16 +279,26 @@ describe Lti::InstallTemplateRegistrationService do
         account2 = account_model
         user2 = user_model
 
-        local_copy = Lti::InstallTemplateRegistrationService.call(
-          account: account2,
-          user: user2,
-          template:
-        )
+        local_copy = create_local_copy(account: account2, user: user2, template:)
 
         expect(local_copy.template_registration).to eq(template)
         expect(local_copy.account).to eq(account2)
         expect(local_copy.created_by).to eq(user2)
         expect(local_copy.updated_by).to eq(user2)
+      end
+    end
+
+    it "binds the account to the cross-shard registration" do
+      template
+
+      @shard2.activate do
+        account2 = account_model
+        user2 = user_model
+
+        create_local_copy(account: account2, user: user2, template:)
+
+        rab = Lti::RegistrationAccountBinding.find_by(account: account2, registration: template)
+        expect(rab).to be_present
       end
     end
   end

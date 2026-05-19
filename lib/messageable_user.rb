@@ -27,22 +27,31 @@ class MessageableUser < User
     options = {
       common_course_column: nil,
       common_group_column: nil,
-      common_role_column: nil
+      common_role_column: nil,
+      static_common_contexts: false
     }.merge(options)
 
     common_course_sql =
       if options[:common_role_column]
         raise ArgumentError unless options[:common_course_column]
 
-        connection.func(:group_concat,
-                        :"#{options[:common_course_column]}::text || ':' || #{options[:common_role_column]}::text")
+        if options[:static_common_contexts]
+          "#{options[:common_course_column]}::text || ':' || #{options[:common_role_column]}::text"
+        else
+          connection.func(:group_concat,
+                          :"#{options[:common_course_column]}::text || ':' || #{options[:common_role_column]}::text")
+        end
       else
         "NULL::text"
       end
 
     common_group_sql =
       if options[:common_group_column].is_a?(String)
-        connection.func(:group_concat, options[:common_group_column].to_sym)
+        if options[:static_common_contexts]
+          options[:common_group_column]
+        else
+          connection.func(:group_concat, options[:common_group_column].to_sym)
+        end
       elsif options[:common_group_column]
         options[:common_group_column].to_s
       else
@@ -55,26 +64,30 @@ class MessageableUser < User
   def self.prepped(options = {})
     options = {
       strict_checks: true,
-      include_deleted: false
+      include_deleted: false,
+      static_common_contexts: false
     }.merge(options)
 
-    # if either of our common course/group id columns are column names (vs.
-    # integers), they need to go in the group by. we turn the first element
-    # into an array and add them to that, so that both postgresql/mysql are
-    # happy (see the documentation on group_concat if you're curious about
-    # the gory details)
-    columns = COLUMNS.dup
-    if options[:common_course_column].is_a?(String) || options[:common_group_column].is_a?(String)
-      head = [columns.shift]
-      head << options[:common_course_column] if options[:common_course_column].is_a?(String)
-      head << options[:common_group_column] if options[:common_group_column].is_a?(String)
-      columns.unshift(head)
+    scope = self.select(MessageableUser.build_select(options))
+
+    unless options[:static_common_contexts]
+      # if either of our common course/group id columns are column names (vs.
+      # integers), they need to go in the group by. we turn the first element
+      # into an array and add them to that, so that both postgresql/mysql are
+      # happy (see the documentation on group_concat if you're curious about
+      # the gory details)
+      columns = COLUMNS.dup
+      if options[:common_course_column].is_a?(String) || options[:common_group_column].is_a?(String)
+        head = [columns.shift]
+        head << options[:common_course_column] if options[:common_course_column].is_a?(String)
+        head << options[:common_group_column] if options[:common_group_column].is_a?(String)
+        columns.unshift(head)
+      end
+
+      scope = scope.group(MessageableUser.connection.group_by(*columns))
     end
 
-    scope = self
-            .select(MessageableUser.build_select(options))
-            .group(MessageableUser.connection.group_by(*columns))
-            .order(User.sortable_name_order_by_clause).order(Arel.sql("users.id"))
+    scope = scope.order(User.sortable_name_order_by_clause).order(Arel.sql("users.id"))
 
     if options[:strict_checks]
       scope.where(AVAILABLE_CONDITIONS)

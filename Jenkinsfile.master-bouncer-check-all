@@ -30,7 +30,6 @@ pipeline {
 
   environment {
     // we only use this
-    PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:master"
     GERRIT_BRANCH = 'master'
     GERGICH_REVIEW_LABEL = 'Lint-Review'
     MASTER_BOUNCER_KEY = credentials('master-bouncer-key')

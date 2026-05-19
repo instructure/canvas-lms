@@ -20,16 +20,20 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {Provider} from 'react-redux'
 
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 import * as AssignmentActions from '../../assignment/AssignmentActions'
 import * as GradeActions from '../../grades/GradeActions'
 import * as StudentActions from '../../students/StudentActions'
 import FlashMessageHolder from '../FlashMessageHolder'
 import configureStore from '../../configureStore'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 describe('GradeSummary FlashMessageHolder', () => {
   let storeEnv

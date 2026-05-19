@@ -91,54 +91,19 @@ module Lti
         end
 
         context "with course term ended, but not for teachers" do
-          context "with ags_improved_course_concluded_check disabled" do
-            before do
-              Account.site_admin.disable_feature!(:ags_improved_course_concluded_check)
-            end
+          it "processes the request" do
+            term = context.enrollment_term
+            term.update!(end_at: 1.day.ago)
+            section = context.course_sections.create!(
+              name: "Active Section",
+              start_at: 2.days.ago,
+              end_at: 1.day.from_now,
+              restrict_enrollments_to_section_dates: true
+            )
+            student_in_section(section, { user: })
 
-            it "processes the request" do
-              term = context.enrollment_term
-              term.update!(end_at: 1.day.ago)
-              term.set_overrides(
-                context.account,
-                "TeacherEnrollment" => { end_at: 1.day.from_now }
-              )
-
-              get :index, params: valid_params
-              expect(response).to be_successful
-            end
-
-            it "does not handle sections" do
-              term = context.enrollment_term
-              term.update!(end_at: 1.day.ago)
-              section = context.course_sections.create!(
-                name: "Active Section",
-                start_at: 2.days.ago,
-                end_at: 1.day.from_now,
-                restrict_enrollments_to_section_dates: true
-              )
-              student_in_section(section, { user: })
-
-              get :index, params: valid_params
-              expect(response).to have_http_status(:unprocessable_content)
-            end
-          end
-
-          context "with ags_improved_course_concluded_check enabled" do
-            it "processes the request" do
-              term = context.enrollment_term
-              term.update!(end_at: 1.day.ago)
-              section = context.course_sections.create!(
-                name: "Active Section",
-                start_at: 2.days.ago,
-                end_at: 1.day.from_now,
-                restrict_enrollments_to_section_dates: true
-              )
-              student_in_section(section, { user: })
-
-              get :index, params: valid_params
-              expect(response).to be_successful
-            end
+            get :index, params: valid_params
+            expect(response).to be_successful
           end
         end
 

@@ -31,6 +31,7 @@ interface UseLanguageFilteringReturn {
 /**
  * Filters available languages based on already-selected subtitles
  * Excludes non-inherited languages that are already selected
+ * (includes both manual uploads and auto-generated captions)
  */
 export function useLanguageFiltering({
   allLanguages,

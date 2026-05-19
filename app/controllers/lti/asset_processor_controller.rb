@@ -20,7 +20,6 @@
 module Lti
   class AssetProcessorController < ApplicationController
     before_action { require_feature_enabled :lti_asset_processor }
-    before_action :require_user
     before_action :require_asset_processor, except: [:resubmit_discussion_notices_all]
     before_action :require_context
     before_action :require_access_to_context
@@ -64,15 +63,15 @@ module Lti
           .order(:discussion_entry_id, version: :desc)
           .preload(:discussion_entry, :user, :root_account)
           .find_in_batches(batch_size: 100) do |versions|
-            Lti::AssetProcessorDiscussionNotifier.delay_if_production.notify_asset_processors_of_discussion(
-              assignment:,
-              submission:,
-              discussion_entry_versions: versions,
-              contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED,
-              current_user: student,
-              asset_processor: nil,
-              tool_id: nil
-            )
+          Lti::AssetProcessorDiscussionNotifier.delay_if_production.notify_asset_processors_of_discussion(
+            assignment:,
+            submission:,
+            discussion_entry_versions: versions,
+            contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED,
+            current_user: student,
+            asset_processor: nil,
+            tool_id: nil
+          )
         end
       end
 

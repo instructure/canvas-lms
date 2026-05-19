@@ -18,12 +18,20 @@
  */
 
 import React from 'react'
-import {render, fireEvent, within} from '@testing-library/react'
+import {render, fireEvent, within, waitFor} from '@testing-library/react'
 import NavMenuLinksSettings from '../NavMenuLinksSettings'
 import {useNavMenuLinksStore} from '../useNavMenuLinksStore'
+import {confirmDanger} from '@instructure/platform-instui-bindings'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock the store
 vi.mock('../useNavMenuLinksStore')
+
+// Mock confirmDanger
+vi.mock('@instructure/platform-instui-bindings', async () => ({
+  ...(await vi.importActual<typeof import('@instructure/platform-instui-bindings')>('@instructure/platform-instui-bindings')),
+  confirmDanger: vi.fn(),
+}))
 
 // Mock the AddLinkModal
 vi.mock('@canvas/nav-menu-links/react/components/AddLinkModal', () => ({
@@ -45,6 +53,15 @@ vi.mock('@canvas/nav-menu-links/react/components/AddLinkModal', () => ({
 describe('NavMenuLinksSettings', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    fakeENV.setup({
+      PERMISSIONS: {
+        manage_nav_menu_links: true,
+      },
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
   })
 
   it('renders empty list when no links exist', () => {
@@ -98,29 +115,100 @@ describe('NavMenuLinksSettings', () => {
     })
   })
 
-  it('calls deleteLink when delete is clicked', () => {
-    const mockDeleteLink = vi.fn()
+  it('shows confirmation dialog when delete is clicked', async () => {
+    vi.mocked(confirmDanger).mockResolvedValue(false)
     vi.mocked(useNavMenuLinksStore).mockReturnValue({
-      links: [{type: 'existing', id: '1', label: 'Link to Delete'}],
+      links: [
+        {
+          type: 'existing',
+          id: '1',
+          url: 'https://example.com',
+          label: 'Link to Delete',
+          placements: {course_nav: true, account_nav: false, user_nav: false},
+        },
+      ],
+      appendLink: vi.fn(),
+      deleteLink: vi.fn(),
+    })
+
+    const {getByRole} = render(<NavMenuLinksSettings />)
+
+    fireEvent.click(getByRole('button', {name: 'Delete Link to Delete'}))
+
+    await waitFor(() =>
+      expect(confirmDanger).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'Delete Custom Link',
+          confirmButtonLabel: 'Delete',
+        }),
+      ),
+    )
+  })
+
+  it('calls deleteLink when confirmed', async () => {
+    const mockDeleteLink = vi.fn()
+    vi.mocked(confirmDanger).mockResolvedValue(true)
+    vi.mocked(useNavMenuLinksStore).mockReturnValue({
+      links: [
+        {
+          type: 'existing',
+          id: '1',
+          url: 'https://example.com',
+          label: 'Link to Delete',
+          placements: {course_nav: true, account_nav: false, user_nav: false},
+        },
+      ],
       appendLink: vi.fn(),
       deleteLink: mockDeleteLink,
     })
 
-    const {getByRole, getByText} = render(<NavMenuLinksSettings />)
+    const {getByRole} = render(<NavMenuLinksSettings />)
 
-    const menuButton = getByRole('button', {name: /Settings for Link to Delete/i})
-    fireEvent.click(menuButton)
+    fireEvent.click(getByRole('button', {name: 'Delete Link to Delete'}))
 
-    const deleteButton = getByRole('menuitem', {name: /Delete/i})
-    fireEvent.click(deleteButton)
+    await waitFor(() => expect(mockDeleteLink).toHaveBeenCalledWith(0))
+  })
 
-    expect(mockDeleteLink).toHaveBeenCalledWith(0)
+  it('does not call deleteLink when dismissed', async () => {
+    const mockDeleteLink = vi.fn()
+    vi.mocked(confirmDanger).mockResolvedValue(false)
+    vi.mocked(useNavMenuLinksStore).mockReturnValue({
+      links: [
+        {
+          type: 'existing',
+          id: '1',
+          url: 'https://example.com',
+          label: 'Link to Delete',
+          placements: {course_nav: true, account_nav: false, user_nav: false},
+        },
+      ],
+      appendLink: vi.fn(),
+      deleteLink: mockDeleteLink,
+    })
+
+    const {getByRole} = render(<NavMenuLinksSettings />)
+
+    fireEvent.click(getByRole('button', {name: 'Delete Link to Delete'}))
+
+    await waitFor(() => expect(confirmDanger).toHaveBeenCalled())
+    expect(mockDeleteLink).not.toHaveBeenCalled()
   })
 
   it('renders hidden input with serialized links JSON', () => {
     const links = [
-      {type: 'existing', id: '1', label: 'Link 1'},
-      {type: 'new', url: 'https://example.com/new', label: 'New Link'},
+      {
+        type: 'existing',
+        id: '1',
+        url: 'https://example.com/link-1',
+        label: 'Link 1',
+        placements: {course_nav: true, account_nav: false, user_nav: false},
+      },
+      {
+        type: 'new',
+        url: 'https://example.com/new',
+        label: 'New Link',
+        placements: {course_nav: true, account_nav: false, user_nav: false},
+      },
     ]
 
     vi.mocked(useNavMenuLinksStore).mockReturnValue({
@@ -136,12 +224,74 @@ describe('NavMenuLinksSettings', () => {
     expect(hiddenInput?.getAttribute('value')).toBe(JSON.stringify(links))
   })
 
+  it('shows url as external link for new links', () => {
+    vi.mocked(useNavMenuLinksStore).mockReturnValue({
+      links: [
+        {
+          type: 'new',
+          url: 'https://example.com/my-link',
+          label: 'My Link',
+          placements: {course_nav: true, account_nav: false, user_nav: false},
+        },
+      ],
+      appendLink: vi.fn(),
+      deleteLink: vi.fn(),
+    })
+
+    const {getByText, getByRole} = render(<NavMenuLinksSettings />)
+
+    expect(getByText('My Link')).toBeInTheDocument()
+    const link = getByRole('link', {name: /https:\/\/example\.com\/my-link/})
+    expect(link).toHaveAttribute('href', 'https://example.com/my-link')
+    expect(link).toHaveAttribute('target', '_blank')
+  })
+
+  it('shows url as external link for existing links', () => {
+    vi.mocked(useNavMenuLinksStore).mockReturnValue({
+      links: [
+        {
+          type: 'existing',
+          id: '1',
+          url: 'https://example.com/existing',
+          label: 'Existing Link',
+          placements: {course_nav: true, account_nav: false, user_nav: false},
+        },
+      ],
+      appendLink: vi.fn(),
+      deleteLink: vi.fn(),
+    })
+
+    const {getByText, getByRole} = render(<NavMenuLinksSettings />)
+
+    expect(getByText('Existing Link')).toBeInTheDocument()
+    const link = getByRole('link', {name: /https:\/\/example\.com\/existing/})
+    expect(link).toHaveAttribute('href', 'https://example.com/existing')
+    expect(link).toHaveAttribute('target', '_blank')
+  })
+
   it('renders links in correct order', () => {
     vi.mocked(useNavMenuLinksStore).mockReturnValue({
       links: [
-        {type: 'existing', id: '1', label: 'First Link'},
-        {type: 'existing', id: '2', label: 'Second Link'},
-        {type: 'new', url: 'https://example.com', label: 'Third Link'},
+        {
+          type: 'existing',
+          id: '1',
+          url: 'https://example.com/first',
+          label: 'First Link',
+          placements: {course_nav: true, account_nav: false, user_nav: false},
+        },
+        {
+          type: 'existing',
+          id: '2',
+          url: 'https://example.com/second',
+          label: 'Second Link',
+          placements: {course_nav: false, account_nav: true, user_nav: false},
+        },
+        {
+          type: 'new',
+          url: 'https://example.com',
+          label: 'Third Link',
+          placements: {course_nav: false, account_nav: false, user_nav: true},
+        },
       ],
       appendLink: vi.fn(),
       deleteLink: vi.fn(),

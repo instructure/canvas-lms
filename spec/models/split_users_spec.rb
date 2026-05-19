@@ -34,16 +34,16 @@ describe SplitUsers do
       UserMerge.from(restored_user).into(source_user)
       SplitUsers.split_db_users(restored_user)
       expect(restored_user.reload.preferences[:accepted_terms]).to be_nil
-      expect(source_user.reload.preferences[:accepted_terms]).to_not be_nil
+      expect(source_user.reload.preferences[:accepted_terms]).not_to be_nil
     end
 
     it "restores terms_of use other way" do
       restored_user.accept_terms
       restored_user.save!
       UserMerge.from(restored_user).into(source_user)
-      expect(source_user.reload.preferences[:accepted_terms]).to_not be_nil
+      expect(source_user.reload.preferences[:accepted_terms]).not_to be_nil
       SplitUsers.split_db_users(source_user)
-      expect(restored_user.reload.preferences[:accepted_terms]).to_not be_nil
+      expect(restored_user.reload.preferences[:accepted_terms]).not_to be_nil
       expect(source_user.reload.preferences[:accepted_terms]).to be_nil
     end
 
@@ -63,8 +63,8 @@ describe SplitUsers do
       source_user.save!
       UserMerge.from(restored_user).into(source_user)
       SplitUsers.split_db_users(source_user)
-      expect(source_user.reload.preferences[:accepted_terms]).to_not be_nil
-      expect(restored_user.reload.preferences[:accepted_terms]).to_not be_nil
+      expect(source_user.reload.preferences[:accepted_terms]).not_to be_nil
+      expect(restored_user.reload.preferences[:accepted_terms]).not_to be_nil
     end
 
     it "restores names" do
@@ -620,6 +620,88 @@ describe SplitUsers do
       expect(admin2.user).to eq restored_user
       expect(admin3.reload.workflow_state).to eq "active"
       expect(admin3.reload.user).to eq source_user
+    end
+
+    it "restores reactivated admin to its prior workflow_state on split" do
+      target_admin = account1.account_users.create!(user: source_user)
+      target_admin.destroy
+      account1.account_users.create!(user: restored_user)
+
+      UserMerge.from(restored_user).into(source_user)
+      expect(target_admin.reload.workflow_state).to eq "active"
+
+      SplitUsers.split_db_users(source_user)
+
+      target_admin.reload
+      expect(target_admin.workflow_state).to eq "deleted"
+      expect(target_admin.user).to eq source_user
+    end
+
+    context "with institutional tag associations" do
+      let(:tag) { institutional_tag_model(account: account1) }
+      let(:tag2) { institutional_tag_model(account: account1, name: "Other Tag", description: "Another tag") }
+
+      it "restores moved tag associations to the original user" do
+        assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: restored_user)
+        UserMerge.from(restored_user).into(source_user)
+        expect(assoc.reload.user_id).to eq source_user.id
+        SplitUsers.split_db_users(source_user)
+        expect(assoc.reload.user_id).to eq restored_user.id
+        expect(assoc.reload.workflow_state).to eq "active"
+      end
+
+      it "reactivates soft-deleted conflict associations on the original user" do
+        InstitutionalTagAssociation.create!(institutional_tag: tag, context: source_user)
+        from_assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: restored_user)
+        UserMerge.from(restored_user).into(source_user)
+        expect(from_assoc.reload.workflow_state).to eq "deleted"
+        SplitUsers.split_db_users(source_user)
+        expect(from_assoc.reload.workflow_state).to eq "active"
+        expect(from_assoc.reload.user_id).to eq restored_user.id
+      end
+
+      it "leaves post-merge tags on the source user untouched" do
+        UserMerge.from(restored_user).into(source_user)
+        post_merge_assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: source_user)
+        SplitUsers.split_db_users(source_user)
+        expect(post_merge_assoc.reload.user_id).to eq source_user.id
+        expect(post_merge_assoc.reload.workflow_state).to eq "active"
+      end
+
+      it "skips restoring a moved association when restored_user already has that tag active" do
+        assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: restored_user)
+        UserMerge.from(restored_user).into(source_user)
+        # Simulate restored_user independently gaining the same tag (e.g. SIS import)
+        duplicate = InstitutionalTagAssociation.create!(institutional_tag: tag, context: restored_user)
+        SplitUsers.split_db_users(source_user)
+        # The moved assoc should stay on source_user since restored_user already has it
+        expect(assoc.reload.user_id).to eq source_user.id
+        expect(duplicate.reload.user_id).to eq restored_user.id
+        expect(duplicate.reload.workflow_state).to eq "active"
+      end
+
+      it "does not change the tag category's account during split" do
+        InstitutionalTagAssociation.create!(institutional_tag: tag, context: restored_user)
+        original_account_id = tag.category.account_id
+        original_category_id = tag.category_id
+        UserMerge.from(restored_user).into(source_user)
+        SplitUsers.split_db_users(source_user)
+        expect(tag.category.reload.account_id).to eq original_account_id
+        expect(tag.reload.category_id).to eq original_category_id
+      end
+
+      it "does not modify root_account_id on the association during split" do
+        root_acct = Account.create!
+        sub_acct = root_acct.sub_accounts.create!
+        sub_tag = institutional_tag_model(account: sub_acct)
+        assoc = InstitutionalTagAssociation.create!(institutional_tag: sub_tag, context: restored_user)
+        expect(assoc.root_account_id).to eq root_acct.id
+        UserMerge.from(restored_user).into(source_user)
+        SplitUsers.split_db_users(source_user)
+        # root_account_id is still derived through tag -> category -> account, unchanged
+        expect(assoc.reload.root_account_id).to eq root_acct.id
+        expect(assoc.reload.root_account_id).to eq sub_tag.reload.root_account_id
+      end
     end
 
     context "sharding" do

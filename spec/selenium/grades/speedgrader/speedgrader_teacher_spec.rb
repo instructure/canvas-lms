@@ -479,7 +479,7 @@ describe "SpeedGrader" do
       # Verify that the grade is .5
       wait_for_ajaximations
       expect { f("#grading-box-extended")["value"] }.to become("3.5")
-      expect(f("#students_selectmenu-button")).to_not have_class("not_graded")
+      expect(f("#students_selectmenu-button")).not_to have_class("not_graded")
       expect(f("#students_selectmenu-button")).to have_class("graded")
     end
   end

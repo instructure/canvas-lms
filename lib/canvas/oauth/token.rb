@@ -78,7 +78,7 @@ module Canvas::OAuth
       Canvas.redis.get("#{REDIS_PREFIX}#{code}").presence || "{}"
     end
 
-    def create_access_token_if_needed(replace_tokens = false)
+    def create_access_token_if_needed(replace_tokens: false)
       @access_token ||= self.class.find_reusable_access_token(user, key, scopes, purpose, real_user:)
 
       if @access_token.nil?

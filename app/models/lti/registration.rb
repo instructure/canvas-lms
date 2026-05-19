@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Lti::Registration < ActiveRecord::Base
+class Lti::Registration < ApplicationRecord
   DEFAULT_PRIVACY_LEVEL = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
   CANVAS_EXTENSION_LABEL = "canvas.instructure.com"
   TRACKED_ATTRIBUTES = %w[
@@ -26,6 +26,7 @@ class Lti::Registration < ActiveRecord::Base
     vendor
     workflow_state
     description
+    lock_deploying
   ].freeze
 
   extend RootAccountResolver
@@ -55,12 +56,32 @@ class Lti::Registration < ActiveRecord::Base
   has_one :manual_configuration, class_name: "Lti::ToolConfiguration", inverse_of: :lti_registration, foreign_key: :lti_registration_id
 
   has_many :deployments, class_name: "ContextExternalTool", inverse_of: :lti_registration, foreign_key: :lti_registration_id
+  alias_method :old_deployments, :deployments
+  has_many :app_deployments, class_name: "ContextExternalTool", foreign_key: :app_id, inverse_of: :app
+
+  def deployments
+    root_account&.feature_enabled?(:lti_registrations_templates) ? app_deployments : super
+  end
+
   has_one :developer_key, inverse_of: :lti_registration, foreign_key: :lti_registration_id
 
   has_many :lti_registration_account_bindings, class_name: "Lti::RegistrationAccountBinding", inverse_of: :registration
   has_many :lti_overlays, class_name: "Lti::Overlay", inverse_of: :registration
   has_many :lti_registration_history_entries, class_name: "Lti::RegistrationHistoryEntry", inverse_of: :lti_registration
+  alias_method :old_lti_registration_history_entries, :lti_registration_history_entries
+  has_many :app_history_entries, class_name: "Lti::RegistrationHistoryEntry", foreign_key: :app_id, inverse_of: :app
+
+  def lti_registration_history_entries
+    root_account&.feature_enabled?(:lti_registrations_templates) ? app_history_entries : old_lti_registration_history_entries
+  end
+
   has_many :context_controls, class_name: "Lti::ContextControl", inverse_of: :registration
+  alias_method :old_context_controls, :context_controls
+  has_many :app_context_controls, class_name: "Lti::ContextControl", foreign_key: :app_id, inverse_of: :app
+
+  def context_controls
+    root_account&.feature_enabled?(:lti_registrations_templates) ? app_context_controls : old_context_controls
+  end
 
   validates :name, :admin_nickname, :vendor, length: { maximum: 255 }
   validates :description, length: { maximum: 2048 }, allow_blank: true
@@ -74,6 +95,25 @@ class Lti::Registration < ActiveRecord::Base
   resolves_root_account through: :account
 
   before_destroy :destroy_associations
+
+  # Returns the local copy of this Registration for the given account, if one exists.
+  # If this Registration is not a template or is already the local copy, returns self.
+  #
+  # @return [Lti::Registration | nil]
+  def local_copy_for(account)
+    return self if root_account == account
+
+    local_copy = local_copies.shard(account.shard).find_by(template_registration: self, account:)
+
+    if local_copy.blank?
+      if account.feature_enabled?(:lti_registrations_templates)
+        raise Lti::LocalAppNotFound
+      else
+        Canvas::Errors.capture_exception(Lti::LocalAppNotFound, "No local copy found for registration #{global_id} on account #{account.global_id}")
+      end
+    end
+    local_copy
+  end
 
   # Searches for an applicable binding for this Registration and Account in
   # the given root account, its parent root account (for federated consortia), and Site Admin.
@@ -196,16 +236,12 @@ class Lti::Registration < ActiveRecord::Base
     end
   end
 
-  # Returns true if this Registration is from a different account than the given account.
+  # Returns true if this Registration is inherited from somewhere else like Site Admin.
   #
   # This will not properly account for a possible future scenario where the account is
   # for a _sub_ account underneath the registration's root account.
   def inherited_for?(account)
-    if self.account.feature_enabled?(:lti_registrations_templates)
-      inherited_from_template?
-    else
-      account != self.account
-    end
+    inherited_from_template? || account != self.account
   end
 
   def inherited_from_template?
@@ -238,9 +274,10 @@ class Lti::Registration < ActiveRecord::Base
   # overlay for said context, if one exists, will be applied to the configuration.
   # @param [Account | Course | nil] context The context for which to generate the configuration.
   # @param [Boolean] include_overlay Whether or not to apply the overlay to the configuration.
+  # @param [Lti::Overlay | nil] overlay An optional overlay object to apply directly.
   # @return [Hash] A Hash conforming to the InternalLtiConfiguration schema.
   # TODO: this will eventually need to account for 1.1 registrations
-  def internal_lti_configuration(context: nil, include_overlay: true)
+  def internal_lti_configuration(context: nil, include_overlay: true, overlay: nil)
     # hack; remove the need to look for developer_key.tool_configuration and ensure that is
     # always available as manual_configuration. This would need to happen in an after_save
     # callback on the developer key.
@@ -250,12 +287,9 @@ class Lti::Registration < ActiveRecord::Base
 
     return internal_config unless include_overlay
 
-    overlay = overlay_for(context)&.data
+    overlay_data = overlay&.data || overlay_for(context)&.data
 
-    # IMS registrations should not allow adding new placements via overlay
-    # Only manual/legacy registrations can have additional placements added
-    additive = ims_registration.blank?
-    Lti::Overlay.apply_to(overlay, internal_config, additive:)
+    Lti::Overlay.apply_to(overlay_data, internal_config)
   end
 
   # Returns a Hash that's usable with the ContextExternalToolImporter to create a new ContextExternalTool.
@@ -328,6 +362,7 @@ class Lti::Registration < ActiveRecord::Base
   # Additionally, dependent: :destroy removes the bindings from the association which we do not want.
   # Finally, dependent: :destroy on the tool_configuration will also hard delete it, which we also don't want.
   def destroy_associations
+    manual_configuration&.destroy
     ims_registration&.destroy
     unless inherited_from_template?
       developer_key&.destroy

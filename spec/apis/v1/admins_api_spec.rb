@@ -154,6 +154,19 @@ describe "Admins API", type: :request do
                    { user_id: @new_user.id })
       expect(response).to have_http_status :not_found
     end
+
+    # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+    # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+    it "passes current_user to SisPseudonym.for" do
+      allow(SisPseudonym).to receive(:for).and_call_original
+      expect(SisPseudonym).to receive(:for)
+        .with(@new_user, anything, hash_including(current_user: @admin))
+        .and_call_original
+      api_call(:post,
+               "/api/v1/accounts/#{@admin.account.id}/admins",
+               { controller: "admins", action: "create", format: "json", account_id: @admin.account.id.to_s },
+               { user_id: @new_user.id })
+    end
   end
 
   describe "destroy" do

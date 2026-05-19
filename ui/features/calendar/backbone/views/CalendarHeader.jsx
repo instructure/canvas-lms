@@ -24,7 +24,7 @@ import CalendarNavigator from './CalendarNavigator'
 import {publish, subscribe} from 'jquery-tinypubsub'
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import CalendarHeaderComponent from '../../react/CalendarHeaderComponent'
 
 extend(CalendarHeader, Backbone.View)
@@ -240,7 +240,7 @@ CalendarHeader.prototype.afterRender = function () {
     return this._loadObjects()
   }
 
-  ReactDOM.render(
+  legacyRender(
     <CalendarHeaderComponent
       bridge={{
         onLoadReady: options => {

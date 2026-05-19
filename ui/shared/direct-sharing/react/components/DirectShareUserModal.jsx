@@ -22,13 +22,14 @@ import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {CONTENT_SHARE_TYPES} from '@canvas/content-sharing/react/proptypes/contentShare'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess} from '@instructure/platform-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {captureException} from '@sentry/react'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const I18n = createI18nScope('direct_share_user_modal')
 
@@ -153,6 +154,8 @@ export default function DirectShareUserModal({id, contentShare, courseId, ...mod
       size="medium"
       footer={<Footer />}
       data-testid="send-to-item-modal"
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
       {...modalProps}
     >
       <Suspense fallback={suspenseFallback}>

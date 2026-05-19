@@ -19,8 +19,11 @@
 import React, {useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
+import {FormFieldGroup} from '@instructure/ui-form-field'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconPeerReviewLine, IconSettingsLine} from '@instructure/ui-icons'
 import {PeerReviewConfigurationTray} from './PeerReviewConfigurationTray'
 import PeerReviewAllocationRulesTray from './PeerReviewAllocationRulesTray'
@@ -52,36 +55,45 @@ export const PeerReviewWidget = ({assignmentId, courseId}: PeerReviewWidgetProps
         borderWidth="small"
         padding="small"
       >
-        <View>
-          <IconPeerReviewLine />
-          <View as="div" margin="0 0 0 small" display="inline-block">
-            <Text>{I18n.t('Peer Review')}</Text>
-          </View>
-
-          <Button
-            margin="0 0 0 x-large"
-            renderIcon={<IconSettingsLine />}
-            data-testid="view-configuration-button"
-            aria-label={I18n.t('View Peer Review Configuration')}
-            onClick={() => {
-              setIsAllocationTrayOpen(false)
-              setIsConfigTrayOpen(true)
-            }}
-          >
-            {I18n.t('View Configuration')}
-          </Button>
-          <Button
-            margin="0 0 0 small"
-            data-testid="allocate-peer-reviews-button"
-            aria-label={I18n.t('Open Peer Review Allocation Tray')}
-            onClick={() => {
-              setIsConfigTrayOpen(false)
-              setIsAllocationTrayOpen(true)
-            }}
-          >
-            {I18n.t('Allocate Peer Reviews')}
-          </Button>
-        </View>
+        <FormFieldGroup
+          description={<ScreenReaderContent>{I18n.t('Peer Review')}</ScreenReaderContent>}
+        >
+          <Flex alignItems="center" gap="small">
+            <Flex.Item>
+              <IconPeerReviewLine />
+            </Flex.Item>
+            <Flex.Item>
+              <Text aria-hidden="true" data-testid="peer-review-text">
+                {I18n.t('Peer Review')}
+              </Text>
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 medium">
+              <Button
+                renderIcon={<IconSettingsLine />}
+                data-testid="view-configuration-button"
+                aria-label={I18n.t('View Peer Review Configuration')}
+                onClick={() => {
+                  setIsAllocationTrayOpen(false)
+                  setIsConfigTrayOpen(true)
+                }}
+              >
+                {I18n.t('View Configuration')}
+              </Button>
+            </Flex.Item>
+            <Flex.Item>
+              <Button
+                data-testid="allocate-peer-reviews-button"
+                aria-label={I18n.t('Open Peer Review Allocation Tray')}
+                onClick={() => {
+                  setIsConfigTrayOpen(false)
+                  setIsAllocationTrayOpen(true)
+                }}
+              >
+                {I18n.t('Allocate Peer Reviews')}
+              </Button>
+            </Flex.Item>
+          </Flex>
+        </FormFieldGroup>
       </View>
       <PeerReviewConfigurationTray
         assignmentId={assignmentId}

@@ -578,20 +578,37 @@ describe ConversationMessage do
       student_in_course(active_all: true)
     end
 
-    it "returns true when feature is enabled on any root account" do
-      Account.default.enable_feature!(:file_association_access)
-      account2 = Account.create!
+    it "returns true when file_association_access_conversation is enabled" do
+      Account.default.enable_feature!(:file_association_access_conversation)
       conversation = @teacher.initiate_conversation([@student])
       message = conversation.add_message("test", root_account_id: Account.default.id)
-      message.root_account_ids = "#{Account.default.id},#{account2.id}"
 
       expect(message.attachment_associations_enabled?).to be true
     end
 
-    it "returns false when feature is disabled on root account" do
-      Account.default.disable_feature!(:file_association_access)
+    it "returns true on any root account with the flag enabled" do
+      account1 = Account.create!
+      account1.enable_feature!(:file_association_access_conversation)
+
       conversation = @teacher.initiate_conversation([@student])
       message = conversation.add_message("test", root_account_id: Account.default.id)
+      message.root_account_ids = "#{Account.default.id},#{account1.id}"
+
+      expect(message.attachment_associations_enabled?).to be true
+    end
+
+    it "returns false when feature is disabled" do
+      Account.default.disable_feature!(:file_association_access_conversation)
+      conversation = @teacher.initiate_conversation([@student])
+      message = conversation.add_message("test", root_account_id: Account.default.id)
+
+      expect(message.attachment_associations_enabled?).to be false
+    end
+
+    it "handles nil root_account_ids" do
+      conversation = @teacher.initiate_conversation([@student])
+      message = conversation.add_message("test", root_account_id: Account.default.id)
+      message.root_account_ids = nil
 
       expect(message.attachment_associations_enabled?).to be false
     end
@@ -601,7 +618,7 @@ describe ConversationMessage do
     before :once do
       course_with_teacher(active_all: true)
       student_in_course(active_all: true)
-      Account.default.enable_feature!(:file_association_access)
+      Account.default.enable_feature!(:file_association_access_conversation)
     end
 
     let(:attachment) { attachment_model(context: @teacher, folder: @teacher.conversation_attachments_folder) }
@@ -628,7 +645,7 @@ describe ConversationMessage do
     end
 
     it "denies access when feature flag is disabled" do
-      Account.default.disable_feature!(:file_association_access)
+      Account.default.disable_feature!(:file_association_access_conversation)
       conversation = @teacher.initiate_conversation([@student])
       message = conversation.add_message("test with attachment", attachment_ids: [attachment.id], root_account_id: Account.default.id)
 
@@ -805,6 +822,85 @@ describe ConversationMessage do
                     })
       cp2.reload
       expect(cp2.workflow_state).to eq "read"
+    end
+  end
+
+  describe "#exclude_pending_temporary_enrollment_recipients" do
+    before :once do
+      Account.default.enable_feature!(:temporary_enrollments)
+      @provider = user_factory(active_all: true)
+      @course = course_with_teacher(active_all: true, user: @provider).course
+      @pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default, created_by: account_admin_user)
+
+      @active_student = user_factory(active_all: true)
+      @course.enroll_student(@active_student, enrollment_state: "active")
+
+      @future_recipient = user_factory(active_all: true)
+      temp_enrollment = @course.enroll_user(
+        @future_recipient,
+        "TeacherEnrollment",
+        {
+          role: teacher_role,
+          temporary_enrollment_source_user_id: @provider.id,
+          temporary_enrollment_pairing_id: @pairing.id,
+        }
+      )
+      temp_enrollment.update!(start_at: 1.day.from_now, end_at: 1.week.from_now)
+
+      [@provider, @active_student, @future_recipient].each do |user|
+        communication_channel(user, { username: "test_#{user.id}@test.com", active_cc: true })
+      end
+    end
+
+    it "excludes users with only future temporary enrollments from recipients" do
+      conversation = @provider.initiate_conversation([@active_student, @future_recipient])
+      message = conversation.add_message("test", root_account_id: Account.default.id)
+
+      recipient_ids = message.recipients.map(&:id)
+      expect(recipient_ids).to include(@active_student.id)
+      expect(recipient_ids).not_to include(@future_recipient.id)
+    end
+
+    it "does not exclude users whose temporary enrollment has already started" do
+      active_recipient = user_factory(active_all: true)
+      communication_channel(active_recipient, { username: "active_temp_#{active_recipient.id}@test.com", active_cc: true })
+      active_temp = @course.enroll_user(
+        active_recipient,
+        "TeacherEnrollment",
+        {
+          role: teacher_role,
+          temporary_enrollment_source_user_id: @provider.id,
+          temporary_enrollment_pairing_id: @pairing.id,
+        }
+      )
+      active_temp.update!(start_at: 1.day.ago, end_at: 1.week.from_now)
+
+      conversation = @provider.initiate_conversation([@active_student, active_recipient])
+      message = conversation.add_message("test", root_account_id: Account.default.id)
+
+      expect(message.recipients.map(&:id)).to include(active_recipient.id)
+    end
+
+    context "when feature flag is disabled" do
+      before { Account.default.disable_feature!(:temporary_enrollments) }
+      after { Account.default.enable_feature!(:temporary_enrollments) }
+
+      it "does not filter recipients" do
+        conversation = @provider.initiate_conversation([@active_student, @future_recipient])
+        message = conversation.add_message("test", root_account_id: Account.default.id)
+
+        expect(message.recipients.map(&:id)).to include(@future_recipient.id)
+      end
+    end
+
+    it "keeps users who have both a future temp enrollment and an active regular enrollment" do
+      # Give the future_recipient a regular active enrollment too
+      @course.enroll_student(@future_recipient, enrollment_state: "active")
+
+      conversation = @provider.initiate_conversation([@future_recipient])
+      message = conversation.add_message("test", root_account_id: Account.default.id)
+
+      expect(message.recipients.map(&:id)).to include(@future_recipient.id)
     end
   end
 end

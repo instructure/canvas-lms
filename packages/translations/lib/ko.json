@@ -17,14 +17,17 @@
     "add_alt_text_for_the_image_48cd88aa": {
         "message": "이미지의 대체 텍스트 추가"
     },
-    "add_another_f4e50d57": {
-        "message": "다른 항목 추가"
-    },
     "add_cc_subtitles_55f0394e": {
         "message": "CC/자막 추가"
     },
     "add_image_60b2de07": {
         "message": "이미지 추가"
+    },
+    "add_new_a9226085": {
+        "message": "새로 추가"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "새 캡션 추가"
     },
     "add_one_9e34a6f8": {
         "message": "추가하기!"
@@ -43,12 +46,6 @@
     },
     "afrikaans_da0fe6ee": {
         "message": "아프리카어"
-    },
-    "ai_response_9624e8e8": {
-        "message": "AI 응답"
-    },
-    "ai_tools_fda01177": {
-        "message": "AI 도구"
     },
     "albanian_21ed929e": {
         "message": "알바니아어"
@@ -94,9 +91,6 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "네트워크 요청을 만드는 데 오류가 발생했습니다"
-    },
-    "an_error_occurred_processing_your_request_a3a38d84": {
-        "message": "요청을 처리하는 데 오류가 발생했습니다"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "미디어를 업로드하는 데 오류가 발생했습니다."
@@ -176,6 +170,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "자동 저장된 콘텐츠가 있습니다. 대신에 자동 저장된 콘텐츠를 로드하시겠습니까?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "자동 캡션"
+    },
     "available_folders_694d0436": {
         "message": "사용 가능한 폴더"
     },
@@ -248,6 +245,27 @@
     "cap_product_3a5265a6": {
         "message": "교집합"
     },
+    "caption_generation_failed_7312f917": {
+        "message": "캡션을 생성하지 못함"
+    },
+    "caption_manager_aae0906f": {
+        "message": "캡션 매니저"
+    },
+    "captionname_caption_delete_failed_3afa617e": {
+        "message": "{ captionName } 캡션을 삭제하지 못함"
+    },
+    "captionname_caption_generation_failed_6fd29bfe": {
+        "message": "{ captionName } 캡션을 생성하지 못함"
+    },
+    "captionname_caption_upload_failed_fa0f13a4": {
+        "message": "{ captionName } 캡션을 업로드하지 못함"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "{ lang }의 캡션을 추가했습니다"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "{ lang }의 캡션을 삭제했습니다"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "상위 과목에서 상속한 캡션을 제거할 수 없습니다."
     },
@@ -308,6 +326,12 @@
     "choose_caption_file_9c45bc4e": {
         "message": "캡션 파일 선택"
     },
+    "choose_file_8d89ccab": {
+        "message": "파일 선택"
+    },
+    "choose_file_required_61f0d716": {
+        "message": "파일 선택(필수)"
+    },
     "choose_usage_rights_33683854": {
         "message": "사용 권리를 선택..."
     },
@@ -346,6 +370,9 @@
     },
     "close_d634289d": {
         "message": "닫기"
+    },
+    "close_keyboard_shortcuts_modal_291ce074": {
+        "message": "키보드 바로 가기 키 모달 닫기"
     },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "자막 파일은 { maxKb }kb 미만이어야 합니다"
@@ -392,9 +419,6 @@
     "complex_numbers_a543d004": {
         "message": "복소수"
     },
-    "compose_44c904f4": {
-        "message": "작성"
-    },
     "computer_1d7dfa6f": {
         "message": "컴퓨터"
     },
@@ -424,9 +448,6 @@
     },
     "coproduct_e7838082": {
         "message": "쌍대곱"
-    },
-    "copy_9748f9f": {
-        "message": "복사"
     },
     "copyright_holder_66ee111": {
         "message": "저작권 보유자:"
@@ -500,9 +521,6 @@
     "custom_6979cd81": {
         "message": "사용자 지정"
     },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "사용자 지정 너비 및 높이(픽셀)"
-    },
     "cyan_c1d5f68a": {
         "message": "녹청"
     },
@@ -551,6 +569,9 @@
     "degree_symbol_4a823d5f": {
         "message": "도(각도) 기호"
     },
+    "delete_failed_6529e336": {
+        "message": "삭제 실패"
+    },
     "delimiters_4db4840d": {
         "message": "구분자"
     },
@@ -562,9 +583,6 @@
     },
     "describe_the_type_ff448da5": {
         "message": "({ TYPE } 설명)"
-    },
-    "describe_the_video_2fe8f46a": {
-        "message": "(동영상 설명)"
     },
     "description_436c48d7": {
         "message": "설명"
@@ -587,9 +605,6 @@
     "dimension_type_f5fa9170": {
         "message": "차원 유형"
     },
-    "dimensions_45ddb7b7": {
-        "message": "차원"
-    },
     "directionality_26ae9e08": {
         "message": "방향형"
     },
@@ -610,9 +625,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "분리합집합"
-    },
-    "dislike_14befc48": {
-        "message": "싫어요"
     },
     "display_options_315aba85": {
         "message": "표시 옵션"
@@ -649,6 +661,9 @@
     },
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "아래 및 오른쪽 대각선 화살표"
+    },
+    "download_captionname_2e5eea35": {
+        "message": "{ captionName } 다운로드"
     },
     "download_filename_2baae924": {
         "message": "{ filename } 다운로드"
@@ -716,9 +731,6 @@
     "embed_image_1080badc": {
         "message": "이미지 포함"
     },
-    "embed_options_44c4cba8": {
-        "message": "포함 옵션"
-    },
     "embed_video_a97a64af": {
         "message": "동영상 포함"
     },
@@ -758,6 +770,9 @@
     "english_united_kingdom_a613f831": {
         "message": "영어(영국)"
     },
+    "enter_a_media_title_81b490ec": {
+        "message": "미디어 제목 입력"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "최소 3자를 입력하여 검색"
     },
@@ -766,9 +781,6 @@
     },
     "enter_search_text_26cb4459": {
         "message": "검색 텍스트 입력"
-    },
-    "enter_text_8b35c65b": {
-        "message": "텍스트 입력"
     },
     "epsilon_54bb8afa": {
         "message": "엡실론"
@@ -824,6 +836,9 @@
     "extra_large_b6cdf1ff": {
         "message": "더 크게"
     },
+    "extra_large_width_x_height_px_915571fa": {
+        "message": "더 크게({ width } x { height }px)"
+    },
     "extra_small_9ae33252": {
         "message": "더 작게"
     },
@@ -839,11 +854,11 @@
     "failed_getting_file_contents_e9ea19f4": {
         "message": "파일 콘텐츠를 받지 못함"
     },
-    "failed_to_copy_response_d3def551": {
-        "message": "응답을 복사하지 못함"
-    },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "외부 도구에서 콘텐츠를 가져오지 못함"
+    },
+    "file_d1b70050": {
+        "message": "파일*"
     },
     "file_name_8fd421ff": {
         "message": "파일 이름"
@@ -1058,12 +1073,6 @@
     "height_69b03e15": {
         "message": "높이"
     },
-    "hello_please_describe_the_modifications_you_would__49b19837": {
-        "message": "안녕하세요. 구성/작문에 수정하려는 사항을 설명하세요."
-    },
-    "hello_please_describe_the_modifications_you_would__600dbbf0": {
-        "message": "안녕하세요. 선택에 수정하려는 사항을 설명하세요."
-    },
     "hexagon_d8468e0d": {
         "message": "6각형"
     },
@@ -1082,6 +1091,9 @@
     "home_351838cd": {
         "message": "홈"
     },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "어떻게 캡션을 요청 및 편집합니까?"
+    },
     "html_code_editor_fd967a44": {
         "message": "html 코드 편집기"
     },
@@ -1096,9 +1108,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "저작권을 보유합니다"
-    },
-    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
-        "message": "죄송합니다. AI의 응답을 찾을 수 없습니다"
     },
     "icelandic_9d6d35de": {
         "message": "아이슬란드어"
@@ -1277,8 +1286,17 @@
     "lambda_4f602498": {
         "message": "람다"
     },
+    "language_91effaa0": {
+        "message": "언어*"
+    },
     "language_arts_icon_a798b0f8": {
         "message": "어학 아이콘"
+    },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "이 미디어에서 구사하는 언어*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (자동)"
     },
     "languages_icon_9d20539": {
         "message": "언어 아이콘"
@@ -1288,6 +1306,9 @@
     },
     "large_text_e7ba08cd": {
         "message": "큰 텍스트"
+    },
+    "large_width_x_height_px_c61c2fd": {
+        "message": "크게({ width } x { height }px)"
     },
     "latvian_2bbb6aab": {
         "message": "라트비아어"
@@ -1397,6 +1418,12 @@
     "links_to_an_external_site_de74145d": {
         "message": "외부 사이트로 링크입니다."
     },
+    "list_collapsed_9ac35920": {
+        "message": "목록이 접혔습니다."
+    },
+    "list_expanded_efec2d0": {
+        "message": "목록이 펼쳐졌습니다."
+    },
     "lists_cd1336fc": {
         "message": "목록"
     },
@@ -1496,6 +1523,9 @@
     "medium_5a8e9ead": {
         "message": "중간"
     },
+    "medium_width_x_height_px_b076f6b6": {
+        "message": "중간({ width } x { height }px)"
+    },
     "merge_links_2478df96": {
         "message": "링크 병합"
     },
@@ -1525,9 +1555,6 @@
     },
     "miscellaneous_e9818229": {
         "message": "기타"
-    },
-    "modify_6b0b13e3": {
-        "message": "수정"
     },
     "module_90d9fd32": {
         "message": "모듈"
@@ -1742,6 +1769,9 @@
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "다음에서 기타 편집기 바로 가기를 찾을 수 있습니다"
     },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "이 기술은 약 85% 정확한 캡션을 생성합니다."
+    },
     "outline_color_3ef2cea7": {
         "message": "윤곽 색"
     },
@@ -1844,14 +1874,14 @@
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "{ createdAt }에서 { name } 님의 미디어 댓글을 재생합니다."
     },
+    "player_layout_14e09a29": {
+        "message": "플레이어 레이아웃"
+    },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Canvas에서 마이크 및 웹캠에 액세스를 허용하세요."
     },
     "please_choose_a_file_c2449cc": {
         "message": "파일을 선택하세요"
-    },
-    "please_decribe_what_you_would_like_to_compose_27a51be5": {
-        "message": "작성하려는 것을 설명하세요"
     },
     "please_enter_a_file_name_f159edc1": {
         "message": "파일 이름을 입력하세요"
@@ -1859,8 +1889,17 @@
     "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
         "message": "지원되는 플랫폼에서 유효한 동영상 URL을 입력하세요."
     },
+    "please_select_a_file_before_uploading_4cd6e2db": {
+        "message": "업로드하기 전에 파일을 선택하세요."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "지원하는 유형의 파일을 선택하세요"
+    },
+    "please_select_a_language_d90256fb": {
+        "message": "언어를 선택하세요"
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": ".vtt 또는 .srt 파일을 선택하세요"
     },
     "plus_d43cd4ec": {
         "message": "더하기"
@@ -1921,6 +1960,9 @@
     },
     "prime_numbers_13464f61": {
         "message": "기수"
+    },
+    "processing_8c569014": {
+        "message": "처리 중..."
     },
     "product_39cf144f": {
         "message": "제품/곱"
@@ -2015,14 +2057,14 @@
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "모든 { alertFindText }을(를) { alertReplaceText }(으)로 바꿈"
     },
+    "request_d1129f7d": {
+        "message": "요청"
+    },
     "reset_95a81614": {
         "message": "초기화"
     },
     "resize_ec83d538": {
         "message": "크기 변경"
-    },
-    "response_copied_to_clipboard_130d66cd": {
-        "message": "응답이 클립보드에 복사됨"
     },
     "restore_auto_save_deccd84b": {
         "message": "자동 저장을 복권하시겠습니까?"
@@ -2030,8 +2072,8 @@
     "result_index_of_max_7db5ad8b": {
         "message": "결과 { index }/{ max }"
     },
-    "retry_ebd5f8ba": {
-        "message": "다시 시도"
+    "retry_captionname_5ed0a12f": {
+        "message": "{ captionName } 다시 시도"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "왼쪽 함의(산출하지 않음)"
@@ -2162,6 +2204,9 @@
     "selected_274ce24f": {
         "message": "선택됨"
     },
+    "selected_file_name_93fa1a14": {
+        "message": "선택된 파일: { name }"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "{ linkFileName } 선택됨"
     },
@@ -2192,14 +2237,17 @@
     "shortcut_911d6255": {
         "message": "바로 가기"
     },
-    "show_all_967a90f0": {
-        "message": "모두 표시"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "이미지 옵션 표시"
     },
     "show_link_options_545338fd": {
         "message": "링크 옵션 표시"
+    },
+    "show_rolling_transcript_c1481744": {
+        "message": "롤링 대화 내용 표시"
+    },
+    "show_rolling_transcript_d353aca4": {
+        "message": "롤링 대화 내용 표시"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "시력에 문제가 없는 사용자는 큰 머리글 또는 굵은 글자체의 머리글을 찾아서 웹 페이지를 빠르게 탐색합니다. 화면 읽기 프로그램 사용자는 컨텍스트에 기반한 이해를 위해 헤더에 의존합니다. 헤더는 적절한 구조를 사용해야 합니다."
@@ -2233,6 +2281,9 @@
     },
     "small_b070434a": {
         "message": "작은"
+    },
+    "small_width_x_height_px_359acd38": {
+        "message": "작게({ width } x { height }px)"
     },
     "solid_circle_9f061dfc": {
         "message": "채워진 원"
@@ -2513,6 +2564,9 @@
     "timebar_a4d18443": {
         "message": "시간 표시줄"
     },
+    "title_can_t_be_blank_eb4021d7": {
+        "message": "제목은 비어 있을 수 없습니다"
+    },
     "title_ee03d132": {
         "message": "제목"
     },
@@ -2533,6 +2587,9 @@
     },
     "top_66e0adb6": {
         "message": "상단"
+    },
+    "transcript_panel_is_available_at_widths_above_720p_1cf94c0d": {
+        "message": "대화 기록 패널은 720px 이상의 너비에서 사용할 수 있습니다."
     },
     "tray_839df38a": {
         "message": "트레이"
@@ -2573,6 +2630,9 @@
     "unpublished_dfd8801": {
         "message": "게시되지 않음"
     },
+    "unsaved_changes_will_be_lost_f977252a": {
+        "message": "저장되지 않은 변경 사항은 사라집니다."
+    },
     "untitled_16aa4f2b": {
         "message": "제목 없음"
     },
@@ -2591,8 +2651,17 @@
     "updated_link_a827e441": {
         "message": "업데이트된 링크"
     },
+    "upload_8b403d05": {
+        "message": "업로드"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "SRT 또는 WebVTT 형식으로 자막 트랙을 업로드합니다."
+    },
     "upload_document_253f0478": {
         "message": "문서 업로드"
+    },
+    "upload_failed_a5dc91ec": {
+        "message": "업로드 실패"
     },
     "upload_file_fd2361b8": {
         "message": "파일 업로드"
@@ -2696,9 +2765,6 @@
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "이미지의 콘텐츠를 설명하기 위해 화면 읽기 프로그램에서 사용"
     },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "동영상의 콘텐츠를 설명하기 위해 화면 읽기 프로그램에서 사용"
-    },
     "user_documents_c206e61f": {
         "message": "사용자 문서"
     },
@@ -2759,8 +2825,8 @@
     "view_word_and_character_counts_a743dd0c": {
         "message": "단어 및 글자 수 보기"
     },
-    "waiting_for_response_1efd0c50": {
-        "message": "응답 대기 중"
+    "viewer_restrictions_e14274c9": {
+        "message": "뷰어 제한"
     },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "장치에 연결된 작동하는 마이크를 탐지할 수 없습니다."
@@ -2782,9 +2848,6 @@
     },
     "welsh_42ab94b1": {
         "message": "웨일스어"
-    },
-    "what_would_you_like_to_do_6dc0d541": {
-        "message": "어떤 작업을 하시겠습니까?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "항목을 목록으로 시각적으로 형식을 지정하는 태그를 사용하지만 목록 관계가 표시되지 않는 경우, 사용자는 정보를 탐색하는 데 어려움이 있을 수 있습니다."
@@ -2815,9 +2878,6 @@
     },
     "wreath_product_200b38ef": {
         "message": "화환곱"
-    },
-    "writing_assistant_a30ac16a": {
-        "message": "작문 조교"
     },
     "xi_149681d0": {
         "message": "크사이"

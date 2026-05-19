@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class MasterCourses::MasterTemplate < ActiveRecord::Base
+class MasterCourses::MasterTemplate < ApplicationRecord
   # the root of all the magic for a blueprint course
   # is created when a course is marked as a blueprint
   # stores the locking (aka restrictions) settings

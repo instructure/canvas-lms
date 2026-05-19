@@ -19,7 +19,7 @@
 #
 
 module Lti
-  class MessageHandler < ActiveRecord::Base
+  class MessageHandler < ApplicationRecord
     BASIC_LTI_LAUNCH_REQUEST = "basic-lti-launch-request"
     TOOL_PROXY_REREGISTRATION_REQUEST = "ToolProxyRegistrationRequest"
 

@@ -36,7 +36,7 @@ import * as tz from '@instructure/moment-utils'
 import moment from 'moment'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {DateTime} from '@instructure/ui-i18n'
 import {View} from '@instructure/ui-view'
@@ -401,7 +401,6 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
         },
       }
       const newEvent = commonEventFactory(objectData, event.possibleContexts())
-      // @ts-expect-error TS18047,TS2339 (typescriptify)
       newEvent.save(
         params,
         () => {

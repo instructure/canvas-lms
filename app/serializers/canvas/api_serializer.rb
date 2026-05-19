@@ -55,7 +55,7 @@ module Canvas
     extend Forwardable
     include Canvas::APISerialization
 
-    attr_reader :controller, :session
+    attr_reader :controller
 
     # Array of strings that can be passed by the controller to signal which
     # associations to embed in the serializer output. You can test this array

@@ -857,8 +857,26 @@ describe Lti::Messages::JwtMessage do
       expect(decoded_jwt["family_name"]).to eq user.last_name
     end
 
-    it "adds the person sourcedid" do
-      expect(decoded_jwt.dig("https://purl.imsglobal.org/spec/lti/claim/lis", "person_sourcedid")).to eq "$Person.sourcedId"
+    context "when lti_suppress_unresolved_variable_names_in_claims is disabled" do
+      before { course.root_account.disable_feature!(:lti_suppress_unresolved_variable_names_in_claims) }
+
+      it "adds the literal variable name as person_sourcedid" do
+        expect(decoded_jwt.dig("https://purl.imsglobal.org/spec/lti/claim/lis", "person_sourcedid")).to eq "$Person.sourcedId"
+      end
+    end
+
+    context "when the user has no SIS pseudonym" do
+      it "sets person_sourcedid to nil" do
+        expect(decoded_jwt.dig("https://purl.imsglobal.org/spec/lti/claim/lis", "person_sourcedid")).to be_nil
+      end
+    end
+
+    context "when the user has a SIS pseudonym with a sis_user_id" do
+      before { managed_pseudonym(user, account: course.root_account, sis_user_id: "sis_abc123") }
+
+      it "sets person_sourcedid to the SIS user ID" do
+        expect(decoded_jwt.dig("https://purl.imsglobal.org/spec/lti/claim/lis", "person_sourcedid")).to eq "sis_abc123"
+      end
     end
 
     it "adds the courses offering sourcedid" do

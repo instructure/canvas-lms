@@ -1,5 +1,5 @@
 <li>
-  <a href="#" data-id="{{id}}">
+  <button type="button" data-id="{{id}}" data-name="{{name}}" aria-label="{{#if selected}}{{#t}}Remove {{name}}{{/t}}{{else}}{{#t}}Add {{name}}{{/t}}{{/if}}">
     <i class="icon-{{type}}" aria-hidden="true"></i>
     {{name}}
 
@@ -9,5 +9,5 @@
     {{else}}
       <i class="icon-add" aria-hidden="true"></i>
     {{/if}}
-  </a>
+  </button>
 </li>

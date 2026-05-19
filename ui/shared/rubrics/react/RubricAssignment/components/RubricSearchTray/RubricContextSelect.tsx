@@ -19,8 +19,10 @@
 import {useQuery} from '@tanstack/react-query'
 import {useEffect} from 'react'
 import {getGradingRubricContexts} from '../../queries'
+import {Heading} from '@instructure/ui-heading'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {View} from '@instructure/ui-view'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {GradingRubricContext} from '../../types/rubricAssignment'
@@ -30,16 +32,22 @@ const I18n = createI18nScope('enhanced-rubrics-assignment-search')
 type RubricContextSelectProps = {
   courseId: string
   selectedContext?: string
-  handleChangeContext: (context: string) => void
+  handleChangeContext: (context: string, rubricsCount: number) => void
   setSelectedContext: (context: string) => void
+  setSelectedRubricCount: (count: number) => void
 }
 export const RubricContextSelect = ({
   courseId,
   selectedContext,
   handleChangeContext,
   setSelectedContext,
+  setSelectedRubricCount,
 }: RubricContextSelectProps) => {
-  const {data: rubricContexts = [], isLoading} = useQuery({
+  const {
+    data: rubricContexts = [],
+    isLoading,
+    isSuccess,
+  } = useQuery({
     queryKey: ['fetchGradingRubricContexts', courseId],
     queryFn: getGradingRubricContexts,
   })
@@ -52,11 +60,13 @@ export const RubricContextSelect = ({
 
       if (matchingCourseContext) {
         setSelectedContext(matchingCourseContext.context_code)
+        setSelectedRubricCount(matchingCourseContext.rubrics || 0)
       } else {
         setSelectedContext(rubricContexts[0]?.context_code)
+        setSelectedRubricCount(rubricContexts[0]?.rubrics || 0)
       }
     }
-  }, [rubricContexts, courseId, setSelectedContext])
+  }, [rubricContexts, courseId, setSelectedContext, setSelectedRubricCount])
 
   const contextPrefix = (contextCode: string) => {
     if (contextCode.startsWith('account_')) {
@@ -72,7 +82,15 @@ export const RubricContextSelect = ({
     return `${context.name} (${contextPrefix(context.context_code)})`
   }
 
-  if (isLoading && !rubricContexts) {
+  if (isSuccess && rubricContexts.length === 0) {
+    return (
+      <View as="div">
+        <Heading level="h3">{I18n.t('No Rubrics Found')}</Heading>
+      </View>
+    )
+  }
+
+  if (isLoading) {
     return <LoadingIndicator />
   }
 
@@ -80,7 +98,10 @@ export const RubricContextSelect = ({
     <SimpleSelect
       renderLabel={<ScreenReaderContent>{I18n.t('select account or course')}</ScreenReaderContent>}
       value={selectedContext}
-      onChange={(_, {value}) => handleChangeContext(value as string)}
+      onChange={(_, {value}) => {
+        const selected = rubricContexts.find(context => context.context_code === value)
+        handleChangeContext(value as string, selected?.rubrics || 0)
+      }}
       data-testid="rubric-context-select"
     >
       {rubricContexts.map(context => (

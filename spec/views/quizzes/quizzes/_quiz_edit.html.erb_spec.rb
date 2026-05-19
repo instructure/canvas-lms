@@ -67,6 +67,26 @@ describe "quizzes/quizzes/_quiz_edit" do
     expect(response.body).not_to match(/student_submissions_warning/)
   end
 
+  context "with blueprint-locked content" do
+    it "escapes HTML in quiz titles" do
+      quiz = @course.quizzes.create!(title: "<img src=x onerror=alert(1)>", description: "a]quiz")
+      assign(:quiz, quiz)
+      assign(:js_env, {
+               quiz_max_combination_count: 200,
+               MASTER_COURSE_DATA: {
+                 "is_master_course_child_content" => true,
+                 "restricted_by_master_course" => true,
+                 "master_course_restrictions" => { content: true }
+               }
+             })
+      render partial: "quizzes/quizzes/quiz_edit_details"
+      doc = Nokogiri::HTML.fragment(response.body)
+      title_el = doc.at_css("h1#quiz_title")
+      expect(title_el.text).to eq("<img src=x onerror=alert(1)>")
+      expect(response.body).not_to include("<img src=x onerror=alert(1)>")
+    end
+  end
+
   context "with suppress_assignment feature" do
     context "on" do
       before do

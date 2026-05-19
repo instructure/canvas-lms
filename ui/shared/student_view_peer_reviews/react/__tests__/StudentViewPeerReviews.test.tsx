@@ -223,6 +223,7 @@ describe('StudentViewPeerReviews Component Tests', () => {
           anonymous_peer_reviews: false,
           course_id: '1',
           peer_review_count: 2,
+          peer_review_sub_assignment: {id: '10'},
           assessment_requests: [
             {
               anonymous_id: 'anonymous1',
@@ -248,6 +249,7 @@ describe('StudentViewPeerReviews Component Tests', () => {
           anonymous_peer_reviews: false,
           course_id: '456',
           peer_review_count: 3,
+          peer_review_sub_assignment: {id: '10'},
           assessment_requests: [
             {
               anonymous_id: 'anonymous1',
@@ -275,6 +277,7 @@ describe('StudentViewPeerReviews Component Tests', () => {
           course_id: '1',
           peer_review_count: 2,
           peer_review_due_at: '2025-01-29T23:59:59Z',
+          peer_review_sub_assignment: {id: '10'},
           assessment_requests: [
             {
               anonymous_id: 'anonymous1',
@@ -299,6 +302,7 @@ describe('StudentViewPeerReviews Component Tests', () => {
           course_id: '1',
           peer_review_count: 2,
           peer_review_points_possible: 10,
+          peer_review_sub_assignment: {id: '10'},
           assessment_requests: [
             {
               anonymous_id: 'anonymous1',
@@ -324,6 +328,7 @@ describe('StudentViewPeerReviews Component Tests', () => {
           peer_review_count: 2,
           peer_review_due_at: '2025-01-29T23:59:59Z',
           peer_review_points_possible: 15,
+          peer_review_sub_assignment: {id: '10'},
           assessment_requests: [
             {
               anonymous_id: 'anonymous1',
@@ -338,6 +343,36 @@ describe('StudentViewPeerReviews Component Tests', () => {
       const {getByText, queryByText} = render(<StudentViewPeerReviews {...defaultProps} />)
       expect(getByText(/Jan 29/)).toBeInTheDocument()
       expect(queryByText('15 pts')).toBeInTheDocument()
+    })
+
+    it('renders individual peer review items for legacy peer reviews (no sub-assignment)', () => {
+      const defaultProps: StudentViewPeerReviewsProps = {
+        assignment: {
+          id: '1',
+          name: 'Assignment 1',
+          anonymous_peer_reviews: false,
+          course_id: '1',
+          assessment_requests: [
+            {
+              anonymous_id: 'anonymous1',
+              user_id: 'user1',
+              user_name: 'username1',
+              available: true,
+            },
+            {
+              anonymous_id: 'anonymous2',
+              user_id: 'user2',
+              user_name: 'username2',
+              available: true,
+            },
+          ],
+        },
+      }
+
+      const {container, queryByText} = render(<StudentViewPeerReviews {...defaultProps} />)
+      expect(container.querySelectorAll('li')).toHaveLength(2)
+      expect(queryByText('username1')).toBeInTheDocument()
+      expect(queryByText('username2')).toBeInTheDocument()
     })
   })
 })

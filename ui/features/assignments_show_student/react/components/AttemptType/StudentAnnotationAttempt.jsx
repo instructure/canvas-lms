@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import axios from '@canvas/axios'
 
 const I18n = createI18nScope('assignments_2_student_annotation')

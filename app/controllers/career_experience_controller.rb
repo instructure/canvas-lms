@@ -41,8 +41,6 @@
 #     }
 #
 class CareerExperienceController < ApplicationController
-  before_action :require_user
-
   # @API Check if Canvas Career is enabled
   #
   # Returns whether the root account has Canvas Career (Horizon) enabled

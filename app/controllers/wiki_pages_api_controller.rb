@@ -172,6 +172,10 @@
 # To explicitly request by ID, you can use the form `/api/v1/courses/:course_id/pages/page_id:7`.
 #
 class WikiPagesApiController < ApplicationController
+  include HorizonMode
+
+  allow_public_horizon_access :index, :show
+
   AI_ALT_TEXT_MAX_LENGTH = 120
   AI_ALT_TEXT_FEATURE_FLAG_SLUG = "alttext"
   AI_ALT_TEXT_TYPE = "Base64"
@@ -182,6 +186,7 @@ class WikiPagesApiController < ApplicationController
   before_action :get_wiki_page, except: %i[create index check_title_availability ai_generate_alt_text]
   before_action :require_wiki_page, except: %i[create update update_front_page index check_title_availability ai_generate_alt_text]
   before_action :was_front_page, except: %i[index check_title_availability ai_generate_alt_text]
+  before_action :extract_block_editor_data, only: %i[create update]
   before_action only: %i[show update destroy revisions show_revision revert] do
     check_differentiated_assignments(@page)
   end
@@ -280,7 +285,7 @@ class WikiPagesApiController < ApplicationController
   #   pages. If not present, do not filter on published status.
   #
   # @argument include[] [String, "body"]
-  #   - "enrollments": Optionally include the page body with each Page.
+  #   - "body": Optionally include the page body with each Page.
   #   If this is a block_editor page, returns the block_editor_attributes.
   #
   # @example_request
@@ -358,7 +363,11 @@ class WikiPagesApiController < ApplicationController
       if @context.wiki.grants_right?(@current_user, :update)
         mc_status = setup_master_course_restrictions(wiki_pages, @context)
       end
-      render json: wiki_pages_json(wiki_pages, @current_user, session, includes.include?("body"), master_course_status: mc_status)
+      render json: wiki_pages_json(wiki_pages,
+                                   @current_user,
+                                   session,
+                                   include_body: includes.include?("body"),
+                                   master_course_status: mc_status)
     end
   end
 
@@ -417,11 +426,15 @@ class WikiPagesApiController < ApplicationController
       @page.saving_user = @current_user
       if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, "participate")
-        render json: wiki_page_json(@page, @current_user, session)
+        create_external_content_ref
+
+        render json: wiki_page_json(@page, @current_user, session, use_block_editor: true)
       else
         render json: @page.errors, status: update_params.is_a?(Symbol) ? update_params : :bad_request
       end
     end
+  rescue InstructureMiscPlugin::Extensions::ContentServiceClient::ClientError => e
+    rescue_content_service_error(e)
   rescue Api::Html::UnparsableContentError => e
     rescue_unparsable_content(e)
   end
@@ -438,8 +451,10 @@ class WikiPagesApiController < ApplicationController
   def show
     if authorized_action(@page, @current_user, :read)
       log_asset_access(@page, "wiki", @wiki)
-      render json: wiki_page_json(@page, @current_user, session)
+      render json: wiki_page_json(@page, @current_user, session, use_block_editor: true)
     end
+  rescue InstructureMiscPlugin::Extensions::ContentServiceClient::ClientError => e
+    rescue_content_service_error(e)
   end
 
   # @API Update/create page
@@ -508,11 +523,15 @@ class WikiPagesApiController < ApplicationController
 
         log_asset_access(@page, "wiki", @wiki, "participate")
         @page.context_module_action(@current_user, @context, :contributed)
-        render json: wiki_page_json(@page, @current_user, session)
+        update_external_content_ref
+
+        render json: wiki_page_json(@page, @current_user, session, use_block_editor: true)
       else
         render json: @page.errors, status: update_params.is_a?(Symbol) ? update_params : :bad_request
       end
     end
+  rescue InstructureMiscPlugin::Extensions::ContentServiceClient::ClientError => e
+    rescue_content_service_error(e)
   rescue Api::Html::UnparsableContentError => e
     rescue_unparsable_content(e)
   end
@@ -593,7 +612,11 @@ class WikiPagesApiController < ApplicationController
                           end
         output_json = nil
         begin
-          output_json = wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
+          output_json = wiki_page_revision_json(revision,
+                                                @current_user,
+                                                session,
+                                                include_content:,
+                                                latest_version: @page.current_version)
         rescue Psych::SyntaxError => e
           # TODO: This should be temporary.  For a long time
           # course exports/imports would corrupt the yaml in the first version
@@ -608,7 +631,11 @@ class WikiPagesApiController < ApplicationController
             revision.yaml = clean_version_yaml
             revision.save
           end
-          output_json = wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
+          output_json = wiki_page_revision_json(revision,
+                                                @current_user,
+                                                session,
+                                                include_content:,
+                                                latest_version: @page.current_version)
         end
         render json: output_json
       end
@@ -639,7 +666,11 @@ class WikiPagesApiController < ApplicationController
       @page.user_id = @current_user.id if @current_user
       @page.saving_user = @current_user
       if @page.save
-        render json: wiki_page_revision_json(@page.versions.current, @current_user, session, true, @page.current_version)
+        render json: wiki_page_revision_json(@page.versions.current,
+                                             @current_user,
+                                             session,
+                                             include_content: true,
+                                             latest_version: @page.current_version)
       else
         render json: @page.errors, status: :bad_request
       end
@@ -907,5 +938,35 @@ class WikiPagesApiController < ApplicationController
     @page.errors.add(:body, error.message) if @page.present?
 
     render json: @page&.errors || {}, status: :bad_request
+  end
+
+  def rescue_content_service_error(error)
+    error_report = ErrorReport.log_error(
+      "content_service_client_error",
+      { message: error.message, service_errors: error.service_errors }
+    )
+    render json: { error: error.message, error_report_id: error_report.id }, status: :service_unavailable
+  end
+
+  def create_external_content_ref
+    return unless @context.account.horizon_block_content_editor?
+
+    @page.create_block_editor_data(user_uuid: @current_user.uuid, data: @block_editor_data)
+  end
+
+  def update_external_content_ref
+    return unless @context.account.horizon_block_content_editor?
+
+    @page.update_block_editor_data(user_uuid: @current_user.uuid, data: @block_editor_data)
+  end
+
+  def extract_block_editor_data
+    return unless params[:wiki_page] && @context.account.horizon_block_content_editor?
+
+    if params[:wiki_page][:block_editor_data].present?
+      # Extract and convert to hash to avoid ActionController::UnfilteredParameters errors
+      block_editor_data_params = params[:wiki_page].delete(:block_editor_data)
+      @block_editor_data = block_editor_data_params.respond_to?(:to_unsafe_h) ? block_editor_data_params.to_unsafe_h : block_editor_data_params
+    end
   end
 end

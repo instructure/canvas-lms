@@ -25,7 +25,6 @@
 class RateLimitingSettingsController < ApplicationController
   before_action :get_context
   before_action :require_account_management
-  before_action :require_feature_flag
   before_action :check_rate_limiting_permission
   before_action :set_oauth_client_config, only: %i[show update destroy]
 
@@ -38,13 +37,13 @@ class RateLimitingSettingsController < ApplicationController
     respond_to do |format|
       format.html do
         set_navigation
-        js_env(
-          ACCOUNT: {
-            "id" => @context.id,
-            "site_admin" => @context.site_admin?,
-            "root_account" => @context.root_account?
-          }
-        )
+        js_env({
+                 ACCOUNT: {
+                   "id" => @context.id,
+                   "site_admin" => @context.site_admin?,
+                   "root_account" => @context.root_account?
+                 }
+               })
         render :index
       end
       format.json do
@@ -117,7 +116,7 @@ class RateLimitingSettingsController < ApplicationController
       respond_to do |format|
         format.json do
           render json: { errors: @oauth_client_config.errors.full_messages },
-                 status: :unprocessable_entity
+                 status: :unprocessable_content
         end
       end
     end
@@ -139,7 +138,7 @@ class RateLimitingSettingsController < ApplicationController
       respond_to do |format|
         format.json do
           render json: { errors: @oauth_client_config.errors.full_messages },
-                 status: :unprocessable_entity
+                 status: :unprocessable_content
         end
       end
     end
@@ -164,16 +163,6 @@ class RateLimitingSettingsController < ApplicationController
   end
 
   private
-
-  def require_feature_flag
-    unless @context.feature_enabled?(:api_rate_limits)
-      respond_to do |format|
-        format.html { redirect_to account_path(@context) }
-        format.json { render json: { error: "Feature not enabled" }, status: :forbidden }
-      end
-      false
-    end
-  end
 
   def check_rate_limiting_permission
     unless @context.grants_right?(@current_user, session, :manage_rate_limiting)

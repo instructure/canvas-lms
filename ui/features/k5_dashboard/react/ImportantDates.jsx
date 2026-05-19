@@ -29,7 +29,7 @@ import {IconSettingsLine} from '@instructure/ui-icons'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 
 import useFetchApi from '@canvas/use-fetch-api-hook'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 import FilterCalendarsModal, {ImportantDatesContextsShape} from './FilterCalendarsModal'

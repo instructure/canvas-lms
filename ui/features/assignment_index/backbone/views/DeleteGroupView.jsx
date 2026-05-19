@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {extend as lodashExtend} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
@@ -145,9 +145,12 @@ DeleteGroupView.prototype.showErrors = function (errors) {
       const errorsContainerID = `ag_${id}_${field}_errors`
       const errorsContainer = this.getElement(`#${errorsContainerID}`)
       if (errorsContainer) {
-        const root = this.errorRoots[errorsContainerID] ?? createRoot(errorsContainer)
-        root.render(<FormattedErrorMessage message={value[0].message} margin={'0 0 0 medium'} />)
-        this.errorRoots[errorsContainerID] = root
+        const element = <FormattedErrorMessage message={value[0].message} margin={'0 0 0 medium'} />
+        if (this.errorRoots[errorsContainerID]) {
+          rerender(this.errorRoots[errorsContainerID], element)
+        } else {
+          this.errorRoots[errorsContainerID] = render(element, errorsContainer)
+        }
       }
     })
   }

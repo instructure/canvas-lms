@@ -66,6 +66,10 @@ module Lti
     let(:placements) { internal_lti_configuration[:placements] }
     let(:developer_key) { DeveloperKey.create!(is_lti_key: true, public_jwk_url: "https://example.com", redirect_uris: ["https://example.com"], account: root_account) }
 
+    it_behaves_like "has_one soft deletion" do
+      subject { tool_configuration.tap(&:save!) }
+    end
+
     def make_placement(type, message_type, extra = {})
       {
         "target_link_uri" => "http://example.com/launch?placement=#{type}",

@@ -37,7 +37,11 @@ export const RubricFormSettings = ({
   return (
     <>
       {showAdditionalOptions && (
-        <Flex.Item margin="0 0 0 small">
+        <Flex.Item
+          size={rubricForm.freeFormCriterionComments ? '12.563rem' : '10.563rem'}
+          shouldGrow
+          shouldShrink
+        >
           <GradingTypeSelect
             onChange={isFreeFormComments => {
               setRubricFormField('freeFormCriterionComments', isFreeFormComments)
@@ -47,7 +51,7 @@ export const RubricFormSettings = ({
         </Flex.Item>
       )}
       {!rubricForm.freeFormCriterionComments && !rubricForm.hidePoints && (
-        <Flex.Item margin="0 0 0 small">
+        <Flex.Item size="10.563rem" shouldGrow shouldShrink>
           <RatingDisplaySelect
             buttonDisplay={rubricForm.buttonDisplay}
             onChange={buttonDisplay => setRubricFormField('buttonDisplay', buttonDisplay)}
@@ -55,7 +59,7 @@ export const RubricFormSettings = ({
         </Flex.Item>
       )}
       {!rubricForm.freeFormCriterionComments && (
-        <Flex.Item margin="0 0 0 small">
+        <Flex.Item size="10.563rem" shouldGrow shouldShrink>
           <RubricRatingOrderSelect
             ratingOrder={rubricForm.ratingOrder}
             onChangeOrder={ratingOrder => setRubricFormField('ratingOrder', ratingOrder)}
@@ -63,7 +67,7 @@ export const RubricFormSettings = ({
         </Flex.Item>
       )}
       {showAdditionalOptions && (
-        <Flex.Item margin="0 0 0 small">
+        <Flex.Item size="10.563rem" shouldGrow shouldShrink>
           <ScoringTypeSelect
             hidePoints={rubricForm.hidePoints}
             onChange={() => {

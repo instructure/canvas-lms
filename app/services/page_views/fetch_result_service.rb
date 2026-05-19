@@ -21,14 +21,14 @@ module PageViews
   class FetchResultService < PageViews::ServiceBase
     def call(query_id)
       uri = @configuration.uri.merge("/api/v5/pageviews/query/#{query_id}/results")
-      CanvasHttp.get(
-        uri.to_s,
+      get_with_clean_redirect(
+        uri,
         request_headers
       ) do |response|
         handle_generic_errors(response) unless response.code.to_i == 200
         response.decode_content = false # Prevent automatic decompression
         format = determine_result_format(response)
-        filename = determine_filename(response)
+        filename = determine_filename(response).delete_suffix(".gz")
         compressed = response_compressed?(response)
         return Common::DownloadableResult.new(format:, filename:, content: response.body, compressed?: compressed)
       end

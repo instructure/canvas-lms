@@ -98,7 +98,9 @@ class AllocationRule < ApplicationRecord
     existing_rules = existing_rules.where.not(id:) if persisted?
 
     if existing_rules.exists?
-      errors.add(applies_to_assessor ? :assessee_id : :assessor_id, I18n.t("This rule conflicts with rule \"%{rule_text}\"", rule_text: format_rule_text(existing_rules.first)))
+      existing_rule = existing_rules.first
+      enforcement = existing_rule.must_review ? I18n.t("strict") : I18n.t("flexible")
+      errors.add(applies_to_assessor ? :assessee_id : :assessor_id, I18n.t("This rule conflicts with rule \"%{rule_text}\" (%{enforcement})", rule_text: format_rule_text(existing_rule), enforcement:))
     end
 
     check_completed_review_conflicts
@@ -124,28 +126,17 @@ class AllocationRule < ApplicationRecord
   def format_rule_text(rule)
     assessee_name = assessee.name
     assessor_name = assessor.name
-    if rule.must_review
-      if rule.review_permitted
-        if rule.applies_to_assessor
-          I18n.t("%{assessor_name} must review %{assessee_name}", assessor_name:, assessee_name:)
-        else
-          I18n.t("%{assessee_name} must be reviewed by %{assessor_name}", assessor_name:, assessee_name:)
-        end
-      elsif rule.applies_to_assessor
-        I18n.t("%{assessor_name} must not review %{assessee_name}", assessor_name:, assessee_name:)
-      else
-        I18n.t("%{assessee_name} must not be reviewed by %{assessor_name}", assessor_name:, assessee_name:)
-      end
-    elsif rule.review_permitted
+
+    if rule.review_permitted
       if rule.applies_to_assessor
-        I18n.t("%{assessor_name} should review %{assessee_name}", assessor_name:, assessee_name:)
+        I18n.t("%{assessor_name} will review %{assessee_name}", assessor_name:, assessee_name:)
       else
-        I18n.t("%{assessee_name} should be reviewed by %{assessor_name}", assessor_name:, assessee_name:)
+        I18n.t("%{assessee_name} will be reviewed by %{assessor_name}", assessor_name:, assessee_name:)
       end
     elsif rule.applies_to_assessor
-      I18n.t("%{assessor_name} should not review %{assessee_name}", assessor_name:, assessee_name:)
+      I18n.t("%{assessor_name} will not review %{assessee_name}", assessor_name:, assessee_name:)
     else
-      I18n.t("%{assessee_name} should not be reviewed by %{assessor_name}", assessor_name:, assessee_name:)
+      I18n.t("%{assessee_name} will not be reviewed by %{assessor_name}", assessor_name:, assessee_name:)
     end
   end
 end

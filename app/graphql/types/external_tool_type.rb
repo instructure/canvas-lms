@@ -19,25 +19,6 @@
 #
 
 module Types
-  class ExternalToolStateType < Types::BaseEnum
-    graphql_name "ExternalToolState"
-    description "States that an External Tool can be in"
-    value "anonymous"
-    value "name_only"
-    value "email_only"
-    value "public"
-  end
-
-  # We can add additional placements as they are needed.
-  class ExternalToolPlacementType < Types::BaseEnum
-    graphql_name "ExternalToolPlacement"
-    description "Placements that an External Tool can have"
-    value "homework_submission"
-    value "ActivityAssetProcessor"
-    value "link_selection"
-    value "resource_selection"
-  end
-
   # This is a little funky. External tools can either be backed by a `ContextExternalTool`
   # in the database, or directly by data in a `ContentTag`. Because there could
   # be conflicting legacy id for these, we are seperating them into two concrete

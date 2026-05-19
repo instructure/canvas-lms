@@ -21,7 +21,7 @@ import {fireEvent, render} from '@testing-library/react'
 import {RubricAssessmentTray, type RubricAssessmentTrayProps} from '../RubricAssessmentTray'
 import {RUBRIC_DATA} from './fixtures'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('RubricAssessmentTray Traditional View Tests', () => {

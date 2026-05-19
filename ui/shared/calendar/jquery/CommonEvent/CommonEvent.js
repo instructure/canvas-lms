@@ -23,7 +23,7 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import 'jquery-tinypubsub'
 import {datetimeString, dateString} from '@canvas/datetime/date-functions'
 import splitAssetString from '@canvas/util/splitAssetString'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('calendar')
 

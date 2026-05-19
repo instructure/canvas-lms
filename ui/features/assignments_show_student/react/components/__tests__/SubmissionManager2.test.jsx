@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {CREATE_SUBMISSION} from '@canvas/assignments/graphql/student/Mutations'
 import {SUBMISSION_HISTORIES_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
@@ -28,7 +28,7 @@ import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/
 import ContextModuleApi from '../../apis/ContextModuleApi'
 import SubmissionManager from '../SubmissionManager'
 import {availableReviewCount} from '@canvas/assignments/helpers/PeerReviewHelpers'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 vi.mock('@canvas/util/globalUtils', () => ({
   assignLocation: vi.fn(),

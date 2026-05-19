@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require "redcarpet"
 
-class ContextExternalTool < ActiveRecord::Base
+class ContextExternalTool < ApplicationRecord
   include Workflow
   include SearchTermHelper
   include PermissionsHelper
@@ -37,7 +37,38 @@ class ContextExternalTool < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :developer_key
   belongs_to :root_account, class_name: "Account"
+  # Can point to a cross-shard registration, is slowly being phased out for app
   belongs_to :lti_registration, class_name: "Lti::Registration"
+  alias_method :old_lti_registration, :lti_registration
+  alias_attribute :old_lti_registration_id, :lti_registration_id
+  # Always points to a local registration
+  belongs_to :app, class_name: "Lti::Registration", optional: true
+
+  def lti_registration
+    if root_account&.feature_enabled?(:lti_registrations_templates)
+      app
+    else
+      old_lti_registration
+    end
+  end
+
+  def lti_registration_id
+    if root_account&.feature_enabled?(:lti_registrations_templates)
+      app_id
+    else
+      old_lti_registration_id
+    end
+  end
+
+  def lti_registration=(value)
+    super
+    sync_app_id
+  end
+
+  def lti_registration_id=(value)
+    super
+    sync_app_id
+  end
 
   include MasterCourses::Restrictor
 
@@ -80,6 +111,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
   serialize :settings, coder: SettingsSerializer
 
+  before_validation :sync_app_id
   # add_identity_hash needs to calculate off of other data in the object, so it
   # should always be the last field change callback to run
   before_save :infer_defaults, :add_identity_hash
@@ -88,6 +120,13 @@ class ContextExternalTool < ActiveRecord::Base
   after_commit :update_unified_tool_id, if: :update_unified_tool_id?
   validate :check_for_xml_error
 
+  scope :for_lti_registration, lambda { |lti_registration, root_account|
+    if root_account&.feature_enabled?(:lti_registrations_templates)
+      where(app: lti_registration)
+    else
+      where(lti_registration:)
+    end
+  }
   scope :disabled, -> { where(workflow_state: DISABLED_STATE) }
   scope :quiz_lti, -> { where(tool_id: QUIZ_LTI) }
   scope :lti_1_3, -> { where(lti_version: "1.3") }
@@ -931,12 +970,14 @@ class ContextExternalTool < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = "deleted"
-    # update all the associated context_control's workflow_state to deleted
-    Lti::ContextControl
-      .where(deployment_id: id)
-      .update_all(workflow_state: "deleted")
-    run_callbacks(:destroy) { save! }
+    transaction do
+      self.workflow_state = "deleted"
+      # update all the associated context_control's workflow_state to deleted
+      Lti::ContextControl
+        .where(deployment_id: id)
+        .update_all(workflow_state: "deleted")
+      run_callbacks(:destroy) { save! }
+    end
   end
 
   def precedence
@@ -951,7 +992,7 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
-  def standard_url(use_environment_overrides = false)
+  def standard_url(use_environment_overrides: false)
     standard_url = ContextExternalTool.standardize_url(url)
 
     if use_environment_overrides
@@ -967,14 +1008,14 @@ class ContextExternalTool < ActiveRecord::Base
   # This method checks both the domain and url
   # host when attempting to match host.
   def matches_host?(url, use_environment_overrides: false)
-    standard_url = standard_url(use_environment_overrides)
+    standard_url = standard_url(use_environment_overrides:)
     matches_tool_domain?(url) ||
       (standard_url.present? &&
         standard_url.host == ContextExternalTool.standardize_url(url)&.host)
   end
 
-  def matches_url?(url, match_queries_exactly = true, use_environment_overrides: false)
-    tool_url = standard_url(use_environment_overrides)
+  def matches_url?(url, match_queries_exactly: true, use_environment_overrides: false)
+    tool_url = standard_url(use_environment_overrides:)
     if match_queries_exactly
       url = ContextExternalTool.standardize_url(url)
       url == tool_url
@@ -1429,6 +1470,43 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   private
+
+  def sync_app_id
+    return if old_lti_registration_id.blank?
+    return unless old_lti_registration_id_changed?
+    return if app_id_changed? && !app_id.nil?
+
+    # root_account may not be set yet (infer_defaults runs before_save,
+    # but this callback runs before_validation), so fall back to context.
+    resolved_root_account = root_account || context&.root_account
+    cross_shard = shard != Shard.shard_for(old_lti_registration_id)
+    # Same-shard but inherited: root accounts that share a shard with Site Admin
+    # (OSS installs, local dev, single-shard multi-tenant) still need their own
+    # local copy for any registration they've inherited from Site Admin.
+    same_shard_inherited = !cross_shard &&
+                           resolved_root_account != Account.site_admin &&
+                           shard == Account.site_admin.shard &&
+                           old_lti_registration&.root_account == Account.site_admin
+
+    if cross_shard || same_shard_inherited
+      local = Lti::Registration.active.find_by(
+        template_registration_id: old_lti_registration_id,
+        account: resolved_root_account
+      )
+      if local
+        self.app_id = local.id
+      else
+        msg = "No local App/Lti::Registration found for lti_registration_id=#{old_lti_registration_id}"
+        if resolved_root_account&.feature_enabled?(:lti_registrations_templates)
+          raise Lti::LocalAppNotFound, msg
+        else
+          Canvas::Errors.capture_exception(:lti_registration_sync, msg, :warn)
+        end
+      end
+    else
+      self.app_id = old_lti_registration_id
+    end
+  end
 
   # Locally and in OSS installations, this can be configured in config/dynamic_settings.yml.
   # Returns an array of strings, each listing a partial or full domain suffix that is considered "internal".

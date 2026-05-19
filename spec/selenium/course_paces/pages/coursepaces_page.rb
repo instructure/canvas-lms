@@ -766,7 +766,7 @@ module CoursePacesPageObject
   def click_section_course_pace(section_name)
     # This check reduces the flakiness of the clicking in this menu.  Keeping
     # the puts line for verification in the logs
-    unless element_exists?(section_cp_xpath_selector(section_name), true)
+    unless element_exists?(section_cp_xpath_selector(section_name), xpath: true)
       click_section_menu_item
     end
 
@@ -776,7 +776,7 @@ module CoursePacesPageObject
   def click_student_course_pace(student_name)
     # This check reduces the flakiness of the clicking in this menu.  Keeping
     # the puts line for verification in the logs
-    unless element_exists?(student_cp_xpath_selector(student_name), true)
+    unless element_exists?(student_cp_xpath_selector(student_name), xpath: true)
       click_students_menu_item
     end
 
@@ -928,7 +928,7 @@ module CoursePacesPageObject
   end
 
   def skip_weekends_exists?
-    element_exists?(skip_weekends_checkbox_xpath_selector, true)
+    element_exists?(skip_weekends_checkbox_xpath_selector, xpath: true)
   end
 
   def update_module_item_duration(item_number, duration)

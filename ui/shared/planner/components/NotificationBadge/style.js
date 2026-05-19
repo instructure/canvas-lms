@@ -47,7 +47,6 @@ export default function buildStyle() {
   }
   .${classNames.activityIndicator}.${classNames.hasBadge} {
     background: transparent;
-    width: auto;
     height: auto;
     align-items: center;
     justify-content: center;

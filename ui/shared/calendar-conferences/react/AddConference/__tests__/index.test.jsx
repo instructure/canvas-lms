@@ -20,7 +20,7 @@
 import React from 'react'
 import {render, fireEvent, act, within} from '@testing-library/react'
 import AddConference from '../index'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer} from '@instructure/platform-alerts'
 
 const pluginConference = {
   conference_type: 'SecretConference',

@@ -17,10 +17,19 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer, showFlashError} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    destroyContainer: vi.fn(),
+    showFlashError: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 import {MOCK_TODOS} from './mocks'
@@ -97,8 +106,8 @@ describe('TodosPage', () => {
 
   it('renders an error if loading todos fails', async () => {
     todosStatus = 500
-    const {findAllByText} = render(<TodosPage {...getProps()} />)
-    expect((await findAllByText('Failed to load todos'))[0]).toBeInTheDocument()
+    render(<TodosPage {...getProps()} />)
+    await waitFor(() => expect(showFlashError).toHaveBeenCalledWith('Failed to load todos'))
   })
 
   it('ignores submitting-type todos', async () => {

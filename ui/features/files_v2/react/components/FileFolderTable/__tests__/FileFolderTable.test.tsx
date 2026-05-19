@@ -20,7 +20,7 @@ import {screen, waitFor} from '@testing-library/react'
 import userEvent, {UserEvent} from '@testing-library/user-event'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../fixtures/fakeData'
 import {renderComponent, defaultProps} from './testUtils'
-import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess, showFlashError} from '@instructure/platform-alerts'
 import {getUniqueId} from '../../../../utils/fileFolderUtils'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {setupServer} from 'msw/node'
@@ -33,10 +33,14 @@ const selectionHandlers = (handlers: any = {}) => {
   }
 }
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: vi.fn(),
-  showFlashError: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashSuccess: vi.fn(),
+    showFlashError: vi.fn(),
+  }
+})
 
 const server = setupServer(
   // Mock any potential API calls

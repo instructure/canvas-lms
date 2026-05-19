@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Ignore < ActiveRecord::Base
+class Ignore < ApplicationRecord
   belongs_to :user
-  belongs_to :asset, polymorphic: [:assignment, :assessment_request, quiz: "Quizzes::Quiz"]
+  belongs_to :asset, polymorphic: [:assignment, :assessment_request, { quiz: "Quizzes::Quiz" }, :peer_review_sub_assignment, :sub_assignment]
 
   validates :user_id, :asset_id, :asset_type, :purpose, presence: true
   validates :permanent, inclusion: { in: [false, true] }

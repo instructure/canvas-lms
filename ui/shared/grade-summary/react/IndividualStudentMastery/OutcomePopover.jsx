@@ -28,7 +28,7 @@ import {IconInfoLine} from '@instructure/ui-icons'
 import DatetimeDisplay from '@canvas/datetime/react/components/DatetimeDisplay'
 import {CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import * as shapes from './shapes'
 
 const I18n = createI18nScope('IndividualStudentMasteryOutcomePopover')
@@ -37,7 +37,6 @@ class OutcomePopover extends React.Component {
   static propTypes = {
     outcome: shapes.outcomeShape.isRequired,
     outcomeProficiency: shapes.outcomeProficiencyShape,
-    breakpoints: breakpointsShape,
   }
 
   static defaultProps = {

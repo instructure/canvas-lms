@@ -459,6 +459,8 @@ describe('permissions::reducer', () => {
             locked: false,
           },
           granular_permission_group: {
+            applies_to_descendants: true,
+            applies_to_self: true,
             built_from_granular_permissions: true,
             enabled: ENABLED_FOR_PARTIAL,
             explicit: true,
@@ -628,6 +630,8 @@ describe('permissions::reducer', () => {
           granular_permission_group: {
             built_from_granular_permissions: true,
             enabled: ENABLED_FOR_PARTIAL,
+            applies_to_descendants: true,
+            applies_to_self: true,
             explicit: true,
             locked: false,
             readonly: false,

@@ -651,7 +651,7 @@ class Speedgrader
 
     # comment library
     def comment_library_link
-      f('[data-testid="comment-library-link"]')
+      f('[data-testid="comment-library-button"]')
     end
 
     def comment_library_count
@@ -659,11 +659,11 @@ class Speedgrader
     end
 
     def comment_library_text_area
-      f('[data-testid="comment-library-text-area"]')
+      f('[data-testid="create-comment-library-item-textarea"]')
     end
 
     def comment_library_edit_text_area
-      f('[data-testid="comment-library-edit-text-area"]')
+      f('[data-testid="comment-library-edit-textarea"]')
     end
 
     def comment_library_save_button
@@ -675,7 +675,7 @@ class Speedgrader
     end
 
     def comment_library_close_button
-      f('[data-testid="close-comment-library-button"]')
+      f('[data-testid="tray-close-button"]')
     end
 
     def comment_library_area
@@ -683,11 +683,11 @@ class Speedgrader
     end
 
     def comment_library_delete_button
-      f('[data-testid="comment-library-delete-button"]')
+      f('[data-testid^="comment-library-delete-button"]')
     end
 
     def comment_library_edit_button
-      f('[data-testid="comment-library-edit-button"]')
+      f('[data-testid^="comment-library-edit-button"]')
     end
 
     def comment_library_suggestions_toggle
@@ -695,7 +695,7 @@ class Speedgrader
     end
 
     def comment_library_suggestion
-      f('[data-testid="comment-suggestion"]')
+      f('[data-testid^="comment-suggestion-"]')
     end
 
     def add_comment_to_library(comment)

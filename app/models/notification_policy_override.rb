@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class NotificationPolicyOverride < ActiveRecord::Base
+class NotificationPolicyOverride < ApplicationRecord
   # NotificationPolicyOverride(id: integer,
   #                            context_id: integer,
   #                            context_type: string,

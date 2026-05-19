@@ -63,6 +63,7 @@ describe('useLtiAssetProcessorsAndReportsForStudent hooks', () => {
     defaultSubmission = {
       submissionId: 'submission-123',
       submissionType: 'online_upload',
+      attempt: 1,
     }
     window.ENV = {
       ...originalEnv,
@@ -176,16 +177,15 @@ describe('useLtiAssetProcessorsAndReportsForStudent hooks', () => {
       expect(mockExecuteQueryAndValidate).not.toHaveBeenCalled()
     })
 
-    it('returns true if ifLastAttemptIsNumber matches the attempt in the query response', async () => {
-      defaultSubmission.ifLastAttemptIsNumber = 1
+    it('returns true when attempt matches reports', async () => {
       const {result} = renderShouldShow()
       await waitUntilIdle()
 
       expect(result.current).toBe(true)
     })
 
-    it("returns false if ifLastAttemptIsNumber doesn't match the attempt in the query response", async () => {
-      defaultSubmission.ifLastAttemptIsNumber = 2
+    it('returns false when attempt does not match any report', async () => {
+      defaultSubmission.attempt = 99
       const {result} = renderShouldShow()
       await waitUntilIdle()
 
@@ -233,8 +233,8 @@ describe('useLtiAssetProcessorsAndReportsForStudent hooks', () => {
       // Verify the returned data matches what we expect from the fixture
       expect(result.current).toEqual({
         assignmentName: 'Test Assignment',
-        attempt: 1,
         submissionType: 'online_upload',
+        hasNextPage: false,
         assetProcessors: expect.arrayContaining([
           expect.objectContaining({
             _id: expect.any(String),

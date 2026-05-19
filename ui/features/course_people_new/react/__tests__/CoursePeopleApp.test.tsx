@@ -37,9 +37,8 @@ vi.mock('../contexts/CoursePeopleContext', () => ({
   getCoursePeopleContext: vi.fn(() => mockContextValue),
 }))
 
-vi.mock('@canvas/error-boundary', () => ({
-  __esModule: true,
-  default: ({
+vi.mock('@instructure/platform-error-boundary', () => ({
+  ErrorBoundary: ({
     children,
     errorComponent,
   }: {

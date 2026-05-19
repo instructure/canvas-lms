@@ -40,7 +40,12 @@ module Canvas::Plugins::TicketingSystem
     end
 
     def export_error(error_report, conf)
-      HTTParty.post(conf[:endpoint_uri], body: error_report.to_document.to_json)
+      document = error_report.to_document
+      # become_user_uri max length in Salesforce is 255, so we need to truncate it to avoid API rejections.
+      if document.dig(:reporter, :become_user_uri).present?
+        document[:reporter][:become_user_uri] = document[:reporter][:become_user_uri].truncate(ErrorReport.maximum_string_length)
+      end
+      HTTParty.post(conf[:endpoint_uri], body: document.to_json)
     end
   end
 end

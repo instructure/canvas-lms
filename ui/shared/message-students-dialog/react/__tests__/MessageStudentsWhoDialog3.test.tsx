@@ -24,7 +24,7 @@ import MessageStudentsWhoDialog, {
   MSWLaunchContext,
 } from '../MessageStudentsWhoDialog'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import type {CamelizedAssignment} from '@canvas/grading/grading'
 import fakeENV from '@canvas/test-utils/fakeENV'
 const students: Student[] = [

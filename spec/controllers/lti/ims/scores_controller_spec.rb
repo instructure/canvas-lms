@@ -238,7 +238,7 @@ module Lti::IMS
             end
 
             it "does not submit homework" do
-              expect_any_instance_of(Assignment).to_not receive(:submit_homework)
+              expect_any_instance_of(Assignment).not_to receive(:submit_homework)
               expect_any_instance_of(Assignment).to receive(:find_or_create_submission)
               send_request
             end
@@ -278,7 +278,7 @@ module Lti::IMS
             end
 
             it "does not submit homework" do
-              expect_any_instance_of(Assignment).to_not receive(:submit_homework)
+              expect_any_instance_of(Assignment).not_to receive(:submit_homework)
               expect_any_instance_of(Assignment).to receive(:find_or_create_submission)
               send_request
             end
@@ -611,7 +611,7 @@ module Lti::IMS
                 attachment = Attachment.last
                 expect(attachment.user).to eq user
                 expect(attachment.display_name).to eq content_items.first[:title]
-                expect(result.submission.attachments).to include attachment
+                expect(result.submission.reload.attachments).to include attachment
               end
 
               let(:actual_progress_url) do
@@ -907,6 +907,63 @@ module Lti::IMS
             end
           end
 
+          context "when over attempt limit with new submissions" do
+            before { result.submission.update!(attempt: 4) }
+
+            context "when submitted_at is unchanged from existing submission" do
+              let(:existing_submitted_at) { Time.zone.parse("2025-01-01 12:00:00").iso8601(3) }
+              let(:params_overrides) do
+                super().merge(
+                  Lti::Result::AGS_EXT_SUBMISSION => {
+                    new_submission: true,
+                    submitted_at: existing_submitted_at
+                  },
+                  :scoreGiven => 15,
+                  :scoreMaximum => 20
+                )
+              end
+
+              before do
+                assignment.submit_homework(user, { submitted_at: existing_submitted_at, submission_type: "external_tool" })
+              end
+
+              it "succeeds and updates score when submitted_at unchanged despite being over attempt limit" do
+                original_attempt = result.submission.attempt
+                send_request
+                expect(response.status.to_i).to eq 200
+                # Score is scaled from scoreGiven (15) / scoreMaximum (20) * line_item.score_maximum
+                expected_score = (15.0 / 20.0) * line_item.score_maximum
+                expect(result.submission.reload.score).to eq expected_score
+                expect(result.submission.attempt).to eq original_attempt
+              end
+            end
+
+            context "when submitted_at changes from existing submission" do
+              let(:existing_submitted_at) { Time.zone.parse("2025-01-01 12:00:00").iso8601(3) }
+              let(:new_submitted_at) { Time.zone.parse("2025-01-01 13:00:00").iso8601(3) }
+              let(:params_overrides) do
+                super().merge(
+                  Lti::Result::AGS_EXT_SUBMISSION => {
+                    new_submission: true,
+                    submitted_at: new_submitted_at
+                  },
+                  :scoreGiven => 15,
+                  :scoreMaximum => 20
+                )
+              end
+
+              before do
+                assignment.submit_homework(user, { submitted_at: existing_submitted_at, submission_type: "external_tool" })
+              end
+
+              it "fails when submitted_at changes and over attempt limit" do
+                send_request
+                expect(response.status.to_i).to eq 422
+                expect(response.body).to include("maximum number of allowed attempts")
+              end
+            end
+          end
+
           context "when submission_type is none" do
             let(:submission_type) { "none" }
 
@@ -1138,26 +1195,8 @@ module Lti::IMS
         end
       end
 
-      context "when activityProgress is set to Initialized" do
-        let(:params_overrides) { super().merge(activityProgress: "Initialized") }
-
-        before do
-          Account.root_accounts.first.disable_feature! :ags_score_trigger_needs_grading_after_submitted
-        end
-
-        it "does not update the submission" do
-          send_request
-          rslt = Lti::Result.find(json["resultUrl"].split("/").last)
-          expect(rslt.submission.workflow_state).to eq("unsubmitted")
-        end
-      end
-
       %w[Initialized Started InProgress].each do |activity_progress|
         context "when activityProgress is set to #{activity_progress}" do
-          before do
-            Account.root_accounts.first.enable_feature! :ags_score_trigger_needs_grading_after_submitted
-          end
-
           let(:params_overrides) { super().merge(activityProgress: activity_progress) }
 
           it "does not update the submission" do
@@ -1170,10 +1209,6 @@ module Lti::IMS
 
       %w[Submitted Completed].each do |activity_progress|
         context "when activityProgress is set to #{activity_progress}" do
-          before do
-            Account.root_accounts.first.enable_feature! :ags_score_trigger_needs_grading_after_submitted
-          end
-
           let(:params_overrides) { super().merge(activityProgress: activity_progress) }
 
           it "does update the submission" do
@@ -1295,7 +1330,7 @@ module Lti::IMS
             expect do
               result
               send_request
-            end.to_not change { result.submission.reload.score }
+            end.not_to change { result.submission.reload.score }
           end
 
           it "has the model validation error in the response" do

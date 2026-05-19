@@ -74,6 +74,7 @@ export interface EnvAssignmentsA2StudentView {
 
 export interface EnvAssignmentsA2TeacherView {
   PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: boolean
+  HAS_PEER_REVIEW_SUB_ASSIGNMENT: boolean
   CAN_EDIT_ASSIGNMENTS: boolean
 }
 

@@ -39,7 +39,6 @@ import {ToggleGroup, type ToggleGroupProps} from '@instructure/ui-toggle-details
 // To disable the border on the toggle group, update paddings and moving the toggle button to the right
 class CustomToggleGroup extends Component<ToggleGroupProps> {
   static allowedProps = ToggleGroup.allowedProps
-  static propTypes = ToggleGroup.propTypes
 
   static defaultProps = {
     size: 'medium',

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Quizzes::QuizStatistics < ActiveRecord::Base
+class Quizzes::QuizStatistics < ApplicationRecord
   DefaultMaxQuestions = 100
   DefaultMaxSubmissions = 1000
 

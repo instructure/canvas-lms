@@ -23,6 +23,10 @@ describe ItemBanksController do
       course_with_teacher(active_all: true)
     end
 
+    before do
+      user_session(@teacher)
+    end
+
     it "returns a 404 when ams_root_account_integration feature flag is disabled" do
       @course.root_account.disable_feature!(:ams_root_account_integration)
 
@@ -48,7 +52,7 @@ describe ItemBanksController do
       get :show, params: { course_id: @course.id }
 
       expect(response).to be_successful
-      expect(controller.remote_env[:ams]).to_not be_nil
+      expect(controller.remote_env[:ams]).not_to be_nil
       expect(controller.remote_env[:ams][:launch_url]).to eq(Services::Ams.launch_url)
       expect(controller.remote_env[:ams][:API_URL]).to eq(Services::Ams.api_url)
     end

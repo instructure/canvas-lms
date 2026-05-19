@@ -32,12 +32,12 @@ module Services
 
     # which of the users does the sender know, and what contexts do they and
     # the sender have in common?
-    def self.common_contexts(sender, users, ignore_result = false)
+    def self.common_contexts(sender, users, ignore_result: false)
       recipients(sender:, user_ids: users, ignore_result:).common_contexts
     end
 
     # which of the users have roles in the context and what are those roles?
-    def self.roles_in_context(context, users, ignore_result = false)
+    def self.roles_in_context(context, users, ignore_result: false)
       context = context.course if context.is_a?(CourseSection)
       recipients(context:, user_ids: users, ignore_result:).common_contexts
     end
@@ -52,7 +52,7 @@ module Services
     #  - have roles in the context and what are those roles? (sender absent;
     #    admin view)
     #
-    def self.known_in_context(sender, context, user_ids = nil, ignore_result = false)
+    def self.known_in_context(sender, context, user_ids = nil, ignore_result: false)
       params = { sender:, context:, ignore_result: }
       params[:user_ids] = user_ids if user_ids
       response = recipients(params)
@@ -60,7 +60,7 @@ module Services
     end
 
     # how many users does the sender know in each of the contexts?
-    def self.count_in_contexts(sender, contexts, ignore_result = false)
+    def self.count_in_contexts(sender, contexts, ignore_result: false)
       counts = count_recipients(sender:, contexts:, ignore_result:)
       # map back from normalized to argument
       contexts.each do |ctx|
@@ -86,7 +86,7 @@ module Services
     #  - have roles in the context and what are those roles? (context provided
     #    without sender; admin view)
     #
-    def self.search_users(sender, options, service_options, ignore_result = false)
+    def self.search_users(sender, options, service_options, ignore_result: false)
       params = options.slice(:search, :context, :exclude_ids, :weak_checks)
       params[:ignore_result] = ignore_result
       params[:sender] = sender

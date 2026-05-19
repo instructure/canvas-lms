@@ -16,15 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   LOGGED_OUT_STUDENT_VIEW_QUERY,
   STUDENT_VIEW_QUERY,
   STUDENT_VIEW_QUERY_WITH_REVIEWER_SUBMISSION,
 } from '@canvas/assignments/graphql/student/Queries'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {useQuery} from '@apollo/client'
 import React from 'react'
 import {string} from 'prop-types'
@@ -74,6 +75,8 @@ const ErrorPage = ({error}) => {
   return (
     <GenericErrorPage
       imageUrl={errorShipUrl}
+      onReportError={reportError}
+      translations={canvasErrorPageTranslations}
       errorSubject={I18n.t('Assignments 2 Student initial query error')}
       errorCategory={I18n.t('Assignments 2 Student Error Page')}
       errorMessage={error.message}

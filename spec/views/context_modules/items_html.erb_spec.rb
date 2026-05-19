@@ -72,7 +72,7 @@ describe "context_modules/items_html" do
   context "when module is not given" do
     it "should not call module item rendering" do
       expect(view)
-        .to_not receive(:render)
+        .not_to receive(:render)
         .with(partial: "context_modules/module_item_next", **non_call_render_params)
 
       subject
@@ -80,14 +80,14 @@ describe "context_modules/items_html" do
 
     it "should not call module item conditional next rendering" do
       expect(view)
-        .to_not receive(:render)
+        .not_to receive(:render)
         .with(partial: "context_modules/module_item_conditional_next", **non_call_render_params)
 
       subject
     end
 
     it "should not call process_module_items_data" do
-      expect_any_instance_of(ContextModulesHelper).to_not receive(:process_module_items_data)
+      expect_any_instance_of(ContextModulesHelper).not_to receive(:process_module_items_data)
 
       subject
     end
@@ -151,7 +151,7 @@ describe "context_modules/items_html" do
       let(:mock_module_data) { { items: [], items_data: {}, items_restrictions: {} } }
 
       it "should not call module item rendering" do
-        expect(view).to_not receive(:render).with(partial: "context_modules/module_item_next", **non_call_render_params)
+        expect(view).not_to receive(:render).with(partial: "context_modules/module_item_next", **non_call_render_params)
 
         subject
       end
@@ -159,7 +159,7 @@ describe "context_modules/items_html" do
 
     it "should not call module item conditional next rendering" do
       expect(view)
-        .to_not receive(:render)
+        .not_to receive(:render)
         .with(partial: "context_modules/module_item_conditional_next", **non_call_render_params)
 
       subject

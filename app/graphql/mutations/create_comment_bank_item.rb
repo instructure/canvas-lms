@@ -45,7 +45,7 @@ class Mutations::CreateCommentBankItem < Mutations::BaseMutation
   end
 
   def get_assignment(assignment_id, course)
-    course.assignments.active.find(assignment_id)
+    AbstractAssignment.assignment_scope_for_context(course).active.find(assignment_id)
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, I18n.t("Assignment not found")
   end

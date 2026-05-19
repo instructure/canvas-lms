@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ReportSnapshot < ActiveRecord::Base
+class ReportSnapshot < ApplicationRecord
   STATS_COLLECTION_URL = "https://stats.instructure.com/stats_collection"
   REPORT_TO_SEND = "counts_progressive_detailed"
 

@@ -82,6 +82,16 @@ module InstLLMHelper
     end
 
     def extract_json(text)
+      extract_balanced(text, open_char: "{", close_char: "}")
+    end
+
+    def extract_json_array(text)
+      extract_balanced(text, open_char: "[", close_char: "]")
+    end
+
+    private
+
+    def extract_balanced(text, open_char:, close_char:)
       depth = 0
       buffer = +""
       in_string = false
@@ -100,10 +110,10 @@ module InstLLMHelper
         elsif ch == "\""
           in_string = true
           buffer << ch
-        elsif ch == "{"
+        elsif ch == open_char
           depth += 1
           buffer << ch
-        elsif ch == "}"
+        elsif ch == close_char
           buffer << ch
           depth -= 1
           if depth == 0

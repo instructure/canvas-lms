@@ -61,7 +61,7 @@ describe Quizzes::QuizQuestion::FileUploadAnswer do
       ids = nil
       expect do
         ids = answer.attachment_ids
-      end.to_not raise_error
+      end.not_to raise_error
       expect(ids).to be_nil
     end
   end

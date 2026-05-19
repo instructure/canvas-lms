@@ -22,10 +22,7 @@ def setupNode() {
 
     checkoutFromGit(gerritProjectUrl('canvas-lms'), refspec: refspecToCheckout, depth: 1)
 
-    credentials.withStarlordCredentials { ->
-      sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
-    }
-
+    sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
     sh 'build/new-jenkins/docker-compose-build-up.sh'
   }
 }

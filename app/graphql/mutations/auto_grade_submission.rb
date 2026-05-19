@@ -29,8 +29,8 @@ class Mutations::AutoGradeSubmission < Mutations::BaseMutation
     submission = Submission.find(submission_id)
 
     errors = []
-    append_issue_message(errors, GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment: submission.assignment))
-    append_issue_message(errors, GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:))
+    GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment: submission.assignment).each { |i| append_issue_message(errors, i) }
+    GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:).each { |i| append_issue_message(errors, i) }
 
     if errors.any?
       raise GraphQL::ExecutionError, "Auto-grading failed due to the following issue(s): #{errors.join(", ")}"

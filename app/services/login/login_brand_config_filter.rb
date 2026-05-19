@@ -44,7 +44,7 @@ class Login::LoginBrandConfigFilter
 
       if custom_labels_enabled
         next if group_key == "registration" && !account.self_registration?
-        next if group_key == "discovery" && !Account.site_admin.feature_enabled?(:new_login_ui_identity_discovery_page)
+        next if group_key == "discovery" && !account.discovery_page_allowed?
       elsif CUSTOM_MESSAGE_GROUPS.include?(group_key)
         next
       end

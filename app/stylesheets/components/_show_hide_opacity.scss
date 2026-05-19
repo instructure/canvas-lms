@@ -43,17 +43,6 @@ $dimmedOpacity: 0.6;
   }
 }
 
-
-
-//  Example markup:
-//  <a class="dim-till-hover">
-//    this will be 50% transparent until hovered over, regardless of .touch or .no-touch
-//  </a>
-.dim-till-hover {
-  opacity: $dimmedOpacity;
-  &:hover, &:focus { opacity: 1 }
-}
-
 @mixin screenreader-only {
   border: 0;
   clip: rect(0 0 0 0);

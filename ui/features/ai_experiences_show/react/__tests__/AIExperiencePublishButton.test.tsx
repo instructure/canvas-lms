@@ -39,6 +39,7 @@ describe('AIExperiencePublishButton', () => {
     courseId: '123',
     isPublished: false,
     canUnpublish: true,
+    contextReady: true,
     onPublishChange: vi.fn(),
   }
 
@@ -65,64 +66,11 @@ describe('AIExperiencePublishButton', () => {
     expect(screen.getByText('Published')).toBeInTheDocument()
   })
 
-  it('opens menu when button is clicked', async () => {
-    render(<AIExperiencePublishButton {...defaultProps} />)
-    const button = screen.getByTestId('ai-experience-publish-button')
-    fireEvent.click(button)
-
-    await waitFor(() => {
-      expect(screen.getByTestId('publish-option')).toBeInTheDocument()
-      expect(screen.getByTestId('unpublish-option')).toBeInTheDocument()
-    })
-  })
-
-  it('publish option is disabled when already published', async () => {
-    render(<AIExperiencePublishButton {...defaultProps} isPublished={true} />)
-    const button = screen.getByTestId('ai-experience-publish-button')
-    fireEvent.click(button)
-
-    await waitFor(() => {
-      const publishOption = screen.getByTestId('publish-option')
-      expect(publishOption).toHaveAttribute('aria-disabled', 'true')
-    })
-  })
-
-  it('unpublish option is disabled when not published', async () => {
-    render(<AIExperiencePublishButton {...defaultProps} isPublished={false} />)
-    const button = screen.getByTestId('ai-experience-publish-button')
-    fireEvent.click(button)
-
-    await waitFor(() => {
-      const unpublishOption = screen.getByTestId('unpublish-option')
-      expect(unpublishOption).toHaveAttribute('aria-disabled', 'true')
-    })
-  })
-
-  it('unpublish option is disabled when cannot unpublish', async () => {
-    render(<AIExperiencePublishButton {...defaultProps} isPublished={true} canUnpublish={false} />)
-    const button = screen.getByTestId('ai-experience-publish-button')
-    fireEvent.click(button)
-
-    await waitFor(() => {
-      const unpublishOption = screen.getByTestId('unpublish-option')
-      expect(unpublishOption).toHaveAttribute('aria-disabled', 'true')
-      expect(screen.getByText('(Students have conversations)')).toBeInTheDocument()
-    })
-  })
-
   it('calls API and callback when publishing', async () => {
     const onPublishChange = vi.fn()
     render(<AIExperiencePublishButton {...defaultProps} onPublishChange={onPublishChange} />)
 
-    const button = screen.getByTestId('ai-experience-publish-button')
-    fireEvent.click(button)
-
-    await waitFor(() => {
-      expect(screen.getByTestId('publish-option')).toBeInTheDocument()
-    })
-
-    const publishOption = screen.getByTestId('publish-option')
-    fireEvent.click(publishOption)
+    fireEvent.click(screen.getByTestId('ai-experience-publish-button'))
 
     await waitFor(() => {
       expect(onPublishChange).toHaveBeenCalledWith('published')
@@ -149,15 +97,7 @@ describe('AIExperiencePublishButton', () => {
       />,
     )
 
-    const button = screen.getByTestId('ai-experience-publish-button')
-    fireEvent.click(button)
-
-    await waitFor(() => {
-      expect(screen.getByTestId('unpublish-option')).toBeInTheDocument()
-    })
-
-    const unpublishOption = screen.getByTestId('unpublish-option')
-    fireEvent.click(unpublishOption)
+    fireEvent.click(screen.getByTestId('ai-experience-publish-button'))
 
     await waitFor(() => {
       expect(onPublishChange).toHaveBeenCalledWith('unpublished')
@@ -187,18 +127,101 @@ describe('AIExperiencePublishButton', () => {
       />,
     )
 
-    const button = screen.getByTestId('ai-experience-publish-button')
-    fireEvent.click(button)
-
-    await waitFor(() => {
-      expect(screen.getByTestId('unpublish-option')).toBeInTheDocument()
-    })
-
-    const unpublishOption = screen.getByTestId('unpublish-option')
-    fireEvent.click(unpublishOption)
+    fireEvent.click(screen.getByTestId('ai-experience-publish-button'))
 
     await waitFor(() => {
       expect(onPublishChange).not.toHaveBeenCalled()
     })
+  })
+
+  it('disables entire button when contextReady is false and unpublished', () => {
+    render(<AIExperiencePublishButton {...defaultProps} isPublished={false} contextReady={false} />)
+    const button = screen.getByTestId('ai-experience-publish-button')
+    expect(button).toBeDisabled()
+  })
+
+  it('disables entire button when canUnpublish is false and published', () => {
+    render(<AIExperiencePublishButton {...defaultProps} isPublished={true} canUnpublish={false} />)
+    const button = screen.getByTestId('ai-experience-publish-button')
+    expect(button).toBeDisabled()
+  })
+
+  it('shows tooltip when contextReady is false and unpublished', () => {
+    const {container} = render(
+      <AIExperiencePublishButton {...defaultProps} isPublished={false} contextReady={false} />,
+    )
+    // Tooltip content is rendered but may not be visible until hover
+    expect(container).toBeInTheDocument()
+  })
+
+  it('shows tooltip when canUnpublish is false and published', () => {
+    const {container} = render(
+      <AIExperiencePublishButton {...defaultProps} isPublished={true} canUnpublish={false} />,
+    )
+    // Tooltip content is rendered but may not be visible until hover
+    expect(container).toBeInTheDocument()
+  })
+
+  it('allows button to be clicked when contextReady is true and unpublished', () => {
+    render(<AIExperiencePublishButton {...defaultProps} isPublished={false} contextReady={true} />)
+    const button = screen.getByTestId('ai-experience-publish-button')
+    expect(button).not.toBeDisabled()
+  })
+
+  it('disables button when indexFailed is true and unpublished', () => {
+    render(
+      <AIExperiencePublishButton
+        {...defaultProps}
+        isPublished={false}
+        contextReady={false}
+        indexFailed={true}
+      />,
+    )
+    const button = screen.getByTestId('ai-experience-publish-button')
+    expect(button).toBeDisabled()
+  })
+
+  it('allows button to be clicked when canUnpublish is true and published', () => {
+    render(<AIExperiencePublishButton {...defaultProps} isPublished={true} canUnpublish={true} />)
+    const button = screen.getByTestId('ai-experience-publish-button')
+    expect(button).not.toBeDisabled()
+  })
+
+  it('clicking unpublished button directly publishes without opening a menu', async () => {
+    const onPublishChange = vi.fn()
+    render(<AIExperiencePublishButton {...defaultProps} onPublishChange={onPublishChange} />)
+
+    fireEvent.click(screen.getByTestId('ai-experience-publish-button'))
+
+    await waitFor(() => {
+      expect(onPublishChange).toHaveBeenCalledWith('published')
+    })
+    expect(screen.queryByText('Publish')).not.toBeInTheDocument()
+    expect(screen.queryByText('Unpublish')).not.toBeInTheDocument()
+  })
+
+  it('clicking published button directly unpublishes without opening a menu', async () => {
+    server.use(
+      http.put('/api/v1/courses/123/ai_experiences/1', () =>
+        HttpResponse.json({id: 1, workflow_state: 'unpublished', can_unpublish: true}),
+      ),
+    )
+
+    const onPublishChange = vi.fn()
+    render(
+      <AIExperiencePublishButton
+        {...defaultProps}
+        isPublished={true}
+        onPublishChange={onPublishChange}
+      />,
+    )
+
+    fireEvent.click(screen.getByTestId('ai-experience-publish-button'))
+
+    await waitFor(() => {
+      expect(onPublishChange).toHaveBeenCalledWith('unpublished')
+    })
+    expect(screen.queryByText('Publish')).not.toBeInTheDocument()
+    expect(screen.queryByText('Unpublish')).not.toBeInTheDocument()
   })
 })

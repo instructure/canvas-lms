@@ -21,6 +21,15 @@ import {render, waitFor, act} from '@testing-library/react'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import {GradesPage} from '../GradesPage'
+import {showFlashError} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
 import {
   MOCK_GRADING_PERIODS_EMPTY,
   MOCK_GRADING_PERIODS_NORMAL,
@@ -84,6 +93,7 @@ describe('GradesPage', () => {
   afterEach(() => {
     server.resetHandlers()
     localStorage.clear()
+    vi.clearAllMocks()
   })
 
   describe('without grading periods', () => {
@@ -121,9 +131,9 @@ describe('GradesPage', () => {
           return new HttpResponse(null, {status: 400})
         }),
       )
-      const {getAllByText} = render(<GradesPage {...getProps()} />)
+      render(<GradesPage {...getProps()} />)
       await waitFor(() =>
-        expect(getAllByText('Failed to load grade details for History')[0]).toBeInTheDocument(),
+        expect(showFlashError).toHaveBeenCalledWith('Failed to load grade details for History'),
       )
     })
 
@@ -342,9 +352,9 @@ describe('GradesPage', () => {
           return HttpResponse.json({})
         }),
       )
-      const {getAllByText} = render(<GradesPage {...getProps()} />)
+      render(<GradesPage {...getProps()} />)
       await waitFor(() =>
-        expect(getAllByText('Failed to load grading periods for History')[0]).toBeInTheDocument(),
+        expect(showFlashError).toHaveBeenCalledWith('Failed to load grading periods for History'),
       )
     })
 

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../../spec_helper"
-
 describe "Api::V1::ModerationGrader" do
   subject(:api) do
     (Class.new do

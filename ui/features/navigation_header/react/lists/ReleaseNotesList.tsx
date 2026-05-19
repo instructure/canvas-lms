@@ -32,7 +32,7 @@ import releaseNotesQuery from '../queries/releaseNotesQuery'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {IconWarningSolid} from '@instructure/ui-icons'
 import {getSetting, setSetting} from '@canvas/settings-query/react/settingsQuery'
-import {sessionStoragePersister} from '@canvas/query'
+import {sessionStoragePersister} from '@instructure/platform-query'
 
 const I18n = createI18nScope('Navigation')
 
@@ -48,7 +48,7 @@ export default function ReleaseNotesList() {
     queryKey: ['settings', 'release_notes_badge_disabled'],
     queryFn: getSetting,
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
   })
 
   const mutation = useMutation({
@@ -70,7 +70,7 @@ export default function ReleaseNotesList() {
     queryKey: ['releaseNotes'],
     queryFn: releaseNotesQuery,
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
   })
 
   const [wasFetchingReleaseNotes, setWasFetchingReleaseNotes] = useState(isFetching)

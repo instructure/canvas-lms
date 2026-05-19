@@ -33,6 +33,7 @@ import {
   type DateAdjustmentConfig,
   type MigrationCreateRequestBody,
   type onSubmitMigrationFormCallback,
+  type submitMigrationFormData,
 } from './react/CommonMigratorControls/types'
 
 export {TreeSelector}
@@ -46,6 +47,7 @@ export type {
   DateAdjustmentConfig,
   MigrationCreateRequestBody,
   onSubmitMigrationFormCallback,
+  submitMigrationFormData,
 }
 
 export {parseDateToISOString} from './react/utils'

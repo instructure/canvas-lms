@@ -49,10 +49,19 @@ class GradeService
       )
 
       map_grade_essay_results_to_canvas(grading_results, @rubric)
+    # These subclasses have static, user-safe messages and can be shown directly.
+    # If new CedarClientError subclasses are added with user-safe messages, add them here.
+    rescue InstructureMiscPlugin::Extensions::CedarClient::ValidationError,
+           InstructureMiscPlugin::Extensions::CedarClient::CedarLimitReachedError,
+           InstructureMiscPlugin::Extensions::CedarClient::UnsupportedLanguageError,
+           InstructureMiscPlugin::Extensions::CedarClient::ContentTooLongError => e
+      raise CedarAi::Errors::GraderError, friendly_cedar_error_for(e)
     rescue InstructureMiscPlugin::Extensions::CedarClient::CedarClientError => e
-      raise CedarAi::Errors::GraderError, e.message
+      Rails.logger.error("[GradeService] Cedar API error: #{e.message}")
+      raise CedarAi::Errors::GraderError, friendly_cedar_error_for(e)
     rescue => e
-      raise CedarAi::Errors::GraderError, "Invalid response from gradeEssay: #{e.message}"
+      Rails.logger.error("[GradeService] Unexpected error: #{e.class}: #{e.message}")
+      raise CedarAi::Errors::GraderError, I18n.t("An unexpected error occurred while grading.")
     end
   end
 
@@ -62,7 +71,7 @@ class GradeService
       acc[key] = {
         "Criteria" => (criterion[:ratings] || []).map do |rating|
           {
-            "Description" => rating[:long_description],
+            "Description" => rating_description_for(criterion, rating),
             "Points" => rating[:points]
           }
         end,
@@ -71,16 +80,21 @@ class GradeService
     end
   end
 
+  def self.rating_description_for(criterion, rating)
+    criterion[:learning_outcome_id].present? ? rating[:description] : rating[:long_description]
+  end
+
   private
 
   def build_cedar_rubric(rubric_data)
     rubric_data.map do |criterion|
       {
         name: criterion[:description],
+        useRange: criterion[:criterion_use_range],
         criteria: (criterion[:ratings] || []).map do |rating|
           {
             points: rating[:points],
-            description: rating[:long_description]
+            description: self.class.rating_description_for(criterion, rating)
           }
         end
       }
@@ -95,7 +109,8 @@ class GradeService
       next unless criterion_data
 
       matched_rating = (criterion_data[:ratings] || []).find do |r|
-        TextNormalizerHelper.normalize(r[:long_description]) ==
+        rating_description = self.class.rating_description_for(criterion_data, r)
+        TextNormalizerHelper.normalize(rating_description) ==
           TextNormalizerHelper.normalize(result.criterion)
       end
       next unless matched_rating
@@ -106,11 +121,11 @@ class GradeService
         "rating" => {
           "id" => matched_rating[:id],
           "description" => result.criterion,
-          "rating" => matched_rating[:points],
+          "rating" => (criterion_data[:criterion_use_range] && result.points) ? result.points : matched_rating[:points],
           "reasoning" => result.reasoning
         },
-        # NEW: inline guidance from gradeEssay
-        "comments" => result.guidance
+        "comments" => result.guidance,
+        "responseId" => result.response_id
       }
     end
   end
@@ -141,6 +156,19 @@ class GradeService
 
   def validate_essay_length(text)
     raise "Submission must be at least 5 words long" if text.split.size < 5
+  end
+
+  def friendly_cedar_error_for(error)
+    case error
+    when InstructureMiscPlugin::Extensions::CedarClient::CedarLimitReachedError
+      I18n.t("Grading is temporarily unavailable. Please try again later.")
+    when InstructureMiscPlugin::Extensions::CedarClient::ContentTooLongError
+      I18n.t("The submission is too long to be graded automatically.")
+    when InstructureMiscPlugin::Extensions::CedarClient::UnsupportedLanguageError
+      I18n.t("The submission language is not supported for automatic grading.")
+    else
+      I18n.t("An unexpected error occurred while grading.")
+    end
   end
 
   def rubric_matches_default_template?

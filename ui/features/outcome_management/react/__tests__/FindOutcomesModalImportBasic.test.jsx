@@ -36,9 +36,13 @@ import {clickEl} from '@canvas/outcomes/react/helpers/testHelpers'
 import resolveProgress from '@canvas/progress/resolve_progress'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-vi.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: vi.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 vi.mock('@canvas/progress/resolve_progress')
 
@@ -131,12 +135,7 @@ describe('FindOutcomesModal - Import Basic Tests', () => {
 
   const render = (
     children,
-    {
-      contextType = 'Account',
-      contextId = '1',
-      mocks = findModalMocks(),
-      renderer = rtlRender,
-    } = {},
+    {contextType = 'Account', contextId = '1', mocks = findModalMocks(), renderer = rtlRender} = {},
   ) => {
     return renderer(
       <OutcomesContext.Provider
@@ -179,10 +178,13 @@ describe('FindOutcomesModal - Import Basic Tests', () => {
       },
     ])
 
-    const {getByText, queryByText, queryAllByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-      contextType: 'Course',
-      mocks: [...findModalMocks({parentAccountChildren: 1}), ...defaultTreeGroupMocks()],
-    })
+    const {getByText, queryByText, queryAllByText} = render(
+      <FindOutcomesModal {...defaultProps()} />,
+      {
+        contextType: 'Course',
+        mocks: [...findModalMocks({parentAccountChildren: 1}), ...defaultTreeGroupMocks()],
+      },
+    )
 
     await waitFor(() => expect(getByText('Account Standards')).toBeInTheDocument())
     await clickEl(getByText('Account Standards'))
@@ -207,18 +209,21 @@ describe('FindOutcomesModal - Import Basic Tests', () => {
   it('handles outcome import button states correctly', async () => {
     const doResolveProgress = delayImportOutcomesProgress()
 
-    const {getByText, getAllByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-      contextType: 'Course',
-      mocks: [
-        ...courseImportMocks,
-        ...importOutcomeMocks({
-          outcomeId: '5',
-          targetContextType: 'Course',
-          sourceContextId: '1',
-          sourceContextType: 'Account',
-        }),
-      ],
-    })
+    const {getByText, getAllByText, queryByText} = render(
+      <FindOutcomesModal {...defaultProps()} />,
+      {
+        contextType: 'Course',
+        mocks: [
+          ...courseImportMocks,
+          ...importOutcomeMocks({
+            outcomeId: '5',
+            targetContextType: 'Course',
+            sourceContextId: '1',
+            sourceContextType: 'Account',
+          }),
+        ],
+      },
+    )
 
     await navigateToGroup(getByText)
 

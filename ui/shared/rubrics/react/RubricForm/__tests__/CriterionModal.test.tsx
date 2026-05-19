@@ -253,10 +253,10 @@ describe('CriterionModal tests', () => {
       const rangeStarts = queryAllByTestId('range-start') as HTMLInputElement[]
 
       expect(rangeStarts).toHaveLength(4)
-      expect(rangeStarts[0].textContent).toEqual('8.1 to ')
-      expect(rangeStarts[1].textContent).toEqual('5.1 to ')
-      expect(rangeStarts[2].textContent).toEqual('3.1 to ')
-      expect(rangeStarts[3].textContent).toEqual('--')
+      expect(rangeStarts[0].textContent).toEqual('>8 to ')
+      expect(rangeStarts[1].textContent).toEqual('>5 to ')
+      expect(rangeStarts[2].textContent).toEqual('>3 to ')
+      expect(rangeStarts[3].textContent).toEqual('>0 to ')
     })
 
     it('should render no range when the ratings of the previous rating are the same as the current rating', () => {
@@ -275,9 +275,9 @@ describe('CriterionModal tests', () => {
       const rangeStarts = queryAllByTestId('range-start') as HTMLInputElement[]
       expect(rangeStarts).toHaveLength(4)
       expect(rangeStarts[0].textContent).toEqual('--')
-      expect(rangeStarts[1].textContent).toEqual('8.1 to ')
-      expect(rangeStarts[2].textContent).toEqual('5.1 to ')
-      expect(rangeStarts[3].textContent).toEqual('--')
+      expect(rangeStarts[1].textContent).toEqual('>8 to ')
+      expect(rangeStarts[2].textContent).toEqual('>5 to ')
+      expect(rangeStarts[3].textContent).toEqual('>0 to ')
     })
   })
 })

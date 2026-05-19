@@ -106,39 +106,7 @@ describe TokensController, type: :request do
         end
       end
 
-      context "with admin_manage_access_tokens feature flag" do
-        before { Account.default.enable_feature!(:admin_manage_access_tokens) }
-
-        it_behaves_like "admin successfully deleting access tokens"
-      end
-
-      context "without admin_manage_access_tokens but with student_access_token_management feature flag" do
-        before do
-          Account.default.disable_feature!(:admin_manage_access_tokens)
-          Account.site_admin.enable_feature!(:student_access_token_management)
-        end
-
-        it_behaves_like "admin successfully deleting access tokens"
-      end
-
-      context "without admin_manage_access_tokens or student_access_token_management feature flag" do
-        before do
-          Account.default.disable_feature!(:admin_manage_access_tokens)
-          Account.site_admin.disable_feature!(:student_access_token_management)
-        end
-
-        it "doesn't allow them to delete tokens" do
-          api_call(:delete,
-                   "/api/v1/users/#{user.id}/tokens/#{token.id}",
-                   controller: "tokens",
-                   action: "destroy",
-                   format: "json",
-                   user_id: user.id,
-                   id: token.id)
-          assert_status(404)
-          expect(token.reload).not_to be_deleted
-        end
-      end
+      it_behaves_like "admin successfully deleting access tokens"
     end
   end
 end

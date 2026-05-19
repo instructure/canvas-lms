@@ -21,6 +21,8 @@ module InstFS
   LONG_JWT_EXPIRATION = 10.minutes
   SHORT_JWT_EXPIRATION = 5.minutes
   class << self
+    include ActionView::Helpers::TagHelper
+
     def enabled?
       # true if plugin is enabled AND all settings values are set
       Canvas::Plugin.find("inst_fs").enabled? && !!app_host && !!jwt_secret
@@ -45,7 +47,7 @@ module InstFS
       if !session[:shown_instfs_pixel] && user && enabled?
         session[:shown_instfs_pixel] = true
         pixel_url = login_pixel_url(token: session_jwt(user, oauth_host))
-        %(<img src="#{pixel_url}" alt="" role="presentation" />).html_safe
+        tag.img src: pixel_url, alt: "", role: "presentation"
       end
     end
 

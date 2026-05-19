@@ -126,13 +126,13 @@ describe('GradeSummary GradersTable', () => {
 
   test('includes a row for each grader', () => {
     mountComponent()
-    expect(wrapper.container.querySelectorAll('.grader-label')).toHaveLength(4)
+    expect(wrapper.getAllByTestId('grader-label')).toHaveLength(4)
   })
 
   test('displays grader names in the row headers', () => {
     mountComponent()
-    const rowHeaders = wrapper.container.querySelectorAll('.grader-label')
-    expect([...rowHeaders].map(header => header.textContent)).toEqual(
+    const rowHeaders = wrapper.getAllByTestId('grader-label')
+    expect(rowHeaders.map(header => header.textContent)).toEqual(
       storeEnv.graders.map(grader => grader.graderName),
     )
   })
@@ -218,7 +218,7 @@ describe('GradeSummary GradersTable', () => {
     test('receives the grade selection details for the related grader', () => {
       mountAndFinishLoading()
       const row = getGraderRow('1103')
-      expect(within(row).getByLabelText('Mrs. Krabappel')).toBeInTheDocument()
+      expect(within(row).getByText('Accept grades by Mrs. Krabappel')).toBeInTheDocument()
     })
   })
 })

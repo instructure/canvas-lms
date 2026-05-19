@@ -282,10 +282,9 @@ export default class FilePreview extends React.PureComponent {
   renderPreview = () => {
     const item = this.state.displayedItem
     if (item && item.get('preview_url')) {
-      const isNewStudioPlayer = ENV.FEATURES?.consolidated_media_player
-      return isNewStudioPlayer && ['video', 'audio'].includes(item.get('mime_class'))
+      return ['video', 'audio'].includes(item.get('mime_class'))
         ? this.renderStudioPlayer(item)
-        : this.renderCanvasPlayer(item)
+        : this.renderCanvasPlayer(item) // check what extra files it supports
     } else {
       return (
         <div className="ef-file-not-found ef-file-preview-frame">

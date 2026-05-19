@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ConversationMessageParticipant < ActiveRecord::Base
+class ConversationMessageParticipant < ApplicationRecord
   include SimpleTags
   include Workflow
   include ConversationHelper

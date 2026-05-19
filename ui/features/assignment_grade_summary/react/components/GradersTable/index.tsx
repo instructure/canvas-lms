@@ -79,9 +79,9 @@ function GradersTable(props) {
         {rows.map(row => (
           <Grid.Row id={`grader-row-${row.graderId}`} key={row.graderId}>
             <Grid.Col>
-              <label className="grader-label" htmlFor={`grader-row-accept-${row.graderId}`}>
+              <Text data-testid="grader-label" variant="contentSmall">
                 {row.graderName}
-              </label>
+              </Text>
             </Grid.Col>
 
             {showAcceptGradesColumn && (

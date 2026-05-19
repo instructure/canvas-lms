@@ -539,6 +539,18 @@ describe Types::SubmissionType do
           resolver.resolve("commentsConnection(filter: {allComments: true}) { nodes { _id }}", current_user: @student2)
         ).to eq [student_2_comment.id.to_s]
       end
+
+      it "returns only reviewer's own comments with status ALL and peerReview true" do
+        student_2_comment = @peer_review_submission.add_comment(author: @student2, comment: "student2 peer review")
+        student_3_comment = @peer_review_submission.add_comment(author: @student3, comment: "student3 peer review")
+
+        result = GraphQLTypeTester.new(@peer_review_submission, current_user: @student2).resolve(
+          "commentsConnection(filter: { status: [ALL], peerReview: true }) { nodes { _id } }"
+        )
+
+        expect(result).to eq [student_2_comment.id.to_s]
+        expect(result).not_to include(student_3_comment.id.to_s)
+      end
     end
 
     context "draft comments" do
@@ -577,6 +589,190 @@ describe Types::SubmissionType do
         expect(
           submission_type.resolve("commentsConnection(includeDraftComments: true, includeDraftsFromOthers: true) { nodes { _id }}", current_user: @student)
         ).to eq [@comment2.id.to_s]
+      end
+    end
+
+    context "status filter argument" do
+      before(:once) do
+        @filter_student = student_in_course(course: @course, active_all: true).user
+        @teacher2 = teacher_in_course(course: @course, active_all: true).user
+        @filter_submission = @assignment.submit_homework(@filter_student, body: "student work")
+        @teacher_comment = @filter_submission.add_comment(author: @teacher, comment: "teacher comment")
+        @teacher_draft = @filter_submission.add_comment(author: @teacher, comment: "teacher draft", draft_comment: true)
+        @teacher2_comment = @filter_submission.add_comment(author: @teacher2, comment: "teacher2 comment")
+        @teacher2_draft = @filter_submission.add_comment(author: @teacher2, comment: "teacher2 draft", draft_comment: true)
+        @student_comment = @filter_submission.add_comment(author: @filter_student, comment: "student comment")
+      end
+
+      it "returns published comments for student with status ALL" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @filter_student).resolve(
+          "commentsConnection(filter: { status: [ALL] }) { nodes { _id } }"
+        )
+
+        visible_comments = @filter_submission.visible_submission_comments_for(@filter_student)
+        expect(result).to match_array(visible_comments.map { |c| c.id.to_s })
+      end
+
+      it "returns published and draft comments for teacher with status ALL" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }) { nodes { _id } }"
+        )
+
+        visible_comments = @filter_submission.visible_submission_comments_for(@teacher)
+        expect(result).to match_array(visible_comments.map { |c| c.id.to_s })
+      end
+
+      it "delegates to visible_submission_comments_for when status is ALL" do
+        expect_any_instance_of(Submission).to receive(:visible_submission_comments_for).with(@teacher).and_call_original
+
+        GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }) { nodes { _id } }"
+        )
+      end
+
+      it "falls back to published comments only when status array is empty" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [] }) { nodes { _id } }"
+        )
+
+        expect(result).to match_array([
+                                        @teacher_comment.id.to_s,
+                                        @teacher2_comment.id.to_s,
+                                        @student_comment.id.to_s
+                                      ])
+        expect(result).not_to include(@teacher_draft.id.to_s)
+        expect(result).not_to include(@teacher2_draft.id.to_s)
+      end
+
+      it "falls back to published comments only when status is null" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: null }) { nodes { _id } }"
+        )
+
+        expect(result).to match_array([
+                                        @teacher_comment.id.to_s,
+                                        @teacher2_comment.id.to_s,
+                                        @student_comment.id.to_s
+                                      ])
+        expect(result).not_to include(@teacher_draft.id.to_s)
+        expect(result).not_to include(@teacher2_draft.id.to_s)
+      end
+
+      it "overrides includeDraftComments parameter when status is ALL" do
+        result_with_false = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }, includeDraftComments: false) { nodes { _id } }"
+        )
+        result_with_true = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }, includeDraftComments: true) { nodes { _id } }"
+        )
+
+        visible_comments = @filter_submission.visible_submission_comments_for(@teacher)
+        expect(result_with_false).to match_array(visible_comments.map { |c| c.id.to_s })
+        expect(result_with_true).to match_array(visible_comments.map { |c| c.id.to_s })
+      end
+
+      it "filters to specified attempt only when combined with forAttempt" do
+        @filter_submission.update!(attempt: 2)
+        attempt_1_comment = @filter_submission.add_comment(author: @teacher, comment: "attempt 1 comment", attempt: 1)
+        attempt_2_comment = @filter_submission.add_comment(author: @teacher, comment: "attempt 2 comment", attempt: 2)
+
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL], forAttempt: 2 }) { nodes { _id } }"
+        )
+
+        expect(result).to include(attempt_2_comment.id.to_s)
+        expect(result).not_to include(attempt_1_comment.id.to_s)
+      end
+
+      it "sorts comments newest first when sortOrder is desc" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }, sortOrder: desc) { nodes { _id } }"
+        )
+
+        visible_comments = @filter_submission.visible_submission_comments_for(@teacher)
+        expected_order = visible_comments.sort_by { |c| [c.created_at.to_i, c.id] }.reverse.map { |c| c.id.to_s }
+        expect(result).to eq(expected_order)
+      end
+
+      it "sorts comments oldest first when sortOrder is asc" do
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL] }, sortOrder: asc) { nodes { _id } }"
+        )
+
+        visible_comments = @filter_submission.visible_submission_comments_for(@teacher)
+        expected_order = visible_comments.sort_by { |c| [c.created_at.to_i, c.id] }.map { |c| c.id.to_s }
+        expect(result).to eq(expected_order)
+      end
+
+      it "returns comments from all attempts when allComments overrides forAttempt" do
+        @filter_submission.update!(attempt: 2)
+        attempt_1_comment = @filter_submission.add_comment(author: @teacher, comment: "attempt 1 comment", attempt: 1)
+        attempt_2_comment = @filter_submission.add_comment(author: @teacher, comment: "attempt 2 comment", attempt: 2)
+
+        result = GraphQLTypeTester.new(@filter_submission, current_user: @teacher).resolve(
+          "commentsConnection(filter: { status: [ALL], allComments: true, forAttempt: 2 }) { nodes { _id } }"
+        )
+
+        expect(result).to include(attempt_1_comment.id.to_s)
+        expect(result).to include(attempt_2_comment.id.to_s)
+      end
+
+      context "with provisional comments" do
+        before(:once) do
+          @final_grader = @teacher
+          @provisional_grader1 = teacher_in_course(course: @course, active_all: true).user
+          @provisional_grader2 = teacher_in_course(course: @course, active_all: true).user
+
+          @moderated_assignment = @course.assignments.create!(
+            name: "moderated assignment",
+            moderated_grading: true,
+            grader_count: 3,
+            final_grader: @final_grader
+          )
+          @moderated_submission = @moderated_assignment.submit_homework(@filter_student, body: "student work")
+
+          @moderated_assignment.grade_student(@filter_student, grade: 8, grader: @final_grader, provisional: true)
+          @moderated_assignment.grade_student(@filter_student, grade: 9, grader: @provisional_grader1, provisional: true)
+          @moderated_assignment.grade_student(@filter_student, grade: 7, grader: @provisional_grader2, provisional: true)
+
+          @final_grader_comment = @moderated_submission.add_comment(
+            author: @final_grader,
+            comment: "final grader provisional comment",
+            provisional: true
+          )
+          @provisional_comment1 = @moderated_submission.add_comment(
+            author: @provisional_grader1,
+            comment: "provisional grader 1 comment",
+            provisional: true
+          )
+          @provisional_comment2 = @moderated_submission.add_comment(
+            author: @provisional_grader2,
+            comment: "provisional grader 2 comment",
+            provisional: true
+          )
+        end
+
+        it "returns provisional comments regardless of includeProvisionalComments parameter when status is ALL" do
+          result_with_false = GraphQLTypeTester.new(@moderated_submission, current_user: @provisional_grader1).resolve(
+            "commentsConnection(filter: { status: [ALL] }, includeProvisionalComments: false) { nodes { _id } }"
+          )
+          result_with_true = GraphQLTypeTester.new(@moderated_submission, current_user: @provisional_grader1).resolve(
+            "commentsConnection(filter: { status: [ALL] }, includeProvisionalComments: true) { nodes { _id } }"
+          )
+
+          visible_comments = @moderated_submission.visible_submission_comments_for(@provisional_grader1)
+          expect(result_with_false).to match_array(visible_comments.map { |c| c.id.to_s })
+          expect(result_with_true).to match_array(visible_comments.map { |c| c.id.to_s })
+          expect(result_with_false).to include(@provisional_comment1.id.to_s)
+        end
+
+        it "returns no provisional comments to students when grades are unpublished" do
+          result = GraphQLTypeTester.new(@moderated_submission, current_user: @filter_student).resolve(
+            "commentsConnection(filter: { status: [ALL] }) { nodes { _id } }"
+          )
+
+          expect(result).to eq([])
+        end
       end
     end
   end
@@ -796,6 +992,60 @@ describe Types::SubmissionType do
               "submissionHistoriesConnection(filter: {includeCurrentSubmission: false}) { nodes { attempt }}"
             )
           ).to eq [1, 2]
+        end
+      end
+    end
+
+    context "previewUrl with legacy version missing course_id" do
+      let(:legacy_student) { student_in_course(course: @course, active_all: true).user }
+      let(:legacy_submission) { legacy_student.submissions.find_by!(assignment: legacy_assignment) }
+      let(:legacy_resolver) { GraphQLTypeTester.new(legacy_submission, current_user: @teacher, request: ActionDispatch::TestRequest.create) }
+
+      before do
+        legacy_assignment.submit_homework(legacy_student, submitted_at: 3.hours.ago, **legacy_homework_opts)
+        legacy_assignment.submit_homework(legacy_student, submitted_at: 2.hours.ago, **legacy_homework_opts)
+        legacy_assignment.submit_homework(legacy_student, **legacy_homework_opts)
+        legacy_submission.versions.each do |version|
+          model = version.model
+          model.course_id = nil
+          version.model = model
+          version.save!
+        end
+      end
+
+      context "regular submission" do
+        let(:legacy_assignment) { @course.assignments.create!(name: "legacy regular", submission_types: "online_text_entry", points_possible: 10) }
+        let(:legacy_homework_opts) { { body: "An attempt" } }
+
+        it "returns preview URLs for all submission histories" do
+          expect(legacy_submission.versions.map { |v| v.model.course_id }).to all(be_nil)
+          expect(
+            legacy_resolver.resolve("submissionHistoriesConnection { nodes { previewUrl }}")
+          ).to all(include("http://test.host/courses/#{@course.id}/assignments/#{legacy_assignment.id}/submissions/#{legacy_student.id}"))
+        end
+      end
+
+      context "anonymous submission" do
+        let(:legacy_assignment) { @course.assignments.create!(name: "legacy anon", submission_types: "online_text_entry", points_possible: 10, anonymous_grading: true) }
+        let(:legacy_homework_opts) { { body: "An attempt" } }
+
+        it "returns preview URLs for all submission histories" do
+          expect(legacy_submission.versions.map { |v| v.model.course_id }).to all(be_nil)
+          expect(
+            legacy_resolver.resolve("submissionHistoriesConnection { nodes { previewUrl }}")
+          ).to all(include("http://test.host/courses/#{@course.id}/assignments/#{legacy_assignment.id}/anonymous_submissions/#{legacy_submission.anonymous_id}"))
+        end
+      end
+
+      context "basic_lti_launch submission" do
+        let(:legacy_assignment) { @course.assignments.create!(name: "legacy lti", submission_types: "external_tool", points_possible: 10) }
+        let(:legacy_homework_opts) { { submission_type: "basic_lti_launch", url: "http://example.com/launch" } }
+
+        it "returns preview URLs for all submission histories" do
+          expect(legacy_submission.versions.map { |v| v.model.course_id }).to all(be_nil)
+          expect(
+            legacy_resolver.resolve("submissionHistoriesConnection { nodes { previewUrl }}")
+          ).to all(include("/courses/#{@course.id}/external_tools/retrieve"))
         end
       end
     end
@@ -1048,6 +1298,22 @@ describe Types::SubmissionType do
 
         submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher)
         query = "commentsConnection(filter: {}, includeProvisionalComments: true) { nodes { _id } }"
+        submission_type.resolve(query)
+      end
+
+      it "does not call visible_provisional_comments when includeProvisionalComments is true and filter status [ALL]" do
+        expect_any_instance_of(Submission).not_to receive(:visible_provisional_comments).with(@teacher, provisional_comments: [@provisional_comment]).and_call_original
+
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher)
+        query = "commentsConnection(filter: {status: [ALL]}, includeProvisionalComments: true) { nodes { _id } }"
+        submission_type.resolve(query)
+      end
+
+      it "does not call visible_provisional_comments when includeProvisionalComments is true and includeDraftComments and includeDraftsFromOthers are true" do
+        expect_any_instance_of(Submission).not_to receive(:visible_provisional_comments).with(@teacher, provisional_comments: [@provisional_comment]).and_call_original
+
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher)
+        query = "commentsConnection(filter: {}, includeDraftComments: true, includeDraftsFromOthers: true, includeProvisionalComments: true) { nodes { _id } }"
         submission_type.resolve(query)
       end
 
@@ -1764,6 +2030,15 @@ describe Types::SubmissionType do
         expect(query_params[:resource_link_lookup_uuid]).to be_nil
         expect(preview_url).not_to include "resource_link_lookup_uuid"
       end
+
+      it "includes native experience sessionless override" do
+        @assignment.submit_homework(
+          @student,
+          submission_type: "basic_lti_launch",
+          url: "http://anexternaltoolsubmission.com"
+        )
+        expect(query_params[:new_quizzes_native_experience_sessionless]).to eq "false"
+      end
     end
 
     it "includes a 'version' query param that corresponds to the attempt number - 1 (and NOT the associated submission version number)" do
@@ -1943,26 +2218,26 @@ describe Types::SubmissionType do
         expect(result).to eq []
       end
 
-      it "uses for_student=true loader for students viewing their own submission" do
+      it "uses for_student=true, latest=false loader for students when latest not specified" do
         loader = instance_double(Loaders::SubmissionLtiAssetReportsLoader)
         allow(Loaders::SubmissionLtiAssetReportsLoader).to receive(:for)
-          .with(for_student: true, latest: true)
+          .with(for_student: true, latest: false)
           .and_return(loader)
         allow(loader).to receive(:load).with(submission.id).and_return(Promise.resolve([]))
 
         submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
 
-        expect(Loaders::SubmissionLtiAssetReportsLoader).to have_received(:for).with(for_student: true, latest: true)
+        expect(Loaders::SubmissionLtiAssetReportsLoader).to have_received(:for).with(for_student: true, latest: false)
       end
 
-      it "always uses latest=true for students" do
+      it "passes latest=true through for students when requested (e.g. grades page)" do
         loader = instance_double(Loaders::SubmissionLtiAssetReportsLoader)
         allow(Loaders::SubmissionLtiAssetReportsLoader).to receive(:for)
           .with(for_student: true, latest: true)
           .and_return(loader)
         allow(loader).to receive(:load).with(submission.id).and_return(Promise.resolve([]))
 
-        submission_type.resolve("ltiAssetReportsConnection(latest: false) { nodes { _id } }")
+        submission_type.resolve("ltiAssetReportsConnection(latest: true) { nodes { _id } }")
 
         expect(Loaders::SubmissionLtiAssetReportsLoader).to have_received(:for).with(for_student: true, latest: true)
       end
@@ -2297,9 +2572,10 @@ describe Types::SubmissionType do
 
   describe "auto_grade_submission_issues" do
     before do
+      allow(Feature.definitions["project_lhotse"]).to receive(:visible_on).and_return(proc { true })
       allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_submission)
         .with(submission: @submission)
-        .and_return({ level: "error", message: "Test error" })
+        .and_return([{ level: "error", message: "Test error" }])
     end
 
     it "returns nil when project_lhotse feature flag is disabled" do
@@ -2311,6 +2587,7 @@ describe Types::SubmissionType do
     it "returns issues when project_lhotse feature flag is enabled" do
       @course.enable_feature!(:project_lhotse)
       expect(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_submission)
+        .at_least(:once).and_return([{ level: "error", message: "Test error" }])
       level = submission_type.resolve("autoGradeSubmissionIssues { level }")
       message = submission_type.resolve("autoGradeSubmissionIssues { message }")
       expect(level).to eq "error"
@@ -2320,9 +2597,10 @@ describe Types::SubmissionType do
 
   describe "auto_grade_submission_errors" do
     before do
+      allow(Feature.definitions["project_lhotse"]).to receive(:visible_on).and_return(proc { true })
       allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_submission)
         .with(submission: @submission)
-        .and_return({ level: "error", message: "Test error" })
+        .and_return([{ level: "error", message: "Test error" }])
     end
 
     it "returns empty array when project_lhotse feature flag is disabled" do
@@ -2333,8 +2611,42 @@ describe Types::SubmissionType do
 
     it "returns error messages when project_lhotse feature flag is enabled" do
       @course.enable_feature!(:project_lhotse)
-      expect(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_submission)
-      expect(submission_type.resolve("autoGradeSubmissionErrors")).to eq(["Test error"])
+      result = submission_type.resolve("autoGradeSubmissionErrors")
+      expect(GraphQLHelpers::AutoGradeEligibilityHelper).to have_received(:validate_submission)
+      expect(result).to eq(["Test error"])
+    end
+  end
+
+  describe "auto_grade_eligibility" do
+    before do
+      allow(Feature.definitions["project_lhotse"]).to receive(:visible_on).and_return(proc { true })
+      allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_submission)
+        .with(submission: @submission)
+        .and_return([{ level: "error", message: "No essay submission found." }, { level: "error", message: "Submission must be at least 5 words." }])
+    end
+
+    it "returns nil when project_lhotse feature flag is disabled" do
+      @course.disable_feature!(:project_lhotse)
+      expect(GraphQLHelpers::AutoGradeEligibilityHelper).not_to receive(:validate_submission)
+      expect(submission_type.resolve("autoGradeEligibility { issues { message } }")).to be_nil
+    end
+
+    it "returns all issues when project_lhotse feature flag is enabled" do
+      @course.enable_feature!(:project_lhotse)
+      result = submission_type.resolve("autoGradeEligibility { issues { message } }")
+      expect(result).to contain_exactly(
+        "No essay submission found.",
+        "Submission must be at least 5 words."
+      )
+    end
+
+    it "returns empty issues array when no issues exist" do
+      allow(GraphQLHelpers::AutoGradeEligibilityHelper).to receive(:validate_submission)
+        .with(submission: @submission)
+        .and_return([])
+      @course.enable_feature!(:project_lhotse)
+      result = submission_type.resolve("autoGradeEligibility { issues { message } }")
+      expect(result).to eq([])
     end
   end
 
@@ -2387,12 +2699,132 @@ describe Types::SubmissionType do
         @quiz_submission_2.complete!
       end
 
-      it "returns versions from all attempts" do
+      it "returns one entry per attempt across all attempts" do
         @quiz_submission.reload
         result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { attempt } }")
         attempts = result.flatten
         expect(attempts.length).to be > 1
       end
+
+      it "returns exactly one entry per unique attempt" do
+        @quiz_submission.reload
+        result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { attempt } }")
+        attempts = result.flatten
+        expect(attempts.uniq.length).to eq(attempts.length), "expected one entry per attempt but got duplicates: #{attempts.inspect}"
+      end
+
+      it "returns the same attempt count as old SpeedGrader submitted_attempts" do
+        @quiz_submission.reload
+        result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { attempt } }")
+        graphql_attempt_count = result.flatten.length
+        classic_quiz_sub = @quiz_submission.quiz_submission
+        old_sg_attempt_count = classic_quiz_sub.submitted_attempts.length
+        expect(graphql_attempt_count).to eq(old_sg_attempt_count)
+      end
+
+      it "returns a non-nil versionNumber for each completed attempt" do
+        @quiz_submission.reload
+        version_numbers = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { versionNumber } }").flatten
+        expect(version_numbers).to all(be_present),
+                                   "expected all versionNumbers to be non-nil but got: #{version_numbers.inspect}"
+      end
+
+      it "returns results ordered most-recent attempt first" do
+        @quiz_submission.reload
+        result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { attempt } }")
+        attempts = result.flatten
+        expect(attempts).to eq(attempts.sort.reverse), "expected descending attempt order but got: #{attempts.inspect}"
+      end
+
+      it "paginates without duplicating entries across pages" do
+        @quiz_submission.reload
+        quiz_submission_type.extract_result = false
+
+        # Fetch page 1 (1 item) and capture the cursor
+        page1 = quiz_submission_type.resolve(<<~GQL)
+          submissionQuizHistoriesConnection(first: 1) {
+            pageInfo { endCursor hasNextPage }
+            nodes { attempt }
+          }
+        GQL
+        connection1 = page1["submissionQuizHistoriesConnection"]
+        page1_attempts = connection1["nodes"].pluck("attempt")
+        end_cursor = connection1["pageInfo"]["endCursor"]
+        expect(connection1["pageInfo"]["hasNextPage"]).to be true
+
+        # Fetch page 2 using the cursor from page 1
+        page2 = quiz_submission_type.resolve(<<~GQL)
+          submissionQuizHistoriesConnection(first: 1, after: "#{end_cursor}") {
+            nodes { attempt }
+          }
+        GQL
+        page2_attempts = page2["submissionQuizHistoriesConnection"]["nodes"].pluck("attempt")
+
+        expect(page2_attempts).not_to be_empty
+        expect(page1_attempts & page2_attempts).to be_empty,
+                                                   "page 2 should not repeat attempts from page 1 but got page1=#{page1_attempts.inspect} page2=#{page2_attempts.inspect}"
+      end
+
+      it "deduplicates attempts when one has been regraded (multiple versions, same attempt number)" do
+        @quiz_submission.reload
+        classic_quiz_sub = @quiz_submission.quiz_submission
+        # Simulate a regrade by saving the quiz submission with versioning again,
+        # creating a second simply_versioned version for the current attempt
+        classic_quiz_sub.with_versioning { classic_quiz_sub.save! }
+
+        result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { attempt } }")
+        attempts = result.flatten
+        expect(attempts.uniq.length).to eq(attempts.length),
+                                        "expected one entry per attempt after regrade but got duplicates: #{attempts.inspect}"
+        expect(attempts.length).to eq(2)
+      end
+
+      it "returns a versionNumber that differs from attempt number after a regrade" do
+        @quiz_submission.reload
+        classic_quiz_sub = @quiz_submission.quiz_submission
+        # A regrade creates a new simply_versioned version for the same attempt,
+        # making version_number > attempt. SpeedGrader uses version_number (not
+        # attempt) for the ?version= preview URL param, so this must be correct.
+        classic_quiz_sub.with_versioning { classic_quiz_sub.save! }
+
+        # Results are ordered newest-first; index 0 is the current (regraded) attempt
+        version_numbers = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { versionNumber } }").flatten
+        attempts = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { attempt } }").flatten
+        current_idx = attempts.index(classic_quiz_sub.attempt)
+        expect(current_idx).not_to be_nil
+        expect(version_numbers[current_idx]).not_to be_nil
+        expect(version_numbers[current_idx]).not_to eq(attempts[current_idx]),
+                                                    "expected versionNumber (#{version_numbers[current_idx]}) to differ from attempt (#{attempts[current_idx]}) after regrade"
+      end
+    end
+  end
+
+  describe "aiGradeResult" do
+    let(:grade_data) do
+      [{ "id" => "criterion_1", "description" => "desc", "comments" => nil, "rating" => { "id" => "r1", "description" => "r desc", "rating" => 3.0, "reasoning" => nil } }]
+    end
+
+    it "returns nil when no result exists for the current attempt" do
+      expect(submission_type.resolve("aiGradeResult { attempt }")).to be_nil
+    end
+
+    it "returns nil for a student" do
+      AutoGradeResult.create!(submission: @submission, attempt: 1, grade_data:, grading_attempts: 1, root_account_id: @course.root_account_id)
+      student_type = GraphQLTypeTester.new(@submission, current_user: @student, request: ActionDispatch::TestRequest.create)
+      expect(student_type.resolve("aiGradeResult { attempt }")).to be_nil
+    end
+
+    it "returns the result for the matching attempt" do
+      AutoGradeResult.create!(submission: @submission, attempt: 1, grade_data:, grading_attempts: 1, root_account_id: @course.root_account_id)
+      expect(submission_type.resolve("aiGradeResult { attempt }")).to eq 1
+    end
+
+    it "returns nil for a different attempt" do
+      AutoGradeResult.create!(submission: @submission, attempt: 1, grade_data:, grading_attempts: 1, root_account_id: @course.root_account_id)
+      submission_attempt_2 = @assignment.grade_student(@student, score: 9, grader: @teacher).first
+      submission_attempt_2.update!(attempt: 2)
+      type = GraphQLTypeTester.new(submission_attempt_2, current_user: @teacher, request: ActionDispatch::TestRequest.create)
+      expect(type.resolve("aiGradeResult { attempt }")).to be_nil
     end
   end
 end

@@ -136,6 +136,25 @@ describe Importers::LtiResourceLinkImporter do
           expect(subject).to be false
         end
       end
+
+      context "when the resource link has an assignment_migration_id but the assignment is not in the destination" do
+        let(:hash) do
+          {
+            "lti_resource_links" => [
+              {
+                "custom" => custom_params,
+                "lookup_uuid" => lookup_uuid,
+                "launch_url" => tool.url,
+                "assignment_migration_id" => "nonexistent_migration_id"
+              }
+            ]
+          }
+        end
+
+        it "does not create a course-level resource link" do
+          expect { subject }.not_to change { destination_course.lti_resource_links.count }
+        end
+      end
     end
 
     context "when the Lti::ResourceLink.context_type is a Course" do

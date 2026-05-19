@@ -20,7 +20,7 @@ import React from 'react'
 import {GradebookCourseOutcomeProficiency, type Outcome} from '../../../types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import type {OutcomeScore, ParsedOutcomeRollup} from '../LearningMasteryTabsView'
 
 const I18n = createI18nScope('enhanced_individual_gradebook')

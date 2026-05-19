@@ -17,16 +17,16 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import GradebookHistoryApp from './react/GradebookHistoryApp'
 import ready from '@instructure/ready'
 
 ready(() => {
-  const root = createRoot(document.getElementById('content'))
-  root.render(
+  render(
     <GradebookHistoryApp
       courseUrl={ENV.COURSE_URL}
       learningMasteryEnabled={ENV.OUTCOME_GRADEBOOK_ENABLED}
     />,
+    document.getElementById('content'),
   )
 })

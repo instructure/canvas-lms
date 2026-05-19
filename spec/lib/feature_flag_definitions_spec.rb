@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe "feature_flag_definition_spec" do
   let(:skip_features) { %w[block_editor block_template_editor] }
 
@@ -28,9 +26,9 @@ describe "feature_flag_definition_spec" do
       skip if skip_features.include?(feature_name)
 
       feature = Feature.definitions[feature_name]
-      expect(feature).to_not be_nil
-      expect(feature.display_name.call).to_not be_nil
-      expect(feature.description.call).to_not be_nil
+      expect(feature).not_to be_nil
+      expect(feature.display_name.call).not_to be_nil
+      expect(feature.description.call).not_to be_nil
     end
   end
 

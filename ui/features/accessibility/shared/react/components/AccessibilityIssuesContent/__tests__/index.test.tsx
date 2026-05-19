@@ -223,6 +223,9 @@ describe('AccessibilityWizard', () => {
       await waitFor(() => {
         expect(screen.getByText(/outstanding issues remaining/i)).toBeInTheDocument()
         expect(screen.getByRole('button', {name: /close remediation/i})).toBeInTheDocument()
+        expect(
+          screen.getByRole('heading', {name: /outstanding issues remaining/i, level: 3}),
+        ).toBeInTheDocument()
       })
     })
 
@@ -1264,6 +1267,57 @@ describe('AccessibilityWizard', () => {
         await waitFor(() => {
           expect(screen.queryByText('You have unsaved changes')).not.toBeInTheDocument()
         })
+      })
+    })
+  })
+
+  describe('Apply button stale resource', () => {
+    it('is disabled when preview returns 409', async () => {
+      // In jsdom, getCourseBasedPath returns '' so requests go to /preview, not /accessibility/preview
+      server.use(
+        http.get('/preview', () =>
+          HttpResponse.json({error: 'Resource has been modified'}, {status: 409}),
+        ),
+      )
+
+      render(<AccessibilityWizard />, {wrapper: createWrapper()})
+
+      await waitFor(() => {
+        expect(screen.getByTestId('apply-button')).toBeDisabled()
+      })
+    })
+
+    it('re-enables when navigating to a different issue', async () => {
+      // In jsdom, getCourseBasedPath returns '' so requests go to /preview, not /accessibility/preview
+      server.use(
+        http.get('/preview', () =>
+          HttpResponse.json({error: 'Resource has been modified'}, {status: 409}),
+        ),
+      )
+
+      const {rerender} = render(<AccessibilityWizard />, {wrapper: createWrapper()})
+
+      await waitFor(() => {
+        expect(screen.getByTestId('apply-button')).toBeDisabled()
+      })
+
+      // Reset preview handler back to successful 200 response
+      server.use(
+        http.get('/preview', () => HttpResponse.json({content: '<div>Preview content</div>'})),
+      )
+
+      // Simulate navigating to a different issue by updating the store to the second issue.
+      // The useEffect in index.tsx resets isResourceStale to false when selectedIssue changes.
+      setupMockStore({
+        ...defaultStore,
+        selectedIssue: multiIssueItem.issues![1],
+        selectedIssueIndex: 1,
+      })
+      rerender(<AccessibilityWizard />)
+
+      // The apply button should be re-enabled now that the issue has changed
+      await waitFor(() => {
+        expect(screen.getByTestId('apply-button')).not.toBeDisabled()
       })
     })
   })

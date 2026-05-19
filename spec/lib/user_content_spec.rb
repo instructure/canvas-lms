@@ -256,7 +256,7 @@ describe UserContent do
           <li><img class='nothing_special'></li>
         </ul></div>
       HTML
-      html = UserContent.escape(string, nil, false)
+      html = UserContent.escape(string, nil, use_updated_math_rendering: false)
       expected = <<~HTML
         <div><ul>
           <li>
@@ -278,7 +278,7 @@ describe UserContent do
         </div>
       HTML
 
-      html = UserContent.escape(string, nil, false)
+      html = UserContent.escape(string, nil, use_updated_math_rendering: false)
       expected = <<~HTML
         <div>
         <img class="equation_image" data-equation-content="int f(x)/g(x)"><span class="hidden-readable"><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>/</mo><mi>g</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></math></span>text node

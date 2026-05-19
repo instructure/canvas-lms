@@ -206,7 +206,6 @@ export const getAssignmentAndPeerReviewOverrides = (
     if (override.peer_review_default_dates) {
       peerReview = getDefaultPeerReviewDates(override)
     } else {
-      // Only create peer review override if there are any overridden dates
       if (hasPeerReviewOverrideDates(override)) {
         peerReviewOverrides.push(getPeerReviewOverride(override))
       }

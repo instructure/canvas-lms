@@ -22,11 +22,14 @@ import userEvent from '@testing-library/user-event'
 import {type MockedFunction} from 'vitest'
 import AddWidgetModal from '../AddWidgetModal'
 import {useWidgetLayout} from '../../../hooks/useWidgetLayout'
+import {useWidgetDashboard} from '../../../hooks/useWidgetDashboardContext'
 import {ResponsiveProvider} from '../../../hooks/useResponsiveContext'
 
 vi.mock('../../../hooks/useWidgetLayout')
+vi.mock('../../../hooks/useWidgetDashboardContext')
 
 const mockUseWidgetLayout = useWidgetLayout as MockedFunction<typeof useWidgetLayout>
+const mockUseWidgetDashboard = useWidgetDashboard as MockedFunction<typeof useWidgetDashboard>
 
 describe('AddWidgetModal', () => {
   const mockAddWidget = vi.fn()
@@ -50,6 +53,9 @@ describe('AddWidgetModal', () => {
       moveWidgetToPosition: vi.fn(),
       removeWidget: vi.fn(),
       resetConfig: vi.fn(),
+    } as any)
+    mockUseWidgetDashboard.mockReturnValue({
+      currentUserRoles: [],
     } as any)
   })
 
@@ -251,6 +257,96 @@ describe('AddWidgetModal', () => {
 
     const todoListGroup = screen.getByRole('group', {name: 'To-do list'})
     expect(todoListGroup).toBeInTheDocument()
+  })
+
+  describe('observer filtering', () => {
+    it('hides inbox widget for observers', () => {
+      mockUseWidgetDashboard.mockReturnValue({
+        currentUserRoles: ['observer', 'user'],
+      } as any)
+
+      render(<AddWidgetModal {...defaultProps} />)
+
+      expect(screen.queryByTestId('widget-card-inbox')).not.toBeInTheDocument()
+    })
+
+    it('hides inbox widget for users with both observer and student roles', () => {
+      // observers only see the widget dashboard when observing students
+      // thus they do not need access to the inbox widget, even if they also have a student role
+      mockUseWidgetDashboard.mockReturnValue({
+        currentUserRoles: ['observer', 'student'],
+      } as any)
+
+      render(<AddWidgetModal {...defaultProps} />)
+
+      expect(screen.queryByTestId('widget-card-inbox')).not.toBeInTheDocument()
+    })
+
+    it('shows inbox widget for non-observers', () => {
+      render(<AddWidgetModal {...defaultProps} />)
+
+      expect(screen.getByTestId('widget-card-inbox')).toBeInTheDocument()
+    })
+  })
+
+  describe('educator role filtering', () => {
+    it('shows only educator widgets for teachers', () => {
+      mockUseWidgetDashboard.mockReturnValue({
+        currentUserRoles: ['teacher'],
+      } as any)
+
+      render(<AddWidgetModal {...defaultProps} />)
+
+      expect(screen.getByTestId('widget-card-educator_announcement_creation')).toBeInTheDocument()
+      expect(screen.getByTestId('widget-card-educator_todo_list')).toBeInTheDocument()
+      expect(screen.getByTestId('widget-card-educator_content_quality')).toBeInTheDocument()
+
+      expect(screen.queryByTestId('widget-card-course_work_combined')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('widget-card-inbox')).not.toBeInTheDocument()
+    })
+
+    it('shows only educator widgets for designers', () => {
+      mockUseWidgetDashboard.mockReturnValue({
+        currentUserRoles: ['designer'],
+      } as any)
+
+      render(<AddWidgetModal {...defaultProps} />)
+
+      expect(screen.getByTestId('widget-card-educator_announcement_creation')).toBeInTheDocument()
+      expect(screen.getByTestId('widget-card-educator_todo_list')).toBeInTheDocument()
+      expect(screen.getByTestId('widget-card-educator_content_quality')).toBeInTheDocument()
+
+      expect(screen.queryByTestId('widget-card-course_work_combined')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('widget-card-inbox')).not.toBeInTheDocument()
+    })
+
+    it('shows educator widgets for multi-role users (teacher + student)', () => {
+      mockUseWidgetDashboard.mockReturnValue({
+        currentUserRoles: ['teacher', 'student'],
+      } as any)
+
+      render(<AddWidgetModal {...defaultProps} />)
+
+      expect(screen.getByTestId('widget-card-educator_announcement_creation')).toBeInTheDocument()
+      expect(screen.getByTestId('widget-card-educator_todo_list')).toBeInTheDocument()
+      expect(screen.getByTestId('widget-card-educator_content_quality')).toBeInTheDocument()
+
+      expect(screen.queryByTestId('widget-card-course_work_combined')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('widget-card-inbox')).not.toBeInTheDocument()
+    })
+
+    it('shows only learner widgets for non-educator roles', () => {
+      render(<AddWidgetModal {...defaultProps} />)
+
+      expect(
+        screen.queryByTestId('widget-card-educator_announcement_creation'),
+      ).not.toBeInTheDocument()
+      expect(screen.queryByTestId('widget-card-educator_todo_list')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('widget-card-educator_content_quality')).not.toBeInTheDocument()
+
+      expect(screen.getByTestId('widget-card-course_work_combined')).toBeInTheDocument()
+      expect(screen.getByTestId('widget-card-inbox')).toBeInTheDocument()
+    })
   })
 
   describe('responsive layout', () => {

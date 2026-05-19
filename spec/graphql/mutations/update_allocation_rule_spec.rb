@@ -573,7 +573,7 @@ RSpec.describe Mutations::UpdateAllocationRule, type: :graphql do
         errors = result["data"]["updateAllocationRule"]["allocationErrors"]
 
         expect(errors).not_to be_empty
-        expect(errors.first["message"]).to eq("This rule conflicts with rule \"#{@student1.name} must review #{@student3.name}\"")
+        expect(errors.first["message"]).to eq("This rule conflicts with rule \"#{@student1.name} will review #{@student3.name}\" (strict)")
       end
     end
 

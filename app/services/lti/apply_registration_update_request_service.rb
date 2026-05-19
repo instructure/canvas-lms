@@ -28,7 +28,7 @@ module Lti
   #
   # @return [Hash] containing the updated lti_registration
   class ApplyRegistrationUpdateRequestService < ApplicationService
-    def initialize(registration_update_request:, applied_by:, overlay_data:, comment: nil)
+    def initialize(registration_update_request:, applied_by: nil, overlay_data: {}, comment: nil)
       @registration_update_request = registration_update_request
       @applied_by = applied_by
       @overlay_data = overlay_data
@@ -38,7 +38,6 @@ module Lti
 
     def call
       raise ArgumentError, "registration_update_request is required" unless @registration_update_request
-      raise ArgumentError, "applied_by is required" unless @applied_by
 
       registration = @registration_update_request.lti_registration
       raise ArgumentError, "Registration not found" unless registration
@@ -46,6 +45,16 @@ module Lti
       # Only support lti_ims_registration for now
       unless @registration_update_request.lti_ims_registration && registration.ims_registration
         raise ArgumentError, "Only Registration update requests for Dynamic Registrations are currently supported"
+      end
+
+      # Ensure this request is pending
+      unless @registration_update_request.pending?
+        raise ArgumentError, "Cannot apply a registration update request that has already been processed."
+      end
+
+      # Ensure this is the most recent update request to prevent applying outdated updates
+      unless @registration_update_request.most_recent?
+        raise ArgumentError, "Cannot apply an outdated registration update request. A newer update request exists."
       end
 
       Lti::Registration.transaction do

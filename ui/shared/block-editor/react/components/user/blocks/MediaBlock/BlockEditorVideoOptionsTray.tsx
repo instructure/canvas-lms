@@ -22,7 +22,7 @@ import VideoOptionsTray from '@instructure/canvas-rce/es/rce/plugins/instructure
 import {saveClosedCaptionsForAttachment} from '@instructure/canvas-media'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {type MediaBlockProps} from './types'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 

@@ -275,7 +275,7 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
         errors = result["data"]["createAllocationRule"]["allocationErrors"]
 
         expect(errors).not_to be_empty
-        expect(errors.first["message"]).to eq("This rule conflicts with rule \"#{@student1.name} must review #{@student2.name}\"")
+        expect(errors.first["message"]).to eq("This rule conflicts with rule \"#{@student1.name} will review #{@student2.name}\" (strict)")
         expect(errors.first["attribute"]).to eq("assessee_id")
         expect(errors.first["attributeId"]).to eq(@student2.id.to_s)
       end
@@ -492,7 +492,7 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
         result = execute_with_input(query)
 
         expect(result["data"]["createAllocationRule"]["allocationErrors"]).not_to be_empty
-        expect(result["data"]["createAllocationRule"]["allocationErrors"].first["message"]).to eq("This rule conflicts with rule \"#{@student1.name} must review #{@student2.name}\"")
+        expect(result["data"]["createAllocationRule"]["allocationErrors"].first["message"]).to eq("This rule conflicts with rule \"#{@student1.name} will review #{@student2.name}\" (strict)")
         expect(result["data"]["createAllocationRule"]["allocationErrors"].first["attribute"]).to eq("assessee_id")
         expect(result["data"]["createAllocationRule"]["allocationErrors"].first["attributeId"]).to eq(@student2.id.to_s)
       end
@@ -803,7 +803,7 @@ RSpec.describe Mutations::CreateAllocationRule, type: :graphql do
         result = execute_with_input(query)
 
         expect(result["data"]["createAllocationRule"]["allocationErrors"]).not_to be_empty
-        expect(result["data"]["createAllocationRule"]["allocationErrors"].first["message"]).to eq("This rule conflicts with rule \"#{@student1.name} must review #{@student2.name}\"")
+        expect(result["data"]["createAllocationRule"]["allocationErrors"].first["message"]).to eq("This rule conflicts with rule \"#{@student1.name} will review #{@student2.name}\" (strict)")
         expect(result["data"]["createAllocationRule"]["allocationErrors"].first["attribute"]).to eq("assessee_id")
         expect(result["data"]["createAllocationRule"]["allocationErrors"].first["attributeId"]).to eq(@student2.id.to_s)
       end

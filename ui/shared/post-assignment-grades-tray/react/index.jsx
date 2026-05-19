@@ -33,7 +33,7 @@ import {
   resolvePostAssignmentGradesStatus,
 } from './Api'
 import {isPostable} from '@canvas/grading/SubmissionHelper'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('post_grades_tray')
 

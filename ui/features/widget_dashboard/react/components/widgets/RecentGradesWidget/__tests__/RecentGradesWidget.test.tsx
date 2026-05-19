@@ -28,7 +28,7 @@ import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
 import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
 import {ResponsiveProvider} from '../../../../hooks/useResponsiveContext'
 import {WidgetDashboardProvider} from '../../../../hooks/useWidgetDashboardContext'
-import {clearWidgetDashboardCache} from '../../../../__tests__/testHelpers'
+import {clearWidgetDashboardCache, PlatformTestWrapper} from '../../../../__tests__/testHelpers'
 
 const server = setupServer()
 
@@ -248,17 +248,19 @@ const setup = (props: Partial<BaseWidgetProps> = {}, matches: string[] = ['deskt
   })
   const defaultProps = buildDefaultProps(props)
   return render(
-    <QueryClientProvider client={queryClient}>
-      <ResponsiveProvider matches={matches}>
-        <WidgetDashboardProvider sharedCourseData={mockSharedCourseData}>
-          <WidgetDashboardEditProvider>
-            <WidgetLayoutProvider>
-              <RecentGradesWidget {...defaultProps} />
-            </WidgetLayoutProvider>
-          </WidgetDashboardEditProvider>
-        </WidgetDashboardProvider>
-      </ResponsiveProvider>
-    </QueryClientProvider>,
+    <PlatformTestWrapper>
+      <QueryClientProvider client={queryClient}>
+        <ResponsiveProvider matches={matches}>
+          <WidgetDashboardProvider sharedCourseData={mockSharedCourseData}>
+            <WidgetDashboardEditProvider>
+              <WidgetLayoutProvider>
+                <RecentGradesWidget {...defaultProps} />
+              </WidgetLayoutProvider>
+            </WidgetDashboardEditProvider>
+          </WidgetDashboardProvider>
+        </ResponsiveProvider>
+      </QueryClientProvider>
+    </PlatformTestWrapper>,
   )
 }
 
@@ -572,7 +574,7 @@ describe('RecentGradesWidget', () => {
     })
   })
 
-  it('does not show expand button for ungraded items', async () => {
+  it('shows expand button for ungraded items', async () => {
     server.use(
       http.post('/api/graphql', async () => {
         return HttpResponse.json({
@@ -626,7 +628,7 @@ describe('RecentGradesWidget', () => {
       expect(screen.getByTestId('grade-status-badge-sub-ungraded')).toHaveTextContent('Not graded')
     })
 
-    expect(screen.queryByTestId('expand-grade-sub-ungraded')).not.toBeInTheDocument()
+    expect(screen.getByTestId('expand-grade-sub-ungraded')).toBeInTheDocument()
   })
 
   it('renders grade items in a semantic list structure', async () => {

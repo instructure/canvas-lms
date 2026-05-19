@@ -159,8 +159,8 @@ describe "course copy" do
     replace_and_proceed(NewCourseCopyPage.course_conclude_at_input, "Jul 11, 2012")
 
     NewCourseCopyPage.create_course_button.click
-    expect(element_exists?(NewCourseCopyPage.course_start_error_message_selector, true)).to be_truthy
-    expect(element_exists?(NewCourseCopyPage.course_end_error_message_selector, true)).to be_truthy
+    expect(element_exists?(NewCourseCopyPage.course_start_error_message_selector, xpath: true)).to be_truthy
+    expect(element_exists?(NewCourseCopyPage.course_end_error_message_selector, xpath: true)).to be_truthy
 
     replace_and_proceed(NewCourseCopyPage.course_conclude_at_input, "Aug 30, 2012")
     expect_new_page_load { NewCourseCopyPage.create_course_button.click }

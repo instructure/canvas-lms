@@ -25,7 +25,7 @@ module Quizzes
     # quiz statistics.
     #
     # This is what you should pass to this serializer!!!
-    Input = Struct.new(:quiz, :options, :student_analysis, :item_analysis) do
+    Input = Struct.new(:quiz, :section_ids, :student_analysis, :item_analysis) do
       include ActiveModel::SerializerSupport
     end
 
@@ -168,11 +168,11 @@ module Quizzes
     end
 
     def student_analysis_report
-      @student_analysis_report ||= object[:student_analysis].report.generate(false, object.options)
+      @student_analysis_report ||= object[:student_analysis].report.generate(legacy: false, section_ids: object.section_ids)
     end
 
     def item_analysis_report
-      @item_analysis_report ||= object[:item_analysis].report.generate(false, object.options)
+      @item_analysis_report ||= object[:item_analysis].report.generate(legacy: false, section_ids: object.section_ids)
     end
 
     def quiz

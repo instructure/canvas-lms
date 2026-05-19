@@ -17,6 +17,7 @@
  */
 
 import {canvas} from '@instructure/ui-themes'
+import type {BreakpointQueries} from '@instructure/ui-responsive'
 
 /**
  * Standard Canvas responsive breakpoints
@@ -63,8 +64,8 @@ export const responsiveQuerySizes = ({
   mobile?: boolean
   tablet?: boolean
   desktop?: boolean
-} = {}) => {
-  const querySizes: Record<string, {minWidth?: string; maxWidth?: string}> = {}
+} = {}): BreakpointQueries => {
+  const querySizes: BreakpointQueries = {}
 
   if (mobile) {
     querySizes.mobile = {maxWidth: `${BREAKPOINTS.mobile}px`}
@@ -79,5 +80,5 @@ export const responsiveQuerySizes = ({
     querySizes.desktop = {minWidth: `${tablet ? BREAKPOINTS.desktop : BREAKPOINTS.mobile + 1}px`}
   }
 
-  return querySizes
+  return querySizes as BreakpointQueries
 }

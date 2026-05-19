@@ -22,7 +22,7 @@ import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import ViewAssignTo, {ViewAssignToProps} from '../ViewAssignTo'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../../hooks/useModuleContext'
 import {MODULES} from '../../../utils/constants'
 

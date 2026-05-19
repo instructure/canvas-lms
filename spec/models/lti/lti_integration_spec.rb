@@ -394,7 +394,7 @@ describe "LTI integration tests" do
       allow(BasicLTI::Sourcedid).to receive(:signing_secret) { "signing-secret-vp04BNqApwdwUYPUI" }
     end
 
-    def tool_setup(for_student = true)
+    def tool_setup(for_student: true)
       if for_student
         course_with_student(active_all: true)
       else
@@ -426,7 +426,7 @@ describe "LTI integration tests" do
     end
 
     it "includes assignment outcome service params for teacher" do
-      hash = tool_setup(false)
+      hash = tool_setup(for_student: false)
       expect(hash["lis_result_sourcedid"]).to be_nil
       expect(hash["lis_outcome_service_url"]).to eq "/my/test/url"
       expect(hash["ext_ims_lis_basic_outcome_url"]).to eq "/my/other/test/url"

@@ -302,7 +302,7 @@ describe Course do
       setup_import(@course, "announcements.json", migration)
 
       ann = @course.announcements.first
-      expect(ann).to_not be_locked
+      expect(ann).not_to be_locked
       expect(migration.workflow_state).to eq("imported")
     end
 
@@ -344,7 +344,7 @@ describe Course do
       dt = @course.discussion_topics.find_by(migration_id: "g8bacee869e70bf19cd6784db3efade7e")
       expect(dt.reply_to_entry_required_count).to eq 2
       expect(dt.assignment.assignment_group).to eq a1.assignment_group
-      expect(dt.assignment.assignment_group).to_not be_deleted
+      expect(dt.assignment.assignment_group).not_to be_deleted
       expect(a1.reload).to be_deleted # didn't restore the previously deleted assignment too
     end
 
@@ -636,6 +636,70 @@ describe Course do
       expect(migration.warnings[0]).to eq "Couldn't adjust dates on assignment lalala (ID #{assignment.id})"
     end
 
+    describe "delayed post scheduling for announcements" do
+      let(:course) { course_model }
+
+      def build_stuck_announcement(course, delayed_post_at)
+        ann = course.announcements.create!(
+          title: "test",
+          message: "body",
+          workflow_state: "post_delayed",
+          delayed_post_at:
+        )
+        ann.update_column(:posted_at, nil)
+        ann
+      end
+
+      context "with date_shift_options and identity day substitutions (trigger 1)" do
+        it "creates a delayed job for a post_delayed announcement when the date does not change" do
+          future_date = 1.week.from_now
+          ann = build_stuck_announcement(course, future_date)
+
+          migration = course.content_migrations.create!(
+            migration_settings: {
+              date_shift_options: {
+                old_start_date: future_date.to_date.to_s,
+                old_end_date: future_date.to_date.to_s,
+                new_start_date: future_date.to_date.to_s,
+                new_end_date: future_date.to_date.to_s,
+                day_substitutions: { future_date.wday.to_s => future_date.wday.to_s }
+              }
+            }
+          )
+          migration.add_imported_item(ann)
+
+          expect do
+            Importers::CourseContentImporter.adjust_dates(course, migration)
+          end.to change { Delayed::Job.where("handler LIKE ?", "%update_based_on_date%").count }.by(1)
+
+          ann.reload
+          expect(ann.workflow_state).to eq "post_delayed"
+        end
+      end
+
+      context "with date_shift_options and missing start/end dates (trigger 2)" do
+        it "creates a delayed job for a post_delayed announcement when shift_date returns original value" do
+          future_date = 1.week.from_now
+          ann = build_stuck_announcement(course, future_date)
+
+          migration = course.content_migrations.create!(
+            migration_settings: {
+              date_shift_options: {
+                day_substitutions: { future_date.wday.to_s => future_date.wday.to_s }
+              }
+            }
+          )
+          migration.add_imported_item(ann)
+
+          allow(course).to receive_messages(real_start_date: nil, real_end_date: nil)
+
+          expect do
+            Importers::CourseContentImporter.adjust_dates(course, migration)
+          end.to change { Delayed::Job.where("handler LIKE ?", "%update_based_on_date%").count }.by(1)
+        end
+      end
+    end
+
     describe "pre_date_shift_for_assignment_importing FF" do
       subject { Importers::CourseContentImporter.adjust_dates(course, migration) }
 
@@ -829,6 +893,27 @@ describe Course do
     context "with allow_student_anonymous_discussion_topics" do
       it_behaves_like "setting set correctly", :allow_student_anonymous_discussion_topics
     end
+
+    context "when course settings are not restricted" do
+      before { allow(Importers::CourseContentImporter).to receive(:course_settings_restricted?).and_return(false) }
+
+      it "does not add a warning" do
+        allow(Importers::CourseContentImporter).to receive(:import_settings_from_migration)
+        allow(Importers::LatePolicyImporter).to receive(:process_migration)
+        Importers::CourseContentImporter.import_settings_from_migration(@course, { course: { storage_quota: 4 } }, @cm)
+        expect(@cm.migration_issues.count).to be 0
+      end
+    end
+
+    context "when course settings are restricted" do
+      before { allow(Importers::CourseContentImporter).to receive(:course_settings_restricted?).and_return(true) }
+
+      it "adds a warning about the restriction" do
+        Importers::CourseContentImporter.import_settings_from_migration(@course, { course: { storage_quota: 4 } }, @cm)
+        expect(@cm.migration_issues.count).to be 1
+        expect(@cm.migration_issues.first.description).to include("Course Settings were not imported")
+      end
+    end
   end
 
   describe "audit logging" do
@@ -857,18 +942,6 @@ describe Course do
       expect(Lti::Pns::LtiContextCopyNoticeBuilder).to receive(:new).once.with(course:, copied_at: migration.started_at.iso8601, source_course: migration.source_course)
 
       subject
-    end
-
-    context "with lti_context_copy_notice flag disabled" do
-      before do
-        course.root_account.disable_feature!(:lti_context_copy_notice)
-      end
-
-      it "does not send LTI Platform Notice" do
-        expect(Lti::PlatformNotificationService).not_to receive(:notify_tools_in_course)
-
-        subject
-      end
     end
   end
 
@@ -983,7 +1056,7 @@ describe Course do
 
     broken_assmt = @course.assignments.where(migration_id: "broken").first
     unbroken_assmt = @course.assignments.where(migration_id: "kindabroken").first
-    expect(unbroken_assmt.description).to_not include("stylesheet")
+    expect(unbroken_assmt.description).not_to include("stylesheet")
 
     expect(migration.migration_issues.count).to eq 1 # should ignore the sanitized one
     expect(migration.migration_issues.first.fix_issue_html_url).to eq "/courses/#{@course.id}/assignments/#{broken_assmt.id}"
@@ -1024,7 +1097,7 @@ describe Course do
     it "Does not log duration on failures" do
       allow(Auditors::Course).to receive(:record_copied).and_raise("Something went wrong at the last minute")
       expect { subject }.to raise_error("Something went wrong at the last minute")
-      expect(InstStatsd::Statsd).to_not have_received(:timing).with("content_migrations.import_failure")
+      expect(InstStatsd::Statsd).not_to have_received(:timing).with("content_migrations.import_failure")
     end
   end
 
@@ -1067,6 +1140,130 @@ describe Course do
 
       it "returns false" do
         expect(Importers::CourseContentImporter.error_on_dates?(item, attributes)).to be false
+      end
+    end
+  end
+
+  describe ".course_settings_restricted?" do
+    let(:course) { course_model }
+    let(:user) { user_model }
+    let(:migration) { instance_double(ContentMigration, user:) }
+
+    context "when the course_navigation_and_feature_options_permissions feature is disabled" do
+      it "returns false" do
+        expect(Importers::CourseContentImporter.course_settings_restricted?(course, migration)).to be false
+      end
+    end
+
+    context "when the course_navigation_and_feature_options_permissions feature is enabled" do
+      before { course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions) }
+
+      let(:perm) { :manage_course_details }
+
+      it "returns false when the user has the permission" do
+        allow(course).to receive(:grants_right?).with(user, perm).and_return(true)
+        expect(Importers::CourseContentImporter.course_settings_restricted?(course, migration)).to be false
+      end
+
+      it "returns true when the user lacks the Course Details related permission" do
+        allow(course).to receive(:grants_right?).with(user, perm).and_return(false)
+        expect(Importers::CourseContentImporter.course_settings_restricted?(course, migration)).to be true
+      end
+
+      it "returns false when migration has no user" do
+        migration_without_user = instance_double(ContentMigration, user: nil)
+        expect(Importers::CourseContentImporter.course_settings_restricted?(course, migration_without_user)).to be false
+      end
+    end
+  end
+
+  describe ".discussion_settings_restricted?" do
+    let(:course) { course_model }
+    let(:user) { user_model }
+    let(:migration) { instance_double(ContentMigration, user:) }
+
+    context "when the default_discussion_options feature is disabled" do
+      it "returns false" do
+        expect(Importers::CourseContentImporter.discussion_settings_restricted?(course, migration)).to be false
+      end
+    end
+
+    context "when the default_discussion_options feature is enabled" do
+      before { course.root_account.enable_feature!(:default_discussion_options) }
+
+      it "returns false when the user has all of the relevant permissions enabled" do
+        allow(course).to receive(:grants_all_rights?).with(user, *RoleOverride::GRANULAR_EDIT_DISCUSSION_TOPIC_PERMISSIONS).and_return(true)
+        expect(Importers::CourseContentImporter.discussion_settings_restricted?(course, migration)).to be false
+      end
+
+      it "returns true when the user lacks at least one of the relevant permissions" do
+        allow(course).to receive(:grants_all_rights?).with(user, *RoleOverride::GRANULAR_EDIT_DISCUSSION_TOPIC_PERMISSIONS).and_return(false)
+        expect(Importers::CourseContentImporter.discussion_settings_restricted?(course, migration)).to be true
+      end
+
+      it "returns false when migration has no user" do
+        migration_without_user = instance_double(ContentMigration, user: nil)
+        expect(Importers::CourseContentImporter.discussion_settings_restricted?(course, migration_without_user)).to be false
+      end
+    end
+  end
+
+  describe ".import_discussion_topics_with_permission_check" do
+    let(:course) { course_model }
+    let(:user) { user_model }
+    let(:migration) { course.content_migrations.create!(user:, copy_options: { everything: "1" }) }
+    let(:data) do
+      {
+        "discussion_topics" => [{ "migration_id" => "abc123", "title" => "A Topic" }],
+        "announcements" => [{ "migration_id" => "ann001", "title" => "An Announcement" }]
+      }.with_indifferent_access
+    end
+
+    context "when discussion settings are not restricted" do
+      before { allow(Importers::CourseContentImporter).to receive(:discussion_settings_restricted?).and_return(false) }
+
+      it "calls the full process_migration on DiscussionTopicImporter" do
+        expect(Importers::DiscussionTopicImporter).to receive(:process_migration).with(data, migration)
+        Importers::CourseContentImporter.import_discussion_topics_with_permission_check(course, data, migration)
+      end
+
+      it "does not add any migration warnings" do
+        allow(Importers::DiscussionTopicImporter).to receive(:process_migration)
+        Importers::CourseContentImporter.import_discussion_topics_with_permission_check(course, data, migration)
+        expect(migration.migration_issues.count).to be 0
+      end
+    end
+
+    context "when discussion settings are restricted" do
+      before { allow(Importers::CourseContentImporter).to receive(:discussion_settings_restricted?).and_return(true) }
+
+      it "does not call process_migration for discussion topics" do
+        expect(Importers::DiscussionTopicImporter).not_to receive(:process_migration)
+        allow(Importers::DiscussionTopicImporter).to receive(:process_announcements_migration)
+        Importers::CourseContentImporter.import_discussion_topics_with_permission_check(course, data, migration)
+      end
+
+      it "still imports announcements" do
+        expect(Importers::DiscussionTopicImporter).to receive(:process_announcements_migration)
+          .with(data["announcements"], migration)
+        Importers::CourseContentImporter.import_discussion_topics_with_permission_check(course, data, migration)
+      end
+
+      it "adds a warning about skipped topics" do
+        allow(Importers::DiscussionTopicImporter).to receive(:process_announcements_migration)
+        Importers::CourseContentImporter.import_discussion_topics_with_permission_check(course, data, migration)
+        expect(migration.migration_issues.count).to be 1
+        expect(migration.migration_issues.first.description).to include("Discussion Topics were not imported")
+      end
+
+      context "when discussion topics are not selected in copy options" do
+        let(:migration) { course.content_migrations.create!(user:, copy_options: { all_course_settings: "1" }) }
+
+        it "does not add a warning" do
+          allow(Importers::DiscussionTopicImporter).to receive(:process_announcements_migration)
+          Importers::CourseContentImporter.import_discussion_topics_with_permission_check(course, data, migration)
+          expect(migration.migration_issues.count).to be 0
+        end
       end
     end
   end
@@ -1212,14 +1409,150 @@ describe Course do
     end
   end
 
+  describe ".find_by_migration_id" do
+    before :once do
+      course_factory
+      @link = NavMenuLink.create!(course: @course, course_nav: true, label: "L", url: "https://example.com", migration_id: "saved_mig_id")
+    end
+
+    it "finds by saved migration_id on the record" do
+      result = Importers::CourseContentImporter.find_by_migration_id(items: [@link], migration_id: "saved_mig_id")
+      expect(result).to eq @link
+    end
+
+    it "finds by computed local CC key" do
+      key = CC::CCHelper.create_key(@link)
+      result = Importers::CourseContentImporter.find_by_migration_id(items: [@link], migration_id: key)
+      expect(result).to eq @link
+    end
+
+    it "finds by computed global CC key" do
+      key = CC::CCHelper.create_key(@link, global: true)
+      result = Importers::CourseContentImporter.find_by_migration_id(items: [@link], migration_id: key)
+      expect(result).to eq @link
+    end
+
+    it "returns nil when no item matches" do
+      result = Importers::CourseContentImporter.find_by_migration_id(items: [@link], migration_id: "nonexistent")
+      expect(result).to be_nil
+    end
+  end
+
+  describe ".all_links_for_course" do
+    before :once do
+      course_factory
+    end
+
+    it "returns active course-nav links for the course" do
+      link = NavMenuLink.create!(course: @course, course_nav: true, label: "L", url: "https://example.com")
+      result = Importers::CourseContentImporter.all_links_for_course(course: @course)
+      expect(result).to include(link)
+    end
+
+    it "returns active course-nav links from the account chain" do
+      account_link = NavMenuLink.create!(context: @course.account, course_nav: true, label: "AL", url: "https://acc.com")
+      result = Importers::CourseContentImporter.all_links_for_course(course: @course)
+      expect(result).to include(account_link)
+    end
+
+    it "excludes deleted links" do
+      link = NavMenuLink.create!(course: @course, course_nav: true, label: "L", url: "https://example.com")
+      link.destroy
+      result = Importers::CourseContentImporter.all_links_for_course(course: @course)
+      expect(result).not_to include(link)
+    end
+
+    it "excludes links that are not course_nav" do
+      link = NavMenuLink.create!(context: @course.account, account_nav: true, label: "L", url: "https://example.com")
+      result = Importers::CourseContentImporter.all_links_for_course(course: @course)
+      expect(result).not_to include(link)
+    end
+  end
+
+  describe ".build_tab_config" do
+    before :once do
+      course_factory
+      @migration = @course.content_migrations.create!
+    end
+
+    it "passes regular tab IDs through unchanged" do
+      tabs = [{ "id" => "assignments" }, { "id" => "discussions", "hidden" => true }]
+      result = Importers::CourseContentImporter.build_tab_config(@course, tabs, @migration)
+      expect(result).to eq tabs
+    end
+
+    it "translates nav_menu_link tab id to the real link id" do
+      link = NavMenuLink.create!(course: @course, course_nav: true, label: "L", url: "https://example.com", migration_id: "link_mig_1")
+      tabs = [{ "id" => "nav_menu_link_link_mig_1", "hidden" => false }]
+      result = Importers::CourseContentImporter.build_tab_config(@course, tabs, @migration)
+      expect(result.length).to eq 1
+      expect(result.first["id"]).to eq "nav_menu_link_#{link.id}"
+    end
+
+    it "also matches nav_menu_link tab by computed CC key" do
+      link = NavMenuLink.create!(course: @course, course_nav: true, label: "L", url: "https://example.com")
+      key = CC::CCHelper.create_key(link)
+      tabs = [{ "id" => "nav_menu_link_#{key}" }]
+      result = Importers::CourseContentImporter.build_tab_config(@course, tabs, @migration)
+      expect(result.length).to eq 1
+      expect(result.first["id"]).to eq "nav_menu_link_#{link.id}"
+    end
+
+    it "drops nav_menu_link tab when link is not found" do
+      tabs = [{ "id" => "nav_menu_link_nonexistent_mig_id" }, { "id" => "discussions" }]
+      result = Importers::CourseContentImporter.build_tab_config(@course, tabs, @migration)
+      expect(result.pluck("id")).to eq ["discussions"]
+    end
+
+    it "preserves additional tab attributes when translating" do
+      NavMenuLink.create!(course: @course, course_nav: true, label: "L", url: "https://example.com", migration_id: "link_mig_1")
+      tabs = [{ "id" => "nav_menu_link_link_mig_1", "hidden" => true, "position" => 5 }]
+      result = Importers::CourseContentImporter.build_tab_config(@course, tabs, @migration)
+      expect(result.first).to include("hidden" => true, "position" => 5)
+    end
+  end
+
+  describe "nav_menu_link import via process_migration" do
+    before :once do
+      course_factory
+    end
+
+    it "calls NavMenuLinkImporter" do
+      migration = @course.content_migrations.create!(
+        migration_settings: { migration_ids_to_import: { copy: { everything: "1" } } }
+      )
+      data = {
+        :course => {
+          tab_configuration: [
+            { "id" => "nav_menu_link_1", "hidden" => true },
+          ]
+        },
+        "nav_menu_links" => [{ "migration_id" => "link_1", "label" => "L", "url" => "https://x.com" }]
+      }
+      expect { Importers::CourseContentImporter.import_content(@course, data, nil, migration) }
+        .to change { NavMenuLink.where(course: @course).count }.by(1)
+    end
+
+    it "skips NavMenuLinkImporter when feature is disabled" do
+      @course.root_account.disable_feature!(:nav_menu_links)
+      migration = @course.content_migrations.create!(
+        migration_settings: { migration_ids_to_import: { copy: { everything: "1" } } }
+      )
+      data = {
+        "nav_menu_links" => [{ "migration_id" => "link_1", "label" => "L", "url" => "https://x.com" }]
+      }
+      expect { Importers::CourseContentImporter.import_content(@course, data, nil, migration) }
+        .not_to change { NavMenuLink.count }
+    end
+  end
+
   describe "tab configuration import" do
     before :once do
       @copy_from = course_factory
       @copy_to = course_factory
     end
 
-    it "filters out nav menu link tabs during import" do
-      # Course copy not handled yet for Nav Menu Link tabs. See INTEROP-9293
+    it "drops nav menu link tabs when no matching link exists in destination course" do
       link = NavMenuLink.create!(
         context: @copy_from,
         course_nav: true,
@@ -1227,7 +1560,6 @@ describe Course do
         url: "https://example.com"
       )
 
-      # Set up tab configuration with nav menu link
       @copy_from.tab_configuration = [
         { "id" => "assignments" },
         { "id" => "nav_menu_link_#{link.id}", "hidden" => true },
@@ -1235,7 +1567,6 @@ describe Course do
       ]
       @copy_from.save!
 
-      # Perform the import
       migration = @copy_to.content_migrations.create!
       data = {
         "all_course_settings" => true,
@@ -1245,10 +1576,45 @@ describe Course do
       }
       Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
 
-      # Nav menu link should not be included in copied tab configuration
       copied_tab_ids = @copy_to.tab_configuration.pluck("id")
       expect(copied_tab_ids.select { it.start_with?("nav_menu_link_") }).to be_empty
       expect(copied_tab_ids).to include("assignments", "discussions")
+    end
+  end
+
+  describe ".clear_assignment_and_quiz_caches" do
+    it "passes sub_assignments along with parent assignments to SubmissionLifecycleManager so cached_due_date is computed for checkpoints" do
+      course_with_student(active_all: true)
+      @course.account.enable_feature!(:discussion_checkpoints)
+
+      topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpoint discussion")
+      reply_to_topic = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 1.week.from_now }],
+        points_possible: 5
+      )
+      reply_to_entry = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: 2.weeks.from_now }],
+        points_possible: 10,
+        replies_required: 2
+      )
+      parent = topic.assignment
+      parent.needs_update_cached_due_dates = true
+
+      migration = @course.content_migrations.create!
+      migration.add_imported_item(parent)
+
+      passed_assignments = nil
+      allow(SubmissionLifecycleManager).to receive(:recompute_course) do |_course, **opts|
+        passed_assignments = opts[:assignments]
+      end
+
+      Importers::CourseContentImporter.clear_assignment_and_quiz_caches(migration)
+
+      expect(passed_assignments).to include(parent, reply_to_topic, reply_to_entry)
     end
   end
 end

@@ -218,5 +218,89 @@ describe ContentMigration do
       tool = @copy_to.context_external_tools.where(migration_id: mig_id(@tool_from)).first
       expect(tool.settings[:content_migration]).to eq @tool_from.settings[:content_migration]
     end
+
+    context "user external tool launch links" do
+      it "preserves user external tool launch links in wiki pages during course copy" do
+        # Create a wiki page with user external tool launch link
+        page = @copy_from.wiki_pages.create!(
+          title: "Requirements Progress Check",
+          body: <<~HTML
+            <p>Click to launch the tool:</p>
+            <iframe src="https://#{@copy_from.root_account.domain}/users/self/external_tools/#{@tool_from.id}"></iframe>
+          HTML
+        )
+
+        run_course_copy
+
+        copied_page = @copy_to.wiki_pages.where(migration_id: mig_id(page)).first
+        expect(copied_page).not_to be_nil
+        expect(copied_page.body).to include("/users/self/external_tools/#{@tool_from.id}")
+        expect(copied_page.body).not_to include("/courses/#{@copy_to.id}/external_tools/#{@tool_from.id}")
+      end
+
+      it "preserves user external tool launch links in syllabus during course copy" do
+        @copy_from.syllabus_body = <<~HTML
+          <p>Course syllabus with tool:</p>
+          <a href="https://#{@copy_from.root_account.domain}/users/self/external_tools/#{@tool_from.id}">Launch Tool</a>
+        HTML
+        @copy_from.save!
+
+        run_course_copy
+
+        expect(@copy_to.syllabus_body).to include("/users/self/external_tools/#{@tool_from.id}")
+        expect(@copy_to.syllabus_body).not_to include("/courses/#{@copy_to.id}/external_tools/#{@tool_from.id}")
+      end
+
+      it "preserves relative user external tool launch links" do
+        page = @copy_from.wiki_pages.create!(
+          title: "Relative Link Page",
+          body: <<~HTML
+            <p>Relative user tool link:</p>
+            <iframe src="/users/self/external_tools/#{@tool_from.id}"></iframe>
+          HTML
+        )
+
+        run_course_copy
+
+        copied_page = @copy_to.wiki_pages.where(migration_id: mig_id(page)).first
+        expect(copied_page).not_to be_nil
+        expect(copied_page.body).to include("/users/self/external_tools/#{@tool_from.id}")
+        expect(copied_page.body).not_to include("/courses/#{@copy_to.id}/external_tools/#{@tool_from.id}")
+      end
+
+      it "preserves user external tool links in assignment descriptions" do
+        assignment = @copy_from.assignments.create!(
+          title: "Assignment with User Tool",
+          description: <<~HTML
+            <p>Instructions:</p>
+            <a href="/users/self/external_tools/#{@tool_from.id}">Launch User Tool</a>
+          HTML
+        )
+
+        run_course_copy
+
+        copied_assignment = @copy_to.assignments.where(migration_id: mig_id(assignment)).first
+        expect(copied_assignment).not_to be_nil
+        expect(copied_assignment.description).to include("/users/self/external_tools/#{@tool_from.id}")
+        expect(copied_assignment.description).not_to include("/courses/#{@copy_to.id}/external_tools/#{@tool_from.id}")
+      end
+
+      it "preserves user external tool links in discussion topics" do
+        topic = @copy_from.discussion_topics.create!(
+          title: "Discussion with User Tool",
+          message: <<~HTML
+            <p>Discussion content:</p>
+            <iframe src="/users/self/external_tools/#{@tool_from.id}"></iframe>
+          HTML
+        )
+
+        run_course_copy
+
+        copied_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
+        expect(copied_topic).not_to be_nil
+        expect(copied_topic.message).to include("/users/self/external_tools/#{@tool_from.id}")
+        expect(copied_topic.message).not_to include("/courses/#{@copy_to.id}/external_tools/#{@tool_from.id}")
+      end
+    end
   end
 end

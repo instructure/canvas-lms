@@ -24,6 +24,7 @@ import stubEnv from '@canvas/stub-env'
 import User from '@canvas/users/backbone/models/User'
 import NewStudentGroupModal from '../NewStudentGroupModal'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+import {queryClient} from '@instructure/platform-query'
 
 injectGlobalAlertContainers()
 
@@ -60,6 +61,7 @@ describe('NewStudentGroupModal', () => {
 
   afterEach(() => {
     server.resetHandlers()
+    queryClient.clear()
   })
 
   it('renders form fields', () => {
@@ -140,12 +142,10 @@ describe('NewStudentGroupModal', () => {
       target: {value: 'name'},
     })
     fireEvent.click(getByRole('combobox', {name: 'Invite Students'}))
-    // Wait for loading state to finish
-    await waitFor(() => {
-      expect(screen.queryByRole('option', {name: 'Loading'})).not.toBeInTheDocument()
-    })
-    // Now click the student option
-    fireEvent.click(getByRole('option', {name: 'Student'}))
+    // findByText (not findByRole): the option's accessible-name computation is
+    // racy on InstUI's nested option markup (<li role="none"><span role="option">).
+    // Text matching is direct and avoids the accessibility-tree resolution race.
+    fireEvent.click(await screen.findByText('Student'))
     fireEvent.click(getByText('Submit'))
     expect(getAllByText(/Saving group/i)).toBeTruthy()
     await waitFor(() => {

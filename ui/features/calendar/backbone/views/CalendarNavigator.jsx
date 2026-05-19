@@ -21,7 +21,7 @@ import {debounce} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/calendarNavigator.handlebars'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import CalendarNavigatorComponent from '../../react/CalendarNavigatorComponent'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -284,7 +284,7 @@ CalendarNavigator.prototype.afterRender = function () {
     return
   }
 
-  ReactDOM.render(
+  legacyRender(
     <CalendarNavigatorComponent
       size={this.options.size || 'large'}
       currentView={this.currentView}
