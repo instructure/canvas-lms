@@ -295,6 +295,50 @@ describe "CanvasHttp" do
       expect(Resolv).to receive(:getaddresses).with(bad_url).and_return(["not.an.ip.address"])
       expect { CanvasHttp.insecure_host?(bad_url) }.to raise_error(CanvasHttp::UnresolvableUriError)
     end
+
+    it "blocks the AWS IMDS address 169.254.169.254" do
+      allow(Resolv).to receive(:getaddresses).with("169.254.169.254").and_return(["169.254.169.254"])
+      expect(CanvasHttp.insecure_host?("169.254.169.254")).to be true
+    end
+
+    it "blocks any host that resolves into the link-local range" do
+      allow(Resolv).to receive(:getaddresses).with("internal.example.com").and_return(["169.254.1.1"])
+      expect(CanvasHttp.insecure_host?("internal.example.com")).to be true
+    end
+
+    it "blocks private range 10.x.x.x" do
+      allow(Resolv).to receive(:getaddresses).with("10.0.0.1").and_return(["10.0.0.1"])
+      expect(CanvasHttp.insecure_host?("10.0.0.1")).to be true
+    end
+
+    it "blocks private range 172.16.x.x" do
+      allow(Resolv).to receive(:getaddresses).with("172.16.0.1").and_return(["172.16.0.1"])
+      expect(CanvasHttp.insecure_host?("172.16.0.1")).to be true
+    end
+
+    it "allows public S3 IPs" do
+      allow(Resolv).to receive(:getaddresses).with("mybucket.s3.amazonaws.com").and_return(["52.217.0.1"])
+      expect(CanvasHttp.insecure_host?("mybucket.s3.amazonaws.com")).to be false
+    end
+
+    it "blocks when any resolved IP is insecure (DNS rebinding protection)" do
+      allow(Resolv).to receive(:getaddresses).with("evil.example.com").and_return(["93.184.216.34", "169.254.169.254"])
+      expect(CanvasHttp.insecure_host?("evil.example.com")).to be true
+    end
+  end
+
+  describe ".blocked_ip_ranges" do
+    it "includes the link-local CIDR block to prevent AWS IMDS access" do
+      expect(CanvasHttp.blocked_ip_ranges).to include("169.254.0.0/16")
+    end
+
+    it "includes all standard private and loopback ranges" do
+      ranges = CanvasHttp.blocked_ip_ranges
+      expect(ranges).to include("127.0.0.1/8")
+      expect(ranges).to include("10.0.0.0/8")
+      expect(ranges).to include("172.16.0.0/12")
+      expect(ranges).to include("192.168.0.0/16")
+    end
   end
 
   describe ".tempfile_for_url" do
@@ -364,6 +408,32 @@ describe "CanvasHttp" do
       expect(CanvasHttp).to receive(:insecure_host?).with("127.0.0.1").and_return(true)
       expect { CanvasHttp.validate_url("http://127.0.0.1") }.not_to raise_error
       expect { CanvasHttp.validate_url("http://127.0.0.1", check_host: true) }.to raise_error(CanvasHttp::InsecureUriError)
+    end
+
+    it "raises InsecureUriError for AWS IMDS URL when check_host is true" do
+      allow(Resolv).to receive(:getaddresses).with("169.254.169.254").and_return(["169.254.169.254"])
+      expect do
+        CanvasHttp.validate_url("http://169.254.169.254/latest/meta-data/iam/security-credentials/role", check_host: true)
+      end.to raise_error(CanvasHttp::InsecureUriError)
+    end
+
+    it "does not raise for AWS IMDS URL when check_host is false (default)" do
+      expect(Resolv).not_to receive(:getaddresses)
+      expect { CanvasHttp.validate_url("http://169.254.169.254/latest/meta-data/") }.not_to raise_error
+    end
+
+    it "allows public S3 URLs with check_host: true" do
+      allow(Resolv).to receive(:getaddresses).with("mybucket.s3.amazonaws.com").and_return(["52.217.0.1"])
+      expect do
+        CanvasHttp.validate_url("https://mybucket.s3.amazonaws.com/file.pdf", check_host: true)
+      end.not_to raise_error
+    end
+
+    it "blocks DNS rebinding attempt where one IP is link-local" do
+      allow(Resolv).to receive(:getaddresses).with("evil.example.com").and_return(["93.184.216.34", "169.254.169.254"])
+      expect do
+        CanvasHttp.validate_url("http://evil.example.com/creds", check_host: true)
+      end.to raise_error(CanvasHttp::InsecureUriError)
     end
 
     it "normalizes unicode names" do
