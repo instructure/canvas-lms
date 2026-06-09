@@ -1,20 +1,22 @@
 ---
 name: update-gems
-description: Update Ruby gem dependencies
+description: "Update Ruby gem dependencies in Canvas LMS using bundler. Runs bundle outdated to audit, bundle update --conservative for safe upgrades, syncs lockfiles, and commits per gem or gem group. Use when the user asks to update gems, run bundle update, upgrade dependencies, check outdated gems, update Gemfile, or resolve bundler version conflicts."
 allowed-tools: Bash(BUNDLE_LOCKFILE=active bundle*), Bash(bundle *), Bash(git add*), Bash(git commit*), Bash(git diff*), Bash(git status*), Read, Grep, Glob, Edit
 ---
 
 Update gems in Canvas LMS following these rules:
 
+## Workflow
+
+1. **Audit**: Run `BUNDLE_LOCKFILE=active bundle outdated` to find outdated gems. Keep this list in memory since it is a relatively slow command.
+2. **Update**: Run `bundle update --conservative <gem_name>` to update individual gems.
+3. **Sync lockfiles**: Run `bundle install` to ensure all lockfiles are in sync.
+4. **Verify**: Check that `bundle install` exits cleanly with no errors. If `bundle update` or `bundle install` fails with a dependency conflict, read the error output to identify the conflicting constraint, then either update the blocking gem first or skip the gem and move on.
+5. **Commit**: Commit with a message of `bundle update <gem_name>`. Check for changes in `Gemfile*.lock`, `Gemfile.d/*.lock`, and `gems/*/Gemfile*.lock`.
+
 ## General Rules
 
-- Never touch `Gemfile*.lock` files directly
-- Run `BUNDLE_LOCKFILE=active bundle outdated` to find the list of outdated gems.
-  Keep this list in memory so you don't have to keep running it, since it is a relatively slow command.
-- Run `bundle update --conservative <gem_name>` to update individual gems
-- Run `bundle install` one more time to ensure all lockfiles are in sync
-- Commit the changes, with a commit message of `bundle update <gem_name>` (you don't need to include the conservative flag in the commit message).
-  Be sure to check for changes in `Gemfile*.lock`, `Gemfile.d/*.lock`, and `gems/*/Gemfile*.lock`.
+- Never touch `Gemfile*.lock` files directly.
 
 ## Gem Groups
 

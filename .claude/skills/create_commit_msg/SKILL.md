@@ -1,5 +1,5 @@
 ---
-name: create_commit_msg
+name: create-commit-msg
 description: Help create a well-formatted git commit message following Canvas LMS conventions
 disable-model-invocation: true
 ---
