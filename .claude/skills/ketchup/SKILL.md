@@ -2,7 +2,7 @@
 name: ketchup
 description: Rebuild context after /clear by analyzing uncommitted changes across Canvas LMS and all plugin repositories
 disable-model-invocation: true
-argument-hint: [optional: "commits" to include committed changes]
+argument-hint: "[optional: 'commits' to include committed changes]"
 ---
 
 I just cleared context. Help me ketchup by analyzing all uncommitted changes.
