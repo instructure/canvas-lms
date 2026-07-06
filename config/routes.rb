@@ -2164,6 +2164,11 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/developer_keys/lookup_utids", action: :lookup_utids
     end
 
+    scope(controller: :live_event_subscriptions) do
+      get "accounts/:account_id/live_event_subscriptions", action: :index, as: "account_live_event_subscriptions"
+      get "accounts/:account_id/live_event_subscriptions/:id", action: :show, as: "account_live_event_subscription"
+    end
+
     scope(controller: "lti/registrations") do
       get "accounts/:account_id/lti_registrations", action: :list
       post "accounts/:account_id/lti_registrations", action: :create

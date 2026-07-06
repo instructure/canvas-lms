@@ -416,3 +416,18 @@ enable_kafka_events:
   display_name: Emit Events to Kafka
   description: Allow emitting events to Kafka
   applies_to: SiteAdmin
+live_event_subscriptions_api:
+  type: setting
+  state: hidden
+  display_name: Live Event Subscriptions API
+  description: |-
+    Read-only API endpoints for auditing live event
+    subscriptions configured for a root account.
+    Sensitive fields such as AWS keys and secrets
+    are masked in the response.
+  applies_to: RootAccount
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
