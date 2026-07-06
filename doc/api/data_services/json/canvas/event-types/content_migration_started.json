@@ -1,0 +1,49 @@
+{
+  "name": "content_migration_started",
+  "definition": "The event is emitted anytime a content migration begins importing content.",
+  "trigger": "Triggered when a content migration transitions into the importing state, before the resulting content changes are applied. Useful as an early signal that a bulk copy/import into a course is starting.",
+  "schema": {
+    "content_migration_id": "The Canvas id of the content migration.",
+    "context_id": "The Canvas id of the context associated with the content migration.",
+    "context_type": "The type of context associated with the content migration.",
+    "context_uuid": "The uuid of the context associated with the content migration.",
+    "import_quizzes_next": "Indicates whether the user requested that the quizzes in the content migration be created in Quizzes.Next (true) or in native Canvas (false).",
+    "lti_context_id": "The lti context id of the context associated with the content migration.",
+    "source_course_lti_id": "The lti context id of the the source course, if applicable.",
+    "source_course_uuid": "The uuid of the source course, if applicable.",
+    "destination_course_lti_id": "Alias for lti_context_id.",
+    "migration_type": "The migration type. Examples include: academic_benchmark_importer, angel_exporter, blackboard_exporter, canvas_cartridge_importer, common_cartridge_importer, course_copy_importer, d2l_exporter, master_course_import, moodle_converter, qti_converter, webct_scraper, zip_file_importer, context_external_tool_1234.",
+    "domain": "The default hostname for the Canvas root account."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "context_id": "21070000000008972",
+          "context_type": "Course",
+          "event_name": "content_migration_started",
+          "event_time": "2019-11-01T19:11:01.024Z",
+          "job_id": "1020020528469291",
+          "job_tag": "ContentMigration#import_content",
+          "producer": "canvas",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
+        },
+        "body": {
+          "content_migration_id": "21070000000000072",
+          "context_id": "21070000000008972",
+          "context_type": "Course",
+          "context_uuid": "Uc69p8GCYLMYWQJqkyzQGqg1kNMXbmnRl8qdCJge",
+          "import_quizzes_next": false,
+          "lti_context_id": "694d2e30346f6a94ad20cea11ce78d19bd849c9c",
+          "source_course_lti_id": "38ab9de0f0bc8e8e0889432275420de08f0d8380",
+          "source_course_uuid": "Wd58q9HDZMNZXRKrlzaRHrh2lONYcnoSm9rePDkh",
+          "destination_course_lti_id": "694d2e30346f6a94ad20cea11ce78d19bd849c9c",
+          "migration_type": "course_copy_importer",
+          "domain": "oxana.instructure.com"
+        }
+      }
+    }
+  ]
+}

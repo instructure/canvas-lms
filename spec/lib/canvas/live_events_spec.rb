@@ -1661,6 +1661,62 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe ".content_migration_started" do
+    let(:course) { course_factory }
+    let(:source_course) { course_factory }
+    let(:migration) do
+      ContentMigration.create(context: course,
+                              source_course:,
+                              migration_type: "course_copy_importer",
+                              workflow_state: "importing",
+                              user: @user)
+    end
+
+    before do
+      migration.migration_settings[:import_quizzes_next] = true
+      course.lti_context_id = "abc"
+      source_course.lti_context_id = "def"
+    end
+
+    it "sends events with expected payload" do
+      expect_event(
+        "content_migration_started",
+        hash_including(
+          content_migration_id: migration.global_id.to_s,
+          context_id: course.global_id.to_s,
+          context_type: course.class.to_s,
+          context_uuid: course.uuid,
+          import_quizzes_next: true,
+          domain: course.root_account.domain,
+          source_course_lti_id: source_course.lti_context_id,
+          source_course_uuid: source_course&.uuid,
+          destination_course_lti_id: course.lti_context_id,
+          migration_type: migration.migration_type
+        ),
+        hash_including(
+          context_type: course.class.to_s,
+          context_id: course.global_id.to_s,
+          root_account_id: course.root_account.global_id.to_s,
+          root_account_uuid: course.root_account.uuid,
+          root_account_lti_guid: course.root_account.lti_guid.to_s
+        )
+      ).once
+
+      Canvas::LiveEvents.content_migration_started(migration)
+    end
+
+    it "never includes a resource map (a completion artifact)" do
+      expect(migration).not_to receive(:asset_map_url)
+      expect_event(
+        "content_migration_started",
+        hash_not_including(:resource_map_url),
+        hash_including(context_id: course.global_id.to_s)
+      ).once
+
+      Canvas::LiveEvents.content_migration_started(migration)
+    end
+  end
+
   describe ".course_section_created" do
     it "triggers a course section creation live event" do
       course_with_student_submissions
@@ -3169,6 +3225,20 @@ describe Canvas::LiveEvents do
       @course = course_model
       @master_template = MasterCourses::MasterTemplate.create!(course: @course)
       @master_migration = MasterCourses::MasterMigration.create!(master_template: @master_template)
+    end
+
+    context "started" do
+      it "triggers a master_migration_started live event" do
+        expect_event("master_migration_started", {
+                       master_migration_id: @master_migration.id.to_s,
+                       master_template_id: @master_template.id.to_s,
+                       account_id: @master_migration.master_template.course.account.global_id.to_s,
+                       account_uuid: @master_migration.master_template.course.account.uuid.to_s,
+                       blueprint_course_uuid: @master_migration.master_template.course.uuid.to_s,
+                       blueprint_course_id: @master_migration.master_template.course.global_id.to_s
+                     }).once
+        Canvas::LiveEvents.master_migration_started(@master_migration)
+      end
     end
 
     context "completed" do
