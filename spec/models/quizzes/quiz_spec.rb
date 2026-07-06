@@ -399,12 +399,27 @@ describe Quizzes::Quiz do
       @course.quizzes.create!(title: "New Quiz", quiz_type: "practice_quiz", access_code: "pw")
     end
 
-    it "does not fire quiz_updated when no quiz-specific fields change" do
+    it "fires quiz_updated when due_at changes" do
+      expect(Canvas::LiveEvents).to receive(:quiz_updated).with(@quiz)
+      @quiz.update!(due_at: 3.days.from_now)
+    end
+
+    it "fires quiz_updated when lock_at changes" do
+      expect(Canvas::LiveEvents).to receive(:quiz_updated).with(@quiz)
+      @quiz.update!(lock_at: 5.days.from_now)
+    end
+
+    it "fires quiz_updated when unlock_at changes" do
+      expect(Canvas::LiveEvents).to receive(:quiz_updated).with(@quiz)
+      @quiz.update!(unlock_at: 1.day.from_now)
+    end
+
+    it "does not fire quiz_updated when no event fields change" do
       expect(Canvas::LiveEvents).not_to receive(:quiz_updated)
       @quiz.update!(title: "Updated Title")
     end
 
-    it "fires quiz_updated exactly once when multiple quiz-specific fields change" do
+    it "fires quiz_updated exactly once when multiple event fields change" do
       expect(Canvas::LiveEvents).to receive(:quiz_updated).with(@quiz).once
       @quiz.update!(access_code: "secret123", time_limit: 30, ip_filter: "10.0.0.1")
     end

@@ -23,18 +23,19 @@ class Quizzes::Quiz < ApplicationRecord
 
   self.table_name = "quizzes"
 
-  # Quiz-specific fields that do not sync to the associated assignment.
-  # When any of these change, we fire a quiz_updated live event so
-  # external consumers know the quiz settings were modified.
-  QUIZ_SPECIFIC_FIELDS = %w[
+  # Fields that trigger a quiz_updated live event when changed.
+  # Includes quiz-specific settings and availability dates.
+  QUIZ_EVENT_FIELDS = %w[
     access_code
     allowed_attempts
     anonymous_submissions
     cant_go_back
     disable_timer_autosubmission
+    due_at
     hide_correct_answers_at
     hide_results
     ip_filter
+    lock_at
     one_question_at_a_time
     one_time_results
     require_lockdown_browser
@@ -45,6 +46,7 @@ class Quizzes::Quiz < ApplicationRecord
     show_correct_answers_last_attempt
     shuffle_answers
     time_limit
+    unlock_at
   ].freeze
 
   include Workflow
@@ -571,7 +573,7 @@ class Quizzes::Quiz < ApplicationRecord
   def fire_quiz_updated_event
     return if saved_changes.key?("id") # new record
     return if saved_by == :migration
-    return unless (saved_changes.keys & QUIZ_SPECIFIC_FIELDS).any?
+    return unless (saved_changes.keys & QUIZ_EVENT_FIELDS).any?
 
     self.class.connection.after_transaction_commit do
       Canvas::LiveEvents.quiz_updated(self)
