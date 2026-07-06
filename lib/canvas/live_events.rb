@@ -606,6 +606,18 @@ module Canvas::LiveEvents
                            })
   end
 
+  def self.quiz_extension_created(quiz_extension)
+    qs = quiz_extension.quiz_submission
+    post_event_stringified("quiz_extension_created", {
+                             quiz_id: qs.global_quiz_id,
+                             user_id: qs.global_user_id,
+                             extra_attempts: quiz_extension.extra_attempts,
+                             extra_time: quiz_extension.extra_time,
+                             manually_unlocked: quiz_extension.manually_unlocked,
+                             end_at: quiz_extension.end_at
+                           })
+  end
+
   def self.wiki_page_created(page)
     post_event_stringified("wiki_page_created", {
                              wiki_page_id: page.global_id,

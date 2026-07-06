@@ -137,7 +137,10 @@ class Quizzes::CourseQuizExtensionsController < ApplicationController
     end
 
     # after we've validated permissions on all extend all submissions
-    quiz_extensions.each(&:extend_submission!)
+    quiz_extensions.each do |extension|
+      extension.extend_submission!
+      Canvas::LiveEvents.quiz_extension_created(extension)
+    end
 
     render json: serialize_jsonapi(quiz_extensions)
   end
