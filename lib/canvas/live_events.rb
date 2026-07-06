@@ -798,6 +798,40 @@ module Canvas::LiveEvents
     payload
   end
 
+  def self.content_migration_started(content_migration)
+    post_event_stringified(
+      "content_migration_started",
+      content_migration_started_data(content_migration),
+      amended_context(content_migration.context)
+    )
+  end
+
+  def self.content_migration_started_data(content_migration)
+    context = content_migration.context
+
+    # NOTE: intentionally omits resource_map_url. At the "importing" state importing? is true, so
+    # asset_map_url(generate_if_needed:) would generate and persist an asset map attachment before
+    # the import has run. The resource map is a completion artifact and belongs on _completed only.
+    payload = {
+      content_migration_id: content_migration.global_id,
+      context_id: context.global_id,
+      context_type: context.class.to_s,
+      lti_context_id: context.lti_context_id,
+      context_uuid: context.uuid,
+      import_quizzes_next: content_migration.migration_settings&.[](:import_quizzes_next) == true,
+      source_course_lti_id: content_migration.source_course&.lti_context_id,
+      source_course_uuid: content_migration.source_course&.uuid,
+      destination_course_lti_id: context.lti_context_id,
+      migration_type: content_migration.migration_type
+    }
+
+    if context.respond_to?(:root_account)
+      payload[:domain] = context.root_account&.domain(ApplicationController.test_cluster_name)
+    end
+
+    payload
+  end
+
   def self.course_section_created(section)
     post_event_stringified("course_section_created", get_course_section_data(section))
   end
@@ -1289,11 +1323,15 @@ module Canvas::LiveEvents
     }
   end
 
-  def self.master_migration_completed(master_migration)
-    post_event_stringified("master_migration_completed", master_migration_completed_data(master_migration))
+  def self.master_migration_started(master_migration)
+    post_event_stringified("master_migration_started", master_migration_data(master_migration))
   end
 
-  def self.master_migration_completed_data(master_migration)
+  def self.master_migration_completed(master_migration)
+    post_event_stringified("master_migration_completed", master_migration_data(master_migration))
+  end
+
+  def self.master_migration_data(master_migration)
     {
       master_migration_id: master_migration.id,
       master_template_id: master_migration.master_template.id,

@@ -530,6 +530,29 @@ describe LiveEventsObserver do
     end
   end
 
+  describe "content_migration_started" do
+    before do
+      user_model
+      account_model
+      course_model(name: "CS101", account: @account)
+      @cm = ContentMigration.create!(
+        context: @course,
+        user: @teacher,
+        workflow_state: "exported"
+      )
+    end
+
+    it "posts a started event when the migration begins importing" do
+      expect(Canvas::LiveEvents).to receive(:content_migration_started).once
+      @cm.update!(workflow_state: "importing")
+    end
+
+    it "does not post a started event for unrelated workflow_state transitions" do
+      expect(Canvas::LiveEvents).not_to receive(:content_migration_started)
+      @cm.update!(workflow_state: "imported")
+    end
+  end
+
   describe "modules" do
     it "posts create events" do
       expect(Canvas::LiveEvents).to receive(:module_created).with(anything)
@@ -771,6 +794,22 @@ describe LiveEventsObserver do
       master_migration = MasterCourses::MasterMigration.create!(master_template:)
       expect(Canvas::LiveEvents).not_to receive(:master_migration_completed)
       master_migration.update(workflow_state: "exports_failed")
+    end
+
+    it "posts a started event when the migration begins exporting" do
+      course_model
+      master_template = MasterCourses::MasterTemplate.create!(course: @course)
+      master_migration = MasterCourses::MasterMigration.create!(master_template:)
+      expect(Canvas::LiveEvents).to receive(:master_migration_started).once
+      master_migration.update(workflow_state: "exporting")
+    end
+
+    it "does not post a started event when the migration completes" do
+      course_model
+      master_template = MasterCourses::MasterTemplate.create!(course: @course)
+      master_migration = MasterCourses::MasterMigration.create!(master_template:)
+      expect(Canvas::LiveEvents).not_to receive(:master_migration_started)
+      master_migration.update(workflow_state: "completed")
     end
   end
 

@@ -111,6 +111,8 @@ module Canvas::LiveEventsCallbacks
     when ContentMigration
       if changes["workflow_state"] && obj.workflow_state == "imported"
         Canvas::LiveEvents.content_migration_completed(obj)
+      elsif changes["workflow_state"] && obj.workflow_state == "importing"
+        Canvas::LiveEvents.content_migration_started(obj)
       end
     when Course
       if changes["syllabus_body"]
@@ -214,6 +216,8 @@ module Canvas::LiveEventsCallbacks
     when MasterCourses::MasterMigration
       if changes["workflow_state"] && obj.workflow_state == "completed"
         Canvas::LiveEvents.master_migration_completed(obj)
+      elsif changes["workflow_state"] && obj.workflow_state == "exporting"
+        Canvas::LiveEvents.master_migration_started(obj)
       end
     when MasterCourses::MasterTemplate
       if %w[default_restrictions use_default_restrictions_by_type default_restrictions_by_type].any? { |field| changes[field] }
