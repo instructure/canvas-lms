@@ -20,7 +20,7 @@
 
 # @API Quiz Extensions
 #
-# API for setting extensions on student quiz submissions
+# API for setting and reading extensions on student quiz submissions
 #
 # @model QuizExtension
 #     {
@@ -68,6 +68,46 @@ class Quizzes::QuizExtensionsController < ApplicationController
   include ::Filters::Quizzes
 
   before_action :require_context, :require_quiz
+
+  # @API List extensions for student quiz submissions
+  #
+  # Returns all quiz extensions that have been set for the given quiz.
+  # Only returns submissions where at least one extension field
+  # (extra_attempts, extra_time, or manually_unlocked) has been set.
+  #
+  # @argument user_id [Optional, Integer]
+  #   If specified, only return extensions for this user.
+  #
+  # <b>Responses</b>
+  #
+  # * <b>200 OK</b> if the request was successful
+  # * <b>403 Forbidden</b> if you are not allowed to manage this quiz
+  #
+  # @example_response
+  #  {
+  #    "quiz_extensions": [QuizExtension]
+  #  }
+  #
+  def index
+    unless @context.grants_any_right?(@current_user, session, :manage_assignments, :manage_assignments_edit)
+      return render_unauthorized_action
+    end
+
+    scope = @quiz.quiz_submissions
+                 .where("extra_attempts > 0 OR extra_time > 0 OR manually_unlocked = ?", true)
+
+    if params[:user_id].present?
+      scope = scope.where(user_id: params[:user_id])
+    end
+
+    quiz_submissions = Api.paginate(scope, self, api_v1_course_quiz_extensions_index_url(@context, @quiz))
+
+    extensions = quiz_submissions.map do |qs|
+      Quizzes::QuizExtension.new(qs, {})
+    end
+
+    render json: serialize_extensions(extensions)
+  end
 
   # @API Set extensions for student quiz submissions
   #
@@ -145,7 +185,10 @@ class Quizzes::QuizExtensionsController < ApplicationController
     end
 
     # after we've validated permissions on all extend all submissions
-    quiz_extensions.each(&:extend_submission!)
+    quiz_extensions.each do |extension|
+      extension.extend_submission!
+      Canvas::LiveEvents.quiz_extension_created(extension)
+    end
 
     render json: serialize_jsonapi(quiz_extensions)
   end
@@ -160,6 +203,21 @@ class Quizzes::QuizExtensionsController < ApplicationController
                                                       root: false,
                                                       include_root: false
                                                     }).as_json
+
+    { quiz_extensions: serialized_set }
+  end
+
+  def serialize_extensions(quiz_extensions)
+    serialized_set = quiz_extensions.map do |ext|
+      {
+        user_id: ext.user_id,
+        quiz_id: ext.quiz_id,
+        extra_attempts: ext.extra_attempts,
+        extra_time: ext.extra_time,
+        manually_unlocked: ext.manually_unlocked,
+        end_at: ext.end_at
+      }
+    end
 
     { quiz_extensions: serialized_set }
   end

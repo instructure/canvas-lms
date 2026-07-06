@@ -2428,11 +2428,17 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: "quizzes/quiz_extensions") do
+      get "courses/:course_id/quizzes/:quiz_id/extensions", action: :index, as: "course_quiz_extensions_index"
       post "courses/:course_id/quizzes/:quiz_id/extensions", action: :create, as: "course_quiz_extensions_create"
     end
 
     scope(controller: "quizzes/course_quiz_extensions") do
       post "courses/:course_id/quiz_extensions", action: :create
+    end
+
+    scope(controller: "quizzes/new_quiz_accommodations") do
+      get "courses/:course_id/new_quizzes/:assignment_id/accommodations", action: :index, as: "course_new_quiz_accommodations"
+      get "courses/:course_id/new_quizzes/:assignment_id/accommodations/:user_id", action: :show, as: "course_new_quiz_accommodation"
     end
 
     scope(controller: "quizzes/quiz_submission_events_api") do

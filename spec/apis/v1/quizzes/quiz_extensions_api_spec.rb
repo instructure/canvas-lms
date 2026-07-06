@@ -96,6 +96,25 @@ describe Quizzes::QuizExtensionsController, type: :request do
         expect(res["quiz_extensions"][0]["extra_attempts"]).to eq 2
         expect(res["quiz_extensions"][1]["extra_attempts"]).to eq 3
       end
+
+      it "emits a live event for each extension created" do
+        expect(Canvas::LiveEvents).to receive(:quiz_extension_created).once
+
+        quiz_extension_params = [
+          { user_id: @student1.id, extra_attempts: 2 }
+        ]
+        api_create_quiz_extension(quiz_extension_params)
+      end
+
+      it "emits live events for multiple extensions" do
+        expect(Canvas::LiveEvents).to receive(:quiz_extension_created).twice
+
+        quiz_extension_params = [
+          { user_id: @student1.id, extra_attempts: 2 },
+          { user_id: @student2.id, extra_attempts: 3 }
+        ]
+        api_create_quiz_extension(quiz_extension_params)
+      end
     end
   end
 end
