@@ -330,6 +330,92 @@ describe Quizzes::Quiz do
     end
   end
 
+  describe "#fire_quiz_created_event" do
+    it "fires quiz_created when a new quiz is created" do
+      expect(Canvas::LiveEvents).to receive(:quiz_created)
+      @course.quizzes.create!(title: "New Quiz", quiz_type: "assignment")
+    end
+
+    it "fires quiz_created for practice quizzes" do
+      expect(Canvas::LiveEvents).to receive(:quiz_created)
+      @course.quizzes.create!(title: "Practice", quiz_type: "practice_quiz")
+    end
+
+    it "does not fire quiz_created when an existing quiz is updated" do
+      quiz = @course.quizzes.create!(title: "Test Quiz", quiz_type: "assignment")
+      quiz.reload
+      expect(Canvas::LiveEvents).not_to receive(:quiz_created)
+      quiz.update!(access_code: "secret123")
+    end
+
+    it "does not fire quiz_created during content migrations" do
+      expect(Canvas::LiveEvents).not_to receive(:quiz_created)
+      quiz = @course.quizzes.build(title: "Migrated Quiz", quiz_type: "assignment")
+      quiz.saved_by = :migration
+      quiz.save!
+    end
+  end
+
+  describe "#fire_quiz_updated_event" do
+    before :once do
+      @quiz = @course.quizzes.create!(title: "Test Quiz", quiz_type: "assignment")
+      @quiz.reload
+    end
+
+    it "fires quiz_updated when access_code changes" do
+      expect(Canvas::LiveEvents).to receive(:quiz_updated).with(@quiz)
+      @quiz.update!(access_code: "secret123")
+    end
+
+    it "fires quiz_updated when time_limit changes" do
+      expect(Canvas::LiveEvents).to receive(:quiz_updated).with(@quiz)
+      @quiz.update!(time_limit: 30)
+    end
+
+    it "fires quiz_updated when ip_filter changes" do
+      expect(Canvas::LiveEvents).to receive(:quiz_updated).with(@quiz)
+      @quiz.update!(ip_filter: "192.168.0.1")
+    end
+
+    it "fires quiz_updated when shuffle_answers changes" do
+      expect(Canvas::LiveEvents).to receive(:quiz_updated).with(@quiz)
+      @quiz.update!(shuffle_answers: true)
+    end
+
+    it "fires quiz_updated when allowed_attempts changes" do
+      expect(Canvas::LiveEvents).to receive(:quiz_updated).with(@quiz)
+      @quiz.update!(allowed_attempts: 3)
+    end
+
+    it "fires quiz_updated for practice quizzes too" do
+      practice = @course.quizzes.create!(title: "Practice", quiz_type: "practice_quiz")
+      practice.reload
+      expect(Canvas::LiveEvents).to receive(:quiz_updated).with(practice)
+      practice.update!(access_code: "secret")
+    end
+
+    it "does not fire quiz_updated for a new quiz" do
+      expect(Canvas::LiveEvents).not_to receive(:quiz_updated)
+      @course.quizzes.create!(title: "New Quiz", quiz_type: "practice_quiz", access_code: "pw")
+    end
+
+    it "does not fire quiz_updated when no quiz-specific fields change" do
+      expect(Canvas::LiveEvents).not_to receive(:quiz_updated)
+      @quiz.update!(title: "Updated Title")
+    end
+
+    it "fires quiz_updated exactly once when multiple quiz-specific fields change" do
+      expect(Canvas::LiveEvents).to receive(:quiz_updated).with(@quiz).once
+      @quiz.update!(access_code: "secret123", time_limit: 30, ip_filter: "10.0.0.1")
+    end
+
+    it "does not fire quiz_updated during content migrations" do
+      expect(Canvas::LiveEvents).not_to receive(:quiz_updated)
+      @quiz.saved_by = :migration
+      @quiz.update!(access_code: "migrated_code")
+    end
+  end
+
   it_behaves_like "Canvas::DraftStateValidations"
 
   it "infers the times if none given" do

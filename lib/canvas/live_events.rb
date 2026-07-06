@@ -598,6 +598,52 @@ module Canvas::LiveEvents
     post_event_stringified("logged_out", {})
   end
 
+  def self.quiz_created(quiz)
+    post_event_stringified("quiz_created", get_quiz_data(quiz))
+  end
+
+  def self.quiz_updated(quiz)
+    post_event_stringified("quiz_updated", get_quiz_data(quiz))
+  end
+
+  def self.get_quiz_data(quiz)
+    {
+      quiz_id: quiz.global_id,
+      assignment_id: quiz.assignment_id ? quiz.global_assignment_id : nil,
+      context_id: quiz.global_context_id,
+      context_type: quiz.context_type,
+      context_uuid: quiz.context.uuid,
+      title: LiveEvents.truncate(quiz.title),
+      description: LiveEvents.truncate(quiz.description),
+      quiz_type: quiz.quiz_type,
+      points_possible: quiz.points_possible,
+      due_at: quiz.due_at,
+      lock_at: quiz.lock_at,
+      unlock_at: quiz.unlock_at,
+      time_limit: quiz.time_limit,
+      access_code: quiz.access_code.present?,
+      ip_filter: quiz.ip_filter,
+      shuffle_answers: quiz.shuffle_answers,
+      allowed_attempts: quiz.allowed_attempts,
+      scoring_policy: quiz.scoring_policy,
+      hide_results: quiz.hide_results,
+      show_correct_answers: quiz.show_correct_answers,
+      show_correct_answers_at: quiz.show_correct_answers_at,
+      hide_correct_answers_at: quiz.hide_correct_answers_at,
+      show_correct_answers_last_attempt: quiz.show_correct_answers_last_attempt,
+      one_question_at_a_time: quiz.one_question_at_a_time,
+      cant_go_back: quiz.cant_go_back,
+      one_time_results: quiz.one_time_results,
+      anonymous_submissions: quiz.anonymous_submissions,
+      require_lockdown_browser: quiz.require_lockdown_browser,
+      require_lockdown_browser_for_results: quiz.require_lockdown_browser_for_results,
+      disable_timer_autosubmission: quiz.disable_timer_autosubmission,
+      only_visible_to_overrides: quiz.only_visible_to_overrides,
+      workflow_state: quiz.workflow_state,
+      updated_at: quiz.updated_at
+    }
+  end
+
   def self.quiz_submitted(submission)
     # TODO: include score, for automatically graded portions?
     post_event_stringified("quiz_submitted", {

@@ -25,6 +25,8 @@ class DataServicesEventsLoader
     "doc/api/data_services/json/canvas/event-types/outcome_proficiency_created.json" => "learning",
     "doc/api/data_services/json/canvas/event-types/outcome_proficiency_updated.json" => "learning",
     "doc/api/data_services/json/caliper/event-types/quiz_submitted.json" => "assessment",
+    "doc/api/data_services/json/caliper/event-types/quiz_created.json" => "basic",
+    "doc/api/data_services/json/caliper/event-types/quiz_updated.json" => "basic",
     "doc/api/data_services/json/caliper/event-types/assignment_created.json" => "basic",
     "doc/api/data_services/json/caliper/event-types/assignment_updated.json" => "basic",
     "doc/api/data_services/json/caliper/event-types/assignment_override_created.json" => "basic",

@@ -1,0 +1,114 @@
+{
+  "name": "quiz_created",
+  "definition": "The event is emitted anytime a new classic quiz is created by an end user or API request.",
+  "trigger": "Triggered when a new classic quiz [old quizzes] is created in a course.",
+  "schema": {
+    "data[0].group.extensions[\"com.instructure.canvas\"]": {
+      "context_type": "Canvas context type where the action took place e.g context_type = Course.",
+      "entity_id": "Canvas context ID"
+    },
+    "data[0].object.extensions[\"com.instructure.canvas\"]": {
+      "entity_id": "Canvas global ID of the object affected by the event",
+      "quiz_type": "The type of quiz (assignment, practice_quiz, graded_survey, survey).",
+      "time_limit": "The time limit for taking the quiz, in minutes.",
+      "access_code": "Whether the quiz requires an access code (boolean).",
+      "workflow_state": "Workflow state of the quiz (created, edited, available, unpublished, deleted)."
+    },
+    "data[0].object": {
+      "type": "Assessment"
+    }
+  },
+  "examples": [
+    {
+      "payload": {
+        "sensor": "http://oxana.instructure.com/",
+        "sendTime": "2019-11-16T02:08:59.579Z",
+        "dataVersion": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+        "data": [
+          {
+            "@context": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+            "id": "urn:uuid:3f672715-6aa8-4293-b62a-3b3319ff5701",
+            "type": "Event",
+            "actor": {
+              "id": "urn:instructure:canvas:user:21070000000000001",
+              "type": "Person",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "user_login": "oxana@example.com",
+                  "user_sis_id": "456-T45",
+                  "root_account_id": "21070000000000001",
+                  "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+                  "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+                  "entity_id": "21070000000000001"
+                }
+              }
+            },
+            "action": "Created",
+            "object": {
+              "id": "urn:instructure:canvas:quiz:21070000002030605",
+              "type": "Assessment",
+              "name": "Chapter 5 Quiz",
+              "dateCreated": "2019-11-01T19:11:11.323Z",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "quiz_type": "assignment",
+                  "time_limit": 30,
+                  "access_code": true,
+                  "workflow_state": "created",
+                  "entity_id": "21070000002030605"
+                }
+              },
+              "dateToShow": "2019-11-01T00:00:00.000Z",
+              "dateToSubmit": "2019-11-05T13:38:00.218Z",
+              "maxScore": 100
+            },
+            "eventTime": "2019-11-01T19:11:11.323Z",
+            "edApp": {
+              "id": "http://oxana.instructure.com/",
+              "type": "SoftwareApplication"
+            },
+            "group": {
+              "id": "urn:instructure:canvas:course:21070000001279362",
+              "type": "CourseOffering",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "context_type": "Course",
+                  "entity_id": "21070000001279362"
+                }
+              }
+            },
+            "membership": {
+              "id": "urn:instructure:canvas:course:21070000001279362:Instructor:21070000000000001",
+              "type": "Membership",
+              "member": {
+                "id": "urn:instructure:canvas:user:21070000000000001",
+                "type": "Person"
+              },
+              "organization": {
+                "id": "urn:instructure:canvas:course:21070000001279362",
+                "type": "CourseOffering"
+              },
+              "roles": [
+                "Instructor"
+              ]
+            },
+            "session": {
+              "id": "urn:instructure:canvas:session:ef686f8ed684abf78cbfa1f6a58112b5",
+              "type": "Session"
+            },
+            "extensions": {
+              "com.instructure.canvas": {
+                "hostname": "oxana.instructure.com",
+                "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+                "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+                "client_ip": "93.184.216.34",
+                "request_url": "https://oxana.instructure.com/api/v1/courses/1279362/quizzes",
+                "version": "1.0.0"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

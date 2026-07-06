@@ -1559,6 +1559,85 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe ".quiz_created" do
+    before :once do
+      course_factory
+      @quiz = @course.quizzes.create!(
+        title: "New Quiz",
+        quiz_type: "assignment",
+        time_limit: 45,
+        access_code: "pass123",
+        shuffle_answers: true
+      )
+    end
+
+    it "triggers a live event with quiz details" do
+      expect_event("quiz_created",
+                   hash_including({
+                     quiz_id: @quiz.global_id.to_s,
+                     context_id: @course.global_id.to_s,
+                     context_uuid: @course.uuid,
+                     context_type: "Course",
+                     title: @quiz.title,
+                     quiz_type: "assignment",
+                     time_limit: 45,
+                     access_code: true,
+                     shuffle_answers: true,
+                     workflow_state: @quiz.workflow_state
+                   })).once
+
+      Canvas::LiveEvents.quiz_created(@quiz)
+    end
+  end
+
+  describe ".quiz_updated" do
+    before :once do
+      course_factory
+      @quiz = @course.quizzes.create!(
+        title: "Test Quiz",
+        quiz_type: "assignment",
+        time_limit: 60,
+        access_code: "secret",
+        ip_filter: "192.168.0.1",
+        shuffle_answers: true,
+        allowed_attempts: 2,
+        scoring_policy: "keep_highest"
+      )
+    end
+
+    it "triggers a live event with quiz details" do
+      expect_event("quiz_updated",
+                   hash_including({
+                     quiz_id: @quiz.global_id.to_s,
+                     context_id: @course.global_id.to_s,
+                     context_uuid: @course.uuid,
+                     context_type: "Course",
+                     title: @quiz.title,
+                     quiz_type: "assignment",
+                     time_limit: 60,
+                     access_code: true,
+                     ip_filter: "192.168.0.1",
+                     shuffle_answers: true,
+                     allowed_attempts: 2,
+                     scoring_policy: "keep_highest",
+                     workflow_state: @quiz.workflow_state
+                   })).once
+
+      Canvas::LiveEvents.quiz_updated(@quiz)
+    end
+
+    it "does not expose the actual access_code value" do
+      event_data = Canvas::LiveEvents.get_quiz_data(@quiz)
+      expect(event_data[:access_code]).to eq true
+    end
+
+    it "sets access_code to false when no access code is set" do
+      quiz = @course.quizzes.create!(title: "No Code Quiz", quiz_type: "practice_quiz")
+      event_data = Canvas::LiveEvents.get_quiz_data(quiz)
+      expect(event_data[:access_code]).to eq false
+    end
+  end
+
   describe ".content_migration_completed" do
     let(:course) { course_factory }
     let(:source_course) { course_factory }
