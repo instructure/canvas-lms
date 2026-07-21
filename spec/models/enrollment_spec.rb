@@ -4160,6 +4160,16 @@ describe Enrollment do
       end.not_to change { conference.reload.invitees.include?(user) }
     end
 
+    it "syncs enrollments that are pending because the course has not started" do
+      conference # Force lazy evaluation to create conference first
+      course.update!(start_at: 1.week.from_now, restrict_enrollments_to_course_dates: true)
+
+      enrollment = course.enroll_student(user, enrollment_state: "active")
+
+      expect(enrollment.enrollment_state.state).to eql "pending_active"
+      expect(conference.reload.invitees).to include(user)
+    end
+
     it "respects remove_observers setting" do
       conference.remove_observers_enabled = true
       conference.save!

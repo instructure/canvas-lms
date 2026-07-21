@@ -238,6 +238,35 @@ describe WebConference do
       conference.invite_users_from_context
       expect(conference.invitees.pluck(:user_id)).to match_array(course.user_ids)
     end
+
+    context "when the course has not started yet" do
+      let(:teacher) { user_factory(active_all: true) }
+      let(:student) { user_factory(active_all: true) }
+      let(:course) do
+        course_factory(active_all: true).tap do |c|
+          c.enroll_teacher(teacher).accept!
+          c.enroll_student(student).accept!
+          c.update!(start_at: 1.week.from_now, restrict_enrollments_to_course_dates: true)
+        end
+      end
+      let(:conference) do
+        BigBlueButtonConference.create!(title: "my conference", user: teacher, context: course)
+      end
+
+      it "still invites students whose enrollments are pending by date" do
+        course # Force lazy evaluation to enroll the student first
+        expect(student.enrollments.first.enrollment_state.state).to eql "pending_active"
+        conference.invite_users_from_context
+        expect(conference.reload.invitees).to include(student)
+      end
+
+      it "does not invite users with concluded or deleted enrollments" do
+        completed_student = user_factory(active_all: true)
+        course.enroll_student(completed_student, enrollment_state: "completed")
+        conference.invite_users_from_context
+        expect(conference.reload.invitees).not_to include(completed_student)
+      end
+    end
   end
 
   context "notifications" do

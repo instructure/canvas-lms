@@ -285,7 +285,10 @@ class WebConference < ApplicationRecord
   end
 
   def invite_users_from_context(user_ids = context.user_ids)
-    members = context.is_a?(Course) ? context.participating_users(user_ids) : context.participating_users_in_context(user_ids)
+    # use a date-tolerant scope so conferences created before the course/term
+    # start date still register their invitees; the :join policy already
+    # prevents access until the course is readable by the user
+    members = context.is_a?(Course) ? context.participating_or_pending_users(user_ids) : context.participating_users_in_context(user_ids)
     new_invitees = members.to_a - invitees
     new_invitees.uniq.each do |u|
       add_invitee(u)
