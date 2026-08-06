@@ -129,10 +129,7 @@ export default class EditCalendarEventView extends Backbone.View {
         attrs.start_at.equals(attrs.start_at.clearTime())
       this.model.set(attrs)
       this.frequency = attrs.rrule
-        ? RRULEToFrequencyOptionValue(
-            moment.tz(attrs.start_date, 'MMM D, YYYY', ENV.TIMEZONE),
-            attrs.rrule,
-          )
+        ? RRULEToFrequencyOptionValue(this.parseEventStartDate(attrs.start_date), attrs.rrule)
         : 'not-repeat'
       this.render()
 
@@ -291,11 +288,18 @@ export default class EditCalendarEventView extends Backbone.View {
     )
   }
 
+  // The start date is written into the field with the active locale, so it has to be
+  // read back with the locale aware parser rather than a fixed English pattern.
+  parseEventStartDate(value) {
+    const parsed = value ? tz.parse(value) : null
+
+    return parsed ? moment.tz(parsed, ENV.TIMEZONE) : moment.invalid()
+  }
+
   renderRecurringEventFrequencyPicker() {
     if (!this.model.get('use_section_dates')) {
       const pickerNode = document.getElementById('recurring_event_frequency_picker')
-      const start = this.$el.find('[name="start_date"]').val()
-      const eventStart = start ? moment.tz(start, 'MMM D, YYYY', ENV.TIMEZONE) : moment('invalid')
+      const eventStart = this.parseEventStartDate(this.$el.find('[name="start_date"]').val())
 
       const rrule = this.model.get('rrule')
       const date = eventStart.isValid() ? eventStart.toISOString(true) : undefined
@@ -308,19 +312,25 @@ export default class EditCalendarEventView extends Backbone.View {
           : this.course.get('term')?.end_at
       }
 
+      // FrequencyPicker throws when it gets no date along with a frequency. Clearing the
+      // start date hits that same condition, so while the date is unknown the picker is
+      // rendered disabled and non repeating, and its changes are ignored so the stored
+      // rrule is not reset to not-repeat behind the user's back.
+      const hasDate = date !== undefined
+
       legacyRender(
         <div id="recurring_event_frequency_picker" style={{margin: '.5rem 0 1rem'}}>
           <FrequencyPickerErrorBoundary>
             <FrequencyPicker
               key={date || 'not-repeat'}
               date={date}
-              interaction={eventStart.isValid() ? 'enabled' : 'disabled'}
+              interaction={hasDate ? 'enabled' : 'disabled'}
               locale={ENV.LOCALE || 'en'}
               timezone={ENV.TIMEZONE}
-              initialFrequency={this.frequency}
-              rrule={rrule}
+              initialFrequency={hasDate ? this.frequency : 'not-repeat'}
+              rrule={hasDate ? rrule : undefined}
               width="fit"
-              onChange={this.handleFrequencyChange}
+              onChange={hasDate ? this.handleFrequencyChange : () => {}}
               courseEndAt={courseEndAt || undefined}
             />
           </FrequencyPickerErrorBoundary>
@@ -337,8 +347,7 @@ export default class EditCalendarEventView extends Backbone.View {
     this.showDuplicates(this.model.get('use_section_dates'))
 
     this.$el.find('[name="start_date"]').on('change', () => {
-      const start = this.$el.find('[name="start_date"]').val()
-      const eventStart = start ? moment.tz(start, 'MMM D, YYYY', ENV.TIMEZONE) : moment('invalid')
+      const eventStart = this.parseEventStartDate(this.$el.find('[name="start_date"]').val())
       if (eventStart.isValid() && this.model.get('rrule') && this.frequency !== 'saved-custom') {
         this.model.set('rrule', updateRRuleForNewDate(eventStart, this.model.get('rrule')))
       }

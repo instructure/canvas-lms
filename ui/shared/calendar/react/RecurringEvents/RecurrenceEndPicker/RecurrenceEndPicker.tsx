@@ -324,7 +324,11 @@ export default function RecurrenceEndPicker({
 
   const gridStyle = {
     display: 'grid',
-    gridTemplateColumns: 'min-content min-content',
+    // The label column is max-content: min-content shrinks to the narrowest wrappable
+    // width, and in languages that allow breaks between characters that is a single
+    // character, which stacks the labels vertically. The label element itself resets
+    // inherited styles, so capping the break from the outside does not work.
+    gridTemplateColumns: 'max-content min-content',
     gridTemplateRows: 'auto auto',
     rowGap: '0.5rem',
     columnGap: '0.75rem',
