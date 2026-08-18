@@ -75,7 +75,15 @@ If you want to migrate the existing database, cancel now
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
       message 'About to run "bundle exec rake db:drop"'
       start_spinner "Deleting db....."
-      _canvas_lms_track_with_log run_command bundle exec rake db:drop
+      # The 'up -d web' above (plus any jobs/webpack) holds a Postgres session,
+      # and db:drop fails with PG::ObjectInUse while any other session is
+      # connected. Stop those containers, drop from a transient container
+      # (db:drop needs no running web), then bring web back so the exec-based
+      # create/migrate below work -- same as the no-existing-db path, which
+      # also runs web before a database is present.
+      _canvas_lms_track_with_log $DOCKER_COMMAND stop web jobs webpack
+      _canvas_lms_track_with_log $DOCKER_COMMAND run --rm web bundle exec rake db:drop
+      _canvas_lms_track_with_log $DOCKER_COMMAND up -d web
       stop_spinner
     fi
   fi
