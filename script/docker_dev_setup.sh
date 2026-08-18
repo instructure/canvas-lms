@@ -10,7 +10,14 @@ LOG="$(pwd)/log/docker_dev_setup.log"
 SCRIPT_NAME="$0 $@"
 OS="$(uname)"
 DOCKER='true'
-CANVAS_SKIP_DOCKER_USERMOD='true'
+# On Linux, skipping usermod leaves the container's docker user at uid 9999,
+# which cannot write bind-mounted files owned by the host user (uid 1000).
+# Skip only where Docker maps uids automatically: macOS (Darwin) and
+# native Windows (MINGW/MSYS via Docker Desktop). WSL2 reports 'Linux' and
+# uses the ext4 filesystem, so it correctly runs usermod like native Linux.
+if [[ $OS != 'Linux' ]]; then
+  CANVAS_SKIP_DOCKER_USERMOD='true'
+fi
 
 _canvas_lms_opt_in_telemetry "$SCRIPT_NAME" "$LOG"
 
