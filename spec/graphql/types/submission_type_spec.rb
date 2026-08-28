@@ -2827,4 +2827,20 @@ describe Types::SubmissionType do
       expect(type.resolve("aiGradeResult { attempt }")).to be_nil
     end
   end
+
+  describe "grader" do
+    it "returns user for graded submission" do
+      expect(submission_type.resolve("grader { _id }")).to eq @teacher.id.to_s
+    end
+
+    it "returns nil for ungraded submissions" do
+      @submission.update!(grader_id: nil)
+      expect(submission_type.resolve("grader { _id }")).to be_nil
+    end
+
+    it "returns nil for automarked submissions" do
+      @submission.update!(grader_id: -1)
+      expect(submission_type.resolve("grader { _id }")).to be_nil
+    end
+  end
 end
