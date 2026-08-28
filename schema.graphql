@@ -10658,6 +10658,7 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   gradeMatchesCurrentSubmission: Boolean
   gradedAnonymously: Boolean
   gradedAt: DateTime
+  grader: User
   gradingPeriodId: ID
   gradingStatus: SubmissionGradingStatus
   groupId: ID

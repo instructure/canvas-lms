@@ -767,4 +767,9 @@ module Interfaces::SubmissionInterface
       submission.attempt
     end
   end
+
+  field :grader, Types::UserType, null: true
+  def graded_by
+    load_association(:grader)
+  end
 end
