@@ -771,7 +771,7 @@ class CalendarEvent < ApplicationRecord
 
     def location; end
 
-    def to_ics(in_own_calendar:, preloaded_attachments: {}, include_description: false, user_events: [])
+    def to_ics(in_own_calendar:, preloaded_attachments: {}, include_description: false, user_events: [], submission_status: nil)
       cal = Icalendar::Calendar.new
       # to appease Outlook
       cal.append_custom_property("METHOD", "PUBLISH")
@@ -798,6 +798,19 @@ class CalendarEvent < ApplicationRecord
         html = api_user_content(@event.description, @event.context, nil, preloaded_attachments, location: @event.asset_string)
         event.description = html_to_text(html)
         event.x_alt_desc = Icalendar::Values::Text.new(html, { "FMTTYPE" => "text/html" })
+      end
+
+      if submission_status
+        status_label = case submission_status
+                        when :submitted, :resubmitted, :graded
+                          I18n.t("Submitted")
+                        when :excused
+                          I18n.t("Excused")
+                        else
+                          I18n.t("Not submitted")
+                        end
+        status_line = I18n.t("Status: %{status}", status: status_label)
+        event.description = event.description ? "#{event.description}\n#{status_line}" : status_line
       end
 
       loc_string = if @event.is_a?(CalendarEvent)

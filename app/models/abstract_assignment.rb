@@ -1911,6 +1911,17 @@ class AbstractAssignment < ApplicationRecord
 
     author_name = context.present? ? context.name : t("atom_no_author", "No Author")
     content = "#{before_label(:due, "Due")} #{datetime_string(due_at, :due_date)}"
+    if opts.key?(:submission_status)
+      status_label = case opts[:submission_status]
+                     when :submitted, :resubmitted, :graded
+                       t("Submitted")
+                     when :excused
+                       t("Excused")
+                     else
+                       t("Not submitted")
+                     end
+      content += "<br/>#{before_label(:status, "Status")} #{status_label}"
+    end
     unless opts[:exclude_description]
       content += "<br/>#{description}<br/><br/>
         <div>
@@ -1949,10 +1960,11 @@ class AbstractAssignment < ApplicationRecord
     context_url_prefix
   end
 
-  def to_ics(in_own_calendar: true, preloaded_attachments: {}, user: nil)
+  def to_ics(in_own_calendar: true, preloaded_attachments: {}, user: nil, submission_status: nil)
     CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar:,
                                               preloaded_attachments:,
-                                              include_description: include_description?(user))
+                                              include_description: include_description?(user),
+                                              submission_status:)
   end
 
   def include_description?(user, lock_info = nil)

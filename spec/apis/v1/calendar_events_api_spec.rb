@@ -5726,6 +5726,76 @@ describe CalendarEventsApiController, type: :request do
         expect(response).to be_successful
         expect(response.body).to include("assignment description")
       end
+
+      it "shows the assignment as not submitted when the student hasn't submitted" do
+        raw_api_call(:get, "/feeds/calendars/#{@student.feed_code}.atom", {
+                       controller: "calendar_events_api", action: "public_feed", format: "atom", feed_code: @student.feed_code
+                     })
+        expect(response).to be_successful
+        expect(response.body).to include("Status: Not submitted")
+      end
+
+      it "shows the assignment as submitted once the student has submitted it" do
+        @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "done")
+        raw_api_call(:get, "/feeds/calendars/#{@student.feed_code}.atom", {
+                       controller: "calendar_events_api", action: "public_feed", format: "atom", feed_code: @student.feed_code
+                     })
+        expect(response).to be_successful
+        expect(response.body).to include("Status: Submitted")
+      end
+
+      it "shows the assignment as excused when the student is excused" do
+        @assignment.grade_student(@student, excused: true, grader: @teacher)
+        raw_api_call(:get, "/feeds/calendars/#{@student.feed_code}.atom", {
+                       controller: "calendar_events_api", action: "public_feed", format: "atom", feed_code: @student.feed_code
+                     })
+        expect(response).to be_successful
+        expect(response.body).to include("Status: Excused")
+      end
+
+      it "does not show a submission status on the generic course feed (no specific student)" do
+        raw_api_call(:get, "/feeds/calendars/#{@course.feed_code}.atom", {
+                       controller: "calendar_events_api", action: "public_feed", format: "atom", feed_code: @course.feed_code
+                     })
+        expect(response).to be_successful
+        expect(response.body).not_to include("Status:")
+      end
+    end
+
+    context "with ics" do
+      it "shows the assignment as not submitted when the student hasn't submitted" do
+        get "/feeds/calendars/#{@student.feed_code}.ics"
+        expect(response).to be_successful
+        cal = Icalendar::Calendar.parse(response.body.dup)[0]
+        assignment_event = cal.events.find { |e| e.summary.include?(@assignment.title) }
+        expect(assignment_event.description).to include("Status: Not submitted")
+      end
+
+      it "shows the assignment as submitted once the student has submitted it" do
+        @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "done")
+        get "/feeds/calendars/#{@student.feed_code}.ics"
+        expect(response).to be_successful
+        cal = Icalendar::Calendar.parse(response.body.dup)[0]
+        assignment_event = cal.events.find { |e| e.summary.include?(@assignment.title) }
+        expect(assignment_event.description).to include("Status: Submitted")
+      end
+
+      it "shows the assignment as excused when the student is excused" do
+        @assignment.grade_student(@student, excused: true, grader: @teacher)
+        get "/feeds/calendars/#{@student.feed_code}.ics"
+        expect(response).to be_successful
+        cal = Icalendar::Calendar.parse(response.body.dup)[0]
+        assignment_event = cal.events.find { |e| e.summary.include?(@assignment.title) }
+        expect(assignment_event.description).to include("Status: Excused")
+      end
+
+      it "does not show a submission status on the generic course feed (no specific student)" do
+        get "/feeds/calendars/#{@course.feed_code}.ics"
+        expect(response).to be_successful
+        cal = Icalendar::Calendar.parse(response.body.dup)[0]
+        assignment_event = cal.events.find { |e| e.summary.include?(@assignment.title) }
+        expect(assignment_event.description.to_s).not_to include("Status:")
+      end
     end
 
     context "discussion with checkpoints" do

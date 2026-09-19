@@ -1340,12 +1340,16 @@ class CalendarEventsApiController < ApplicationController
 
         # scan the descriptions for attachments
         preloaded_attachments = api_bulk_load_user_content_attachments(@events.map(&:description))
+        submission_status_by_assignment_id = submission_statuses_for_feed(@events, @current_user)
         @events.each do |event|
           ics_event =
             if event.is_a?(CalendarEvent)
               event.to_ics(in_own_calendar: false, preloaded_attachments:, user: @current_user, user_events: appointments)
             else
-              event.to_ics(in_own_calendar: false, preloaded_attachments:, user: @current_user)
+              event.to_ics(in_own_calendar: false,
+                            preloaded_attachments:,
+                            user: @current_user,
+                            submission_status: submission_status_by_assignment_id[event.id])
             end
           calendar.add_event(ics_event) if ics_event
         end
@@ -1356,8 +1360,14 @@ class CalendarEventsApiController < ApplicationController
         title = t :feed_title, "%{course_or_group_name} Calendar Feed", course_or_group_name: @context.name
         link = calendar_url_for(@context)
 
+        submission_status_by_assignment_id = submission_statuses_for_feed(@events, @current_user)
+
         feed_xml = AtomFeedHelper.render_xml(title:, link:, entries: @events) do |e|
-          { exclude_description: !!e.try(:locked_for?, @current_user) }
+          opts = { exclude_description: !!e.try(:locked_for?, @current_user) }
+          if e.is_a?(AbstractAssignment) && submission_status_by_assignment_id.key?(e.id)
+            opts[:submission_status] = submission_status_by_assignment_id[e.id]
+          end
+          opts
         end
 
         render plain: feed_xml
@@ -1585,6 +1595,28 @@ class CalendarEventsApiController < ApplicationController
   def get_calendar_context
     @context = Context.find_by_asset_string(params[:calendar_event].delete(:context_code)) if params[:calendar_event] && params[:calendar_event][:context_code]
     raise ActiveRecord::RecordNotFound unless @context
+  end
+
+  # returns { assignment_id => :submitted | :excused | :unsubmitted } for the given user,
+  # only for the AbstractAssignment entries present in `events`
+  def submission_statuses_for_feed(events, user)
+    return {} unless user
+
+    assignment_ids = events.select { |e| e.is_a?(AbstractAssignment) }.map(&:id)
+    return {} if assignment_ids.empty?
+
+    Submission.active
+              .where(user_id: user.id, assignment_id: assignment_ids)
+              .pluck(:assignment_id, :workflow_state, :submitted_at, :excused)
+              .each_with_object({}) do |(assignment_id, workflow_state, submitted_at, excused), statuses|
+      statuses[assignment_id] = if excused
+                                   :excused
+                                 elsif submitted_at.present? || workflow_state != "unsubmitted"
+                                   :submitted
+                                 else
+                                   :unsubmitted
+                                 end
+    end
   end
 
   def get_event(search_assignments: false)
