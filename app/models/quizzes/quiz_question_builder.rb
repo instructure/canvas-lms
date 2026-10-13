@@ -149,7 +149,7 @@ class Quizzes::QuizQuestionBuilder
       variables.each do |variable|
         variable_id = ::AssessmentQuestion.variable_id(variable)
         re = Regexp.new("\\[#{variable}\\]")
-        text = text.sub re, <<~HTML
+        input = <<~HTML
           <input
             class='question_input'
             type='text'
@@ -158,6 +158,8 @@ class Quizzes::QuizQuestionBuilder
             name='question_#{q[:id]}_#{variable_id}'
             value='{{question_#{q[:id]}_#{variable_id}}}' />
         HTML
+        # strip the heredoc's newlines so the input stays inline in <pre>/code blocks
+        text = text.sub(re, input.squish)
       end
 
       q[:original_question_text] = q[:question_text]
@@ -184,7 +186,7 @@ class Quizzes::QuizQuestionBuilder
         HTML
 
         re = Regexp.new("\\[#{variable}\\]")
-        text = text.sub(re, select)
+        text = text.sub(re, select.chomp)
       end # variable loop
 
       q[:original_question_text] = q[:question_text]

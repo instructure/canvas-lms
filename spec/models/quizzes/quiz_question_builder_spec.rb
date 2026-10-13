@@ -68,6 +68,32 @@ describe Quizzes::QuizQuestionBuilder do
       expect(questions[0][:question_text]).not_to include("\\b")
     end
 
+    it "does not insert line breaks around fill in multiple blanks inputs" do
+      questions = quiz_question_builder.build_submission_questions(1, [
+                                                                     {
+                                                                       id: 1,
+                                                                       name: "some question",
+                                                                       question_type: Quizzes::QuizQuestion::Q_FILL_IN_MULTIPLE_BLANKS,
+                                                                       question_text: "<pre>print([blank](s))</pre>",
+                                                                       answers: [{ id: 2, blank_id: "blank", text: "repr" }]
+                                                                     }
+                                                                   ])
+      expect(questions[0][:question_text]).to match(%r{\A<pre>print\(<input [^\n]*/>\(s\)\)</pre>\z})
+    end
+
+    it "does not insert a line break after multiple dropdowns selects" do
+      questions = quiz_question_builder.build_submission_questions(1, [
+                                                                     {
+                                                                       id: 1,
+                                                                       name: "some question",
+                                                                       question_type: Quizzes::QuizQuestion::Q_MULTIPLE_DROPDOWNS,
+                                                                       question_text: "<pre>print([blank](s))</pre>",
+                                                                       answers: [{ id: 2, blank_id: "blank", text: "repr" }]
+                                                                     }
+                                                                   ])
+      expect(questions[0][:question_text]).to end_with("</select>(s))</pre>")
+    end
+
     context "with a question bank entry" do
       before(:once) do
         @bank = @course.assessment_question_banks.create!(title: "Test Bank")
