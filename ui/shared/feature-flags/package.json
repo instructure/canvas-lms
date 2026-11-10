@@ -1,8 +1,0 @@
-{
-  "name": "@canvas/feature-flags",
-  "private": true,
-  "version": "1.0.0",
-  "author": "neme",
-  "main": "./react/FeatureFlags.jsx",
-  "owner": "FOO"
-}

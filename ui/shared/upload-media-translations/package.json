@@ -1,8 +1,0 @@
-{
-  "name": "@canvas/upload-media-translations",
-  "private": true,
-  "version": "1.0.0",
-  "author": "Spencer Olson <solson@instructure.com>",
-  "main": "./index.js",
-  "owner": "RCX"
-}

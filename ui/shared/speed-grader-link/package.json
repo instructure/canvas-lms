@@ -1,8 +1,0 @@
-{
-  "name": "@canvas/speed-grader-link",
-  "private": true,
-  "version": "1.0.0",
-  "author": "neme",
-  "main": "./react/index.jsx",
-  "owner": "EVAL"
-}

@@ -1,8 +1,0 @@
-node_modules
-lib
-.nyc_output
-coverage
-npm-debug*
-doc/*.js
-github-pages/dist
-**/__tests__/__screenshots__/**

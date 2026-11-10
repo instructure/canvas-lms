@@ -1,8 +1,0 @@
-{
-  "name": "@canvas/settings-query",
-  "private": true,
-  "version": "1.0.0",
-  "author": "neme",
-  "main": "./index.tsx",
-  "owner": "CFA"
-}

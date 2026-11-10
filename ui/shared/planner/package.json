@@ -1,8 +1,0 @@
-{
-  "name": "@canvas/planner",
-  "private": true,
-  "version": "1.0.0",
-  "author": "neme",
-  "main": "./index.tsx",
-  "owner": "VICE"
-}

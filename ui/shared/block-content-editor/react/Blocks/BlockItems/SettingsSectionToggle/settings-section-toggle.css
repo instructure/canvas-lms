@@ -1,8 +1,0 @@
-[data-settingssectiontoggle] > span:first-child {
-  padding-inline: 0 !important;
-  flex-direction: row-reverse;
-}
-
-[data-settingssectiontoggle] > span:first-child > span {
-  padding-inline: 0 !important;
-}

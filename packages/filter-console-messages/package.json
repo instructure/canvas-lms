@@ -1,7 +1,0 @@
-{
-  "name": "@instructure/filter-console-messages",
-  "version": "1.0.0",
-  "author": "neme",
-  "private": true,
-  "main": "./index.js"
-}

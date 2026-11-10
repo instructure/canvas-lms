@@ -1,7 +1,0 @@
-{
-  "name": "@canvas/discovery_page",
-  "private": true,
-  "version": "1.0.0",
-  "main": "./index.tsx",
-  "owner": "CII"
-}

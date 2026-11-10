@@ -1,8 +1,0 @@
-{
-  "name": "@canvas/serialize-form",
-  "private": true,
-  "version": "1.0.0",
-  "author": "neme",
-  "main": "./jquery.serializeForm.js",
-  "owner": "CFA"
-}

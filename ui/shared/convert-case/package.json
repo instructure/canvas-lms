@@ -1,8 +1,0 @@
-{
-  "name": "@canvas/convert-case",
-  "private": true,
-  "version": "1.0.0",
-  "author": "neme",
-  "main": "./convert-case.ts",
-  "owner": "CFA"
-}

@@ -1,6 +1,0 @@
-{
-  "imports": {
-    "#params": "./params.js",
-    "#webpack-i18nliner-handlebars-loader": "./webpack/i18nLinerHandlebars.js"
-  }
-}
