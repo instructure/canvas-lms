@@ -301,12 +301,17 @@ class SubmissionsApiController < ApplicationController
   #
   # A paginated list of all existing submissions for a given set of students and assignments.
   #
+  # For users without a course or section enrollment, the parameter student_ids[] is required.
+  #
   # @argument student_ids[] [String]
   #   List of student ids to return submissions for. If this argument is
   #   omitted, return submissions for the calling user. Students may only list
   #   their own submissions. Observers may only list those of associated
   #   students. The special id "all" will return submissions for all students
   #   in the course/section as appropriate.
+  #   For users without a course or section enrollment, student id(s) or “all”
+  #   (student_ids[]=all) must be provided. Failure to do so will result in a
+  #   401 Unauthorized error.
   #
   # @argument assignment_ids[] [String]
   #   List of assignments to return submissions for. If none are given,
