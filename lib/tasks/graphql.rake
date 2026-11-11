@@ -10,6 +10,6 @@ namespace :graphql do
                                                     .transform_values { |x| x.map(&:graphql_name).sort }
                                                     .sort_by { |k, _| k }.to_h
 
-    Rails.root.join("ui/shared/apollo-v3/possibleTypes.json").write(JSON.pretty_generate(possible_types_map))
+    Rails.root.join("frontend/ui/shared/apollo-v3/possibleTypes.json").write(JSON.pretty_generate(possible_types_map))
   end
 end

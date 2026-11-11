@@ -3,13 +3,13 @@ owned_globs:
   - app/controllers/immersive_reader_controller.rb
   - app/views/courses/link_validator.html.erb
   - lib/course_link_validator.rb
-  - packages/canvas-media/**/*
-  - packages/canvas-rce/**/*
-  - ui/features/accessibility/**/*
-  - ui/features/course_link_validator/**/*
-  - ui/features/files/**/*
-  - ui/features/files_v2/**/*
-  - ui/shared/block-content-editor/**/*
-  - ui/shared/immersive-reader/**/*
+  - frontend/packages/canvas-media/**/*
+  - frontend/packages/canvas-rce/**/*
+  - frontend/ui/features/accessibility/**/*
+  - frontend/ui/features/course_link_validator/**/*
+  - frontend/ui/features/files/**/*
+  - frontend/ui/features/files_v2/**/*
+  - frontend/ui/shared/block-content-editor/**/*
+  - frontend/ui/shared/immersive-reader/**/*
 github:
   team: ''

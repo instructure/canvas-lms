@@ -20,7 +20,7 @@
 module GraphQL
   # Predefined GraphQL queries to mitigate abuse by unauthenticated users
   class PersistedQuery
-    QUERIES_DIR = "ui/shared/graphql/persistedQueries"
+    QUERIES_DIR = "frontend/ui/shared/graphql/persistedQueries"
     MANIFEST_FILE = "manifest.json"
 
     class << self
