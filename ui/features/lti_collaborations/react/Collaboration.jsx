@@ -62,7 +62,7 @@ class Collaboration extends React.Component {
     // the presence of update_url is a decent signal for a 1.1 collaboration, since the update_url
     // functionality is built into that spec and tools should respect that if they allow editing.
     const canEdit = collaboration.permissions.update && collaboration.update_url
-    const editUrl = `/${context}/${contextId}/lti_collaborations/external_tools/retrieve?content_item_id=${collaboration.id}&placement=collaboration&url=${collaboration.update_url}&display=borderless`
+    const editUrl = `/${context}/${contextId}/lti_collaborations/external_tools/retrieve?content_item_id=${collaboration.id}&placement=collaboration&url=${encodeURIComponent(collaboration.update_url)}&display=borderless`
 
     return (
       <div ref={this.wrapperRef} className="Collaboration">
