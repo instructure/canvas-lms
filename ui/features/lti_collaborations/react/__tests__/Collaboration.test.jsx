@@ -71,7 +71,16 @@ describe('Collaboration', () => {
     render(<Collaboration {...props} />)
     const editLink = screen.getByTestId('edit-collaboration')
     expect(editLink.href).toContain(
-      `/courses/1/lti_collaborations/external_tools/retrieve?content_item_id=${props.collaboration.id}&placement=collaboration&url=${props.collaboration.update_url}&display=borderless`,
+      `/courses/1/lti_collaborations/external_tools/retrieve?content_item_id=${props.collaboration.id}&placement=collaboration&url=${encodeURIComponent(props.collaboration.update_url)}&display=borderless`,
     )
+  })
+
+  it('keeps the whole update_url when it has several query parameters', () => {
+    const update_url = 'https://tool.example.com/edit?collab=123&mode=edit'
+    render(<Collaboration {...props} collaboration={{...props.collaboration, update_url}} />)
+    const params = new URL(screen.getByTestId('edit-collaboration').href).searchParams
+    expect(params.get('url')).toBe(update_url)
+    expect(params.get('display')).toBe('borderless')
+    expect(params.get('mode')).toBeNull()
   })
 })
