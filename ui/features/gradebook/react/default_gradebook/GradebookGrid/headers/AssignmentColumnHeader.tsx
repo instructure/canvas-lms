@@ -485,7 +485,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
 
         {this.rubricAssessmentImportExportDisplayed() && (
           <MenuItem onSelect={() => this.selectBulkRubricExport()}>
-            {I18n.t('Bulk Download Rubrics')}
+            {I18n.t('Export Student Scores with Rubrics')}
           </MenuItem>
         )}
 
