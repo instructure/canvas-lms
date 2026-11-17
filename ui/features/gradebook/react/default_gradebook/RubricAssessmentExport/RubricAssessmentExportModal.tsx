@@ -60,14 +60,14 @@ export const RubricAssessmentExportModal = () => {
     <Modal
       open={isOpen}
       onDismiss={closeModal}
-      label={I18n.t('Bulk Download Rubrics')}
+      label={I18n.t('Export Student Scores with Rubrics')}
       shouldCloseOnDocumentClick={true}
       size="small"
       data-testid="export-rubric-modal"
     >
       <Modal.Header>
         {renderCloseButton()}
-        <Heading>{I18n.t('Bulk Download Rubrics')}</Heading>
+        <Heading>{I18n.t('Export Student Scores with Rubrics')}</Heading>
       </Modal.Header>
       <Modal.Body>
         <Flex direction="column" padding="small 0 small 0" gap="small">
