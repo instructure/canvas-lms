@@ -238,6 +238,64 @@ describe WebConference do
       conference.invite_users_from_context
       expect(conference.invitees.pluck(:user_id)).to match_array(course.user_ids)
     end
+
+    context "when the course has not started yet" do
+      let_once(:teacher) { user_factory(active_all: true) }
+      let_once(:student) { user_with_communication_channel(active_all: true) }
+      let_once(:course) do
+        course_factory(active_all: true).tap do |c|
+          c.enroll_teacher(teacher).accept!
+          c.enroll_student(student).accept!
+          c.update!(start_at: 1.week.from_now, restrict_enrollments_to_course_dates: true)
+        end
+      end
+      let(:conference) { BigBlueButtonConference.create!(title: "my conference", user: teacher, context: course) }
+
+      before { Notification.create!(name: "Web Conference Invitation", category: "TestImmediately") }
+
+      it "invites students whose enrollments are pending by date" do
+        expect(student.enrollments.first.enrollment_state.state).to eql "pending_active"
+        conference.invite_users_from_context
+        expect(conference.reload.invitees).to include(student)
+      end
+
+      it "invites pending students who can't view the course before it starts" do
+        course.update!(restrict_student_future_view: true)
+        expect(student.enrollments.first.enrollment_state.reload).to be_restricted_access
+        conference.invite_users_from_context
+        expect(conference.reload.invitees).to include(student)
+      end
+
+      it "invites pending students while the course is unpublished" do
+        course.update!(workflow_state: "claimed")
+        conference.invite_users_from_context
+        expect(conference.reload.invitees).to include(student)
+      end
+
+      it "does not invite users who haven't accepted or have concluded" do
+        invited_student = user_factory(active_all: true)
+        completed_student = user_factory(active_all: true)
+        course.enroll_student(invited_student)
+        course.enroll_student(completed_student, enrollment_state: "completed")
+        conference.invite_users_from_context
+        expect(conference.reload.invitees).not_to include(invited_student, completed_student)
+      end
+
+      it "does not notify pending students" do
+        conference.invite_users_from_context
+        expect(conference.messages_sent["Web Conference Invitation"].map(&:user)).not_to include(student)
+        expect(student.messages).to be_empty
+      end
+
+      it "does not let pending students join until the course starts" do
+        conference.invite_users_from_context
+        expect(course.grants_right?(student, :read)).to be true
+        expect(conference.grants_right?(student, :join)).to be false
+
+        course.update!(start_at: 1.day.ago)
+        expect(WebConference.find(conference.id).grants_right?(User.find(student.id), :join)).to be true
+      end
+    end
   end
 
   context "notifications" do
