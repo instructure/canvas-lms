@@ -285,12 +285,25 @@ class WebConference < ApplicationRecord
   end
 
   def invite_users_from_context(user_ids = context.user_ids)
-    members = context.is_a?(Course) ? context.participating_users(user_ids) : context.participating_users_in_context(user_ids)
+    # include enrollments that are only pending because the course hasn't
+    # started, so they are already invitees once it does; nothing re-syncs
+    # invitees when the start date passes. Until then the :join policy keeps
+    # them out and the invitation broadcast policy doesn't notify them.
+    members = context.is_a?(Course) ? context.participating_or_pending_users(user_ids) : context.participating_users_in_context(user_ids)
     new_invitees = members.to_a - invitees
     new_invitees.uniq.each do |u|
       add_invitee(u)
     end
     save
+  end
+
+  # an invitee whose enrollment hasn't started yet may be able to preview the
+  # course, but can't take part in its conferences until it starts
+  def awaiting_course_start?(user)
+    return false unless context.is_a?(Course)
+
+    states = context.enrollments.where(user_id: user).preload(:enrollment_state).map(&:state_based_on_date)
+    states.include?(:accepted) && !states.include?(:active)
   end
 
   def recording_ready!
@@ -497,10 +510,10 @@ class WebConference < ApplicationRecord
   scope :after, ->(date) { where("web_conferences.start_at IS NULL OR web_conferences.start_at>?", date) }
 
   set_policy do
-    given { |user, session| users.include?(user) && context.grants_right?(user, session, :read) }
+    given { |user, session| users.include?(user) && context.grants_right?(user, session, :read) && !awaiting_course_start?(user) }
     can :read and can :join
 
-    given { |user, session| users.include?(user) && context.grants_right?(user, session, :read) && long_running? && active? }
+    given { |user, session| users.include?(user) && context.grants_right?(user, session, :read) && !awaiting_course_start?(user) && long_running? && active? }
     can :resume
 
     given { |user, session| context.grants_right?(user, session, :create_conferences) }

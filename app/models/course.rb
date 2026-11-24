@@ -4393,6 +4393,14 @@ class Course < ApplicationRecord
     User.where(id: enrollments.active_by_date.where(user_id: user_ids).select(:user_id))
   end
 
+  # like participating_users, but also includes users with an accepted
+  # enrollment that is only pending because the course/term hasn't started
+  # yet, even when they are restricted from viewing the course before it starts
+  def participating_or_pending_users(user_ids)
+    scope = enrollments.joins(:enrollment_state).where(enrollment_states: { state: %w[active pending_active] })
+    User.where(id: scope.where(user_id: user_ids).select(:user_id))
+  end
+
   def student_view_student
     User.transaction do
       fake_student = find_or_create_student_view_student
